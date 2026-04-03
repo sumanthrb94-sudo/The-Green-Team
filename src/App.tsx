@@ -2429,12 +2429,48 @@ const HomeView = ({ isSubscribed, onNewsletterClick }: { isSubscribed: boolean, 
 );
 
 export default function App() {
+  type ViewMode = 'home' | 'map' | 'list' | 'gallery' | 'analytics' | 'the-sil';
+  const VIEW_ORDER: ViewMode[] = ['home', 'list', 'gallery', 'analytics', 'the-sil', 'map'];
+
   const [isSubscribed, setIsSubscribed] = useState(() => {
     return localStorage.getItem('gt_subscribed') === 'true';
   });
   const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
-  const [viewMode, setViewMode] = useState<'home' | 'map' | 'list' | 'gallery' | 'analytics' | 'the-sil'>('home');
+  const [viewMode, setViewMode] = useState<ViewMode>('home');
   const [isDark, setIsDark] = useState(false);
+
+  // ── Scroll-position memory ────────────────────────────────────────────────
+  const scrollPositions = useRef<Partial<Record<ViewMode, number>>>({});
+  const scrollRef       = useRef<HTMLDivElement>(null);
+
+  const handleViewChange = useCallback((next: ViewMode) => {
+    // Save current scroll before leaving
+    if (scrollRef.current) scrollPositions.current[viewMode] = scrollRef.current.scrollTop;
+    setViewMode(next);
+  }, [viewMode]);
+
+  // Restore scroll after the new view renders
+  useEffect(() => {
+    if (scrollRef.current) scrollRef.current.scrollTop = scrollPositions.current[viewMode] ?? 0;
+  }, [viewMode]);
+
+  // ── Swipe navigation (horizontal > 60 px, dominant over vertical) ────────
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
+
+  const onTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  }, []);
+
+  const onTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (!touchStart.current) return;
+    const dx = e.changedTouches[0].clientX - touchStart.current.x;
+    const dy = Math.abs(e.changedTouches[0].clientY - touchStart.current.y);
+    touchStart.current = null;
+    if (Math.abs(dx) < 60 || Math.abs(dx) < dy * 1.5) return; // vertical scroll, ignore
+    const idx = VIEW_ORDER.indexOf(viewMode);
+    if (dx < 0 && idx < VIEW_ORDER.length - 1) handleViewChange(VIEW_ORDER[idx + 1]); // swipe left → next
+    if (dx > 0 && idx > 0)                     handleViewChange(VIEW_ORDER[idx - 1]); // swipe right → prev
+  }, [viewMode, handleViewChange]);
 
   useEffect(() => {
     if (isDark) document.documentElement.classList.add('dark');
@@ -2447,37 +2483,19 @@ export default function App() {
   };
 
   return (
-    <div className="h-screen w-screen bg-cream text-olive-900 overflow-hidden flex flex-col transition-colors duration-700">
-      <Navbar isSubscribed={isSubscribed} onNewsletterClick={() => setIsNewsletterOpen(true)} onModeChange={setViewMode} isDark={isDark} setIsDark={setIsDark} />
-      
+    <div
+      className="h-screen w-screen bg-cream text-olive-900 overflow-hidden flex flex-col transition-colors duration-700"
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+    >
+      <Navbar isSubscribed={isSubscribed} onNewsletterClick={() => setIsNewsletterOpen(true)} onModeChange={handleViewChange} isDark={isDark} setIsDark={setIsDark} />
+
       <main className="flex-1 flex overflow-hidden relative">
         {/* Center - Map or other views */}
         <div className="flex-1 relative overflow-hidden bg-surface">
-          {viewMode === 'map' && (
-            <>
-              {/* ── Mobile: map under development ─────────────────────────────── */}
-              <div className="md:hidden h-full flex flex-col items-center justify-center gap-6 p-10 text-center bg-olive-900">
-                <MapIcon className="w-12 h-12 text-gold/50" />
-                <div>
-                  <p className="text-[9px] uppercase tracking-[0.5em] text-gold/60 mb-2">Under Development</p>
-                  <h2 className="text-2xl font-headline font-bold text-cream tracking-tight mb-3">Interactive Map</h2>
-                  <p className="text-cream/40 text-sm leading-relaxed max-w-xs">
-                    The sanctuary map is data-intensive and optimised for desktop.
-                    Open on a larger screen for the full experience.
-                  </p>
-                </div>
-                <div className="px-6 py-3 border border-gold/30 text-gold text-[10px] uppercase tracking-[0.4em] rounded-lg">
-                  View on Desktop
-                </div>
-              </div>
-              {/* ── Desktop: full map ──────────────────────────────────────────── */}
-              <div className="hidden md:block h-full">
-                <SanctuaryMapLayout />
-              </div>
-            </>
-          )}
+          {viewMode === 'map' && <SanctuaryMapLayout />}
           {viewMode !== 'map' && (
-            <div className="h-full w-full overflow-y-auto">
+            <div ref={scrollRef} className="h-full w-full overflow-y-auto">
               {viewMode === 'home' && <HomeView isSubscribed={isSubscribed} onNewsletterClick={() => setIsNewsletterOpen(true)} />}
               {viewMode === 'list' && <Sanctuaries isSubscribed={isSubscribed} onNewsletterClick={() => setIsNewsletterOpen(true)} isFullPage />}
               {viewMode === 'gallery' && <EcosystemPillars isFullPage />}
