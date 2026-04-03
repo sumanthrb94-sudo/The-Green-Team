@@ -2435,6 +2435,8 @@ const HomeView = ({ isSubscribed, onNewsletterClick }: { isSubscribed: boolean, 
 
 // ─── Admin Dashboard ─────────────────────────────────────────────────────────
 
+const ADMIN_EMAIL = 'sumanthbolla97@gmail.com';
+
 const AdminDashboard = ({ onClose }: { onClose: () => void }) => {
   const [user, setUser] = useState<User | null>(null);
   const [tab, setTab] = useState<'leads' | 'newsletter'>('leads');
@@ -2442,6 +2444,8 @@ const AdminDashboard = ({ onClose }: { onClose: () => void }) => {
   const [subs, setSubs] = useState<NewsletterEntry[]>([]);
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(false);
+
+  const isAuthorized = user?.email === ADMIN_EMAIL;
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, u => setUser(u));
@@ -2460,13 +2464,19 @@ const AdminDashboard = ({ onClose }: { onClose: () => void }) => {
   };
 
   useEffect(() => {
-    if (user) fetchData();
-  }, [user]);
+    if (user && isAuthorized) fetchData();
+  }, [user, isAuthorized]);
 
   const handleSignIn = async () => {
     setLoading(true);
-    try { await signInWithPopup(auth, googleProvider); }
-    finally { setLoading(false); }
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      if (result.user.email !== ADMIN_EMAIL) {
+        await signOut(auth);
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSignOut = async () => {
@@ -2487,7 +2497,7 @@ const AdminDashboard = ({ onClose }: { onClose: () => void }) => {
           <span className="font-bold text-sm uppercase tracking-widest text-olive-900">Admin Console</span>
         </div>
         <div className="flex items-center gap-4">
-          {user && (
+          {user && isAuthorized && (
             <>
               <span className="hidden sm:block text-xs text-olive-800/50 truncate max-w-[200px]">{user.email}</span>
               <button onClick={fetchData} disabled={fetching} className="p-2 rounded-full hover:bg-primary/10 transition-colors" title="Refresh">
@@ -2507,6 +2517,7 @@ const AdminDashboard = ({ onClose }: { onClose: () => void }) => {
       {!user ? (
         /* Sign-In Screen */
         <div className="flex flex-col items-center justify-center min-h-[70vh] gap-8 px-6">
+          {loading && <p className="sr-only">Verifying…</p>}
           <div className="text-center max-w-sm">
             <ShieldCheck className="w-16 h-16 text-primary mx-auto mb-6 opacity-30" />
             <h2 className="text-3xl font-serif italic text-olive-900 mb-3">Admin Access</h2>
@@ -2526,6 +2537,24 @@ const AdminDashboard = ({ onClose }: { onClose: () => void }) => {
               </svg>
             )}
             {loading ? 'Signing in…' : 'Continue with Google'}
+          </button>
+        </div>
+      ) : !isAuthorized ? (
+        /* Access Denied */
+        <div className="flex flex-col items-center justify-center min-h-[70vh] gap-8 px-6">
+          <div className="text-center max-w-sm">
+            <X className="w-16 h-16 text-red-400 mx-auto mb-6 opacity-60" />
+            <h2 className="text-3xl font-serif italic text-olive-900 mb-3">Access Denied</h2>
+            <p className="text-olive-800/50 text-sm font-light mb-2">
+              <span className="font-medium text-olive-900">{user.email}</span> is not authorised.
+            </p>
+            <p className="text-olive-800/40 text-xs">Please sign in with the admin account.</p>
+          </div>
+          <button
+            onClick={handleSignOut}
+            className="flex items-center gap-3 border border-olive-800/20 text-olive-800 px-8 py-3 text-xs uppercase tracking-[0.4em] font-bold hover:bg-primary/5 transition-all"
+          >
+            <LogOut className="w-4 h-4" /> Sign Out & Try Again
           </button>
         </div>
       ) : (
