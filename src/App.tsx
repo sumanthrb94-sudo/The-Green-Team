@@ -1686,7 +1686,7 @@ const SanctuaryMapLayout = () => {
                             : net > -0.12 ? '#4ade80'  // green  — good
                             :               '#3b82f6'; // blue   — very clean / forest zone
             // Opacity scales with absolute deviation from 0; always slightly visible
-            const fillOpacity = (Math.abs(net) * 0.45 + 0.10 + pulseFactor) * point.boundaryFade;
+            const fillOpacity = (Math.abs(net) * 0.22 + 0.04 + pulseFactor) * point.boundaryFade;
 
             return (
               <React.Fragment key={`grid-${idx}`}>
