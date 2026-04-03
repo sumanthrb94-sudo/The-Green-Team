@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, FC } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef, FC } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Wind, 
@@ -904,6 +904,78 @@ const PropertyDetailOverlay = ({ sanctuary, onClose }: { sanctuary: Sanctuary, o
   );
 };
 
+/**
+ * Renders a CSS backdrop-filter blur + dark veil that covers everything
+ * OUTSIDE the RRR polygon. Uses clip-path: path(evenodd) so the RRR
+ * interior is punched out and shows the unblurred map.
+ * Updates on every map move/zoom via Leaflet events.
+ */
+const RRRBlurOverlay: FC<{ rrrPath: [number, number][] }> = ({ rrrPath }) => {
+  const map = useMap();
+  const blurRef  = useRef<HTMLDivElement | null>(null);
+  const darkRef  = useRef<HTMLDivElement | null>(null);
+
+  const update = useCallback(() => {
+    const blur = blurRef.current;
+    const dark = darkRef.current;
+    if (!blur || !dark) return;
+    const container = map.getContainer();
+    const w = container.offsetWidth;
+    const h = container.offsetHeight;
+
+    const pts = rrrPath
+      .map(([lat, lng]) => {
+        const p = map.latLngToContainerPoint(L.latLng(lat, lng));
+        return `${p.x},${p.y}`;
+      })
+      .join(' ');
+
+    // evenodd: outer full-screen rect MINUS the RRR interior = only outside area
+    const d = `path(evenodd, "M 0,0 L ${w},0 L ${w},${h} L 0,${h} Z M ${pts} Z")`;
+    blur.style.clipPath = d;
+    dark.style.clipPath = d;
+  }, [map, rrrPath]);
+
+  useEffect(() => {
+    const container = map.getContainer();
+
+    // Blur layer — sits above tiles (z 200) but below paths/polylines (z 400)
+    const blur = document.createElement('div');
+    blur.style.cssText = [
+      'position:absolute', 'inset:0',
+      'backdrop-filter:blur(10px)', '-webkit-backdrop-filter:blur(10px)',
+      'z-index:350', 'pointer-events:none',
+    ].join(';');
+    blurRef.current = blur;
+    container.appendChild(blur);
+
+    // Subtle dark veil on top of the blur for contrast
+    const dark = document.createElement('div');
+    dark.style.cssText = [
+      'position:absolute', 'inset:0',
+      'background:rgba(8,12,16,0.38)',
+      'z-index:351', 'pointer-events:none',
+    ].join(';');
+    darkRef.current = dark;
+    container.appendChild(dark);
+
+    const EVENTS = ['move', 'zoom', 'moveend', 'zoomend', 'viewreset', 'resize'];
+    EVENTS.forEach(e => map.on(e, update));
+    update();
+
+    return () => {
+      EVENTS.forEach(e => map.off(e, update));
+      [blur, dark].forEach(el => { if (container.contains(el)) container.removeChild(el); });
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Re-run when RRR path changes (shouldn't happen, but safety net)
+  useEffect(() => { update(); }, [update]);
+
+  return null;
+};
+
 const SanctuaryMapLayout = () => {
   const [isSatellite, setIsSatellite] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -1008,16 +1080,28 @@ const SanctuaryMapLayout = () => {
   }, []);
 
   // Generate a grid of points for the "Real-time Mesh"
+  // Each point pre-computes a boundaryFade (0–1) so the AQI heatmap blends
+  // smoothly into the RRR boundary rather than cutting off abruptly.
   const gridPoints = useMemo(() => {
-    const points = [];
-    // Wider grid for Telangana view
+    const points: { lat: number; lng: number; boundaryFade: number }[] = [];
     const step = isTelanganaView ? 0.2 : 0.03;
     const latRange = isTelanganaView ? [15.8, 19.8] : [16.9, 17.9];
     const lngRange = isTelanganaView ? [77.1, 81.1] : [78.0, 79.1];
-    
+
+    // Approximate RRR centroid and semi-axes (degrees)
+    const CX = 17.505, CY = 78.44;
+    const AX = 0.33,   AY = 0.41;  // half-height, half-width
+    // Fade starts when normalised distance > FADE_START and reaches 0 at 1.0
+    const FADE_START = 0.76;
+
     for (let lat = latRange[0]; lat <= latRange[1]; lat += step) {
       for (let lng = lngRange[0]; lng <= lngRange[1]; lng += step) {
-        points.push({ lat, lng });
+        const nLat = (lat - CX) / AX;
+        const nLng = (lng - CY) / AY;
+        const nd = Math.sqrt(nLat * nLat + nLng * nLng);
+        if (nd >= 1.0) continue; // outside ellipse → skip
+        const boundaryFade = nd < FADE_START ? 1 : 1 - ((nd - FADE_START) / (1.0 - FADE_START));
+        points.push({ lat, lng, boundaryFade });
       }
     }
     return points;
@@ -1457,13 +1541,15 @@ const SanctuaryMapLayout = () => {
           </button>
         </div>
 
-        <MapContainer 
-          center={[17.49, 78.48]} 
-          zoom={10} 
-          scrollWheelZoom={true} 
+        <MapContainer
+          center={[17.49, 78.48]}
+          zoom={10}
+          scrollWheelZoom={true}
           zoomControl={false}
           className="h-full w-full"
           style={{ background: '#0a0f14' }}
+          maxBounds={[[17.0, 77.75], [18.0, 79.15]]}
+          maxBoundsViscosity={0.9}
         >
           <ZoomControl position="bottomleft" />
           <MapController targetView={targetView} />
@@ -1491,7 +1577,7 @@ const SanctuaryMapLayout = () => {
             return (
               <React.Fragment key={`grid-${idx}`}>
                 {showAqi && (
-                  <Circle 
+                  <Circle
                     center={[point.lat, point.lng]}
                     radius={isTelanganaView ? 12000 : 3500}
                     className="trichome-glass-mesh"
@@ -1499,7 +1585,7 @@ const SanctuaryMapLayout = () => {
                       fillColor: aqiIntensity > 0.6 ? '#ef4444' : aqiIntensity > 0.3 ? '#fb923c' : '#2dd4bf',
                       color: 'rgba(255, 255, 255, 0.15)',
                       weight: 1,
-                      fillOpacity: (aqiIntensity * 0.4) + (pulseFactor * 0.5)
+                      fillOpacity: ((aqiIntensity * 0.4) + (pulseFactor * 0.5)) * point.boundaryFade
                     }}
                   />
                 )}
@@ -1548,15 +1634,9 @@ const SanctuaryMapLayout = () => {
             />
           )}
 
-          {/* Outside RRR vignette */}
-          <Polygon 
-            positions={[
-              [[90, -180],[90, 180],[-90, 180],[-90, -180]],
-              RRR_PATH
-            ]}
-            pathOptions={{ fillColor: '#000', color: 'transparent', fillOpacity: 0.55 }}
-            interactive={false}
-          />
+          {/* Outside-RRR blur overlay — backdrop-filter blur + dark veil,
+              clipped to the exterior via clip-path:path(evenodd) */}
+          <RRRBlurOverlay rrrPath={RRR_PATH} />
 
 
 
