@@ -22,8 +22,8 @@
   --color-olive-900: #2d3a1d;
   --color-olive-800: #3d5229;
   --color-olive-700: #556b2f;
-  --color-cashew: #f5f5dc;
-  --color-cream: #fdf5e6;
+  --color-cashew: #e8f3ee;
+  --color-cream: #f2f8f5;
   --color-gold: #d4af37;
   --color-charcoal: #1a1a1a;
 }
@@ -64,7 +64,7 @@
 }
 
 .cashew-gradient {
-  background: linear-gradient(135deg, #fdf5e6 0%, #f5f5dc 100%);
+  background: linear-gradient(135deg, var(--color-cream) 0%, var(--color-cashew) 100%);
 }
 
 @layer utilities {
