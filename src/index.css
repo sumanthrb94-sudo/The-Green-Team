@@ -1,0 +1,118 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-headline: "Manrope", sans-serif;
+  --font-serif: "Cormorant Garamond", serif;
+  
+  --color-primary: #00694e;
+  --color-on-primary: #ffffff;
+  --color-background: #f5fafe;
+  --color-surface: #f5fafe;
+  --color-on-surface: #161c1f;
+  --color-secondary: #586062;
+  --color-tertiary: #984138;
+  --color-surface-container: #e9eff3;
+  --color-surface-container-low: #eff4f8;
+  --color-surface-container-highest: #dee3e7;
+  --color-outline: #6d7a73;
+  
+  --color-olive-900: #2d3a1d;
+  --color-olive-800: #3d5229;
+  --color-olive-700: #556b2f;
+  --color-cashew: #f5f5dc;
+  --color-cream: #fdf5e6;
+  --color-gold: #d4af37;
+  --color-charcoal: #1a1a1a;
+}
+
+@layer base {
+  body {
+    @apply bg-surface text-on-surface font-sans antialiased selection:bg-primary/20;
+  }
+  
+  h1, h2, h3 {
+    @apply font-headline tracking-tight leading-[1.1];
+  }
+}
+
+.marker-glass {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
+}
+
+.btn-membership {
+  @apply px-10 py-5 rounded-none font-sans text-[10px] uppercase tracking-[0.4em] font-bold transition-all duration-500 border;
+}
+
+.btn-olive {
+  @apply bg-olive-800 text-cream border-olive-800 hover:bg-olive-900;
+}
+
+.btn-outline-olive {
+  @apply border-olive-800 text-olive-800 hover:bg-olive-800 hover:text-cream;
+}
+
+.input-cashew {
+  @apply w-full bg-transparent border-b border-olive-800/20 py-6 outline-none focus:border-olive-800 transition-all font-light text-xl text-olive-900 placeholder:text-olive-800/30;
+}
+
+.membership-card {
+  @apply relative p-12 border border-olive-800/10 bg-white/40 backdrop-blur-sm transition-all duration-700 hover:border-olive-800/30 hover:shadow-xl;
+}
+
+.cashew-gradient {
+  background: linear-gradient(135deg, #fdf5e6 0%, #f5f5dc 100%);
+}
+
+@layer utilities {
+  .animate-spin-slow {
+    animation: spin 8s linear infinite;
+  }
+  
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+}
+
+.custom-popup .leaflet-popup-content-wrapper {
+  @apply rounded-none bg-cream border border-olive-800/10 p-0 overflow-hidden;
+}
+
+.custom-popup .leaflet-popup-tip {
+  @apply bg-cream border border-olive-800/10;
+}
+
+.custom-popup .leaflet-popup-content {
+  @apply m-0;
+}
+
+.olive-gradient {
+  background: linear-gradient(135deg, #3d5229 0%, #2d3a1d 100%);
+}
+
+.custom-div-icon {
+  background: transparent;
+  border: none;
+}
+
+.custom-div-icon div {
+  transition: all 0.3s ease;
+}
+
+.custom-div-icon:hover div {
+  transform: scale(1.2);
+}
+
+.custom-tooltip {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.custom-tooltip::before {
+  display: none !important;
+}

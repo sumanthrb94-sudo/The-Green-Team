@@ -1,0 +1,7 @@
+{
+  "name": "The Green Team - Independent Sanctuary Curators",
+  "description": "An independent collective curating self-sustaining organic sanctuaries. Featuring MODCON Agartha and The SIL, focused on organic food, water security, and renewable energy.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
