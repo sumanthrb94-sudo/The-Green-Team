@@ -1015,30 +1015,53 @@ const SanctuaryMapLayout = () => {
     });
   };
 
-  // Define Hotspots for Heatmaps
+  // ── Pollution sources (positive intensity = dirty air) ──────────────────
   const AQI_HOTSPOTS = [
-    { lat: 17.44, lng: 78.38, intensity: 0.8 }, // HITEC City
-    { lat: 17.38, lng: 78.48, intensity: 0.9 }, // Charminar/Old City
-    { lat: 17.48, lng: 78.44, intensity: 1.0 }, // Sanath Nagar Industrial
-    { lat: 17.24, lng: 78.43, intensity: 0.6 }, // Airport
-    { lat: 17.40, lng: 78.45, intensity: 0.7 }, // City Center
-    { lat: 17.62, lng: 78.08, intensity: 0.4 }, // Sangareddy
-    { lat: 17.88, lng: 78.48, intensity: 0.3 }, // Toopran
-    { lat: 17.51, lng: 78.88, intensity: 0.4 }, // Bhongir
-    { lat: 17.24, lng: 78.90, intensity: 0.5 }, // Choutuppal
+    { lat: 17.44, lng: 78.38, intensity: 0.85 }, // HITEC City industrial corridor
+    { lat: 17.38, lng: 78.48, intensity: 0.95 }, // Charminar / Old City
+    { lat: 17.48, lng: 78.44, intensity: 1.00 }, // Sanath Nagar Industrial
+    { lat: 17.24, lng: 78.43, intensity: 0.55 }, // Airport / Shamshabad
+    { lat: 17.40, lng: 78.45, intensity: 0.72 }, // City Centre
+    { lat: 17.62, lng: 78.08, intensity: 0.38 }, // Sangareddy industrial
+    { lat: 17.51, lng: 78.88, intensity: 0.35 }, // Bhongir
+    { lat: 17.24, lng: 78.90, intensity: 0.40 }, // Choutuppal
+    { lat: 17.50, lng: 78.50, intensity: 0.60 }, // Secunderabad rail yard
   ];
 
-  // Helper to calculate intensity at a point
-  const getIntensity = (point: { lat: number, lng: number }, hotspots: { lat: number, lng: number, intensity: number }[]) => {
-    let totalIntensity = 0;
-    hotspots.forEach(spot => {
-      const dist = Math.sqrt(Math.pow(point.lat - spot.lat, 2) + Math.pow(point.lng - spot.lng, 2));
-      // Inverse square law for falloff
-      totalIntensity += spot.intensity / (1 + dist * 40); 
+  // ── Clean-air sources near forests & water bodies (negative = blue) ──────
+  const CLEAN_AIR_ZONES = [
+    { lat: 17.74, lng: 78.28, strength: 0.90 }, // Narsapur Forest Reserve   ← Agartha
+    { lat: 17.37, lng: 78.29, strength: 0.80 }, // Osman Sagar / Gandipet    ← Neo-Vertex corridor
+    { lat: 17.31, lng: 78.31, strength: 0.75 }, // Himayat Sagar reservoir
+    { lat: 17.35, lng: 78.34, strength: 0.70 }, // Mrugavani National Park
+    { lat: 17.33, lng: 78.58, strength: 0.60 }, // Mahavir Harina Vanasthali
+    { lat: 17.52, lng: 78.33, strength: 0.65 }, // Ameenpur Lake biodiversity site
+    { lat: 17.31, lng: 77.85, strength: 0.65 }, // Ananthagiri Hills
+    { lat: 17.24, lng: 78.48, strength: 0.55 }, // Tukkuguda green belt        ← The SIL
+    { lat: 17.43, lng: 78.41, strength: 0.50 }, // Jubilee Hills ridge canopy  ← Aether
+    { lat: 17.38, lng: 78.33, strength: 0.58 }, // Kokapet / Neopolis fringe   ← Neo-Vertex
+  ];
+
+  // ── Net AQI intensity: range -0.5 (very clean/blue) → +1.0 (polluted/red)
+  const getIntensity = (
+    point: { lat: number; lng: number },
+    hotspots: { lat: number; lng: number; intensity: number }[],
+    cleanZones: { lat: number; lng: number; strength: number }[],
+  ) => {
+    let pollution = 0;
+    hotspots.forEach(s => {
+      const d = Math.sqrt((point.lat - s.lat) ** 2 + (point.lng - s.lng) ** 2);
+      pollution += s.intensity / (1 + d * 40);
     });
-    // Add a small real-time fluctuation
-    totalIntensity += (Math.sin(point.lat * 100 + point.lng * 100 + livePulse * 0.1) * 0.05);
-    return Math.max(0, Math.min(totalIntensity, 1));
+    let clean = 0;
+    cleanZones.forEach(z => {
+      const d = Math.sqrt((point.lat - z.lat) ** 2 + (point.lng - z.lng) ** 2);
+      clean += z.strength / (1 + d * 50);
+    });
+    const net = pollution - clean * 0.75;
+    // Small real-time shimmer
+    const shimmer = Math.sin(point.lat * 100 + point.lng * 100 + livePulse * 0.1) * 0.03;
+    return Math.max(-0.5, Math.min(net + shimmer, 1.0));
   };
 
   const selectedSanctuary = useMemo(() => 
@@ -1555,9 +1578,10 @@ const SanctuaryMapLayout = () => {
           <MapController targetView={targetView} />
           <ZoomTracker onZoom={setCurrentZoom} />
           {isSatellite ? (
+            /* Pure satellite — no Google labels/POIs/restaurant names */
             <TileLayer
               attribution="&copy; Google Maps"
-              url="https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}"
+              url="https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}"
             />
           ) : (
             <TileLayer
@@ -1569,10 +1593,61 @@ const SanctuaryMapLayout = () => {
 
 
 
-          {/* Real-time Environmental Mesh */}
+          {/* ── Forests & Water Bodies — thick Google Maps-style filled overlays ── */}
+          {NATURAL_FEATURES.map(feature => {
+            const isForest = feature.type === 'forest';
+            return (
+              <React.Fragment key={feature.id}>
+                <Polygon
+                  positions={feature.boundary}
+                  interactive={false}
+                  pathOptions={isForest ? {
+                    // Deep forest green — matches Google Maps park/forest palette
+                    fillColor: '#14532d',
+                    fillOpacity: 0.62,
+                    color: '#15803d',
+                    weight: 2.5,
+                    dashArray: undefined,
+                  } : {
+                    // Water blue
+                    fillColor: '#1e3a8a',
+                    fillOpacity: 0.50,
+                    color: '#1d4ed8',
+                    weight: 2,
+                  }}
+                />
+                {/* Soft inner glow ring for depth */}
+                <Polygon
+                  positions={feature.boundary}
+                  interactive={false}
+                  pathOptions={isForest ? {
+                    fillColor: '#16a34a',
+                    fillOpacity: 0.18,
+                    color: 'transparent',
+                    weight: 0,
+                  } : {
+                    fillColor: '#3b82f6',
+                    fillOpacity: 0.15,
+                    color: 'transparent',
+                    weight: 0,
+                  }}
+                />
+              </React.Fragment>
+            );
+          })}
+
+          {/* Real-time Environmental Mesh — blue near forests, red near industry */}
           {gridPoints.map((point, idx) => {
-            const aqiIntensity = getIntensity(point, AQI_HOTSPOTS);
-            const pulseFactor = Math.sin((idx + livePulse) * 0.1) * 0.05;
+            const net = getIntensity(point, AQI_HOTSPOTS, CLEAN_AIR_ZONES);
+            const pulseFactor = Math.sin((idx + livePulse) * 0.1) * 0.03;
+            // 5-band colour scale: red → orange → yellow → green → blue
+            const fillColor = net > 0.55  ? '#ef4444'  // red   — very polluted
+                            : net > 0.28  ? '#f97316'  // orange — polluted
+                            : net > 0.08  ? '#eab308'  // yellow — moderate
+                            : net > -0.12 ? '#4ade80'  // green  — good
+                            :               '#3b82f6'; // blue   — very clean / forest zone
+            // Opacity scales with absolute deviation from 0; always slightly visible
+            const fillOpacity = (Math.abs(net) * 0.45 + 0.10 + pulseFactor) * point.boundaryFade;
 
             return (
               <React.Fragment key={`grid-${idx}`}>
@@ -1582,10 +1657,10 @@ const SanctuaryMapLayout = () => {
                     radius={isTelanganaView ? 12000 : 3500}
                     className="trichome-glass-mesh"
                     pathOptions={{
-                      fillColor: aqiIntensity > 0.6 ? '#ef4444' : aqiIntensity > 0.3 ? '#fb923c' : '#2dd4bf',
-                      color: 'rgba(255, 255, 255, 0.15)',
+                      fillColor,
+                      color: 'rgba(255,255,255,0.1)',
                       weight: 1,
-                      fillOpacity: ((aqiIntensity * 0.4) + (pulseFactor * 0.5)) * point.boundaryFade
+                      fillOpacity,
                     }}
                   />
                 )}
