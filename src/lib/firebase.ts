@@ -13,11 +13,19 @@ const firebaseConfig = {
   measurementId:     import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
-const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
+// Guard: if env vars are missing (e.g. Vercel without vars set) don't crash the app
+if (!firebaseConfig.apiKey) {
+  console.warn('[Firebase] VITE_FIREBASE_* env vars not set — auth and Firestore disabled.');
+}
 
-export const auth     = getAuth(app);
-export const db       = getFirestore(app);
+const app = firebaseConfig.apiKey
+  ? (getApps().length ? getApps()[0] : initializeApp(firebaseConfig))
+  : null;
+
+export const auth           = app ? getAuth(app) : null as any;
+export const db             = app ? getFirestore(app) : null as any;
 export const googleProvider = new GoogleAuthProvider();
 
-// Analytics — only in browser environments that support it
-isSupported().then(yes => { if (yes) getAnalytics(app); });
+if (app) {
+  isSupported().then(yes => { if (yes) getAnalytics(app); });
+}
