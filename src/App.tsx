@@ -45,8 +45,16 @@ import { AlertTriangle, ZoomIn, LogOut, RefreshCw, Users, Mail as MailIcon, Shie
 import L from 'leaflet';
 
 // Firebase
-import { onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth';
-import type { User } from 'firebase/auth';
+import {
+  onAuthStateChanged,
+  signInWithPopup,
+  signOut,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signInWithPhoneNumber,
+  RecaptchaVerifier,
+} from 'firebase/auth';
+import type { User, ConfirmationResult } from 'firebase/auth';
 import { auth, googleProvider } from './lib/firebase';
 import { saveLead, saveNewsletter, getLeads, getNewsletterSubs } from './lib/leads';
 import type { Lead, NewsletterEntry } from './lib/leads';
@@ -132,7 +140,16 @@ const Logo = ({ className = "w-10 h-10", textClassName = "text-xl md:text-2xl", 
   </div>
 );
 
-const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDark, onAdminClick }: { isSubscribed: boolean, onNewsletterClick: () => void, onModeChange: (mode: any) => void, isDark: boolean, setIsDark: (v: boolean) => void, onAdminClick: () => void }) => {
+const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDark, onSignInClick, authUser, onSignOut }: {
+  isSubscribed: boolean;
+  onNewsletterClick: () => void;
+  onModeChange: (mode: any) => void;
+  isDark: boolean;
+  setIsDark: (v: boolean) => void;
+  onSignInClick: () => void;
+  authUser: User | null;
+  onSignOut: () => void;
+}) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navItems = [
@@ -163,9 +180,26 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
         >
           {isDark ? <Sun className="w-5 h-5 text-gold" /> : <Moon className="w-5 h-5 text-olive-900" />}
         </button>
-        <button onClick={onAdminClick} className="hidden sm:block text-xs uppercase tracking-[0.2em] font-bold bg-primary text-on-primary hover:bg-olive-900 transition-all px-6 py-2.5 rounded-full shadow-sm hover:shadow-md">
-          Sign In
-        </button>
+        {authUser ? (
+          <div className="flex items-center gap-3">
+            <div className="hidden sm:flex items-center gap-2 text-xs text-olive-800/60">
+              <div className="w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-[10px] uppercase">
+                {(authUser.displayName?.[0] || authUser.email?.[0] || authUser.phoneNumber?.[1] || '?').toUpperCase()}
+              </div>
+              <span className="max-w-[120px] truncate">{authUser.displayName || authUser.email || authUser.phoneNumber}</span>
+            </div>
+            <button
+              onClick={onSignOut}
+              className="text-xs uppercase tracking-[0.2em] font-bold border border-primary/30 text-primary hover:bg-primary hover:text-on-primary transition-all px-4 py-2 rounded-full"
+            >
+              Sign Out
+            </button>
+          </div>
+        ) : (
+          <button onClick={onSignInClick} className="text-xs uppercase tracking-[0.2em] font-bold bg-primary text-on-primary hover:bg-olive-900 transition-all px-6 py-2.5 rounded-full shadow-sm hover:shadow-md">
+            Sign In
+          </button>
+        )}
         
         <button 
           onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -2433,55 +2467,264 @@ const HomeView = ({ isSubscribed, onNewsletterClick }: { isSubscribed: boolean, 
   </div>
 );
 
-// ─── Admin Dashboard ─────────────────────────────────────────────────────────
+// ─── Auth Modal ──────────────────────────────────────────────────────────────
 
-const ADMIN_EMAIL = 'sumanthbolla97@gmail.com';
-
-const AdminDashboard = ({ onClose }: { onClose: () => void }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [tab, setTab] = useState<'leads' | 'newsletter'>('leads');
-  const [leads, setLeads] = useState<Lead[]>([]);
-  const [subs, setSubs] = useState<NewsletterEntry[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [fetching, setFetching] = useState(false);
-
-  const isAuthorized = user?.email === ADMIN_EMAIL;
-
-  useEffect(() => {
-    const unsub = onAuthStateChanged(auth, u => setUser(u));
-    return unsub;
-  }, []);
-
-  const fetchData = async () => {
-    setFetching(true);
-    try {
-      const [l, s] = await Promise.all([getLeads(), getNewsletterSubs()]);
-      setLeads(l);
-      setSubs(s);
-    } finally {
-      setFetching(false);
-    }
+const friendlyAuthError = (code: string) => {
+  const map: Record<string, string> = {
+    'auth/user-not-found':           'No account found. Try signing up.',
+    'auth/wrong-password':           'Incorrect password.',
+    'auth/invalid-credential':       'Invalid email or password.',
+    'auth/email-already-in-use':     'Email already registered. Sign in instead.',
+    'auth/weak-password':            'Password must be at least 6 characters.',
+    'auth/invalid-email':            'Enter a valid email address.',
+    'auth/invalid-phone-number':     'Enter a valid number with country code (e.g. +91).',
+    'auth/invalid-verification-code':'Invalid OTP. Please try again.',
+    'auth/too-many-requests':        'Too many attempts. Try again later.',
+    'auth/missing-phone-number':     'Please enter your phone number.',
   };
+  return map[code] || 'Something went wrong. Please try again.';
+};
 
+const AuthModal = ({
+  isOpen,
+  onClose,
+  onSuccess,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess: (user: User) => void;
+}) => {
+  const [tab, setTab]               = useState<'email' | 'phone'>('email');
+  const [emailMode, setEmailMode]   = useState<'signin' | 'signup'>('signin');
+  const [email, setEmail]           = useState('');
+  const [password, setPassword]     = useState('');
+  const [phone, setPhone]           = useState('+91 ');
+  const [otp, setOtp]               = useState('');
+  const [otpSent, setOtpSent]       = useState(false);
+  const [confirmResult, setConfirmResult] = useState<ConfirmationResult | null>(null);
+  const [loading, setLoading]       = useState(false);
+  const [error, setError]           = useState('');
+  const recaptchaVerifier           = useRef<RecaptchaVerifier | null>(null);
+
+  // Reset everything when modal closes
   useEffect(() => {
-    if (user && isAuthorized) fetchData();
-  }, [user, isAuthorized]);
+    if (!isOpen) {
+      setTab('email'); setEmailMode('signin');
+      setEmail(''); setPassword('');
+      setPhone('+91 '); setOtp('');
+      setOtpSent(false); setConfirmResult(null); setError('');
+      recaptchaVerifier.current?.clear();
+      recaptchaVerifier.current = null;
+    }
+  }, [isOpen]);
 
-  const handleSignIn = async () => {
+  const handleEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
     setLoading(true);
     try {
-      const result = await signInWithPopup(auth, googleProvider);
-      if (result.user.email !== ADMIN_EMAIL) {
-        await signOut(auth);
-      }
+      const cred = emailMode === 'signin'
+        ? await signInWithEmailAndPassword(auth, email, password)
+        : await createUserWithEmailAndPassword(auth, email, password);
+      onSuccess(cred.user);
+      onClose();
+    } catch (err: any) {
+      setError(friendlyAuthError(err.code));
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSignOut = async () => {
-    await signOut(auth);
+  const handleSendOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      if (!recaptchaVerifier.current) {
+        recaptchaVerifier.current = new RecaptchaVerifier(auth, 'recaptcha-container', { size: 'invisible' });
+      }
+      const result = await signInWithPhoneNumber(auth, phone.trim(), recaptchaVerifier.current);
+      setConfirmResult(result);
+      setOtpSent(true);
+    } catch (err: any) {
+      setError(friendlyAuthError(err.code));
+      recaptchaVerifier.current?.clear();
+      recaptchaVerifier.current = null;
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!confirmResult) return;
+    setError('');
+    setLoading(true);
+    try {
+      const cred = await confirmResult.confirm(otp);
+      onSuccess(cred.user);
+      onClose();
+    } catch (err: any) {
+      setError(friendlyAuthError(err.code));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            onClick={onClose}
+            className="absolute inset-0 bg-olive-900/90 backdrop-blur-xl"
+          />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            className="relative bg-cream w-full max-w-md p-10 md:p-14 shadow-2xl border border-olive-800/10"
+          >
+            <button onClick={onClose} className="absolute top-6 right-6 text-olive-900/40 hover:text-olive-900 transition-all">
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="text-center mb-10">
+              <h2 className="text-3xl font-serif italic text-olive-900 mb-2">Member Access</h2>
+              <p className="text-olive-800/50 text-sm font-light">Sign in to unlock the sanctuaries.</p>
+            </div>
+
+            {/* Tabs */}
+            <div className="flex gap-1 mb-8 border-b border-outline/10">
+              {(['email', 'phone'] as const).map(t => (
+                <button
+                  key={t}
+                  onClick={() => { setTab(t); setError(''); }}
+                  className={cn(
+                    "flex-1 py-3 text-[10px] uppercase tracking-[0.4em] font-bold border-b-2 transition-all",
+                    tab === t ? "border-primary text-olive-900" : "border-transparent text-olive-800/40 hover:text-olive-900"
+                  )}
+                >
+                  {t === 'email' ? 'Email' : 'Phone / OTP'}
+                </button>
+              ))}
+            </div>
+
+            {/* ── Email Tab ── */}
+            {tab === 'email' && (
+              <form onSubmit={handleEmailSubmit} className="space-y-6">
+                <div className="space-y-2">
+                  <label className="text-[9px] uppercase tracking-[0.5em] text-olive-800/40">Email</label>
+                  <input type="email" value={email} onChange={e => setEmail(e.target.value)} required className="input-cashew" placeholder="email@domain.com" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[9px] uppercase tracking-[0.5em] text-olive-800/40">Password</label>
+                  <input type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} className="input-cashew" placeholder="••••••••" />
+                </div>
+                {error && <p className="text-red-500 text-xs leading-relaxed">{error}</p>}
+                <button type="submit" disabled={loading} className="w-full btn-membership btn-olive flex items-center justify-center gap-3">
+                  {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <ArrowRight className="w-4 h-4" />}
+                  {loading ? 'Please wait…' : emailMode === 'signin' ? 'Sign In' : 'Create Account'}
+                </button>
+                <p className="text-center text-[10px] text-olive-800/50">
+                  {emailMode === 'signin' ? "Don't have an account? " : 'Already registered? '}
+                  <button
+                    type="button"
+                    onClick={() => { setEmailMode(emailMode === 'signin' ? 'signup' : 'signin'); setError(''); }}
+                    className="text-primary underline underline-offset-2 font-bold"
+                  >
+                    {emailMode === 'signin' ? 'Sign Up' : 'Sign In'}
+                  </button>
+                </p>
+              </form>
+            )}
+
+            {/* ── Phone Tab ── */}
+            {tab === 'phone' && (
+              <>
+                {!otpSent ? (
+                  <form onSubmit={handleSendOtp} className="space-y-6">
+                    <div className="space-y-2">
+                      <label className="text-[9px] uppercase tracking-[0.5em] text-olive-800/40">Mobile Number</label>
+                      <input
+                        type="tel"
+                        value={phone}
+                        onChange={e => setPhone(e.target.value)}
+                        required
+                        className="input-cashew"
+                        placeholder="+91 98765 43210"
+                      />
+                      <p className="text-[9px] text-olive-800/30 uppercase tracking-widest">Include country code (+91 for India)</p>
+                    </div>
+                    {error && <p className="text-red-500 text-xs">{error}</p>}
+                    <div id="recaptcha-container" />
+                    <button type="submit" disabled={loading} className="w-full btn-membership btn-olive flex items-center justify-center gap-3">
+                      {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                      {loading ? 'Sending OTP…' : 'Send OTP'}
+                    </button>
+                  </form>
+                ) : (
+                  <form onSubmit={handleVerifyOtp} className="space-y-6">
+                    <div className="space-y-2">
+                      <label className="text-[9px] uppercase tracking-[0.5em] text-olive-800/40">Enter OTP</label>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        value={otp}
+                        onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                        required
+                        maxLength={6}
+                        autoFocus
+                        className="input-cashew tracking-[0.5em] text-center text-2xl"
+                        placeholder="• • • • • •"
+                      />
+                      <p className="text-[9px] text-olive-800/30 uppercase tracking-widest">OTP sent to {phone.trim()}</p>
+                    </div>
+                    {error && <p className="text-red-500 text-xs">{error}</p>}
+                    <button type="submit" disabled={loading || otp.length < 6} className="w-full btn-membership btn-olive flex items-center justify-center gap-3">
+                      {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                      {loading ? 'Verifying…' : 'Verify & Sign In'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setOtpSent(false); setOtp(''); setError(''); recaptchaVerifier.current?.clear(); recaptchaVerifier.current = null; }}
+                      className="w-full text-[10px] text-olive-800/40 hover:text-olive-900 transition-colors uppercase tracking-widest"
+                    >
+                      ← Change Number
+                    </button>
+                  </form>
+                )}
+              </>
+            )}
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
+  );
+};
+
+// ─── Admin Dashboard ─────────────────────────────────────────────────────────
+
+const ADMIN_EMAIL = 'sumanthbolla97@gmail.com';
+
+const AdminDashboard = ({ onClose, user }: { onClose: () => void; user: User }) => {
+  const [tab, setTab]           = useState<'leads' | 'newsletter'>('leads');
+  const [leads, setLeads]       = useState<Lead[]>([]);
+  const [subs, setSubs]         = useState<NewsletterEntry[]>([]);
+  const [fetching, setFetching] = useState(false);
+
+  const fetchData = async () => {
+    setFetching(true);
+    try {
+      const [l, s] = await Promise.all([getLeads(), getNewsletterSubs()]);
+      setLeads(l); setSubs(s);
+    } finally {
+      setFetching(false);
+    }
+  };
+
+  useEffect(() => { fetchData(); }, []);
 
   const fmt = (ts: { seconds: number } | null) => {
     if (!ts) return '—';
@@ -2497,67 +2740,17 @@ const AdminDashboard = ({ onClose }: { onClose: () => void }) => {
           <span className="font-bold text-sm uppercase tracking-widest text-olive-900">Admin Console</span>
         </div>
         <div className="flex items-center gap-4">
-          {user && isAuthorized && (
-            <>
-              <span className="hidden sm:block text-xs text-olive-800/50 truncate max-w-[200px]">{user.email}</span>
-              <button onClick={fetchData} disabled={fetching} className="p-2 rounded-full hover:bg-primary/10 transition-colors" title="Refresh">
-                <RefreshCw className={cn("w-4 h-4 text-olive-800", fetching && "animate-spin")} />
-              </button>
-              <button onClick={handleSignOut} className="flex items-center gap-2 text-xs uppercase tracking-widest text-olive-800/60 hover:text-olive-900 transition-colors">
-                <LogOut className="w-4 h-4" /> Sign Out
-              </button>
-            </>
-          )}
+          <span className="hidden sm:block text-xs text-olive-800/50 truncate max-w-[200px]">{user.email}</span>
+          <button onClick={fetchData} disabled={fetching} className="p-2 rounded-full hover:bg-primary/10 transition-colors" title="Refresh">
+            <RefreshCw className={cn("w-4 h-4 text-olive-800", fetching && "animate-spin")} />
+          </button>
           <button onClick={onClose} className="p-2 rounded-full hover:bg-primary/10 transition-colors">
             <X className="w-5 h-5 text-olive-900" />
           </button>
         </div>
       </div>
 
-      {!user ? (
-        /* Sign-In Screen */
-        <div className="flex flex-col items-center justify-center min-h-[70vh] gap-8 px-6">
-          {loading && <p className="sr-only">Verifying…</p>}
-          <div className="text-center max-w-sm">
-            <ShieldCheck className="w-16 h-16 text-primary mx-auto mb-6 opacity-30" />
-            <h2 className="text-3xl font-serif italic text-olive-900 mb-3">Admin Access</h2>
-            <p className="text-olive-800/50 text-sm font-light">Sign in with your Google account to view lead details.</p>
-          </div>
-          <button
-            onClick={handleSignIn}
-            disabled={loading}
-            className="flex items-center gap-4 bg-olive-900 text-cream px-8 py-4 text-xs uppercase tracking-[0.4em] font-bold hover:bg-primary transition-all shadow-md"
-          >
-            {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : (
-              <svg className="w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
-                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
-                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-              </svg>
-            )}
-            {loading ? 'Signing in…' : 'Continue with Google'}
-          </button>
-        </div>
-      ) : !isAuthorized ? (
-        /* Access Denied */
-        <div className="flex flex-col items-center justify-center min-h-[70vh] gap-8 px-6">
-          <div className="text-center max-w-sm">
-            <X className="w-16 h-16 text-red-400 mx-auto mb-6 opacity-60" />
-            <h2 className="text-3xl font-serif italic text-olive-900 mb-3">Access Denied</h2>
-            <p className="text-olive-800/50 text-sm font-light mb-2">
-              <span className="font-medium text-olive-900">{user.email}</span> is not authorised.
-            </p>
-            <p className="text-olive-800/40 text-xs">Please sign in with the admin account.</p>
-          </div>
-          <button
-            onClick={handleSignOut}
-            className="flex items-center gap-3 border border-olive-800/20 text-olive-800 px-8 py-3 text-xs uppercase tracking-[0.4em] font-bold hover:bg-primary/5 transition-all"
-          >
-            <LogOut className="w-4 h-4" /> Sign Out & Try Again
-          </button>
-        </div>
-      ) : (
+      {(
         /* Dashboard */
         <div className="px-6 md:px-12 py-8 max-w-7xl mx-auto">
           {/* Summary cards */}
@@ -2666,9 +2859,29 @@ const AdminDashboard = ({ onClose }: { onClose: () => void }) => {
   );
 };
 
+// ─── App ─────────────────────────────────────────────────────────────────────
+
 export default function App() {
   type ViewMode = 'home' | 'map' | 'list' | 'gallery' | 'analytics' | 'the-sil' | 'admin';
   const VIEW_ORDER: ViewMode[] = ['home', 'list', 'gallery', 'analytics', 'the-sil', 'map'];
+
+  const [authUser, setAuthUser]   = useState<User | null>(null);
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
+
+  // Global auth state listener
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, u => {
+      setAuthUser(u);
+      // Auto-redirect admin to dashboard after sign-in
+      if (u?.email === ADMIN_EMAIL) setViewMode('admin');
+    });
+    return unsub;
+  }, []);
+
+  const handleSignOut = async () => {
+    await signOut(auth);
+    setViewMode('home');
+  };
 
   const [isSubscribed, setIsSubscribed] = useState(() => {
     return localStorage.getItem('gt_subscribed') === 'true';
@@ -2726,13 +2939,22 @@ export default function App() {
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
-      <Navbar isSubscribed={isSubscribed} onNewsletterClick={() => setIsNewsletterOpen(true)} onModeChange={handleViewChange} isDark={isDark} setIsDark={setIsDark} onAdminClick={() => handleViewChange('admin')} />
+      <Navbar
+        isSubscribed={isSubscribed}
+        onNewsletterClick={() => setIsNewsletterOpen(true)}
+        onModeChange={handleViewChange}
+        isDark={isDark}
+        setIsDark={setIsDark}
+        onSignInClick={() => setIsAuthOpen(true)}
+        authUser={authUser}
+        onSignOut={handleSignOut}
+      />
 
       <main className="flex-1 flex overflow-hidden relative">
         {/* Center - Map or other views */}
         <div className="flex-1 relative overflow-hidden bg-surface">
           {viewMode === 'map' && <SanctuaryMapLayout />}
-          {viewMode === 'admin' && <AdminDashboard onClose={() => handleViewChange('home')} />}
+          {viewMode === 'admin' && authUser && <AdminDashboard onClose={() => handleViewChange('home')} user={authUser} />}
           {viewMode !== 'map' && viewMode !== 'admin' && (
             <div ref={scrollRef} className="h-full w-full overflow-y-auto">
               {viewMode === 'home' && <HomeView isSubscribed={isSubscribed} onNewsletterClick={() => setIsNewsletterOpen(true)} />}
@@ -2746,8 +2968,18 @@ export default function App() {
       </main>
 
       <ChatBot data={{ sanctuaries: SANCTUARIES }} />
-      
-      <NewsletterModal 
+
+      <AuthModal
+        isOpen={isAuthOpen}
+        onClose={() => setIsAuthOpen(false)}
+        onSuccess={user => {
+          setAuthUser(user);
+          setIsAuthOpen(false);
+          if (user.email === ADMIN_EMAIL) handleViewChange('admin');
+        }}
+      />
+
+      <NewsletterModal
         isOpen={isNewsletterOpen} 
         onClose={() => setIsNewsletterOpen(false)} 
         onSubscribe={handleSubscribe} 
