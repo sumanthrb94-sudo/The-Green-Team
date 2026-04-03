@@ -29,7 +29,12 @@ import {
   Layers,
   Map as MapIcon,
   Plane,
-  Moon
+  Moon,
+  Activity,
+  Globe2,
+  Home,
+  Route,
+  RotateCcw
 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { cn } from './lib/utils';
@@ -910,6 +915,33 @@ const SanctuaryMapLayout = () => {
   const [targetView, setTargetView] = useState<{ center: [number, number], zoom: number } | null>(null);
   const [currentZoom, setCurrentZoom] = useState(10);
   const [livePulse, setLivePulse] = useState(0);
+  const [activeFilters, setActiveFilters] = useState<Set<string>>(new Set(['satellite']));
+
+  const FILTER_PILLS = [
+    { id: 'sanctuaries',  label: 'Sanctuaries',     icon: Home },
+    { id: 'orr-exits',    label: 'ORR Exits',        icon: Route },
+    { id: 'rrr-exits',    label: 'RRR Exits',        icon: RotateCcw },
+    { id: 'clean-air',    label: 'Clean Air',        icon: Leaf },
+    { id: 'aqi-live',     label: 'AQI Live',         icon: Activity },
+    { id: 'forest-zone',  label: 'Forest Zone',      icon: Trees },
+    { id: 'satellite',    label: 'Satellite',        icon: Globe2 },
+    { id: 'airport',      label: 'Airport Zone',     icon: Plane },
+    { id: 'regional',     label: 'Regional (RRR)',   icon: MapIcon },
+  ];
+
+  const toggleFilter = (filterId: string) => {
+    setActiveFilters(prev => {
+      const isCurrentlyActive = prev.has(filterId);
+      const next = new Set(prev);
+      if (isCurrentlyActive) next.delete(filterId);
+      else next.add(filterId);
+      if (filterId === 'aqi-live')  setShowAqi(!isCurrentlyActive);
+      if (filterId === 'satellite') setIsSatellite(!isCurrentlyActive);
+      if (filterId === 'regional')  setIsRegionalView(!isCurrentlyActive);
+      if (filterId === 'airport')   setIsAirportFocus(!isCurrentlyActive);
+      return next;
+    });
+  };
 
   // Define Hotspots for Heatmaps
   const AQI_HOTSPOTS = [
@@ -1293,6 +1325,30 @@ const SanctuaryMapLayout = () => {
     { id: "rrr-exit-7", type: 'rrr-exit', title: "RRR Proposed Exit", location: "Chevella Hub",          coords: [17.2600, 78.2360] as [number, number], aqi: 28 }
   ];
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const filteredLocations = useMemo(() => {
+    const hasTypeFilter    = activeFilters.has('sanctuaries') || activeFilters.has('orr-exits') || activeFilters.has('rrr-exits');
+    const hasQualityFilter = activeFilters.has('clean-air')   || activeFilters.has('forest-zone');
+    if (!hasTypeFilter && !hasQualityFilter) return locations;
+    return locations.filter(loc => {
+      let passesType    = !hasTypeFilter;
+      let passesQuality = !hasQualityFilter;
+      if (hasTypeFilter) {
+        passesType =
+          (activeFilters.has('sanctuaries') && loc.type === 'sanctuary') ||
+          (activeFilters.has('orr-exits')   && loc.type === 'exit')      ||
+          (activeFilters.has('rrr-exits')   && loc.type === 'rrr-exit');
+      }
+      if (hasQualityFilter) {
+        const fr = (loc as { forestRadius?: number }).forestRadius ?? 0;
+        passesQuality =
+          (activeFilters.has('clean-air')   && (loc.aqi ?? 999) <= 50) ||
+          (activeFilters.has('forest-zone') && loc.type === 'sanctuary' && fr >= 3000);
+      }
+      return passesType && passesQuality;
+    });
+  }, [activeFilters]); // locations is stable per render
+
   return (
     <div className="h-full w-full relative overflow-hidden flex">
       <div className="flex-1 relative">
@@ -1338,43 +1394,59 @@ const SanctuaryMapLayout = () => {
           </div>
         </div>
 
-        {/* View Controls Overlay */}
-        <div className="absolute top-6 right-6 z-[1000] flex flex-col gap-2">
-          <button 
-            onClick={() => setIsSatellite(!isSatellite)}
-            className={cn(
-              "px-4 py-2 text-[9px] uppercase tracking-widest font-bold border transition-all bg-surface/90 backdrop-blur-md rounded-lg shadow-lg flex items-center justify-center gap-2",
-              isSatellite ? "text-primary border-primary" : "text-secondary border-outline/20"
-            )}
-          >
-            <MapIcon className="w-3 h-3" />
-            {isSatellite ? 'Hybrid View' : 'Map View'}
-          </button>
-          <button 
-            onClick={() => setIsRegionalView(!isRegionalView)}
-            className={cn(
-              "px-4 py-2 text-[9px] uppercase tracking-widest font-bold border transition-all bg-surface/90 backdrop-blur-md rounded-lg shadow-lg",
-              isRegionalView ? "text-primary border-primary" : "text-secondary border-outline/20"
-            )}
-          >
-            Regional View (RRR)
-          </button>
-          <button 
-            onClick={() => setShowAqi(!showAqi)}
-            className={cn(
-              "px-4 py-2 text-[9px] uppercase tracking-widest font-bold border transition-all bg-surface/90 backdrop-blur-md rounded-lg shadow-lg flex items-center gap-2",
-              showAqi ? "text-red-600 border-red-600" : "text-secondary border-outline/20"
-            )}
-          >
-            <Wind className="w-3 h-3" />
-            AQI Heatmap
-          </button>
+        {/* Live AQI badge — visible when AQI Live filter is active */}
+        <AnimatePresence>
           {showAqi && (
-            <div className="mt-2 px-3 py-1 bg-red-600 text-on-surface text-[8px] font-bold uppercase tracking-widest rounded-full animate-pulse flex items-center gap-2 self-end">
-              <div className="w-1.5 h-1.5 bg-surface rounded-full" />
-              Live Data Feed
-            </div>
+            <motion.div
+              initial={{ opacity: 0, x: 12 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 12 }}
+              className="absolute top-6 right-6 z-[1000]"
+            >
+              <div className="px-3 py-1.5 bg-red-600 text-white text-[8px] font-bold uppercase tracking-widest rounded-full animate-pulse flex items-center gap-2 shadow-lg shadow-red-600/30">
+                <div className="w-1.5 h-1.5 bg-white rounded-full" />
+                Live AQI Feed
+              </div>
+            </motion.div>
           )}
+        </AnimatePresence>
+
+        {/* Google Maps-style Premium Segment Filter Pill Bar */}
+        <div className="absolute top-[4.5rem] left-4 right-4 z-[1000] pointer-events-none">
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15, duration: 0.4, ease: 'easeOut' }}
+            className="filter-pill-bar flex items-center gap-2 overflow-x-auto py-1 pointer-events-auto"
+          >
+            {FILTER_PILLS.map((pill, idx) => {
+              const Icon = pill.icon;
+              const isActive = activeFilters.has(pill.id);
+              return (
+                <motion.button
+                  key={pill.id}
+                  initial={{ opacity: 0, scale: 0.85, y: -6 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ delay: idx * 0.045 + 0.1, type: 'spring', stiffness: 320, damping: 22 }}
+                  whileHover={{ scale: 1.06, y: -2 }}
+                  whileTap={{ scale: 0.94 }}
+                  onClick={() => toggleFilter(pill.id)}
+                  className={cn(
+                    "flex-shrink-0 flex items-center gap-1.5 h-9 px-3.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-colors duration-200 whitespace-nowrap border cursor-pointer select-none",
+                    isActive
+                      ? "bg-primary text-on-primary border-transparent shadow-lg shadow-primary/30"
+                      : "bg-surface/90 backdrop-blur-md text-secondary border-outline/20 shadow-md hover:border-primary/50 hover:text-primary hover:bg-surface"
+                  )}
+                >
+                  <Icon className="w-3.5 h-3.5 flex-shrink-0" />
+                  <span>{pill.label}</span>
+                  {isActive && pill.id === 'aqi-live' && (
+                    <span className="w-1.5 h-1.5 bg-on-primary/75 rounded-full animate-pulse ml-0.5 flex-shrink-0" />
+                  )}
+                </motion.button>
+              );
+            })}
+          </motion.div>
         </div>
 
         {/* Bottom Right Action */}
@@ -1488,7 +1560,7 @@ const SanctuaryMapLayout = () => {
 
 
 
-          {locations.map((loc) => {
+          {filteredLocations.map((loc) => {
             const isPremium = loc.type === 'sanctuary';
             const isExit = loc.type === 'exit' || loc.type === 'rrr-exit';
             
