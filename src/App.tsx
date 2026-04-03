@@ -2865,30 +2865,26 @@ export default function App() {
   type ViewMode = 'home' | 'map' | 'list' | 'gallery' | 'analytics' | 'the-sil' | 'admin';
   const VIEW_ORDER: ViewMode[] = ['home', 'list', 'gallery', 'analytics', 'the-sil', 'map'];
 
-  const [authUser, setAuthUser]   = useState<User | null>(null);
+  const [authUser, setAuthUser]     = useState<User | null>(null);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(() => localStorage.getItem('gt_subscribed') === 'true');
+  const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
+  const [viewMode, setViewMode]     = useState<ViewMode>('home');
+  const [isDark, setIsDark]         = useState(false);
 
-  // Global auth state listener
+  // Global auth state — declared after all useState so setViewMode is in scope
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, u => {
       setAuthUser(u);
-      // Auto-redirect admin to dashboard after sign-in
       if (u?.email === ADMIN_EMAIL) setViewMode('admin');
     });
     return unsub;
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSignOut = async () => {
     await signOut(auth);
     setViewMode('home');
   };
-
-  const [isSubscribed, setIsSubscribed] = useState(() => {
-    return localStorage.getItem('gt_subscribed') === 'true';
-  });
-  const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
-  const [viewMode, setViewMode] = useState<ViewMode>('home');
-  const [isDark, setIsDark] = useState(false);
 
   // ── Scroll-position memory ────────────────────────────────────────────────
   const scrollPositions = useRef<Partial<Record<ViewMode, number>>>({});
@@ -2972,10 +2968,10 @@ export default function App() {
       <AuthModal
         isOpen={isAuthOpen}
         onClose={() => setIsAuthOpen(false)}
-        onSuccess={user => {
-          setAuthUser(user);
+        onSuccess={u => {
+          setAuthUser(u);
           setIsAuthOpen(false);
-          if (user.email === ADMIN_EMAIL) handleViewChange('admin');
+          if (u.email === ADMIN_EMAIL) setViewMode('admin');
         }}
       />
 
