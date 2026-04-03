@@ -103,30 +103,6 @@ const SANCTUARIES: Sanctuary[] = [
     image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=1200',
     features: ['Vertical Forest', 'Smart Energy', 'Zero Waste', 'Community Hub']
   },
-  {
-    id: 'aether',
-    title: 'Aether Private Estate',
-    location: 'Jubilee Hills Pinnacle',
-    aqi: 25,
-    noise: 42,
-    commute: '0 mins to City Core',
-    valuation: '₹125 Cr',
-    memberPrice: '₹100 Cr',
-    image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=80&w=1200',
-    features: ['Helipad', 'Private Woods', 'Armored Access', 'Off-Grid Config']
-  },
-  {
-    id: 'neo-vertex',
-    title: 'Neo-Vertex Penthouses',
-    location: 'Neopolis, Kokapet',
-    aqi: 38,
-    noise: 45,
-    commute: '2 mins to Financial District',
-    valuation: '₹180 Cr',
-    memberPrice: '₹140 Cr',
-    image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&q=80&w=1200',
-    features: ['Sky Garden', 'Biometric Elevators', 'Zero Gravity Pool', 'AI Climate']
-  }
 ];
 
 // --- Components ---
@@ -1038,8 +1014,6 @@ const SanctuaryMapLayout = () => {
     { lat: 17.52, lng: 78.33, strength: 0.65 }, // Ameenpur Lake biodiversity site
     { lat: 17.31, lng: 77.85, strength: 0.65 }, // Ananthagiri Hills
     { lat: 17.24, lng: 78.48, strength: 0.55 }, // Tukkuguda green belt        ← The SIL
-    { lat: 17.43, lng: 78.41, strength: 0.50 }, // Jubilee Hills ridge canopy  ← Aether
-    { lat: 17.38, lng: 78.33, strength: 0.58 }, // Kokapet / Neopolis fringe   ← Neo-Vertex
   ];
 
   // ── Net AQI intensity: range -0.5 (very clean/blue) → +1.0 (polluted/red)
@@ -1381,32 +1355,6 @@ const SanctuaryMapLayout = () => {
       ] as [number, number][],
       image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=800",
       description: "Vertical villaments strategically positioned near the protected green belts of the Future City."
-    },
-    {
-      id: "aether",
-      type: 'sanctuary',
-      title: "Aether Private Estate",
-      location: "Jubilee Hills Pinnacle",
-      coords: [17.43, 78.41] as [number, number],
-      aqi: 25,
-      noise: 42,
-      forestRadius: 800,
-      boundary: [[17.435, 78.405], [17.435, 78.415], [17.425, 78.415], [17.425, 78.405]] as [number, number][],
-      image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=80&w=800",
-      description: "An ultra-secure, 125 Crore palatial estate dominating the Jubilee Hills landscape."
-    },
-    {
-      id: "neo-vertex",
-      type: 'sanctuary',
-      title: "Neo-Vertex Penthouses",
-      location: "Neopolis, Kokapet",
-      coords: [17.38, 78.33] as [number, number],
-      aqi: 38,
-      noise: 45,
-      forestRadius: 1200,
-      boundary: [[17.385, 78.325], [17.385, 78.335], [17.375, 78.335], [17.375, 78.325]] as [number, number][],
-      image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&q=80&w=800",
-      description: "The crown jewel of Kokapet, valued over 180 Crore, featuring entirely self-contained ecosystem floors."
     },
     { id: "exit-1",  type: 'exit', title: "ORR Exit 1",  location: "Gachibowli",      coords: [17.4218, 78.3412] as [number, number], aqi: 142 },
     { id: "exit-3",  type: 'exit', title: "ORR Exit 3",  location: "Patancheru",       coords: [17.4880, 78.3120] as [number, number], aqi: 156 },
