@@ -405,15 +405,15 @@ const EcosystemPillars = ({ isFullPage = false }: { isFullPage?: boolean }) => {
   return (
     <section id="ecosystems" className={cn(
       "px-6 md:px-24 bg-surface",
-      isFullPage ? "py-24" : "py-48"
+      isFullPage ? "py-16" : "py-14"
     )}>
       <div className="max-w-7xl mx-auto">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 1.2 }}
-          className="mb-32"
+          className="mb-10"
         >
           <span className="text-olive-800 text-xs font-bold uppercase tracking-[0.6em] mb-6 block">The Resource Agenda</span>
           <h2 className="text-5xl md:text-8xl font-medium text-olive-900">Self-Sustaining <br /><span className="italic text-olive-800">Ecosystems.</span></h2>
@@ -427,7 +427,7 @@ const EcosystemPillars = ({ isFullPage = false }: { isFullPage?: boolean }) => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.2, duration: 0.8 }}
-              className="p-12 border border-olive-800/10 bg-cream/20 hover:bg-cream/40 transition-all rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1"
+              className="p-8 border border-olive-800/10 bg-cream/20 hover:bg-cream/40 transition-all rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1"
             >
               <div className="text-olive-800 mb-8">{p.icon}</div>
               <h4 className="text-2xl font-bold text-olive-900 mb-6">{p.title}</h4>
@@ -444,10 +444,10 @@ const Advantage = ({ isFullPage = false }: { isFullPage?: boolean }) => {
   return (
     <section id="the-advantage" className={cn(
       "px-12 md:px-24 bg-surface/[0.01] border-y border-olive-800/5",
-      isFullPage ? "py-24" : "py-48"
+      isFullPage ? "py-16" : "py-14"
     )}>
       <div className="max-w-7xl mx-auto">
-        <div className="grid lg:grid-cols-12 gap-24">
+        <div className="grid lg:grid-cols-12 gap-12">
           <motion.div 
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -466,7 +466,7 @@ const Advantage = ({ isFullPage = false }: { isFullPage?: boolean }) => {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 1, delay: 0.2 }}
-            className="lg:col-span-7 space-y-12"
+            className="lg:col-span-7 space-y-6"
           >
             <p className="text-2xl md:text-4xl font-normal leading-snug text-olive-900/90">
               "Market negligence is your opportunity. While the crowd waits for the launch, our members have already secured their legacy."
@@ -508,7 +508,7 @@ const TheSIL = ({ isSubscribed, onNewsletterClick, isFullPage = false }: { isSub
   return (
     <section id="the-sil" className={cn(
       "px-12 md:px-24 bg-olive-900 text-cream relative overflow-hidden",
-      isFullPage ? "py-24" : "py-48"
+      isFullPage ? "py-16" : "py-14"
     )}>
       {!isSubscribed && (
         <div className="absolute inset-0 z-20 bg-olive-900/80 backdrop-blur-md flex flex-col items-center justify-center p-12 text-center">
@@ -1853,10 +1853,10 @@ const Sanctuaries = ({ isSubscribed, onNewsletterClick, isFullPage = false }: { 
   return (
     <section id="agartha" className={cn(
       "px-12 md:px-24",
-      isFullPage ? "py-24" : "py-48"
+      isFullPage ? "py-16" : "py-14"
     )}>
       <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col lg:flex-row justify-between items-end mb-32 gap-12">
+        <div className="flex flex-col lg:flex-row justify-between items-end mb-10 gap-8">
           <div className="max-w-3xl">
             <span className="text-olive-800 text-[10px] font-bold uppercase tracking-[0.6em] mb-6 block">Curated Portfolio</span>
             <h2 className="text-6xl md:text-8xl font-medium text-olive-900">Curated <br /><span className="italic text-olive-800">Sanctuaries.</span></h2>
@@ -1918,7 +1918,7 @@ const Membership = () => {
   ];
 
   return (
-    <section id="membership" className="py-48 px-12 md:px-24 bg-olive-800 text-cream">
+    <section id="membership" className="py-16 px-12 md:px-24 bg-olive-800 text-cream">
       <div className="max-w-7xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-24 items-center">
           <div>
@@ -2026,7 +2026,7 @@ const ApplicationForm = () => {
   };
 
   return (
-    <section id="apply" className="py-48 px-12 md:px-24 bg-cream">
+    <section id="apply" className="py-16 px-12 md:px-24 bg-cream">
       <div className="max-w-5xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-24 items-center">
           <div>
@@ -2091,7 +2091,7 @@ const Footer = () => {
   return (
     <footer className="bg-olive-900 text-cream py-32 px-12 md:px-24">
       <div className="max-w-7xl mx-auto">
-        <div className="grid md:grid-cols-4 gap-24 mb-32">
+        <div className="grid md:grid-cols-4 gap-12 mb-12">
           <div className="col-span-2">
             <div className="flex items-center gap-4 mb-12">
               <Logo className="w-10 h-10 text-cream" />
