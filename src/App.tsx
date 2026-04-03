@@ -41,8 +41,15 @@ import { cn } from './lib/utils';
 import { GoogleGenAI } from "@google/genai";
 
 import { MapContainer, TileLayer, Marker, Popup, Circle, Polygon, useMap, ZoomControl, Polyline, Tooltip, useMapEvents } from 'react-leaflet';
-import { AlertTriangle, ZoomIn } from 'lucide-react';
+import { AlertTriangle, ZoomIn, LogOut, RefreshCw, Users, Mail as MailIcon, ShieldCheck } from 'lucide-react';
 import L from 'leaflet';
+
+// Firebase
+import { onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth';
+import type { User } from 'firebase/auth';
+import { auth, googleProvider } from './lib/firebase';
+import { saveLead, saveNewsletter, getLeads, getNewsletterSubs } from './lib/leads';
+import type { Lead, NewsletterEntry } from './lib/leads';
 
 // Fix Leaflet icon issue
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
@@ -125,7 +132,7 @@ const Logo = ({ className = "w-10 h-10", textClassName = "text-xl md:text-2xl", 
   </div>
 );
 
-const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDark }: { isSubscribed: boolean, onNewsletterClick: () => void, onModeChange: (mode: any) => void, isDark: boolean, setIsDark: (v: boolean) => void }) => {
+const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDark, onAdminClick }: { isSubscribed: boolean, onNewsletterClick: () => void, onModeChange: (mode: any) => void, isDark: boolean, setIsDark: (v: boolean) => void, onAdminClick: () => void }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navItems = [
@@ -156,7 +163,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
         >
           {isDark ? <Sun className="w-5 h-5 text-gold" /> : <Moon className="w-5 h-5 text-olive-900" />}
         </button>
-        <button className="hidden sm:block text-xs uppercase tracking-[0.2em] font-bold bg-primary text-on-primary hover:bg-olive-900 transition-all px-6 py-2.5 rounded-full shadow-sm hover:shadow-md">
+        <button onClick={onAdminClick} className="hidden sm:block text-xs uppercase tracking-[0.2em] font-bold bg-primary text-on-primary hover:bg-olive-900 transition-all px-6 py-2.5 rounded-full shadow-sm hover:shadow-md">
           Sign In
         </button>
         
@@ -1952,8 +1959,7 @@ const NewsletterModal = ({ isOpen, onClose, onSubscribe }: { isOpen: boolean, on
   const { register, handleSubmit, formState: { isSubmitting } } = useForm();
 
   const onSubmit = async (data: any) => {
-    console.log("Newsletter Signup:", data);
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    await saveNewsletter(data.email, 'modal');
     onSubscribe();
     onClose();
   };
@@ -2020,8 +2026,7 @@ const ApplicationForm = () => {
   const [submitted, setSubmitted] = useState(false);
 
   const onSubmit = async (data: any) => {
-    console.log("Membership Application:", data);
-    await new Promise(resolve => setTimeout(resolve, 2500));
+    await saveLead({ name: data.name, email: data.email, intent: data.intent });
     setSubmitted(true);
   };
 
@@ -2208,7 +2213,7 @@ const NewsletterHighlight = ({ onSubscribe }: { onSubscribe: () => void }) => {
     e.preventDefault();
     if (!email) return;
     setLoading(true);
-    await new Promise(r => setTimeout(r, 1500));
+    await saveNewsletter(email, 'inline');
     setLoading(false);
     setDone(true);
     onSubscribe();
@@ -2428,8 +2433,212 @@ const HomeView = ({ isSubscribed, onNewsletterClick }: { isSubscribed: boolean, 
   </div>
 );
 
+// ─── Admin Dashboard ─────────────────────────────────────────────────────────
+
+const AdminDashboard = ({ onClose }: { onClose: () => void }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [tab, setTab] = useState<'leads' | 'newsletter'>('leads');
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [subs, setSubs] = useState<NewsletterEntry[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(false);
+
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, u => setUser(u));
+    return unsub;
+  }, []);
+
+  const fetchData = async () => {
+    setFetching(true);
+    try {
+      const [l, s] = await Promise.all([getLeads(), getNewsletterSubs()]);
+      setLeads(l);
+      setSubs(s);
+    } finally {
+      setFetching(false);
+    }
+  };
+
+  useEffect(() => {
+    if (user) fetchData();
+  }, [user]);
+
+  const handleSignIn = async () => {
+    setLoading(true);
+    try { await signInWithPopup(auth, googleProvider); }
+    finally { setLoading(false); }
+  };
+
+  const handleSignOut = async () => {
+    await signOut(auth);
+  };
+
+  const fmt = (ts: { seconds: number } | null) => {
+    if (!ts) return '—';
+    return new Date(ts.seconds * 1000).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
+  };
+
+  return (
+    <div className="h-full w-full overflow-y-auto bg-cream">
+      {/* Header */}
+      <div className="sticky top-0 z-10 bg-cream border-b border-outline/10 px-6 md:px-12 py-4 flex items-center justify-between shadow-sm">
+        <div className="flex items-center gap-3">
+          <ShieldCheck className="w-5 h-5 text-primary" />
+          <span className="font-bold text-sm uppercase tracking-widest text-olive-900">Admin Console</span>
+        </div>
+        <div className="flex items-center gap-4">
+          {user && (
+            <>
+              <span className="hidden sm:block text-xs text-olive-800/50 truncate max-w-[200px]">{user.email}</span>
+              <button onClick={fetchData} disabled={fetching} className="p-2 rounded-full hover:bg-primary/10 transition-colors" title="Refresh">
+                <RefreshCw className={cn("w-4 h-4 text-olive-800", fetching && "animate-spin")} />
+              </button>
+              <button onClick={handleSignOut} className="flex items-center gap-2 text-xs uppercase tracking-widest text-olive-800/60 hover:text-olive-900 transition-colors">
+                <LogOut className="w-4 h-4" /> Sign Out
+              </button>
+            </>
+          )}
+          <button onClick={onClose} className="p-2 rounded-full hover:bg-primary/10 transition-colors">
+            <X className="w-5 h-5 text-olive-900" />
+          </button>
+        </div>
+      </div>
+
+      {!user ? (
+        /* Sign-In Screen */
+        <div className="flex flex-col items-center justify-center min-h-[70vh] gap-8 px-6">
+          <div className="text-center max-w-sm">
+            <ShieldCheck className="w-16 h-16 text-primary mx-auto mb-6 opacity-30" />
+            <h2 className="text-3xl font-serif italic text-olive-900 mb-3">Admin Access</h2>
+            <p className="text-olive-800/50 text-sm font-light">Sign in with your Google account to view lead details.</p>
+          </div>
+          <button
+            onClick={handleSignIn}
+            disabled={loading}
+            className="flex items-center gap-4 bg-olive-900 text-cream px-8 py-4 text-xs uppercase tracking-[0.4em] font-bold hover:bg-primary transition-all shadow-md"
+          >
+            {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : (
+              <svg className="w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+              </svg>
+            )}
+            {loading ? 'Signing in…' : 'Continue with Google'}
+          </button>
+        </div>
+      ) : (
+        /* Dashboard */
+        <div className="px-6 md:px-12 py-8 max-w-7xl mx-auto">
+          {/* Summary cards */}
+          <div className="grid grid-cols-2 gap-4 mb-8">
+            <div className="bg-surface border border-outline/10 p-6 flex items-center gap-4">
+              <Users className="w-8 h-8 text-primary opacity-60" />
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.4em] text-olive-800/40 mb-1">Membership Leads</p>
+                <p className="text-3xl font-bold text-olive-900">{leads.length}</p>
+              </div>
+            </div>
+            <div className="bg-surface border border-outline/10 p-6 flex items-center gap-4">
+              <MailIcon className="w-8 h-8 text-primary opacity-60" />
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.4em] text-olive-800/40 mb-1">Newsletter Subs</p>
+                <p className="text-3xl font-bold text-olive-900">{subs.length}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Tabs */}
+          <div className="flex gap-1 mb-6 border-b border-outline/10">
+            {(['leads', 'newsletter'] as const).map(t => (
+              <button
+                key={t}
+                onClick={() => setTab(t)}
+                className={cn(
+                  "px-6 py-3 text-[10px] uppercase tracking-[0.4em] font-bold border-b-2 transition-all",
+                  tab === t ? "border-primary text-olive-900" : "border-transparent text-olive-800/40 hover:text-olive-900"
+                )}
+              >
+                {t === 'leads' ? 'Membership Leads' : 'Newsletter'}
+              </button>
+            ))}
+          </div>
+
+          {/* Leads table */}
+          {tab === 'leads' && (
+            <div className="overflow-x-auto">
+              {leads.length === 0 ? (
+                <p className="text-olive-800/40 text-sm py-12 text-center">No leads yet.</p>
+              ) : (
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-[9px] uppercase tracking-[0.4em] text-olive-800/40 border-b border-outline/10">
+                      <th className="text-left py-3 pr-6">Name</th>
+                      <th className="text-left py-3 pr-6">Email</th>
+                      <th className="text-left py-3 pr-6">Intent</th>
+                      <th className="text-left py-3">Submitted</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {leads.map(l => (
+                      <tr key={l.id} className="border-b border-outline/5 hover:bg-primary/5 transition-colors">
+                        <td className="py-4 pr-6 font-medium text-olive-900">{l.name}</td>
+                        <td className="py-4 pr-6 text-olive-800/70">{l.email}</td>
+                        <td className="py-4 pr-6 text-olive-800/50 max-w-xs">
+                          <span className="line-clamp-2">{l.intent || '—'}</span>
+                        </td>
+                        <td className="py-4 text-olive-800/40 whitespace-nowrap text-xs">{fmt(l.createdAt)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          )}
+
+          {/* Newsletter table */}
+          {tab === 'newsletter' && (
+            <div className="overflow-x-auto">
+              {subs.length === 0 ? (
+                <p className="text-olive-800/40 text-sm py-12 text-center">No subscribers yet.</p>
+              ) : (
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-[9px] uppercase tracking-[0.4em] text-olive-800/40 border-b border-outline/10">
+                      <th className="text-left py-3 pr-6">Email</th>
+                      <th className="text-left py-3 pr-6">Source</th>
+                      <th className="text-left py-3">Signed Up</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {subs.map(s => (
+                      <tr key={s.id} className="border-b border-outline/5 hover:bg-primary/5 transition-colors">
+                        <td className="py-4 pr-6 font-medium text-olive-900">{s.email}</td>
+                        <td className="py-4 pr-6">
+                          <span className={cn(
+                            "text-[9px] uppercase tracking-widest font-bold px-2 py-1",
+                            s.source === 'modal' ? "bg-gold/20 text-gold" : "bg-primary/10 text-primary"
+                          )}>
+                            {s.source === 'modal' ? 'Modal' : 'Inline'}
+                          </span>
+                        </td>
+                        <td className="py-4 text-olive-800/40 whitespace-nowrap text-xs">{fmt(s.createdAt)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
 export default function App() {
-  type ViewMode = 'home' | 'map' | 'list' | 'gallery' | 'analytics' | 'the-sil';
+  type ViewMode = 'home' | 'map' | 'list' | 'gallery' | 'analytics' | 'the-sil' | 'admin';
   const VIEW_ORDER: ViewMode[] = ['home', 'list', 'gallery', 'analytics', 'the-sil', 'map'];
 
   const [isSubscribed, setIsSubscribed] = useState(() => {
@@ -2488,13 +2697,14 @@ export default function App() {
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
-      <Navbar isSubscribed={isSubscribed} onNewsletterClick={() => setIsNewsletterOpen(true)} onModeChange={handleViewChange} isDark={isDark} setIsDark={setIsDark} />
+      <Navbar isSubscribed={isSubscribed} onNewsletterClick={() => setIsNewsletterOpen(true)} onModeChange={handleViewChange} isDark={isDark} setIsDark={setIsDark} onAdminClick={() => handleViewChange('admin')} />
 
       <main className="flex-1 flex overflow-hidden relative">
         {/* Center - Map or other views */}
         <div className="flex-1 relative overflow-hidden bg-surface">
           {viewMode === 'map' && <SanctuaryMapLayout />}
-          {viewMode !== 'map' && (
+          {viewMode === 'admin' && <AdminDashboard onClose={() => handleViewChange('home')} />}
+          {viewMode !== 'map' && viewMode !== 'admin' && (
             <div ref={scrollRef} className="h-full w-full overflow-y-auto">
               {viewMode === 'home' && <HomeView isSubscribed={isSubscribed} onNewsletterClick={() => setIsNewsletterOpen(true)} />}
               {viewMode === 'list' && <Sanctuaries isSubscribed={isSubscribed} onNewsletterClick={() => setIsNewsletterOpen(true)} isFullPage />}
