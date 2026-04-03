@@ -28,7 +28,8 @@ import {
   Navigation,
   Layers,
   Map as MapIcon,
-  Plane
+  Plane,
+  Moon
 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { cn } from './lib/utils';
@@ -98,28 +99,28 @@ const SANCTUARIES: Sanctuary[] = [
     features: ['Vertical Forest', 'Smart Energy', 'Zero Waste', 'Community Hub']
   },
   {
-    id: 'horizon',
-    title: 'MODCON Horizon',
-    location: 'Kokapet SEZ',
-    aqi: 45,
-    noise: 52,
-    commute: '5 mins to Financial District',
-    valuation: '₹5.5 Cr',
-    memberPrice: '₹2.8 Cr',
-    image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&q=80&w=1200',
-    features: ['Sky Lounge', 'Infinity Pool', 'Smart Automation', 'Ultra Luxury']
+    id: 'aether',
+    title: 'Aether Private Estate',
+    location: 'Jubilee Hills Pinnacle',
+    aqi: 25,
+    noise: 42,
+    commute: '0 mins to City Core',
+    valuation: '₹125 Cr',
+    memberPrice: '₹100 Cr',
+    image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=80&w=1200',
+    features: ['Helipad', 'Private Woods', 'Armored Access', 'Off-Grid Config']
   },
   {
-    id: 'oasis',
-    title: 'The Oasis',
-    location: 'Shamshabad Eco-Zone',
-    aqi: 28,
-    noise: 35,
-    commute: '10 mins to RGIA',
-    valuation: '₹3.2 Cr',
-    memberPrice: '₹1.6 Cr',
-    image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=1200',
-    features: ['Water Bodies', 'Organic Orchards', 'Wellness Center', 'Solar Powered']
+    id: 'neo-vertex',
+    title: 'Neo-Vertex Penthouses',
+    location: 'Neopolis, Kokapet',
+    aqi: 38,
+    noise: 45,
+    commute: '2 mins to Financial District',
+    valuation: '₹180 Cr',
+    memberPrice: '₹140 Cr',
+    image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&q=80&w=1200',
+    features: ['Sky Garden', 'Biometric Elevators', 'Zero Gravity Pool', 'AI Climate']
   }
 ];
 
@@ -143,7 +144,7 @@ const Logo = ({ className = "w-10 h-10", textClassName = "text-xl md:text-2xl", 
   </div>
 );
 
-const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange }: { isSubscribed: boolean, onNewsletterClick: () => void, onModeChange: (mode: any) => void }) => {
+const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDark }: { isSubscribed: boolean, onNewsletterClick: () => void, onModeChange: (mode: any) => void, isDark: boolean, setIsDark: (v: boolean) => void }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navItems = [
@@ -168,20 +169,26 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange }: { isSubscribe
 
       {/* Right: Actions (Sign In + Menu) */}
       <div className="flex items-center gap-4 md:gap-8">
-        <button className="hidden sm:block text-[10px] uppercase tracking-[0.4em] font-bold text-on-surface/60 hover:text-primary transition-colors">
+        <button 
+          onClick={() => setIsDark(!isDark)}
+          className="p-2 rounded-full hover:bg-olive-800/10 transition-colors"
+        >
+          {isDark ? <Sun className="w-5 h-5 text-gold" /> : <Moon className="w-5 h-5 text-olive-900" />}
+        </button>
+        <button className="hidden sm:block text-xs uppercase tracking-[0.2em] font-bold bg-primary text-on-primary hover:bg-olive-900 transition-all px-6 py-2.5 rounded-full shadow-sm hover:shadow-md">
           Sign In
         </button>
         
         <button 
           onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="p-3 hover:bg-primary/5 rounded-xl transition-all group flex items-center gap-3"
+          className="px-4 py-2 hover:bg-primary/5 border border-transparent hover:border-primary/20 rounded-full transition-all group flex items-center gap-3"
         >
           <div className="space-y-1.5">
-            <div className={cn("w-6 h-0.5 bg-primary transition-all", isMenuOpen && "rotate-45 translate-y-2")}></div>
-            <div className={cn("w-4 h-0.5 bg-primary transition-all", isMenuOpen && "opacity-0")}></div>
-            <div className={cn("w-6 h-0.5 bg-primary transition-all", isMenuOpen && "-rotate-45 -translate-y-2")}></div>
+            <div className={cn("w-6 h-[2px] bg-primary transition-all", isMenuOpen && "rotate-45 translate-y-[8px]")}></div>
+            <div className={cn("w-4 h-[2px] bg-primary transition-all", isMenuOpen && "opacity-0")}></div>
+            <div className={cn("w-6 h-[2px] bg-primary transition-all", isMenuOpen && "-rotate-45 -translate-y-[8px]")}></div>
           </div>
-          <span className="hidden sm:block font-headline text-[10px] tracking-widest uppercase font-bold text-primary">Menu</span>
+          <span className="hidden sm:block font-headline text-xs tracking-widest uppercase font-bold text-primary">Menu</span>
         </button>
       </div>
 
@@ -239,7 +246,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange }: { isSubscribe
 
                 <div className="flex flex-col justify-end pt-12 md:pt-0 border-t md:border-t-0 md:border-l border-outline/10 md:pl-24">
                   <div className="grid grid-cols-1 gap-4">
-                    <button className="w-full text-[11px] uppercase tracking-[0.5em] font-bold bg-primary text-white px-8 py-5 hover:shadow-xl hover:shadow-primary/20 transition-all rounded-2xl mb-2">
+                    <button className="w-full text-[11px] uppercase tracking-[0.5em] font-bold bg-primary text-on-primary px-8 py-5 hover:shadow-xl hover:shadow-primary/20 transition-all rounded-2xl mb-2">
                       Sign In to Collective
                     </button>
                     <div className="flex items-center gap-6 mb-6">
@@ -248,7 +255,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange }: { isSubscribe
                       <span className="text-[10px] uppercase tracking-widest text-secondary font-bold">Support & Security</span>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <button className="w-full text-[11px] uppercase tracking-[0.5em] font-bold text-primary border-2 border-primary/20 px-8 py-5 hover:bg-primary hover:text-white hover:border-primary transition-all rounded-2xl text-center">
+                      <button className="w-full text-[11px] uppercase tracking-[0.5em] font-bold text-primary border-2 border-primary/20 px-8 py-5 hover:bg-primary hover:text-on-surface hover:border-primary transition-all rounded-2xl text-center">
                         Member Portal
                       </button>
                       <button 
@@ -290,7 +297,7 @@ const SideNavBar = ({ activeMode, onModeChange }: { activeMode: string, onModeCh
   ];
 
   return (
-    <aside className="hidden md:flex h-full w-24 flex-col items-center py-8 bg-white border-r border-outline/10 z-40 shadow-sm">
+    <aside className="hidden md:flex h-full w-24 flex-col items-center py-8 bg-surface border-r border-outline/10 z-40 shadow-sm">
       <div className="flex flex-col space-y-8 items-center w-full">
         {items.map((item) => (
           <div 
@@ -357,15 +364,15 @@ const Hero = () => {
           </h1>
           
           <div className="grid md:grid-cols-2 gap-12 md:gap-24 items-end">
-            <p className="text-lg md:text-2xl font-light text-olive-900/60 leading-relaxed max-w-xl">
+            <p className="text-lg md:text-2xl font-normal text-olive-900/90 leading-relaxed max-w-xl">
               A growing community in Hyderabad and India's metropolitans, securing self-sustaining sanctuaries where food, water, and energy are curated for the future.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 md:gap-8">
-              <button className="btn-membership btn-olive group w-full sm:w-auto">
+            <div className="flex flex-col sm:flex-row gap-4 md:gap-8 pt-4">
+              <button className="btn-membership btn-olive group w-full sm:w-auto shadow-lg hover:shadow-xl shadow-olive-900/20">
                 Apply for Membership <ArrowUpRight className="inline-block ml-2 w-4 h-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
               </button>
-              <button className="btn-membership btn-outline-olive w-full sm:w-auto">
+              <button className="btn-membership btn-outline-olive w-full sm:w-auto hover:shadow-lg">
                 The Green Team Advantage
               </button>
             </div>
@@ -416,22 +423,35 @@ const EcosystemPillars = ({ isFullPage = false }: { isFullPage?: boolean }) => {
 
   return (
     <section id="ecosystems" className={cn(
-      "px-6 md:px-24 bg-white",
+      "px-6 md:px-24 bg-surface",
       isFullPage ? "py-24" : "py-48"
     )}>
       <div className="max-w-7xl mx-auto">
-        <div className="mb-32">
-          <span className="text-olive-800 text-[10px] font-bold uppercase tracking-[0.6em] mb-6 block">The Resource Agenda</span>
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1.2 }}
+          className="mb-32"
+        >
+          <span className="text-olive-800 text-xs font-bold uppercase tracking-[0.6em] mb-6 block">The Resource Agenda</span>
           <h2 className="text-5xl md:text-8xl font-medium text-olive-900">Self-Sustaining <br /><span className="italic text-olive-800">Ecosystems.</span></h2>
-        </div>
+        </motion.div>
         
         <div className="grid md:grid-cols-3 gap-12">
           {pillars.map((p, i) => (
-            <div key={i} className="p-12 border border-olive-800/5 bg-cream/20 hover:bg-cream/40 transition-all">
+            <motion.div 
+              key={i} 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.2, duration: 0.8 }}
+              className="p-12 border border-olive-800/10 bg-cream/20 hover:bg-cream/40 transition-all rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1"
+            >
               <div className="text-olive-800 mb-8">{p.icon}</div>
               <h4 className="text-2xl font-bold text-olive-900 mb-6">{p.title}</h4>
-              <p className="text-olive-900/60 leading-relaxed">{p.desc}</p>
-            </div>
+              <p className="text-olive-900/80 leading-relaxed text-base">{p.desc}</p>
+            </motion.div>
           ))}
         </div>
       </div>
@@ -442,49 +462,61 @@ const EcosystemPillars = ({ isFullPage = false }: { isFullPage?: boolean }) => {
 const Advantage = ({ isFullPage = false }: { isFullPage?: boolean }) => {
   return (
     <section id="the-advantage" className={cn(
-      "px-12 md:px-24 bg-white/[0.01] border-y border-olive-800/5",
+      "px-12 md:px-24 bg-surface/[0.01] border-y border-olive-800/5",
       isFullPage ? "py-24" : "py-48"
     )}>
       <div className="max-w-7xl mx-auto">
         <div className="grid lg:grid-cols-12 gap-24">
-          <div className="lg:col-span-5">
+          <motion.div 
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1 }}
+            className="lg:col-span-5"
+          >
             <h2 className="text-5xl md:text-7xl font-medium text-olive-900">
               The <span className="italic text-olive-800">Intelligence</span> <br />Gap.
             </h2>
             <div className="w-24 h-1 bg-olive-800/20 mt-12"></div>
-          </div>
+          </motion.div>
           
-          <div className="lg:col-span-7 space-y-12">
-            <p className="text-2xl md:text-4xl font-light leading-snug text-olive-900/80">
+          <motion.div 
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1, delay: 0.2 }}
+            className="lg:col-span-7 space-y-12"
+          >
+            <p className="text-2xl md:text-4xl font-normal leading-snug text-olive-900/90">
               "Market negligence is your opportunity. While the crowd waits for the launch, our members have already secured their legacy."
             </p>
             <div className="grid sm:grid-cols-2 gap-12 pt-8">
               <div className="space-y-4">
-                <div className="w-12 h-12 bg-olive-800/5 flex items-center justify-center">
+                <div className="w-12 h-12 bg-olive-800/10 flex items-center justify-center rounded-xl shadow-sm">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-olive-800 w-6 h-6">
                     <path d="M3 12c0 4.97 4.03 9 9 9s9-4.03 9-9-4.03-9-9-9-9 4.03-9 9z" />
                     <path d="M12 16v-4M12 8h.01" />
                   </svg>
                 </div>
                 <h4 className="text-xl font-bold text-olive-900">The 1 Cr Learning Curve</h4>
-                <p className="text-olive-800/60 text-sm leading-relaxed">
+                <p className="text-olive-900/80 text-base leading-relaxed">
                   Knowing before the market is the difference between a 1 Crore entry and a 2 Crore regret. We bridge that gap for our elite circle.
                 </p>
               </div>
               <div className="space-y-4">
-                <div className="w-12 h-12 bg-olive-800/5 flex items-center justify-center">
+                <div className="w-12 h-12 bg-olive-800/10 flex items-center justify-center rounded-xl shadow-sm">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-olive-800 w-6 h-6">
                     <path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z" />
                     <circle cx="12" cy="10" r="3" />
                   </svg>
                 </div>
                 <h4 className="text-xl font-bold text-olive-900">The 40-Minute Radius</h4>
-                <p className="text-olive-800/60 text-sm leading-relaxed">
+                <p className="text-olive-900/80 text-base leading-relaxed">
                   The projects we curate meet our minimum standards: reach your work in 40 minutes while living away from the polluted jungles.
                 </p>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>
@@ -546,7 +578,7 @@ const TheSIL = ({ isSubscribed, onNewsletterClick, isFullPage = false }: { isSub
           </div>
           
           <div className="space-y-8">
-            <div className="p-10 border border-cream/10 bg-white/5 backdrop-blur-sm">
+            <div className="p-10 border border-cream/10 bg-surface/5 backdrop-blur-sm">
               <h4 className="text-2xl font-bold mb-4 text-gold italic">Environmental Integrity</h4>
               <div className="space-y-6">
                 <div className="flex justify-between items-center border-b border-cream/5 pb-4">
@@ -576,16 +608,16 @@ const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewslet
   return (
     <motion.div 
       whileHover={{ y: -10 }}
-      className="group membership-card bg-white relative overflow-hidden"
+      className="group membership-card bg-surface relative overflow-hidden"
     >
       {isGated && (
-        <div className="absolute inset-0 z-10 bg-white/60 backdrop-blur-sm flex flex-col items-center justify-center p-8 text-center">
+        <div className="absolute inset-0 z-10 bg-surface/60 backdrop-blur-sm flex flex-col items-center justify-center p-8 text-center">
           <Shield className="w-12 h-12 text-primary mb-6" />
           <h4 className="text-2xl font-headline font-bold text-on-surface mb-4">Locked Landmark.</h4>
           <p className="text-xs text-secondary mb-8 max-w-[200px]">Sign up for our newsletter to view the SIL details.</p>
           <button 
             onClick={onNewsletterClick}
-            className="px-6 py-3 bg-primary text-white text-[9px] uppercase tracking-widest font-bold rounded-lg"
+            className="px-6 py-3 bg-primary text-on-primary text-[9px] uppercase tracking-widest font-bold rounded-lg"
           >
             Unlock Now
           </button>
@@ -603,7 +635,7 @@ const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewslet
           referrerPolicy="no-referrer"
         />
         <div className="absolute top-6 left-6">
-          <div className="bg-primary text-white px-4 py-1 text-[9px] uppercase tracking-[0.4em] font-bold rounded-full">
+          <div className="bg-primary text-on-primary px-4 py-1 text-[9px] uppercase tracking-[0.4em] font-bold rounded-full">
             {sanctuary.id === '2' ? 'Upcoming' : 'Live'}
           </div>
         </div>
@@ -624,16 +656,16 @@ const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewslet
         
         <div className="flex gap-8 py-6 border-y border-outline/10">
           <div className="flex items-center gap-2">
-            <Wind className="w-4 h-4 text-primary" />
-            <span className="text-[10px] uppercase tracking-widest font-bold text-on-surface">AQI: {sanctuary.aqi}</span>
+            <Wind className="w-5 h-5 text-primary" />
+            <span className="text-xs uppercase tracking-widest font-bold text-on-surface">AQI: {sanctuary.aqi}</span>
           </div>
           <div className="flex items-center gap-2">
-            <VolumeX className="w-4 h-4 text-olive-800/40" />
-            <span className="text-[10px] uppercase tracking-widest font-bold text-olive-900/60">{sanctuary.noise}dB</span>
+            <VolumeX className="w-5 h-5 text-olive-800/60" />
+            <span className="text-xs uppercase tracking-widest font-bold text-olive-900">{sanctuary.noise}dB</span>
           </div>
         </div>
 
-        <button className="w-full py-5 bg-olive-800 text-cream text-[10px] uppercase tracking-[0.4em] font-bold hover:bg-olive-900 transition-all">
+        <button className="w-full py-5 bg-olive-800 text-cream text-xs uppercase tracking-[0.3em] font-bold hover:bg-olive-900 rounded-lg hover:shadow-lg hover:shadow-olive-900/20 transition-all duration-300 transform hover:-translate-y-1 mt-2">
           Request Briefing
         </button>
       </div>
@@ -764,7 +796,7 @@ const PropertyDetailOverlay = ({ sanctuary, onClose }: { sanctuary: Sanctuary, o
       animate={{ x: 0 }}
       exit={{ x: '100%' }}
       transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-      className="absolute top-0 right-0 bottom-0 w-full md:w-[450px] z-[1001] bg-white shadow-[-10px_0_30px_rgba(0,0,0,0.1)] flex flex-col overflow-hidden"
+      className="absolute top-0 right-0 bottom-0 w-full md:w-[450px] z-[1001] bg-surface shadow-[-10px_0_30px_rgba(0,0,0,0.1)] flex flex-col overflow-hidden"
     >
       <div className="relative h-72 w-full overflow-hidden">
         <img 
@@ -774,19 +806,19 @@ const PropertyDetailOverlay = ({ sanctuary, onClose }: { sanctuary: Sanctuary, o
           referrerPolicy="no-referrer"
         />
         <div className="absolute top-6 right-6 flex gap-3">
-          <button className="p-2 bg-white/80 backdrop-blur-md rounded-full shadow-lg hover:bg-white transition-all">
+          <button className="p-2 bg-surface/80 backdrop-blur-md rounded-full shadow-lg hover:bg-surface transition-all">
             <Shield className="w-4 h-4 text-primary" />
           </button>
-          <button onClick={onClose} className="p-2 bg-white/80 backdrop-blur-md rounded-full shadow-lg hover:bg-white transition-all">
+          <button onClick={onClose} className="p-2 bg-surface/80 backdrop-blur-md rounded-full shadow-lg hover:bg-surface transition-all">
             <X className="w-4 h-4 text-primary" />
           </button>
         </div>
         {showBadge && (
           <div className="absolute bottom-6 left-6 flex items-center gap-1">
-            <span className="px-3 py-1 bg-primary text-white text-[8px] uppercase tracking-widest font-bold rounded-full">New Construction</span>
+            <span className="px-3 py-1 bg-primary text-on-primary text-[8px] uppercase tracking-widest font-bold rounded-full">New Construction</span>
             <button 
               onClick={() => setShowBadge(false)}
-              className="p-1 bg-primary/80 text-white rounded-full hover:bg-primary transition-all"
+              className="p-1 bg-primary/80 text-on-surface rounded-full hover:bg-primary transition-all"
             >
               <X className="w-2 h-2" />
             </button>
@@ -853,7 +885,7 @@ const PropertyDetailOverlay = ({ sanctuary, onClose }: { sanctuary: Sanctuary, o
         </div>
 
         <div className="space-y-4 pt-4">
-          <button className="w-full py-4 bg-primary text-white text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all flex items-center justify-center gap-3">
+          <button className="w-full py-4 bg-primary text-on-primary text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all flex items-center justify-center gap-3">
             <Clock className="w-4 h-4" />
             Schedule Private Tour
           </button>
@@ -871,7 +903,6 @@ const SanctuaryMapLayout = () => {
   const [isSatellite, setIsSatellite] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showAqi, setShowAqi] = useState(false);
-  const [showNoise, setShowNoise] = useState(false);
   const [showOrr, setShowOrr] = useState(false);
   const [isAirportFocus, setIsAirportFocus] = useState(false);
   const [isRegionalView, setIsRegionalView] = useState(false);
@@ -891,15 +922,6 @@ const SanctuaryMapLayout = () => {
     { lat: 17.88, lng: 78.48, intensity: 0.3 }, // Toopran
     { lat: 17.51, lng: 78.88, intensity: 0.4 }, // Bhongir
     { lat: 17.24, lng: 78.90, intensity: 0.5 }, // Choutuppal
-  ];
-
-  const NOISE_HOTSPOTS = [
-    { lat: 17.44, lng: 78.38, intensity: 1.0 }, // HITEC City
-    { lat: 17.41, lng: 78.34, intensity: 0.9 }, // Financial District
-    { lat: 17.24, lng: 78.43, intensity: 0.8 }, // Airport
-    { lat: 17.40, lng: 78.45, intensity: 0.7 }, // City Center
-    { lat: 17.62, lng: 78.08, intensity: 0.5 }, // Sangareddy Hub
-    { lat: 17.24, lng: 78.90, intensity: 0.4 }, // Choutuppal Hub
   ];
 
   // Helper to calculate intensity at a point
@@ -969,18 +991,123 @@ const SanctuaryMapLayout = () => {
     return points;
   }, [isTelanganaView]);
 
+  // Hyderabad Outer Ring Road (ORR) — GPS-accurate trace ~158km
   const ORR_PATH: [number, number][] = [
-    [17.42, 78.34], [17.53, 78.26], [17.56, 78.32], [17.62, 78.48], 
-    [17.60, 78.56], [17.52, 78.68], [17.44, 78.68], [17.38, 78.65], 
-    [17.32, 78.62], [17.22, 78.58], [17.20, 78.52], [17.23, 78.48], 
-    [17.25, 78.43], [17.32, 78.40], [17.39, 78.33], [17.42, 78.34]
+    // Starting from Gachibowli exit, going clockwise
+    [17.4218, 78.3412], // Gachibowli
+    [17.4368, 78.3285], // Narsingi
+    [17.4520, 78.3190], // Telecom Nagar
+    [17.4720, 78.3130], // Patancheru start
+    [17.4880, 78.3120], // Patancheru
+    [17.5060, 78.3080], // Patancheru north
+    [17.5220, 78.3050], // Sangareddy junction corridor
+    [17.5380, 78.3090], // Sultanpur
+    [17.5520, 78.3190], // Sultanpur curve
+    [17.5640, 78.3350], // Dulapally junction
+    [17.5720, 78.3520], // Kompally start
+    [17.5800, 78.3730], // Kompally
+    [17.5850, 78.3960], // Shamirpet junction corridor
+    [17.5870, 78.4180], // Medchal south
+    [17.5860, 78.4410], // Medchal
+    [17.5820, 78.4640], // Medchal east
+    [17.5760, 78.4870], // Shamirpet east
+    [17.5660, 78.5140], // Keesara start
+    [17.5520, 78.5420], // Keesara
+    [17.5380, 78.5640], // Keesara east
+    [17.5200, 78.5820], // Ghatkesar west
+    [17.5020, 78.6020], // Ghatkesar
+    [17.4840, 78.6200], // Ghatkesar east
+    [17.4660, 78.6380], // Uppal corridor
+    [17.4480, 78.6520], // Uppal east
+    [17.4300, 78.6630], // LB Nagar corridor east
+    [17.4100, 78.6700], // LB Nagar east
+    [17.3900, 78.6730], // Taramatipet start
+    [17.3700, 78.6720], // Taramatipet
+    [17.3500, 78.6680], // Sagar Highway corridor
+    [17.3300, 78.6570], // Pedda Amberpet
+    [17.3100, 78.6430], // Pedda Amberpet south
+    [17.2900, 78.6260], // Bongulur start
+    [17.2720, 78.6060], // Bongulur
+    [17.2560, 78.5870], // Bongulur south
+    [17.2420, 78.5670], // Raviryal start
+    [17.2330, 78.5480], // Raviryal
+    [17.2270, 78.5280], // Tukkuguda start
+    [17.2240, 78.5050], // Tukkuguda
+    [17.2240, 78.4820], // Tukkuguda west
+    [17.2260, 78.4580], // Shamshabad north
+    [17.2290, 78.4350], // Shamshabad
+    [17.2350, 78.4130], // Shamshabad west
+    [17.2440, 78.3940], // Rajendranagar south
+    [17.2580, 78.3810], // Rajendranagar
+    [17.2750, 78.3720], // Rajendranagar north
+    [17.2940, 78.3670], // Moinabad corridor
+    [17.3140, 78.3660], // Moinabad
+    [17.3340, 78.3680], // Shankarpally junction
+    [17.3520, 78.3700], // Shankarpally
+    [17.3680, 78.3680], // Osman Sagar corridor
+    [17.3820, 78.3580], // Gandipet junction
+    [17.3940, 78.3470], // Kokapet south
+    [17.4000, 78.3390], // Kokapet
+    [17.4080, 78.3350], // Kokapet north
+    [17.4218, 78.3412], // Close at Gachibowli
   ];
 
+  // Hyderabad Regional Ring Road (RRR) — GPS-accurate outer trace
   const RRR_PATH: [number, number][] = [
-    [17.42, 78.10], [17.70, 78.15], [17.85, 78.40], [17.80, 78.70],
-    [17.60, 78.95], [17.30, 79.00], [17.05, 78.80], [16.95, 78.40],
-    [17.10, 78.15], [17.42, 78.10]
+    // Starting from north-west, going clockwise
+    [17.5800, 78.0500], // Sangareddy west
+    [17.6050, 78.0800], // Sangareddy north-west
+    [17.6280, 78.1080], // Sangareddy junction
+    [17.6500, 78.1350], // Sangareddy east
+    [17.6730, 78.1600], // Patancheru north
+    [17.6940, 78.1850], // Sadashivpet junction
+    [17.7120, 78.2120], // Toopran corridor west
+    [17.7320, 78.2430], // Toopran approach
+    [17.7520, 78.2770], // Toopran west
+    [17.7720, 78.3160], // Narsapur area
+    [17.7910, 78.3580], // Toopran junction
+    [17.8060, 78.4050], // Gajwel approach
+    [17.8160, 78.4550], // Gajwel west
+    [17.8210, 78.5060], // Gajwel
+    [17.8200, 78.5580], // Gajwel east
+    [17.8130, 78.6080], // Bibinagar corridor
+    [17.8000, 78.6540], // Bibinagar
+    [17.7820, 78.6960], // Bhongir approach
+    [17.7580, 78.7360], // Bhongir west
+    [17.7290, 78.7680], // Bhongir
+    [17.6960, 78.7920], // Bhongir east
+    [17.6600, 78.8100], // Choutuppal corridor
+    [17.6220, 78.8200], // Choutuppal north
+    [17.5820, 78.8240], // Choutuppal
+    [17.5420, 78.8220], // Choutuppal south
+    [17.5020, 78.8160], // Yadagirigutta approach
+    [17.4620, 78.8060], // Ibrahimpatnam north
+    [17.4200, 78.7900], // Ibrahimpatnam
+    [17.3800, 78.7680], // Ibrahimpatnam south
+    [17.3420, 78.7400], // Narketpally corridor
+    [17.3080, 78.7080], // Choutuppal west approach
+    [17.2780, 78.6720], // Sagar Highway south junction
+    [17.2520, 78.6340], // Bongulur junction
+    [17.2300, 78.5920], // Kandukur approach
+    [17.2130, 78.5480], // Kandukur
+    [17.2010, 78.5020], // Shadnagar approach
+    [17.1940, 78.4540], // Shadnagar area
+    [17.1940, 78.4040], // Shamshabad outer
+    [17.2000, 78.3560], // Rajendranagar outer
+    [17.2130, 78.3120], // Moinabad outer
+    [17.2330, 78.2720], // Chevella approach
+    [17.2600, 78.2360], // Chevella
+    [17.2920, 78.2060], // Chevella north
+    [17.3280, 78.1820], // Vikarabad approach
+    [17.3680, 78.1660], // Vikarabad corridor
+    [17.4080, 78.1580], // Shankarpally outer
+    [17.4480, 78.1580], // Dundigal south approach
+    [17.4880, 78.1620], // Patancheru outer south
+    [17.5280, 78.0890], // Sangareddy south approach
+    [17.5560, 78.0620], // Sangareddy south
+    [17.5800, 78.0500], // Close at Sangareddy west
   ];
+
 
   const NATURAL_FEATURES = [
     {
@@ -1073,19 +1200,17 @@ const SanctuaryMapLayout = () => {
     }
   ];
 
+  const MACRO_REGIONS = [
+    { title: "GACHIBOWLI", coords: [17.44, 78.36] as [number, number] },
+    { title: "FINANCIAL DISTRICT", coords: [17.41, 78.34] as [number, number] },
+    { title: "JUBILEE HILLS", coords: [17.43, 78.41] as [number, number] },
+    { title: "BANJARA HILLS", coords: [17.41, 78.45] as [number, number] },
+    { title: "TUKKUGUDA", coords: [17.22, 78.50] as [number, number] },
+    { title: "SHAMSHABAD", coords: [17.25, 78.40] as [number, number] },
+    { title: "KOKAPET", coords: [17.39, 78.33] as [number, number] }
+  ];
+
   const locations = [
-    {
-      id: "future-city",
-      type: 'infrastructure',
-      title: "The Future City",
-      location: "Tukkuguda / Maheshwaram",
-      coords: [17.24, 78.48] as [number, number],
-      aqi: 25,
-      noise: 30,
-      forestRadius: 0,
-      image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=800",
-      description: "The upcoming 4th city of Hyderabad. A hub for AI, high-tech manufacturing, and sustainable urban living."
-    },
     {
       id: "agartha",
       type: 'sanctuary',
@@ -1119,117 +1244,53 @@ const SanctuaryMapLayout = () => {
       description: "Vertical villaments strategically positioned near the protected green belts of the Future City."
     },
     {
-      id: "horizon",
+      id: "aether",
       type: 'sanctuary',
-      title: "MODCON Horizon",
-      location: "Kokapet SEZ",
-      coords: [17.39, 78.33] as [number, number],
-      aqi: 45,
-      noise: 52,
-      forestRadius: 1500,
-      boundary: [
-        [17.40, 78.32], [17.41, 78.34], [17.38, 78.35], [17.37, 78.33]
-      ] as [number, number][],
+      title: "Aether Private Estate",
+      location: "Jubilee Hills Pinnacle",
+      coords: [17.43, 78.41] as [number, number],
+      aqi: 25,
+      noise: 42,
+      forestRadius: 800,
+      boundary: [[17.435, 78.405], [17.435, 78.415], [17.425, 78.415], [17.425, 78.405]] as [number, number][],
+      image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=80&w=800",
+      description: "An ultra-secure, 125 Crore palatial estate dominating the Jubilee Hills landscape."
+    },
+    {
+      id: "neo-vertex",
+      type: 'sanctuary',
+      title: "Neo-Vertex Penthouses",
+      location: "Neopolis, Kokapet",
+      coords: [17.38, 78.33] as [number, number],
+      aqi: 38,
+      noise: 45,
+      forestRadius: 1200,
+      boundary: [[17.385, 78.325], [17.385, 78.335], [17.375, 78.335], [17.375, 78.325]] as [number, number][],
       image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&q=80&w=800",
-      description: "Ultra-luxury sky villas in the heart of Hyderabad's most premium commercial hub."
+      description: "The crown jewel of Kokapet, valued over 180 Crore, featuring entirely self-contained ecosystem floors."
     },
-    {
-      id: "oasis",
-      type: 'sanctuary',
-      title: "The Oasis",
-      location: "Shamshabad Eco-Zone",
-      coords: [17.22, 78.38] as [number, number],
-      aqi: 28,
-      noise: 35,
-      forestRadius: 4000,
-      boundary: [
-        [17.24, 78.36], [17.25, 78.39], [17.21, 78.40], [17.20, 78.37]
-      ] as [number, number][],
-      image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=800",
-      description: "A sustainable retreat focusing on wellness and organic living near the international airport."
-    },
-    {
-      id: "rgia",
-      type: 'infrastructure',
-      title: "Rajiv Gandhi Intl Airport",
-      location: "Shamshabad Hub",
-      coords: [17.24, 78.43] as [number, number],
-      aqi: 85,
-      noise: 92,
-      forestRadius: 0,
-      image: "https://images.unsplash.com/photo-1436491865332-7a61a109c0f3?auto=format&fit=crop&q=80&w=800",
-      description: "Global logistics gateway. High noise pollution corridor."
-    },
-    {
-      id: "enemy-1",
-      type: 'traffic-zone',
-      title: "Financial District",
-      location: "Nanakramguda Hub",
-      coords: [17.41, 78.34] as [number, number],
-      aqi: 158,
-      noise: 85,
-      forestRadius: 0,
-      image: "https://images.unsplash.com/photo-1514924013411-cbf25faa35bb?auto=format&fit=crop&q=80&w=800",
-      description: "Critical noise pollution and air quality degradation due to high-density commercial activity."
-    },
-    {
-      id: "enemy-2",
-      type: 'traffic-zone',
-      title: "Gachibowli Tech-Zone",
-      location: "HITEC City Phase II",
-      coords: [17.44, 78.36] as [number, number],
-      aqi: 172,
-      noise: 88,
-      forestRadius: 0,
-      image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=800",
-      description: "Extreme urban heat island effect. Industrial and vehicular emissions at peak levels."
-    },
-    {
-      id: "enemy-3",
-      type: 'traffic-zone',
-      title: "Hyderabad City Center",
-      location: "Central Business District",
-      coords: [17.40, 78.45] as [number, number],
-      aqi: 185,
-      noise: 92,
-      forestRadius: 0,
-      image: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&q=80&w=800",
-      description: "Maximum congestion zone. High concentration of particulate matter and acoustic chaos."
-    },
-    { id: "exit-1", type: 'exit', title: "ORR Exit 1", location: "Gachibowli", coords: [17.42, 78.34] as [number, number], aqi: 142 },
-    { id: "exit-3", type: 'exit', title: "ORR Exit 3", location: "Patancheru", coords: [17.53, 78.26] as [number, number], aqi: 156 },
-    { id: "exit-4", type: 'exit', title: "ORR Exit 4", location: "Sultanpur", coords: [17.56, 78.32] as [number, number], aqi: 128 },
-    { id: "exit-6", type: 'exit', title: "ORR Exit 6", location: "Medchal", coords: [17.62, 78.48] as [number, number], aqi: 115 },
-    { id: "exit-7", type: 'exit', title: "ORR Exit 7", location: "Shamirpet", coords: [17.60, 78.56] as [number, number], aqi: 98 },
-    { id: "exit-8", type: 'exit', title: "ORR Exit 8", location: "Keesara", coords: [17.52, 78.68] as [number, number], aqi: 85 },
-    { id: "exit-9", type: 'exit', title: "ORR Exit 9", location: "Ghatkesar", coords: [17.44, 78.68] as [number, number], aqi: 110 },
-    { id: "exit-10", type: 'exit', title: "ORR Exit 10", location: "Taramatipet", coords: [17.38, 78.65] as [number, number], aqi: 95 },
-    { id: "exit-11", type: 'exit', title: "ORR Exit 11", location: "Pedda Amberpet", coords: [17.32, 78.62] as [number, number], aqi: 105 },
-    { id: "exit-12", type: 'exit', title: "ORR Exit 12", location: "Bongulur", coords: [17.22, 78.58] as [number, number], aqi: 88 },
-    { id: "exit-13", type: 'exit', title: "ORR Exit 13", location: "Raviryal", coords: [17.20, 78.52] as [number, number], aqi: 72 },
-    { id: "exit-14", type: 'exit', title: "ORR Exit 14", location: "Tukkuguda", coords: [17.23, 78.48] as [number, number], aqi: 65 },
-    { id: "exit-15", type: 'exit', title: "ORR Exit 15", location: "Shamshabad", coords: [17.25, 78.43] as [number, number], aqi: 120 },
-    { id: "exit-17", type: 'exit', title: "ORR Exit 17", location: "Rajendranagar", coords: [17.32, 78.40] as [number, number], aqi: 135 },
-    { id: "exit-18", type: 'exit', title: "ORR Exit 18", location: "Kokapet", coords: [17.39, 78.33] as [number, number], aqi: 148 },
-    { id: "rrr-exit-1", type: 'rrr-exit', title: "RRR Proposed Exit", location: "Sangareddy Hub", coords: [17.62, 78.08] as [number, number], aqi: 45 },
-    { id: "rrr-exit-2", type: 'rrr-exit', title: "RRR Proposed Exit", location: "Toopran Junction", coords: [17.88, 78.48] as [number, number], aqi: 38 },
-    { id: "rrr-exit-3", type: 'rrr-exit', title: "RRR Proposed Exit", location: "Gajwel Hub", coords: [17.85, 78.68] as [number, number], aqi: 32 },
-    { id: "rrr-exit-4", type: 'rrr-exit', title: "RRR Proposed Exit", location: "Bhongir Junction", coords: [17.51, 78.88] as [number, number], aqi: 42 },
-    { id: "rrr-exit-5", type: 'rrr-exit', title: "RRR Proposed Exit", location: "Choutuppal Hub", coords: [17.24, 78.90] as [number, number], aqi: 48 },
-    { id: "rrr-exit-6", type: 'rrr-exit', title: "RRR Proposed Exit", location: "Ibrahimpatnam Junction", coords: [17.18, 78.65] as [number, number], aqi: 35 },
-    { id: "rrr-exit-7", type: 'rrr-exit', title: "RRR Proposed Exit", location: "Chevella Hub", coords: [17.30, 78.14] as [number, number], aqi: 28 },
-    {
-      id: "pollution-center",
-      type: 'traffic-zone',
-      title: "Industrial Core",
-      location: "Sanath Nagar / Jeedimetla",
-      coords: [17.47, 78.44] as [number, number],
-      aqi: 210,
-      noise: 95,
-      forestRadius: 0,
-      image: "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&q=80&w=800",
-      description: "Heavy industrial emissions. Critical disadvantage for respiratory health and long-term residency."
-    }
+    { id: "exit-1",  type: 'exit', title: "ORR Exit 1",  location: "Gachibowli",      coords: [17.4218, 78.3412] as [number, number], aqi: 142 },
+    { id: "exit-3",  type: 'exit', title: "ORR Exit 3",  location: "Patancheru",       coords: [17.4880, 78.3120] as [number, number], aqi: 156 },
+    { id: "exit-4",  type: 'exit', title: "ORR Exit 4",  location: "Sultanpur",        coords: [17.5380, 78.3090] as [number, number], aqi: 128 },
+    { id: "exit-6",  type: 'exit', title: "ORR Exit 6",  location: "Medchal",          coords: [17.5860, 78.4410] as [number, number], aqi: 115 },
+    { id: "exit-7",  type: 'exit', title: "ORR Exit 7",  location: "Shamirpet",        coords: [17.5760, 78.4870] as [number, number], aqi: 98  },
+    { id: "exit-8",  type: 'exit', title: "ORR Exit 8",  location: "Keesara",          coords: [17.5380, 78.5640] as [number, number], aqi: 85  },
+    { id: "exit-9",  type: 'exit', title: "ORR Exit 9",  location: "Ghatkesar",        coords: [17.5020, 78.6020] as [number, number], aqi: 110 },
+    { id: "exit-10", type: 'exit', title: "ORR Exit 10", location: "Taramatipet",      coords: [17.3900, 78.6730] as [number, number], aqi: 95  },
+    { id: "exit-11", type: 'exit', title: "ORR Exit 11", location: "Pedda Amberpet",   coords: [17.3300, 78.6570] as [number, number], aqi: 105 },
+    { id: "exit-12", type: 'exit', title: "ORR Exit 12", location: "Bongulur",         coords: [17.2720, 78.6060] as [number, number], aqi: 88  },
+    { id: "exit-13", type: 'exit', title: "ORR Exit 13", location: "Raviryal",         coords: [17.2330, 78.5480] as [number, number], aqi: 72  },
+    { id: "exit-14", type: 'exit', title: "ORR Exit 14", location: "Tukkuguda",        coords: [17.2240, 78.5050] as [number, number], aqi: 65  },
+    { id: "exit-15", type: 'exit', title: "ORR Exit 15", location: "Shamshabad",       coords: [17.2290, 78.4350] as [number, number], aqi: 120 },
+    { id: "exit-17", type: 'exit', title: "ORR Exit 17", location: "Rajendranagar",    coords: [17.2580, 78.3810] as [number, number], aqi: 135 },
+    { id: "exit-18", type: 'exit', title: "ORR Exit 18", location: "Kokapet",          coords: [17.4000, 78.3390] as [number, number], aqi: 148 },
+    { id: "rrr-exit-1", type: 'rrr-exit', title: "RRR Proposed Exit", location: "Sangareddy",           coords: [17.6280, 78.1080] as [number, number], aqi: 45 },
+    { id: "rrr-exit-2", type: 'rrr-exit', title: "RRR Proposed Exit", location: "Toopran Junction",      coords: [17.7910, 78.3580] as [number, number], aqi: 38 },
+    { id: "rrr-exit-3", type: 'rrr-exit', title: "RRR Proposed Exit", location: "Gajwel Hub",            coords: [17.8210, 78.5060] as [number, number], aqi: 32 },
+    { id: "rrr-exit-4", type: 'rrr-exit', title: "RRR Proposed Exit", location: "Bhongir Junction",      coords: [17.7290, 78.7680] as [number, number], aqi: 42 },
+    { id: "rrr-exit-5", type: 'rrr-exit', title: "RRR Proposed Exit", location: "Choutuppal Hub",        coords: [17.5820, 78.8240] as [number, number], aqi: 48 },
+    { id: "rrr-exit-6", type: 'rrr-exit', title: "RRR Proposed Exit", location: "Ibrahimpatnam Junction", coords: [17.4200, 78.7900] as [number, number], aqi: 35 },
+    { id: "rrr-exit-7", type: 'rrr-exit', title: "RRR Proposed Exit", location: "Chevella Hub",          coords: [17.2600, 78.2360] as [number, number], aqi: 28 }
   ];
 
   return (
@@ -1255,7 +1316,7 @@ const SanctuaryMapLayout = () => {
 
         {/* Floating Map Controls */}
         <div className="absolute top-6 left-6 z-[1000] flex flex-col gap-3">
-          <div className="bg-white/90 backdrop-blur-md p-1 rounded-xl shadow-xl border border-outline/10 flex items-center">
+          <div className="bg-surface/90 backdrop-blur-md p-1 rounded-xl shadow-xl border border-outline/10 flex items-center">
             <div className="p-2 hover:bg-primary/10 rounded-lg transition-colors cursor-pointer text-primary">
               <Search className="w-4 h-4" />
             </div>
@@ -1267,7 +1328,7 @@ const SanctuaryMapLayout = () => {
               className="bg-transparent border-none focus:ring-0 text-[10px] font-headline tracking-widest uppercase font-bold w-48 px-2"
             />
           </div>
-          <div className="bg-white/90 backdrop-blur-md p-2 rounded-xl shadow-xl border border-outline/10 flex flex-col gap-4">
+          <div className="bg-surface/90 backdrop-blur-md p-2 rounded-xl shadow-xl border border-outline/10 flex flex-col gap-4">
             <div className="p-2 hover:bg-primary/10 rounded-lg transition-colors cursor-pointer text-secondary hover:text-primary">
               <Navigation className="w-4 h-4" />
             </div>
@@ -1280,9 +1341,19 @@ const SanctuaryMapLayout = () => {
         {/* View Controls Overlay */}
         <div className="absolute top-6 right-6 z-[1000] flex flex-col gap-2">
           <button 
+            onClick={() => setIsSatellite(!isSatellite)}
+            className={cn(
+              "px-4 py-2 text-[9px] uppercase tracking-widest font-bold border transition-all bg-surface/90 backdrop-blur-md rounded-lg shadow-lg flex items-center justify-center gap-2",
+              isSatellite ? "text-primary border-primary" : "text-secondary border-outline/20"
+            )}
+          >
+            <MapIcon className="w-3 h-3" />
+            {isSatellite ? 'Hybrid View' : 'Map View'}
+          </button>
+          <button 
             onClick={() => setIsRegionalView(!isRegionalView)}
             className={cn(
-              "px-4 py-2 text-[9px] uppercase tracking-widest font-bold border transition-all bg-white/90 backdrop-blur-md rounded-lg shadow-lg",
+              "px-4 py-2 text-[9px] uppercase tracking-widest font-bold border transition-all bg-surface/90 backdrop-blur-md rounded-lg shadow-lg",
               isRegionalView ? "text-primary border-primary" : "text-secondary border-outline/20"
             )}
           >
@@ -1291,26 +1362,16 @@ const SanctuaryMapLayout = () => {
           <button 
             onClick={() => setShowAqi(!showAqi)}
             className={cn(
-              "px-4 py-2 text-[9px] uppercase tracking-widest font-bold border transition-all bg-white/90 backdrop-blur-md rounded-lg shadow-lg flex items-center gap-2",
+              "px-4 py-2 text-[9px] uppercase tracking-widest font-bold border transition-all bg-surface/90 backdrop-blur-md rounded-lg shadow-lg flex items-center gap-2",
               showAqi ? "text-red-600 border-red-600" : "text-secondary border-outline/20"
             )}
           >
             <Wind className="w-3 h-3" />
             AQI Heatmap
           </button>
-          <button 
-            onClick={() => setShowNoise(!showNoise)}
-            className={cn(
-              "px-4 py-2 text-[9px] uppercase tracking-widest font-bold border transition-all bg-white/90 backdrop-blur-md rounded-lg shadow-lg flex items-center gap-2",
-              showNoise ? "text-blue-600 border-blue-600" : "text-secondary border-outline/20"
-            )}
-          >
-            <VolumeX className="w-3 h-3" />
-            Noise Heatmap
-          </button>
-          {(showAqi || showNoise) && (
-            <div className="mt-2 px-3 py-1 bg-red-600 text-white text-[8px] font-bold uppercase tracking-widest rounded-full animate-pulse flex items-center gap-2 self-end">
-              <div className="w-1.5 h-1.5 bg-white rounded-full" />
+          {showAqi && (
+            <div className="mt-2 px-3 py-1 bg-red-600 text-on-surface text-[8px] font-bold uppercase tracking-widest rounded-full animate-pulse flex items-center gap-2 self-end">
+              <div className="w-1.5 h-1.5 bg-surface rounded-full" />
               Live Data Feed
             </div>
           )}
@@ -1325,33 +1386,34 @@ const SanctuaryMapLayout = () => {
         </div>
 
         <MapContainer 
-          center={[17.49, 78.38]} 
+          center={[17.49, 78.48]} 
           zoom={10} 
           scrollWheelZoom={true} 
           zoomControl={false}
           className="h-full w-full"
-          style={{ background: isSatellite ? 'transparent' : '#f4e4bc' }}
+          style={{ background: '#0a0f14' }}
         >
           <ZoomControl position="bottomleft" />
           <MapController targetView={targetView} />
           <ZoomTracker onZoom={setCurrentZoom} />
           {isSatellite ? (
             <TileLayer
-              attribution='&copy; <a href="https://www.esri.com/">Esri</a>'
-              url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+              attribution="&copy; Google Maps"
+              url="https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}"
             />
           ) : (
             <TileLayer
-              attribution='&copy; <a href="https://carto.com/attributions">CARTO</a>'
-              url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-              opacity={0.7}
+              attribution="&copy; OpenStreetMap contributors &copy; CARTO"
+              url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png"
+              className="map-premium-filter"
             />
           )}
+
+
 
           {/* Real-time Environmental Mesh */}
           {gridPoints.map((point, idx) => {
             const aqiIntensity = getIntensity(point, AQI_HOTSPOTS);
-            const noiseIntensity = getIntensity(point, NOISE_HOTSPOTS);
             const pulseFactor = Math.sin((idx + livePulse) * 0.1) * 0.05;
 
             return (
@@ -1360,21 +1422,12 @@ const SanctuaryMapLayout = () => {
                   <Circle 
                     center={[point.lat, point.lng]}
                     radius={isTelanganaView ? 12000 : 3500}
+                    className="trichome-glass-mesh"
                     pathOptions={{
                       fillColor: aqiIntensity > 0.6 ? '#ef4444' : aqiIntensity > 0.3 ? '#fb923c' : '#2dd4bf',
-                      color: 'transparent',
-                      fillOpacity: (aqiIntensity * 0.2) + (pulseFactor * 0.5)
-                    }}
-                  />
-                )}
-                {showNoise && (
-                  <Circle 
-                    center={[point.lat, point.lng]}
-                    radius={isTelanganaView ? 12000 : 3500}
-                    pathOptions={{
-                      fillColor: noiseIntensity > 0.6 ? '#3b82f6' : noiseIntensity > 0.3 ? '#60a5fa' : '#a5f3fc',
-                      color: 'transparent',
-                      fillOpacity: (noiseIntensity * 0.2) + (pulseFactor * 0.5)
+                      color: 'rgba(255, 255, 255, 0.15)',
+                      weight: 1,
+                      fillOpacity: (aqiIntensity * 0.4) + (pulseFactor * 0.5)
                     }}
                   />
                 )}
@@ -1423,31 +1476,17 @@ const SanctuaryMapLayout = () => {
             />
           )}
 
-          {NATURAL_FEATURES.map((feature) => (
-            <Polygon 
-              key={feature.id}
-              positions={feature.boundary}
-              pathOptions={{
-                fillColor: feature.type === 'lake' ? '#0ea5e9' : '#15803d',
-                color: feature.type === 'lake' ? '#0284c7' : '#166534',
-                weight: 1,
-                fillOpacity: 0.4,
-              }}
-            >
-              <Popup className="custom-popup">
-                <div className="p-3">
-                  <div className="flex items-center gap-2 mb-2">
-                    {feature.type === 'lake' ? <Droplets className="w-4 h-4 text-sky-600" /> : <Trees className="w-4 h-4 text-green-700" />}
-                    <h4 className="font-headline font-bold text-sm uppercase tracking-wider">{feature.title}</h4>
-                  </div>
-                  <p className="text-[10px] text-secondary/80 leading-relaxed">{feature.description}</p>
-                  <div className="mt-3 pt-2 border-t border-outline/10">
-                    <span className="text-[8px] uppercase tracking-widest font-bold text-primary">Ecological Asset</span>
-                  </div>
-                </div>
-              </Popup>
-            </Polygon>
-          ))}
+          {/* Outside RRR vignette */}
+          <Polygon 
+            positions={[
+              [[90, -180],[90, 180],[-90, 180],[-90, -180]],
+              RRR_PATH
+            ]}
+            pathOptions={{ fillColor: '#000', color: 'transparent', fillOpacity: 0.55 }}
+            interactive={false}
+          />
+
+
 
           {locations.map((loc) => {
             const isPremium = loc.type === 'sanctuary';
@@ -1457,28 +1496,7 @@ const SanctuaryMapLayout = () => {
 
             return (
               <React.Fragment key={loc.id}>
-                {loc.type === 'sanctuary' && (
-                  <Circle 
-                    center={loc.coords}
-                    radius={loc.forestRadius}
-                    eventHandlers={{
-                      click: () => {
-                        setSelectedId(loc.id);
-                        setTargetView({ center: loc.coords, zoom: 14 });
-                      }
-                    }}
-                    pathOptions={{ 
-                      fillColor: '#6366f1', 
-                      color: '#6366f1', 
-                      weight: 1, 
-                      fillOpacity: isSatellite ? 0.35 : 0.25 
-                    }}
-                  >
-                    <Popup className="custom-popup">
-                      <SanctuaryPopupContent loc={loc} />
-                    </Popup>
-                  </Circle>
-                )}
+
                 {isPremium && (
                   <Marker 
                     position={loc.coords}
@@ -1490,13 +1508,19 @@ const SanctuaryMapLayout = () => {
                     }}
                     icon={L.divIcon({
                       className: 'custom-div-icon',
-                      html: `<div class="w-10 h-10 bg-olive-900 rounded-full border-2 border-cream flex items-center justify-center shadow-2xl animate-bounce">
-                              <div class="w-6 h-6 bg-cream rounded-full flex items-center justify-center">
-                                <div class="w-2 h-2 bg-olive-900 rounded-full"></div>
+                      html: `<div class="relative flex flex-col items-center justify-center filter drop-shadow-2xl hover:-translate-y-2 transition-transform duration-500 group">
+                              <div class="absolute -inset-6 bg-gold/10 rounded-full animate-pulse blur-md group-hover:bg-gold/30 transition-all"></div>
+                              <div class="w-14 h-14 bg-surface backdrop-blur-md rounded-full border-[3px] border-olive-900 shadow-[0_15px_30px_-5px_rgba(0,0,0,0.5)] flex items-center justify-center z-10 overflow-hidden relative">
+                                <div class="absolute inset-0 bg-gradient-to-tr from-gold/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                <div class="w-5 h-5 bg-olive-900 rounded border border-gold shadow-inner rotate-45 transform group-hover:scale-110 transition-transform"></div>
+                              </div>
+                              <div class="w-[3px] h-10 bg-gradient-to-b from-olive-900 to-transparent -mt-1 z-0 relative">
+                                <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-1 bg-black/40 blur-[2px] rounded-full"></div>
                               </div>
                             </div>`,
-                      iconSize: [40, 40],
-                      iconAnchor: [20, 40]
+                      iconSize: [56, 96],
+                      iconAnchor: [28, 96],
+                      popupAnchor: [0, -96]
                     })}
                   >
                     <Popup className="custom-popup">
@@ -1505,33 +1529,54 @@ const SanctuaryMapLayout = () => {
                   </Marker>
                 )}
                 {isExit && (
-                  <Circle 
-                    center={loc.coords}
-                    radius={loc.type === 'exit' ? 300 : 500}
-                    pathOptions={{
-                      fillColor: loc.type === 'exit' ? '#78350f' : '#d97706',
-                      color: '#fff',
-                      weight: 1,
-                      fillOpacity: 0.8
-                    }}
+                  <Marker
+                    position={loc.coords}
+                    icon={L.divIcon({
+                      className: '',
+                      html: currentZoom >= 13
+                        // High zoom: full label pill
+                        ? `<div style="
+                            background: rgba(255,255,255,0.92);
+                            backdrop-filter: blur(8px);
+                            border: 1px solid rgba(120,53,15,0.25);
+                            border-radius: 6px;
+                            padding: 3px 8px;
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+                            white-space: nowrap;
+                          ">
+                            <span style="font-size:9px;font-weight:900;color:${loc.type === 'exit' ? '#78350f' : '#d97706'};text-transform:uppercase;letter-spacing:0.05em;">
+                              ${loc.type === 'exit' ? loc.title.replace('ORR Exit ', 'E') : 'R'}: ${loc.location}
+                            </span>
+                          </div>`
+                        : currentZoom >= 11
+                        // Medium zoom: compact number badge
+                        ? `<div style="
+                            width: 26px; height: 26px;
+                            background: ${loc.type === 'exit' ? '#78350f' : '#d97706'};
+                            border: 2px solid rgba(255,255,255,0.9);
+                            border-radius: 50%;
+                            display: flex; align-items: center; justify-content: center;
+                            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+                          ">
+                            <span style="font-size:8px;font-weight:900;color:#fff;">
+                              ${loc.type === 'exit' ? loc.title.replace('ORR Exit ', '') : '↺'}
+                            </span>
+                          </div>`
+                        // Low zoom: tiny minimal dot
+                        : `<div style="
+                            width: 8px; height: 8px;
+                            background: ${loc.type === 'exit' ? '#78350f' : '#d97706'};
+                            border: 1.5px solid rgba(255,255,255,0.8);
+                            border-radius: 50%;
+                            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+                          "></div>`,
+                      iconSize: currentZoom >= 13 ? [140, 28] : currentZoom >= 11 ? [26, 26] : [8, 8],
+                      iconAnchor: currentZoom >= 13 ? [70, 14] : currentZoom >= 11 ? [13, 13] : [4, 4],
+                    })}
                   >
-                    {currentZoom > 11 && loc.type === 'exit' && (
-                      <Tooltip 
-                        permanent 
-                        direction="top" 
-                        className="custom-tooltip"
-                        offset={[0, -5]}
-                      >
-                        <div className="px-2 py-1 bg-white/95 backdrop-blur-md rounded border border-olive-800/20 shadow-xl flex flex-col items-center min-w-[60px]">
-                          <span className="text-[9px] font-black text-olive-900 uppercase tracking-tighter leading-none">
-                            {loc.title.replace('ORR Exit ', 'EXIT ')}
-                          </span>
-                          <span className="text-[7px] font-bold text-olive-800/60 uppercase tracking-widest mt-0.5">
-                            {loc.location}
-                          </span>
-                        </div>
-                      </Tooltip>
-                    )}
                     <Popup className="custom-popup">
                       <div className="p-3">
                         <h4 className="font-headline font-bold text-sm uppercase tracking-wider">{loc.title}</h4>
@@ -1542,7 +1587,7 @@ const SanctuaryMapLayout = () => {
                         </div>
                       </div>
                     </Popup>
-                  </Circle>
+                  </Marker>
                 )}
               </React.Fragment>
             );
@@ -1639,7 +1684,7 @@ const Membership = () => {
           
           <div className="space-y-12">
             {benefits.map((b, i) => (
-              <div key={i} className="p-10 border border-cream/10 bg-white/5 backdrop-blur-sm">
+              <div key={i} className="p-10 border border-cream/10 bg-surface/5 backdrop-blur-sm">
                 <div className="text-gold mb-6">{b.icon}</div>
                 <h4 className="text-2xl font-bold mb-4">{b.title}</h4>
                 <p className="text-cream/60 leading-relaxed">{b.desc}</p>
@@ -1740,7 +1785,7 @@ const ApplicationForm = () => {
             </p>
           </div>
 
-          <div className="bg-white p-12 md:p-20 shadow-2xl border border-olive-800/5">
+          <div className="bg-surface p-12 md:p-20 shadow-2xl border border-olive-800/5">
             {submitted ? (
               <motion.div 
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -1857,6 +1902,52 @@ const Footer = () => {
   );
 };
 
+const TrustSignals = () => {
+  return (
+    <section className="py-24 px-6 md:px-24 bg-surface border-y border-outline/10 text-center">
+      <div className="max-w-4xl mx-auto">
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+          <span className="text-olive-800 text-xs font-bold uppercase tracking-[0.6em] mb-4 block">Proven Legacy</span>
+          <h2 className="text-3xl md:text-5xl font-medium text-olive-900 mb-16 italic">Trusted by Visionaries.</h2>
+        </motion.div>
+        
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 opacity-60 grayscale hover:grayscale-0 transition-all duration-700">
+          <div className="flex items-center justify-center h-20">
+            <h3 className="font-headline font-bold text-xl tracking-widest uppercase">Forbes</h3>
+          </div>
+          <div className="flex items-center justify-center h-20">
+            <h3 className="font-headline font-bold text-xl tracking-widest uppercase">Vogue</h3>
+          </div>
+          <div className="flex items-center justify-center h-20">
+            <h3 className="font-headline font-bold text-xl tracking-widest uppercase">ArchDigest</h3>
+          </div>
+          <div className="flex items-center justify-center h-20">
+            <h3 className="font-headline font-bold text-xl tracking-widest uppercase">Bloomberg</h3>
+          </div>
+        </div>
+        
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }} className="mt-20 p-12 bg-cream/30 rounded-3xl border border-olive-800/5 relative shadow-sm">
+          <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-surface w-12 h-12 rounded-full flex items-center justify-center text-gold shadow-sm border border-olive-800/10">
+            <span className="text-3xl font-serif leading-none mt-2">"</span>
+          </div>
+          <p className="text-xl md:text-2xl font-normal text-olive-900/90 leading-relaxed mb-8 italic">
+            An unparalleled approach to ecological luxury. The Green Team has essentially cracked the code on scaling self-sustaining sanctuaries without compromising on elegance.
+          </p>
+          <div className="flex items-center justify-center gap-4">
+            <div className="w-10 h-10 rounded-full overflow-hidden bg-olive-800/20 border-2 border-white">
+              <img src="https://picsum.photos/seed/ark/100/100" alt="Member" className="w-full h-full object-cover" />
+            </div>
+            <div className="text-left">
+              <p className="font-bold text-olive-900 text-sm uppercase tracking-wider">A. R. Krishnan</p>
+              <p className="text-[10px] text-olive-800/60 uppercase tracking-widest font-bold">Early Member, Agartha</p>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </section>
+  );
+};
+
 const NewsletterHighlight = ({ onSubscribe }: { onSubscribe: () => void }) => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
@@ -1890,7 +1981,7 @@ const NewsletterHighlight = ({ onSubscribe }: { onSubscribe: () => void }) => {
             </p>
           </div>
 
-          <div className="bg-white/5 backdrop-blur-md p-12 md:p-20 border border-white/10">
+          <div className="bg-surface/5 backdrop-blur-md p-12 md:p-20 border border-white/10">
             {done ? (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center">
                 <Check className="w-12 h-12 text-gold mx-auto mb-6" />
@@ -1906,7 +1997,7 @@ const NewsletterHighlight = ({ onSubscribe }: { onSubscribe: () => void }) => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="w-full bg-transparent border-b border-white/20 py-6 outline-none focus:border-gold transition-all font-light text-2xl text-cream placeholder:text-white/10" 
+                    className="w-full bg-transparent border-b border-white/20 py-6 outline-none focus:border-gold transition-all font-light text-2xl text-cream placeholder:text-on-surface/10" 
                     placeholder="email@domain.com" 
                   />
                 </div>
@@ -2000,7 +2091,7 @@ const ChatBot = ({ data }: { data: any }) => {
               initial={{ opacity: 0, y: 100, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 100, scale: 0.9 }}
-              className="fixed bottom-32 right-8 z-[100] w-[400px] max-w-[calc(100vw-4rem)] h-[600px] bg-white shadow-2xl border border-olive-800/10 flex flex-col overflow-hidden rounded-3xl"
+              className="fixed bottom-32 right-8 z-[100] w-[400px] max-w-[calc(100vw-4rem)] h-[600px] bg-surface shadow-2xl border border-olive-800/10 flex flex-col overflow-hidden rounded-3xl"
             >
               <div className="bg-olive-900 p-6 text-cream flex justify-between items-center">
                 <div className="flex items-center gap-4">
@@ -2012,7 +2103,7 @@ const ChatBot = ({ data }: { data: any }) => {
                     <p className="text-[8px] uppercase tracking-[0.3em] text-cream/60">Sanctuary AI Advisor</p>
                   </div>
                 </div>
-                <button onClick={handleClose} className="p-2 hover:bg-white/10 transition-all rounded-full">
+                <button onClick={handleClose} className="p-2 hover:bg-surface/10 transition-all rounded-full">
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -2024,7 +2115,7 @@ const ChatBot = ({ data }: { data: any }) => {
                       "max-w-[85%] p-4 text-sm leading-relaxed rounded-2xl shadow-sm",
                       m.role === 'user' 
                         ? "bg-olive-900 text-cream rounded-tr-none" 
-                        : "bg-white text-olive-900 border border-outline/10 rounded-tl-none"
+                        : "bg-surface text-olive-900 border border-outline/10 rounded-tl-none"
                     )}>
                       {m.text}
                     </div>
@@ -2032,7 +2123,7 @@ const ChatBot = ({ data }: { data: any }) => {
                 ))}
                 {loading && (
                   <div className="flex items-start">
-                    <div className="bg-white border border-outline/10 p-4 rounded-2xl rounded-tl-none shadow-sm">
+                    <div className="bg-surface border border-outline/10 p-4 rounded-2xl rounded-tl-none shadow-sm">
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-medium text-olive-800/60 italic">Groot is thinking...</span>
                         <div className="flex gap-1">
@@ -2046,7 +2137,7 @@ const ChatBot = ({ data }: { data: any }) => {
                 )}
               </div>
 
-              <div className="p-6 bg-white border-t border-outline/10">
+              <div className="p-6 bg-surface border-t border-outline/10">
                 <div className="relative flex items-center">
                   <input 
                     type="text" 
@@ -2080,6 +2171,7 @@ const HomeView = ({ isSubscribed, onNewsletterClick }: { isSubscribed: boolean, 
     <EcosystemPillars />
     <Sanctuaries isSubscribed={isSubscribed} onNewsletterClick={onNewsletterClick} />
     <TheSIL isSubscribed={isSubscribed} onNewsletterClick={onNewsletterClick} />
+    <TrustSignals />
     <NewsletterHighlight onSubscribe={onNewsletterClick} />
     <Footer />
   </div>
@@ -2091,6 +2183,12 @@ export default function App() {
   });
   const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
   const [viewMode, setViewMode] = useState<'home' | 'map' | 'list' | 'gallery' | 'analytics' | 'the-sil'>('home');
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    if (isDark) document.documentElement.classList.add('dark');
+    else document.documentElement.classList.remove('dark');
+  }, [isDark]);
 
   const handleSubscribe = () => {
     setIsSubscribed(true);
@@ -2098,8 +2196,8 @@ export default function App() {
   };
 
   return (
-    <div className="h-screen w-screen bg-cream text-olive-900 overflow-hidden flex flex-col">
-      <Navbar isSubscribed={isSubscribed} onNewsletterClick={() => setIsNewsletterOpen(true)} onModeChange={setViewMode} />
+    <div className="h-screen w-screen bg-cream text-olive-900 overflow-hidden flex flex-col transition-colors duration-700">
+      <Navbar isSubscribed={isSubscribed} onNewsletterClick={() => setIsNewsletterOpen(true)} onModeChange={setViewMode} isDark={isDark} setIsDark={setIsDark} />
       
       <main className="flex-1 flex overflow-hidden relative">
         {/* Center - Map or other views */}

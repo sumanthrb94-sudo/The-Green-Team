@@ -7,25 +7,75 @@
   --font-headline: "Manrope", sans-serif;
   --font-serif: "Cormorant Garamond", serif;
   
-  --color-primary: #00694e;
-  --color-on-primary: #ffffff;
-  --color-background: #f5fafe;
-  --color-surface: #f5fafe;
-  --color-on-surface: #161c1f;
-  --color-secondary: #586062;
-  --color-tertiary: #984138;
-  --color-surface-container: #e9eff3;
-  --color-surface-container-low: #eff4f8;
-  --color-surface-container-highest: #dee3e7;
-  --color-outline: #6d7a73;
+  --color-primary: var(--primary);
+  --color-on-primary: var(--on-primary);
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-on-surface: var(--on-surface);
+  --color-secondary: var(--secondary);
+  --color-tertiary: var(--tertiary);
+  --color-surface-container: var(--surface-container);
+  --color-surface-container-low: var(--surface-container-low);
+  --color-surface-container-highest: var(--surface-container-highest);
+  --color-outline: var(--outline);
   
-  --color-olive-900: #2d3a1d;
-  --color-olive-800: #3d5229;
-  --color-olive-700: #556b2f;
-  --color-cashew: #e8f3ee;
-  --color-cream: #f2f8f5;
-  --color-gold: #d4af37;
-  --color-charcoal: #1a1a1a;
+  --color-olive-900: var(--olive-900);
+  --color-olive-800: var(--olive-800);
+  --color-olive-700: var(--olive-700);
+  --color-cashew: var(--cashew);
+  --color-cream: var(--cream);
+  --color-gold: var(--gold);
+  --color-charcoal: var(--charcoal);
+  
+  /* Additional variables that may be used directly */
+  --bg-surface: var(--surface);
+  --text-on-surface: var(--on-surface);
+}
+
+@layer base {
+  :root {
+    --primary: #00694e;
+    --on-primary: #ffffff;
+    --background: #f5fafe;
+    --surface: #f5fafe;
+    --on-surface: #161c1f;
+    --secondary: #586062;
+    --tertiary: #984138;
+    --surface-container: #e9eff3;
+    --surface-container-low: #eff4f8;
+    --surface-container-highest: #dee3e7;
+    --outline: #6d7a73;
+    
+    --olive-900: #2d3a1d;
+    --olive-800: #3d5229;
+    --olive-700: #556b2f;
+    --cashew: #e8f3ee;
+    --cream: #f2f8f5;
+    --gold: #d4af37;
+    --charcoal: #1a1a1a;
+  }
+  
+  .dark {
+    --primary: #4ade80; /* Brighter neon green for dark mode */
+    --on-primary: #152219;
+    --background: #0f1412;
+    --surface: #0f1412;
+    --on-surface: #f2f8f5;
+    --secondary: #a0acab;
+    --tertiary: #fecaca;
+    --surface-container: #1e2622;
+    --surface-container-low: #151b19;
+    --surface-container-highest: #2b3630;
+    --outline: #6d7a73;
+    
+    --olive-900: #eef5e6; /* Inverted: dark text becomes light */
+    --olive-800: #d1e0c2;
+    --olive-700: #aebf9c;
+    --cashew: #152219; /* Inverted background colors */
+    --cream: #101712;  /* Deep dark forest tint */
+    --gold: #edd282;  /* Lighter gold */
+    --charcoal: #f9fafb;
+  }
 }
 
 @layer base {
@@ -115,4 +165,23 @@
 
 .custom-tooltip::before {
   display: none !important;
+}
+
+.map-premium-filter {
+  filter: sepia(30%) contrast(1.1) brightness(0.9) saturate(0.8);
+}
+
+@keyframes pulse-forest {
+  0% { fill-opacity: 0.15; filter: drop-shadow(0 0 5px rgba(34, 197, 94, 0.4)); }
+  50% { fill-opacity: 0.45; filter: drop-shadow(0 0 15px rgba(34, 197, 94, 0.8)); }
+  100% { fill-opacity: 0.15; filter: drop-shadow(0 0 5px rgba(34, 197, 94, 0.4)); }
+}
+
+.animated-forest {
+  animation: pulse-forest 4s infinite ease-in-out;
+}
+
+.trichome-glass-mesh {
+  mix-blend-mode: hard-light;
+  stroke-dasharray: 4 8;
 }
