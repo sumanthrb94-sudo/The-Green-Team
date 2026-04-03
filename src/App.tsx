@@ -318,7 +318,7 @@ const SideNavBar = ({ activeMode, onModeChange }: { activeMode: string, onModeCh
 
 const Hero = () => {
   return (
-    <section className="relative min-h-[calc(100vh-5rem)] flex flex-col justify-start px-6 md:px-24 pt-4 md:pt-8 pb-24 overflow-hidden cashew-gradient">
+    <section className="relative flex flex-col justify-start px-6 md:px-24 pt-6 pb-12 overflow-hidden cashew-gradient">
       <div className="absolute inset-0 z-0 opacity-10 mix-blend-multiply">
         <img 
           src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&q=80&w=1920" 
@@ -334,7 +334,7 @@ const Hero = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2, ease: "circOut" }}
         >
-          <div className="flex items-center gap-3 md:gap-4 mb-8 md:mb-12">
+          <div className="flex items-center gap-3 md:gap-4 mb-4 md:mb-6">
             <div className="w-8 md:w-12 h-px bg-olive-800/40"></div>
             <span className="text-olive-800 text-[8px] md:text-[10px] font-bold uppercase tracking-[0.4em] md:tracking-[0.6em]">Independent Sanctuary Curators</span>
           </div>
@@ -344,7 +344,7 @@ const Hero = () => {
             <span className="italic text-olive-800 font-medium">Early Entry.</span>
           </h1>
           
-          <div className="grid md:grid-cols-2 gap-12 md:gap-24 items-end">
+          <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-end">
             <p className="text-lg md:text-2xl font-normal text-olive-900/90 leading-relaxed max-w-xl">
               A growing community in Hyderabad and India's metropolitans, securing self-sustaining sanctuaries where food, water, and energy are curated for the future.
             </p>
@@ -419,7 +419,7 @@ const EcosystemPillars = ({ isFullPage = false }: { isFullPage?: boolean }) => {
           <h2 className="text-5xl md:text-8xl font-medium text-olive-900">Self-Sustaining <br /><span className="italic text-olive-800">Ecosystems.</span></h2>
         </motion.div>
         
-        <div className="grid md:grid-cols-3 gap-12">
+        <div className="grid md:grid-cols-3 gap-6">
           {pillars.map((p, i) => (
             <motion.div 
               key={i} 
@@ -447,7 +447,7 @@ const Advantage = ({ isFullPage = false }: { isFullPage?: boolean }) => {
       isFullPage ? "py-16" : "py-14"
     )}>
       <div className="max-w-7xl mx-auto">
-        <div className="grid lg:grid-cols-12 gap-12">
+        <div className="grid lg:grid-cols-12 gap-8">
           <motion.div 
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -458,7 +458,7 @@ const Advantage = ({ isFullPage = false }: { isFullPage?: boolean }) => {
             <h2 className="text-5xl md:text-7xl font-medium text-olive-900">
               The <span className="italic text-olive-800">Intelligence</span> <br />Gap.
             </h2>
-            <div className="w-24 h-1 bg-olive-800/20 mt-12"></div>
+            <div className="w-24 h-1 bg-olive-800/20 mt-6"></div>
           </motion.div>
           
           <motion.div 
@@ -471,7 +471,7 @@ const Advantage = ({ isFullPage = false }: { isFullPage?: boolean }) => {
             <p className="text-2xl md:text-4xl font-normal leading-snug text-olive-900/90">
               "Market negligence is your opportunity. While the crowd waits for the launch, our members have already secured their legacy."
             </p>
-            <div className="grid sm:grid-cols-2 gap-12 pt-8">
+            <div className="grid sm:grid-cols-2 gap-6 pt-4">
               <div className="space-y-4">
                 <div className="w-12 h-12 bg-olive-800/10 flex items-center justify-center rounded-xl shadow-sm">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-olive-800 w-6 h-6">
@@ -531,18 +531,18 @@ const TheSIL = ({ isSubscribed, onNewsletterClick, isFullPage = false }: { isSub
       </div>
       
       <div className="max-w-7xl mx-auto relative z-10">
-        <div className="grid lg:grid-cols-2 gap-24 items-center">
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div>
             <div className="flex items-center gap-4 mb-8">
               <span className="px-3 py-1 bg-gold text-olive-900 text-[9px] font-bold uppercase tracking-widest">Upcoming Landmark</span>
               <span className="text-cream/40 text-[9px] uppercase tracking-[0.4em]">Tukkuguda</span>
             </div>
-            <h2 className="text-5xl md:text-8xl font-medium mb-12">The <span className="italic text-gold">SIL</span> <br />Villament.</h2>
-            <p className="text-xl md:text-2xl font-light text-cream/60 leading-relaxed mb-12">
+            <h2 className="text-5xl md:text-7xl font-medium mb-6">The <span className="italic text-gold">SIL</span> <br />Villament.</h2>
+            <p className="text-lg md:text-xl font-light text-cream/60 leading-relaxed mb-6">
               Imagine an 18-floor masterpiece where **two floors equal one villa**. Amidst a landscape of traditional villas, The SIL stands as the only tower—a soaring statement of exclusivity in Tukkuguda.
             </p>
             
-            <div className="grid grid-cols-2 gap-12 mb-16">
+            <div className="grid grid-cols-2 gap-6 mb-8">
               <div>
                 <p className="text-[9px] uppercase tracking-[0.4em] text-gold mb-2">Location</p>
                 <p className="text-xl font-serif italic">Tukkuguda</p>
@@ -1920,7 +1920,7 @@ const Membership = () => {
   return (
     <section id="membership" className="py-16 px-12 md:px-24 bg-olive-800 text-cream">
       <div className="max-w-7xl mx-auto">
-        <div className="grid lg:grid-cols-2 gap-24 items-center">
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div>
             <span className="text-cream/60 text-[10px] font-bold uppercase tracking-[0.6em] mb-8 block">The Membership</span>
             <h2 className="text-5xl md:text-8xl font-medium mb-12">The Power of <br /><span className="italic text-gold">Collective</span> Intelligence.</h2>
@@ -2028,7 +2028,7 @@ const ApplicationForm = () => {
   return (
     <section id="apply" className="py-16 px-12 md:px-24 bg-cream">
       <div className="max-w-5xl mx-auto">
-        <div className="grid lg:grid-cols-2 gap-24 items-center">
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div>
             <h2 className="text-5xl md:text-7xl font-medium text-olive-900 mb-12">Apply for <br /><span className="italic text-olive-800">Membership.</span></h2>
             <p className="text-xl md:text-2xl font-light text-olive-900/40 leading-relaxed">
@@ -2223,7 +2223,7 @@ const NewsletterHighlight = ({ onSubscribe }: { onSubscribe: () => void }) => {
       </div>
       
       <div className="max-w-7xl mx-auto relative z-10">
-        <div className="grid lg:grid-cols-2 gap-24 items-center">
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div>
             <span className="text-gold text-[10px] font-bold uppercase tracking-[0.6em] mb-8 block">The Intelligence Network</span>
             <h2 className="text-5xl md:text-7xl font-medium mb-12">Stay ahead of <br /><span className="italic text-cream/60">the resource curve.</span></h2>
@@ -2453,7 +2453,29 @@ export default function App() {
       <main className="flex-1 flex overflow-hidden relative">
         {/* Center - Map or other views */}
         <div className="flex-1 relative overflow-hidden bg-surface">
-          {viewMode === 'map' && <SanctuaryMapLayout />}
+          {viewMode === 'map' && (
+            <>
+              {/* ── Mobile: map under development ─────────────────────────────── */}
+              <div className="md:hidden h-full flex flex-col items-center justify-center gap-6 p-10 text-center bg-olive-900">
+                <MapIcon className="w-12 h-12 text-gold/50" />
+                <div>
+                  <p className="text-[9px] uppercase tracking-[0.5em] text-gold/60 mb-2">Under Development</p>
+                  <h2 className="text-2xl font-headline font-bold text-cream tracking-tight mb-3">Interactive Map</h2>
+                  <p className="text-cream/40 text-sm leading-relaxed max-w-xs">
+                    The sanctuary map is data-intensive and optimised for desktop.
+                    Open on a larger screen for the full experience.
+                  </p>
+                </div>
+                <div className="px-6 py-3 border border-gold/30 text-gold text-[10px] uppercase tracking-[0.4em] rounded-lg">
+                  View on Desktop
+                </div>
+              </div>
+              {/* ── Desktop: full map ──────────────────────────────────────────── */}
+              <div className="hidden md:block h-full">
+                <SanctuaryMapLayout />
+              </div>
+            </>
+          )}
           {viewMode !== 'map' && (
             <div className="h-full w-full overflow-y-auto">
               {viewMode === 'home' && <HomeView isSubscribed={isSubscribed} onNewsletterClick={() => setIsNewsletterOpen(true)} />}
