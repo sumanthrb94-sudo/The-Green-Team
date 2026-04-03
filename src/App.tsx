@@ -1104,64 +1104,64 @@ const SanctuaryMapLayout = () => {
     return points;
   }, [isTelanganaView]);
 
-  // Hyderabad Outer Ring Road (ORR) — GPS-accurate trace ~158km
+  // Hyderabad Outer Ring Road (ORR) — refined 158 km trace aligned to satellite road
   const ORR_PATH: [number, number][] = [
-    // Starting from Gachibowli exit, going clockwise
-    [17.4218, 78.3412], // Gachibowli
-    [17.4368, 78.3285], // Narsingi
-    [17.4520, 78.3190], // Telecom Nagar
-    [17.4720, 78.3130], // Patancheru start
-    [17.4880, 78.3120], // Patancheru
-    [17.5060, 78.3080], // Patancheru north
-    [17.5220, 78.3050], // Sangareddy junction corridor
-    [17.5380, 78.3090], // Sultanpur
-    [17.5520, 78.3190], // Sultanpur curve
-    [17.5640, 78.3350], // Dulapally junction
-    [17.5720, 78.3520], // Kompally start
-    [17.5800, 78.3730], // Kompally
-    [17.5850, 78.3960], // Shamirpet junction corridor
-    [17.5870, 78.4180], // Medchal south
-    [17.5860, 78.4410], // Medchal
-    [17.5820, 78.4640], // Medchal east
-    [17.5760, 78.4870], // Shamirpet east
-    [17.5660, 78.5140], // Keesara start
-    [17.5520, 78.5420], // Keesara
-    [17.5380, 78.5640], // Keesara east
-    [17.5200, 78.5820], // Ghatkesar west
-    [17.5020, 78.6020], // Ghatkesar
-    [17.4840, 78.6200], // Ghatkesar east
-    [17.4660, 78.6380], // Uppal corridor
-    [17.4480, 78.6520], // Uppal east
-    [17.4300, 78.6630], // LB Nagar corridor east
-    [17.4100, 78.6700], // LB Nagar east
-    [17.3900, 78.6730], // Taramatipet start
-    [17.3700, 78.6720], // Taramatipet
-    [17.3500, 78.6680], // Sagar Highway corridor
-    [17.3300, 78.6570], // Pedda Amberpet
-    [17.3100, 78.6430], // Pedda Amberpet south
-    [17.2900, 78.6260], // Bongulur start
-    [17.2720, 78.6060], // Bongulur
-    [17.2560, 78.5870], // Bongulur south
-    [17.2420, 78.5670], // Raviryal start
-    [17.2330, 78.5480], // Raviryal
-    [17.2270, 78.5280], // Tukkuguda start
-    [17.2240, 78.5050], // Tukkuguda
-    [17.2240, 78.4820], // Tukkuguda west
-    [17.2260, 78.4580], // Shamshabad north
-    [17.2290, 78.4350], // Shamshabad
-    [17.2350, 78.4130], // Shamshabad west
-    [17.2440, 78.3940], // Rajendranagar south
-    [17.2580, 78.3810], // Rajendranagar
-    [17.2750, 78.3720], // Rajendranagar north
-    [17.2940, 78.3670], // Moinabad corridor
-    [17.3140, 78.3660], // Moinabad
-    [17.3340, 78.3680], // Shankarpally junction
-    [17.3520, 78.3700], // Shankarpally
-    [17.3680, 78.3680], // Osman Sagar corridor
-    [17.3820, 78.3580], // Gandipet junction
-    [17.3940, 78.3470], // Kokapet south
-    [17.4000, 78.3390], // Kokapet
-    [17.4080, 78.3350], // Kokapet north
+    [17.4218, 78.3412], // E1  Gachibowli SW
+    [17.4150, 78.3250], // Narsingi W
+    [17.4100, 78.3120], // Narsingi
+    [17.4200, 78.2980], // Telecom Nagar
+    [17.4380, 78.2860], // Patancheru approach
+    [17.4580, 78.2800], // Patancheru S
+    [17.4800, 78.2780], // E3  Patancheru (NH-65 junction)
+    [17.5020, 78.2810], // Patancheru N
+    [17.5200, 78.2880], // Bowrampet
+    [17.5380, 78.2980], // Dundigal S
+    [17.5520, 78.3100], // E4  Sultanpur
+    [17.5640, 78.3280], // Dulapally junction
+    [17.5720, 78.3480], // Kompally S
+    [17.5790, 78.3700], // Kompally
+    [17.5850, 78.3930], // Bollaram
+    [17.5880, 78.4160], // E6  Medchal S (NH-44 N junction)
+    [17.5880, 78.4420], // E6  Medchal
+    [17.5840, 78.4660], // Medchal E
+    [17.5770, 78.4890], // E7  Shamirpet
+    [17.5660, 78.5150], // Keesara approach
+    [17.5520, 78.5420], // E8  Keesara
+    [17.5340, 78.5650], // Keesara E
+    [17.5140, 78.5860], // Ghatkesar W
+    [17.4960, 78.6040], // E9  Ghatkesar (NH-163 junction)
+    [17.4760, 78.6220], // Ghatkesar E
+    [17.4560, 78.6370], // Uppal approach
+    [17.4350, 78.6490], // Uppal E
+    [17.4130, 78.6580], // LB Nagar E N
+    [17.3910, 78.6640], // E10 Taramatipet
+    [17.3710, 78.6640], // Taramatipet S
+    [17.3510, 78.6610], // Hayathnagar
+    [17.3300, 78.6520], // E11 Pedda Amberpet
+    [17.3090, 78.6370], // Pedda Amberpet S
+    [17.2880, 78.6170], // Bongulur N
+    [17.2690, 78.5960], // E12 Bongulur
+    [17.2530, 78.5760], // Bongulur S
+    [17.2390, 78.5560], // E13 Raviryal
+    [17.2290, 78.5360], // Raviryal S
+    [17.2240, 78.5130], // Tukkuguda N
+    [17.2200, 78.4880], // E14 Tukkuguda
+    [17.2200, 78.4630], // Tukkuguda W
+    [17.2230, 78.4390], // Shamshabad N
+    [17.2250, 78.4180], // E15 Shamshabad (NH-44 airport junction)
+    [17.2310, 78.3980], // Shamshabad W
+    [17.2430, 78.3810], // Rajendranagar S
+    [17.2590, 78.3700], // E17 Rajendranagar
+    [17.2780, 78.3630], // Rajendranagar N
+    [17.2970, 78.3600], // Moinabad
+    [17.3170, 78.3600], // Moinabad N
+    [17.3360, 78.3610], // Shankarpally S
+    [17.3550, 78.3620], // Shankarpally
+    [17.3720, 78.3570], // Osman Sagar corridor
+    [17.3870, 78.3470], // Gandipet
+    [17.3970, 78.3380], // E18 Kokapet S
+    [17.4040, 78.3300], // Kokapet
+    [17.4130, 78.3320], // Kokapet N
     [17.4218, 78.3412], // Close at Gachibowli
   ];
 
@@ -1221,6 +1221,97 @@ const SanctuaryMapLayout = () => {
     [17.5800, 78.0500], // Close at Sangareddy west
   ];
 
+  // Radial National Highways & expressways — ORR junctions → RRR junctions
+  // All share the same amber highway colour as ORR/RRR
+  const HIGHWAYS: { id: string; name: string; path: [number, number][] }[] = [
+    {
+      id: 'nh-65',
+      name: 'NH 65',
+      // Mumbai / Pune (NW): city → ORR Patancheru (E3) → RRR Sangareddy
+      path: [
+        [17.430, 78.430],
+        [17.456, 78.384],
+        [17.476, 78.336],
+        [17.480, 78.278], // ORR E3 Patancheru
+        [17.508, 78.252],
+        [17.540, 78.222],
+        [17.568, 78.190],
+        [17.600, 78.156],
+        [17.628, 78.108], // RRR Sangareddy
+      ],
+    },
+    {
+      id: 'nh-44-s',
+      name: 'NH 44',
+      // Bangalore / Chennai (S): city → ORR Shamshabad (E15) → RRR south
+      path: [
+        [17.415, 78.468],
+        [17.375, 78.470],
+        [17.326, 78.465],
+        [17.280, 78.452],
+        [17.250, 78.435], // ORR E15 Shamshabad / RGIA
+        [17.218, 78.418],
+        [17.196, 78.404], // RRR outer south
+      ],
+    },
+    {
+      id: 'nh-163',
+      name: 'NH 163',
+      // Vijayawada (E): city → ORR Ghatkesar (E9) → RRR Bhongir
+      path: [
+        [17.440, 78.502],
+        [17.455, 78.555],
+        [17.472, 78.590],
+        [17.496, 78.604], // ORR E9 Ghatkesar
+        [17.522, 78.630],
+        [17.558, 78.664],
+        [17.582, 78.692],
+        [17.619, 78.726], // RRR Bhongir corridor
+      ],
+    },
+    {
+      id: 'nh-44-n',
+      name: 'NH 44',
+      // Nagpur (N): city → ORR Medchal (E6) → RRR Toopran
+      path: [
+        [17.460, 78.462],
+        [17.508, 78.460],
+        [17.554, 78.450],
+        [17.588, 78.442], // ORR E6 Medchal
+        [17.622, 78.442],
+        [17.664, 78.444],
+        [17.696, 78.448], // RRR Toopran corridor
+      ],
+    },
+    {
+      id: 'pvnr',
+      name: 'PVNR Expressway',
+      // Connects old city to Financial District / ORR Gachibowli
+      path: [
+        [17.400, 78.506],
+        [17.412, 78.486],
+        [17.422, 78.462],
+        [17.428, 78.436],
+        [17.425, 78.408],
+        [17.422, 78.370], // ORR E1 Gachibowli
+      ],
+    },
+    {
+      id: 'sagar-hwy',
+      name: 'Sagar Highway',
+      // SE corridor: city → ORR → RRR Ibrahimpatnam
+      path: [
+        [17.418, 78.492],
+        [17.398, 78.510],
+        [17.376, 78.530],
+        [17.354, 78.556],
+        [17.330, 78.572], // ORR E10 corridor
+        [17.308, 78.592],
+        [17.278, 78.622],
+        [17.252, 78.638], // RRR Ibrahimpatnam approach
+      ],
+    },
+  ];
 
   const NATURAL_FEATURES = [
     {
@@ -1616,46 +1707,31 @@ const SanctuaryMapLayout = () => {
             );
           })}
           
-          {/* Infrastructure Outlines */}
-          {/* ORR Highlight Glow */}
-          <Polyline 
-            positions={ORR_PATH}
-            pathOptions={{ 
-              color: '#78350f', 
-              weight: 12, 
-              opacity: 0.1,
-            }}
-          />
-          <Polyline 
-            positions={ORR_PATH}
-            pathOptions={{ 
-              color: '#78350f', 
-              weight: 4, 
-              opacity: 0.9,
-              dashArray: '10, 5'
-            }}
-          />
-          {/* RRR Outline (Less Opaque than ORR but visible) */}
-          <Polyline 
-            positions={RRR_PATH}
-            pathOptions={{ 
-              color: '#d97706', 
-              weight: 3, 
-              opacity: 0.6,
-              dashArray: '5, 10'
-            }}
-          />
-          
-          {showOrr && (
-            <Polyline 
-              positions={ORR_PATH}
-              pathOptions={{ 
-                color: '#78350f', 
-                weight: 8, 
-                opacity: 0.4,
-              }}
-            />
-          )}
+          {/* ── Radial highways (NH-65, NH-44 N/S, NH-163, PVNR, Sagar Hwy) ──────── */}
+          {HIGHWAYS.map(hw => (
+            <React.Fragment key={hw.id}>
+              {/* glow */}
+              <Polyline positions={hw.path} pathOptions={{ color: '#d97706', weight: 10, opacity: 0.07, lineCap: 'round' }} />
+              {/* road */}
+              <Polyline positions={hw.path} pathOptions={{ color: '#d97706', weight: 2.5, opacity: 0.80, lineCap: 'round' }} />
+            </React.Fragment>
+          ))}
+
+          {/* ── ORR — solid amber line, matches satellite road ─────────────────── */}
+          {/* glow */}
+          <Polyline positions={ORR_PATH} pathOptions={{ color: '#d97706', weight: 16, opacity: 0.10, lineCap: 'round' }} />
+          {/* casing */}
+          <Polyline positions={ORR_PATH} pathOptions={{ color: '#92400e', weight: 6,  opacity: 0.95, lineCap: 'round' }} />
+          {/* centre stripe */}
+          <Polyline positions={ORR_PATH} pathOptions={{ color: '#fcd34d', weight: 2,  opacity: 0.85, lineCap: 'round' }} />
+
+          {/* ── RRR — same amber family, longer dash = proposed alignment ─────── */}
+          {/* glow */}
+          <Polyline positions={RRR_PATH} pathOptions={{ color: '#d97706', weight: 12, opacity: 0.08, lineCap: 'round' }} />
+          {/* casing */}
+          <Polyline positions={RRR_PATH} pathOptions={{ color: '#92400e', weight: 4,  opacity: 0.80, dashArray: '14, 10', lineCap: 'round' }} />
+          {/* centre stripe */}
+          <Polyline positions={RRR_PATH} pathOptions={{ color: '#fcd34d', weight: 1.5, opacity: 0.65, dashArray: '14, 10', lineCap: 'round' }} />
 
           {/* Outside-RRR blur overlay — backdrop-filter blur + dark veil,
               clipped to the exterior via clip-path:path(evenodd) */}
@@ -1713,7 +1789,7 @@ const SanctuaryMapLayout = () => {
                         ? `<div style="
                             background: rgba(255,255,255,0.92);
                             backdrop-filter: blur(8px);
-                            border: 1px solid rgba(120,53,15,0.25);
+                            border: 1px solid rgba(217,119,6,0.40);
                             border-radius: 6px;
                             padding: 3px 8px;
                             display: flex;
@@ -1722,7 +1798,7 @@ const SanctuaryMapLayout = () => {
                             box-shadow: 0 2px 8px rgba(0,0,0,0.15);
                             white-space: nowrap;
                           ">
-                            <span style="font-size:9px;font-weight:900;color:${loc.type === 'exit' ? '#78350f' : '#d97706'};text-transform:uppercase;letter-spacing:0.05em;">
+                            <span style="font-size:9px;font-weight:900;color:#92400e;text-transform:uppercase;letter-spacing:0.05em;">
                               ${loc.type === 'exit' ? loc.title.replace('ORR Exit ', 'E') : 'R'}: ${loc.location}
                             </span>
                           </div>`
@@ -1730,7 +1806,7 @@ const SanctuaryMapLayout = () => {
                         // Medium zoom: compact number badge
                         ? `<div style="
                             width: 26px; height: 26px;
-                            background: ${loc.type === 'exit' ? '#78350f' : '#d97706'};
+                            background: #d97706;
                             border: 2px solid rgba(255,255,255,0.9);
                             border-radius: 50%;
                             display: flex; align-items: center; justify-content: center;
@@ -1743,7 +1819,7 @@ const SanctuaryMapLayout = () => {
                         // Low zoom: tiny minimal dot
                         : `<div style="
                             width: 8px; height: 8px;
-                            background: ${loc.type === 'exit' ? '#78350f' : '#d97706'};
+                            background: #d97706;
                             border: 1.5px solid rgba(255,255,255,0.8);
                             border-radius: 50%;
                             box-shadow: 0 1px 3px rgba(0,0,0,0.3);
