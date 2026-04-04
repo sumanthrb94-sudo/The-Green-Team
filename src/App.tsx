@@ -947,9 +947,9 @@ const AagarthaInteractiveLayout: FC<{ onClose: () => void }> = ({ onClose }) => 
       {/* ── LEFT: Site Plan image ── */}
       <div className="relative w-full md:flex-1 h-[48vh] md:h-auto overflow-hidden">
         <img
-          src="https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&q=80&w=1600"
+          src="/agartha-layout.jpg"
           alt="Agartha site plan"
-          className="w-full h-full object-cover opacity-60"
+          className="w-full h-full object-cover"
           referrerPolicy="no-referrer"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/40 pointer-events-none" />
