@@ -625,7 +625,7 @@ const TheSIL = ({ isSubscribed, onNewsletterClick, isFullPage = false }: { isSub
 };
 
 const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewsletterClick: () => void }> = ({ sanctuary, isSubscribed, onNewsletterClick }) => {
-  const isGated = sanctuary.id === '2' && !isSubscribed;
+  const isGated = sanctuary.id === 'the-sil' && !isSubscribed;
 
   return (
     <motion.div 
@@ -658,7 +658,7 @@ const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewslet
         />
         <div className="absolute top-6 left-6">
           <div className="bg-primary text-on-primary px-4 py-1 text-[9px] uppercase tracking-[0.4em] font-bold rounded-full">
-            {sanctuary.id === '2' ? 'Upcoming' : 'Live'}
+            {sanctuary.id === 'the-sil' ? 'Upcoming' : 'Live'}
           </div>
         </div>
       </div>
