@@ -861,12 +861,16 @@ const SanctuaryPopupContent = ({ loc }: { loc: any }) => (
 const MapController = ({ targetView }: { targetView: { center: [number, number], zoom: number } | null }) => {
   const map = useMap();
   useEffect(() => {
-    if (targetView) {
-      map.flyTo(targetView.center, targetView.zoom, {
-        animate: true,
-        duration: 1.5
-      });
-    }
+    if (!targetView) return;
+    const [lat, lng] = targetView.center;
+    // Guard: reject NaN or zero-size container (map is hidden via display:none)
+    if (!isFinite(lat) || !isFinite(lng)) return;
+    const size = map.getSize();
+    if (size.x === 0 || size.y === 0) return;
+    map.flyTo([lat, lng], targetView.zoom, {
+      animate: true,
+      duration: 1.5
+    });
   }, [targetView, map]);
   return null;
 };
@@ -877,6 +881,16 @@ const ZoomTracker = ({ onZoom }: { onZoom: (zoom: number) => void }) => {
       onZoom(map.getZoom());
     },
   });
+  return null;
+};
+
+// Fixes always-mounted hidden map: forces Leaflet to recalculate container size
+const MapResizer = () => {
+  const map = useMap();
+  useEffect(() => {
+    const t = setTimeout(() => { map.invalidateSize(); }, 50);
+    return () => clearTimeout(t);
+  }, [map]);
   return null;
 };
 
@@ -2057,20 +2071,19 @@ const SanctuaryMapLayout = () => {
     { id: "rrr-exit-7", type: 'rrr-exit', title: "RRR Proposed Exit", location: "Chevella Hub",          coords: [17.2600, 78.2360] as [number, number], aqi: 28 }
   ];
 
-  // ── Key hazard zones — industrial / traffic / pollution hotspots ─────────
-  const KEY_ZONES = [
-    { id: 'kz-sanath-nagar',  name: 'Sanath Nagar Industrial',   aqi: 198, noise: 82, hazard: 'critical', coords: [17.480, 78.442], tag: 'Heavy Industry' },
-    { id: 'kz-charminar',     name: 'Charminar Old City',         aqi: 175, noise: 88, hazard: 'critical', coords: [17.360, 78.480], tag: 'Dense Traffic + Industry' },
-    { id: 'kz-hitec',         name: 'HITEC City Tech Corridor',   aqi: 148, noise: 74, hazard: 'high',     coords: [17.440, 78.382], tag: 'Construction + Traffic' },
-    { id: 'kz-secunderabad',  name: 'Secunderabad Rail Hub',       aqi: 162, noise: 86, hazard: 'high',     coords: [17.442, 78.498], tag: 'Rail Emissions' },
-    { id: 'kz-airport',       name: 'Shamshabad Airport Zone',    aqi: 134, noise: 92, hazard: 'high',     coords: [17.240, 78.430], tag: 'Jet Noise + Fumes' },
-    { id: 'kz-kukatpally',    name: 'Kukatpally Industrial',      aqi: 155, noise: 79, hazard: 'high',     coords: [17.485, 78.408], tag: 'Mixed Industry' },
-    { id: 'kz-patancheru',    name: 'Patancheru Pharma Cluster',  aqi: 210, noise: 68, hazard: 'critical', coords: [17.530, 78.265], tag: 'Chemical / Pharma' },
-    { id: 'kz-jeedimetla',    name: 'Jeedimetla Industrial Estate',aqi: 188, noise: 72, hazard: 'critical', coords: [17.516, 78.423], tag: 'Heavy Industry' },
-    { id: 'kz-nacharam',      name: 'Nacharam Industrial Area',   aqi: 145, noise: 76, hazard: 'high',     coords: [17.412, 78.548], tag: 'Mixed Industry' },
-    { id: 'kz-uppal',         name: 'Uppal Industrial Zone',      aqi: 138, noise: 73, hazard: 'high',     coords: [17.398, 78.558], tag: 'Industrial Estates' },
-    { id: 'kz-lb-nagar',      name: 'LB Nagar Traffic Corridor',  aqi: 122, noise: 84, hazard: 'moderate', coords: [17.348, 78.558], tag: 'Dense Traffic' },
-    { id: 'kz-mehdipatnam',   name: 'Mehdipatnam Junction',       aqi: 118, noise: 80, hazard: 'moderate', coords: [17.392, 78.434], tag: 'Traffic Bottleneck' },
+  const KEY_ZONES: { id: string; name: string; aqi: number; noise: number; hazard: string; coords: [number, number]; tag: string }[] = [
+    { id: 'kz-sanath-nagar',  name: 'Sanath Nagar Industrial',    aqi: 198, noise: 82, hazard: 'critical', coords: [17.480, 78.442] as [number,number], tag: 'Heavy Industry' },
+    { id: 'kz-charminar',     name: 'Charminar Old City',          aqi: 175, noise: 88, hazard: 'critical', coords: [17.360, 78.480] as [number,number], tag: 'Dense Traffic + Industry' },
+    { id: 'kz-hitec',         name: 'HITEC City Tech Corridor',    aqi: 148, noise: 74, hazard: 'high',     coords: [17.440, 78.382] as [number,number], tag: 'Construction + Traffic' },
+    { id: 'kz-secunderabad',  name: 'Secunderabad Rail Hub',        aqi: 162, noise: 86, hazard: 'high',     coords: [17.442, 78.498] as [number,number], tag: 'Rail Emissions' },
+    { id: 'kz-airport',       name: 'Shamshabad Airport Zone',     aqi: 134, noise: 92, hazard: 'high',     coords: [17.240, 78.430] as [number,number], tag: 'Jet Noise + Fumes' },
+    { id: 'kz-kukatpally',    name: 'Kukatpally Industrial',       aqi: 155, noise: 79, hazard: 'high',     coords: [17.485, 78.408] as [number,number], tag: 'Mixed Industry' },
+    { id: 'kz-patancheru',    name: 'Patancheru Pharma Cluster',   aqi: 210, noise: 68, hazard: 'critical', coords: [17.530, 78.265] as [number,number], tag: 'Chemical / Pharma' },
+    { id: 'kz-jeedimetla',    name: 'Jeedimetla Industrial Estate', aqi: 188, noise: 72, hazard: 'critical', coords: [17.516, 78.423] as [number,number], tag: 'Heavy Industry' },
+    { id: 'kz-nacharam',      name: 'Nacharam Industrial Area',    aqi: 145, noise: 76, hazard: 'high',     coords: [17.412, 78.548] as [number,number], tag: 'Mixed Industry' },
+    { id: 'kz-uppal',         name: 'Uppal Industrial Zone',       aqi: 138, noise: 73, hazard: 'high',     coords: [17.398, 78.558] as [number,number], tag: 'Industrial Estates' },
+    { id: 'kz-lb-nagar',      name: 'LB Nagar Traffic Corridor',   aqi: 122, noise: 84, hazard: 'moderate', coords: [17.348, 78.558] as [number,number], tag: 'Dense Traffic' },
+    { id: 'kz-mehdipatnam',   name: 'Mehdipatnam Junction',        aqi: 118, noise: 80, hazard: 'moderate', coords: [17.392, 78.434] as [number,number], tag: 'Traffic Bottleneck' },
   ];
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -2201,6 +2214,7 @@ const SanctuaryMapLayout = () => {
           maxBoundsViscosity={0.9}
         >
           <ZoomControl position="bottomleft" />
+          <MapResizer />
           {activeFilters.has('forest-zone') && NATURAL_FEATURES.map(feature => {
             const isForest = feature.type === 'forest';
             return (
