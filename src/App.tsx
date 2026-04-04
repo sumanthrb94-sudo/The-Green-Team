@@ -2939,6 +2939,7 @@ export default function App() {
 
   // Global auth state — declared after all useState so setViewMode is in scope
   useEffect(() => {
+    if (!auth) return; // Firebase not configured — skip auth listener
     const unsub = onAuthStateChanged(auth, u => {
       setAuthUser(u);
       if (u?.email === ADMIN_EMAIL) setViewMode('admin');
@@ -2954,7 +2955,7 @@ export default function App() {
   }, [isNewsletterOpen, isAuthOpen]);
 
   const handleSignOut = async () => {
-    await signOut(auth);
+    if (auth) await signOut(auth);
     setViewMode('home');
   };
 
