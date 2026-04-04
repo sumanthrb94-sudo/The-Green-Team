@@ -159,84 +159,69 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
     { name: 'Ecosystems', id: 'gallery' },
     { name: 'Agartha', id: 'list' },
     { name: 'SYL', id: 'syl' },
-    { name: 'Membership', id: 'membership' }
+    { name: 'Membership', id: 'membership' },
   ];
 
+  const avatarLetter = (authUser?.displayName?.[0] || authUser?.email?.[0] || authUser?.phoneNumber?.[1] || '?').toUpperCase();
+
   return (
-    <nav className="relative z-50 px-4 md:px-8 flex items-center h-16 md:h-20 bg-cream border-b border-outline/10 shadow-sm">
-      {/* Left: Brand Name */}
-      <div className="flex-1 flex items-center">
-        <Logo 
-          className="w-8 h-8" 
-          textClassName="text-lg md:text-xl"
-        />
-      </div>
+    <nav className="relative z-50 px-6 md:px-10 flex items-center justify-between h-16 md:h-20 bg-cream border-b border-outline/10">
+      {/* Left: Brand only */}
+      <Logo className="w-7 h-7" textClassName="text-base md:text-lg" />
 
-      {/* Right: Actions (Sign In + Menu) */}
-      <div className="flex items-center gap-4 md:gap-8">
-        <button 
-          onClick={() => setIsDark(!isDark)}
-          className="p-2 rounded-full hover:bg-olive-800/10 transition-colors"
-        >
-          {isDark ? <Sun className="w-5 h-5 text-gold" /> : <Moon className="w-5 h-5 text-olive-900" />}
-        </button>
+      {/* Right: single trigger — avatar (logged in) or hamburger (logged out) */}
+      <button
+        onClick={() => setIsMenuOpen(!isMenuOpen)}
+        aria-label="Open menu"
+        className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-primary/5 transition-colors"
+      >
         {authUser ? (
-          <div className="flex items-center gap-3">
-            <div className="hidden sm:flex items-center gap-2 text-xs text-olive-800/60">
-              <div className="w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-[10px] uppercase">
-                {(authUser.displayName?.[0] || authUser.email?.[0] || authUser.phoneNumber?.[1] || '?').toUpperCase()}
-              </div>
-              <span className="max-w-[120px] truncate">{authUser.displayName || authUser.email || authUser.phoneNumber}</span>
+          authUser.photoURL ? (
+            <img
+              src={authUser.photoURL}
+              referrerPolicy="no-referrer"
+              alt="Profile"
+              className="w-9 h-9 rounded-full object-cover ring-2 ring-primary/20"
+            />
+          ) : (
+            <div className="w-9 h-9 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-sm uppercase select-none">
+              {avatarLetter}
             </div>
-            <button
-              onClick={onSignOut}
-              className="text-xs uppercase tracking-[0.2em] font-bold border border-primary/30 text-primary hover:bg-primary hover:text-on-primary transition-all px-4 py-2 rounded-full"
-            >
-              Sign Out
-            </button>
-          </div>
+          )
         ) : (
-          <button onClick={onSignInClick} className="text-xs uppercase tracking-[0.2em] font-bold bg-primary text-on-primary hover:bg-olive-900 transition-all px-6 py-2.5 rounded-full shadow-sm hover:shadow-md">
-            Sign In
-          </button>
-        )}
-        
-        <button 
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="px-4 py-2 hover:bg-primary/5 border border-transparent hover:border-primary/20 rounded-full transition-all group flex items-center gap-3"
-        >
-          <div className="space-y-1.5">
-            <div className={cn("w-6 h-[2px] bg-primary transition-all", isMenuOpen && "rotate-45 translate-y-[8px]")}></div>
-            <div className={cn("w-4 h-[2px] bg-primary transition-all", isMenuOpen && "opacity-0")}></div>
-            <div className={cn("w-6 h-[2px] bg-primary transition-all", isMenuOpen && "-rotate-45 -translate-y-[8px]")}></div>
+          <div className="space-y-[5px] py-1">
+            <div className={cn("w-6 h-[2px] bg-primary transition-all duration-300", isMenuOpen && "rotate-45 translate-y-[7px]")} />
+            <div className={cn("w-4 h-[2px] bg-primary transition-all duration-300", isMenuOpen && "opacity-0 w-6")} />
+            <div className={cn("w-6 h-[2px] bg-primary transition-all duration-300", isMenuOpen && "-rotate-45 -translate-y-[7px]")} />
           </div>
-          <span className="hidden sm:block font-headline text-xs tracking-widest uppercase font-bold text-primary">Menu</span>
-        </button>
-      </div>
+        )}
+      </button>
 
-      {/* Mobile/Master Menu Overlay */}
+      {/* Full-screen menu overlay */}
       <AnimatePresence>
         {isMenuOpen && (
           <>
-            {/* Click-off area (Backdrop) */}
-            <motion.div 
+            <motion.div
+              key="nav-backdrop"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsMenuOpen(false)}
               className="fixed inset-0 bg-black/60 backdrop-blur-md z-[55]"
             />
-            
+
             <motion.div
+              key="nav-panel"
               initial={{ opacity: 0, y: '-100%' }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: '-100%' }}
-              transition={{ type: "spring", damping: 30, stiffness: 300 }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
               className="fixed top-0 left-0 right-0 bg-surface z-[60] flex flex-col p-8 md:p-16 shadow-2xl rounded-b-[40px] max-h-[95vh] overflow-y-auto"
             >
+              {/* Panel header */}
               <div className="flex items-center justify-between mb-12">
                 <Logo className="w-8 h-8" textClassName="text-lg" />
-                <button 
+                <button
                   onClick={() => setIsMenuOpen(false)}
                   className="p-3 hover:bg-primary/5 rounded-full transition-all"
                 >
@@ -245,12 +230,13 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
               </div>
 
               <div className="grid md:grid-cols-2 gap-12 md:gap-24">
+                {/* Nav links */}
                 <div className="flex flex-col gap-6">
-                  <p className="text-[10px] uppercase tracking-[0.6em] text-secondary font-bold mb-4 opacity-40">Navigation Hub</p>
+                  <p className="text-[10px] uppercase tracking-[0.6em] text-secondary font-bold opacity-40">Explore</p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-6">
                     {navItems.map((item) => (
-                      <button 
-                        key={item.id} 
+                      <button
+                        key={item.id}
                         onClick={() => {
                           if (['home', 'map', 'analytics', 'gallery', 'list', 'syl'].includes(item.id)) {
                             onModeChange(item.id as any);
@@ -266,40 +252,90 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
                   </div>
                 </div>
 
-                <div className="flex flex-col justify-end pt-12 md:pt-0 border-t md:border-t-0 md:border-l border-outline/10 md:pl-24">
-                  <div className="grid grid-cols-1 gap-4">
-                    <button className="w-full text-[11px] uppercase tracking-[0.5em] font-bold bg-primary text-on-primary px-8 py-5 hover:shadow-xl hover:shadow-primary/20 transition-all rounded-2xl mb-2">
-                      Sign In to Collective
-                    </button>
-                    <div className="flex items-center gap-6 mb-6">
-                      <MessageSquare className="w-5 h-5 text-secondary cursor-pointer hover:text-primary transition-colors" />
-                      <Shield className="w-5 h-5 text-secondary cursor-pointer hover:text-primary transition-colors" />
-                      <span className="text-[10px] uppercase tracking-widest text-secondary font-bold">Support & Security</span>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <button className="w-full text-[11px] uppercase tracking-[0.5em] font-bold text-primary border-2 border-primary/20 px-8 py-5 hover:bg-primary hover:text-on-surface hover:border-primary transition-all rounded-2xl text-center">
-                        Member Portal
-                      </button>
-                      <button 
+                {/* CTA / Account section */}
+                <div className="flex flex-col justify-end pt-12 md:pt-0 border-t md:border-t-0 md:border-l border-outline/10 md:pl-24 gap-4">
+                  {authUser ? (
+                    /* Logged-in state */
+                    <>
+                      <div className="flex items-center gap-4 mb-4">
+                        {authUser.photoURL ? (
+                          <img src={authUser.photoURL} referrerPolicy="no-referrer" alt="Profile" className="w-12 h-12 rounded-full object-cover ring-2 ring-primary/20" />
+                        ) : (
+                          <div className="w-12 h-12 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-lg uppercase select-none">
+                            {avatarLetter}
+                          </div>
+                        )}
+                        <div>
+                          <p className="text-sm font-bold text-on-surface truncate max-w-[180px]">{authUser.displayName || authUser.email || authUser.phoneNumber}</p>
+                          <p className="text-[10px] uppercase tracking-widest text-secondary/60 mt-0.5">Member</p>
+                        </div>
+                      </div>
+                      <button
                         onClick={() => {
                           setIsMenuOpen(false);
                           onNewsletterClick();
                         }}
-                        className="w-full text-[11px] uppercase tracking-[0.5em] font-bold text-secondary border-2 border-transparent px-8 py-5 hover:text-primary transition-all text-center"
+                        className="w-full text-[11px] uppercase tracking-[0.5em] font-bold bg-primary text-on-primary px-8 py-5 hover:shadow-xl hover:shadow-primary/20 transition-all rounded-2xl"
                       >
-                        List Property
+                        Explore Sanctuaries
                       </button>
-                    </div>
-                  </div>
+                    </>
+                  ) : (
+                    /* Logged-out state — conversion CTA */
+                    <>
+                      <p className="text-[10px] uppercase tracking-[0.4em] text-secondary/50 font-bold mb-2">Join The Collective</p>
+                      <button
+                        onClick={() => {
+                          setIsMenuOpen(false);
+                          onSignInClick();
+                        }}
+                        className="w-full text-[11px] uppercase tracking-[0.5em] font-bold bg-primary text-on-primary px-8 py-5 hover:shadow-xl hover:shadow-primary/20 transition-all rounded-2xl"
+                      >
+                        Sign In
+                      </button>
+                      <button
+                        onClick={() => {
+                          setIsMenuOpen(false);
+                          onNewsletterClick();
+                        }}
+                        className="w-full text-[11px] uppercase tracking-[0.5em] font-bold text-primary border-2 border-primary/20 px-8 py-5 hover:bg-primary hover:text-on-primary hover:border-primary transition-all rounded-2xl text-center"
+                      >
+                        Get Early Access
+                      </button>
+                    </>
+                  )}
+
+                  {/* Dark mode toggle — blended in */}
+                  <button
+                    onClick={() => setIsDark(!isDark)}
+                    className="flex items-center gap-3 text-[10px] uppercase tracking-[0.4em] text-secondary/50 font-bold hover:text-primary transition-colors mt-2 self-start"
+                  >
+                    {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                    {isDark ? 'Light Mode' : 'Dark Mode'}
+                  </button>
                 </div>
               </div>
 
-              <div className="mt-16 pt-8 border-t border-outline/10 flex flex-col md:flex-row justify-between items-center gap-8">
+              {/* Footer row */}
+              <div className="mt-16 pt-8 border-t border-outline/10 flex flex-col md:flex-row justify-between items-center gap-6">
                 <div className="flex gap-8">
-                  <span className="text-[9px] uppercase tracking-widest text-secondary/60">Privacy Policy</span>
-                  <span className="text-[9px] uppercase tracking-widest text-secondary/60">Terms of Service</span>
+                  <span className="text-[9px] uppercase tracking-widest text-secondary/50">Privacy Policy</span>
+                  <span className="text-[9px] uppercase tracking-widest text-secondary/50">Terms of Service</span>
                 </div>
-                <p className="text-[9px] uppercase tracking-widest text-secondary/40">© 2026 The Green Team • Independent Sanctuary Curators</p>
+                <div className="flex items-center gap-8">
+                  {authUser && (
+                    <button
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        onSignOut();
+                      }}
+                      className="text-[9px] uppercase tracking-widest text-secondary/40 hover:text-primary transition-colors"
+                    >
+                      Sign Out
+                    </button>
+                  )}
+                  <p className="text-[9px] uppercase tracking-widest text-secondary/40">© 2026 The Green Team</p>
+                </div>
               </div>
             </motion.div>
           </>
