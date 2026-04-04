@@ -3259,23 +3259,6 @@ export default function App() {
   type ViewMode = 'home' | 'map' | 'list' | 'gallery' | 'analytics' | 'syl' | 'admin';
   const VIEW_ORDER: ViewMode[] = ['home', 'list', 'gallery', 'analytics', 'syl', 'map'];
 
-  // ── URL ↔ ViewMode mapping ────────────────────────────────────────────────
-  const PATH_TO_VIEW: Record<string, ViewMode> = {
-    '/': 'home', '/map': 'map', '/agartha': 'list',
-    '/gallery': 'gallery', '/analytics': 'analytics',
-    '/syl': 'syl', '/admin': 'admin',
-  };
-  const VIEW_TO_PATH: Record<ViewMode, string> = {
-    home: '/', map: '/map', list: '/agartha',
-    gallery: '/gallery', analytics: '/analytics',
-    syl: '/syl', admin: '/admin',
-  };
-
-  const viewFromUrl = (): ViewMode => {
-    const path = window.location.pathname;
-    return PATH_TO_VIEW[path] ?? 'home';
-  };
-
   const [authUser, setAuthUser]   = useState<User | null>(null);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
 
@@ -3283,6 +3266,7 @@ export default function App() {
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, u => {
       setAuthUser(u);
+      // Auto-redirect admin to dashboard after sign-in
       if (u?.email === ADMIN_EMAIL) setViewMode('admin');
     });
     return unsub;
@@ -3293,77 +3277,49 @@ export default function App() {
     setViewMode('home');
   };
 
-  const [isSubscribed, setIsSubscribed] = useState(() =>
-    localStorage.getItem('gt_subscribed') === 'true'
-  );
+  const [isSubscribed, setIsSubscribed] = useState(() => {
+    return localStorage.getItem('gt_subscribed') === 'true';
+  });
   const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
-
-  // Initialise from URL so deep links / refresh land on the right view
-  const [viewMode, setViewMode] = useState<ViewMode>(viewFromUrl);
-  const [isDark, setIsDark] = useState(() =>
-    sessionStorage.getItem('gt_dark') === 'true'
-  );
+  const [viewMode, setViewMode] = useState<ViewMode>('home');
+  const [isDark, setIsDark] = useState(false);
 
   // ── Scroll-position memory ────────────────────────────────────────────────
-  const scrollPositions = useRef<Partial<Record<ViewMode, number>>>(
-    JSON.parse(sessionStorage.getItem('gt_scroll') ?? '{}')
-  );
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollPositions = useRef<Partial<Record<ViewMode, number>>>({});
+  const scrollRef       = useRef<HTMLDivElement>(null);
 
   const handleViewChange = useCallback((next: ViewMode) => {
-    if (scrollRef.current) {
-      scrollPositions.current[viewMode] = scrollRef.current.scrollTop;
-      sessionStorage.setItem('gt_scroll', JSON.stringify(scrollPositions.current));
-    }
-    // Push to browser history so back button works correctly
-    const path = VIEW_TO_PATH[next];
-    window.history.pushState({ view: next }, '', path);
+    // Save current scroll before leaving
+    if (scrollRef.current) scrollPositions.current[viewMode] = scrollRef.current.scrollTop;
     setViewMode(next);
   }, [viewMode]);
 
-  // Restore scroll after view renders
+  // Restore scroll after the new view renders
   useEffect(() => {
-    if (scrollRef.current)
-      scrollRef.current.scrollTop = scrollPositions.current[viewMode] ?? 0;
+    if (scrollRef.current) scrollRef.current.scrollTop = scrollPositions.current[viewMode] ?? 0;
   }, [viewMode]);
 
-  // Handle browser back / forward (popstate)
-  useEffect(() => {
-    const onPop = (e: PopStateEvent) => {
-      const v = (e.state?.view as ViewMode) ?? viewFromUrl();
-      if (scrollRef.current)
-        scrollPositions.current[viewMode] = scrollRef.current.scrollTop;
-      setViewMode(v);
-    };
-    window.addEventListener('popstate', onPop);
-    // Seed initial history entry so back doesn't leave the app
-    window.history.replaceState({ view: viewMode }, '', VIEW_TO_PATH[viewMode]);
-    return () => window.removeEventListener('popstate', onPop);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  // ── Swipe navigation (horizontal > 60 px, dominant over vertical) ────────
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
 
-  // ── Block browser swipe back/forward on mobile ────────────────────────────
-  useEffect(() => {
-    // overscroll-behavior on <html> stops Chrome's swipe-to-navigate gesture
-    document.documentElement.style.overscrollBehaviorX = 'none';
-    // Also block touchmove in the X direction at the edge of the viewport
-    const preventEdgeSwipe = (e: TouchEvent) => {
-      const t = e.touches[0];
-      // Only block near screen edges (first/last 20px) where browser gesture triggers
-      if (t.clientX < 20 || t.clientX > window.innerWidth - 20) {
-        e.preventDefault();
-      }
-    };
-    document.addEventListener('touchmove', preventEdgeSwipe, { passive: false });
-    return () => {
-      document.documentElement.style.overscrollBehaviorX = '';
-      document.removeEventListener('touchmove', preventEdgeSwipe);
-    };
+  const onTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
   }, []);
+
+  const onTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (!touchStart.current) return;
+    const dx = e.changedTouches[0].clientX - touchStart.current.x;
+    const dy = Math.abs(e.changedTouches[0].clientY - touchStart.current.y);
+    touchStart.current = null;
+    if (Math.abs(dx) < 60 || Math.abs(dx) < dy * 1.5) return; // vertical scroll, ignore
+    const idx = VIEW_ORDER.indexOf(viewMode);
+    if (dx < 0 && idx < VIEW_ORDER.length - 1) handleViewChange(VIEW_ORDER[idx + 1]); // swipe left → next
+    if (dx > 0 && idx > 0)                     handleViewChange(VIEW_ORDER[idx - 1]); // swipe right → prev
+  }, [viewMode, handleViewChange]);
 
   useEffect(() => {
     if (isDark) document.documentElement.classList.add('dark');
     else document.documentElement.classList.remove('dark');
-    sessionStorage.setItem('gt_dark', String(isDark));
   }, [isDark]);
 
   const handleSubscribe = () => {
@@ -3374,7 +3330,8 @@ export default function App() {
   return (
     <div
       className="h-screen w-screen bg-cream text-olive-900 overflow-hidden flex flex-col transition-colors duration-700"
-      style={{ overscrollBehavior: 'none' }}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
     >
       <Navbar
         isSubscribed={isSubscribed}
