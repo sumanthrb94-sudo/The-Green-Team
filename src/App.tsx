@@ -281,7 +281,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
                   {authUser ? (
                     /* Logged-in state */
                     <>
-                      <div className="flex items-center gap-4 mb-4">
+                      <div className="flex items-center gap-4 mb-6">
                         {authUser.photoURL ? (
                           <img src={authUser.photoURL} referrerPolicy="no-referrer" alt="Profile" className="w-12 h-12 rounded-full object-cover ring-2 ring-primary/20" />
                         ) : (
@@ -297,11 +297,21 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
                       <button
                         onClick={() => {
                           setIsMenuOpen(false);
-                          onNewsletterClick();
+                          onModeChange('map');
                         }}
                         className="w-full text-[11px] uppercase tracking-[0.5em] font-bold bg-primary text-on-primary px-8 py-5 hover:shadow-xl hover:shadow-primary/20 transition-all rounded-2xl"
                       >
                         Explore Sanctuaries
+                      </button>
+                      <button
+                        onClick={() => {
+                          setIsMenuOpen(false);
+                          onSignOut();
+                        }}
+                        className="w-full text-[11px] uppercase tracking-[0.5em] font-bold text-error border-2 border-error/20 px-8 py-5 hover:bg-error hover:text-white hover:border-error transition-all rounded-2xl flex items-center justify-center gap-3"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        Sign Out
                       </button>
                     </>
                   ) : (
@@ -346,20 +356,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
                   <span className="text-[9px] uppercase tracking-widest text-secondary/50">Privacy Policy</span>
                   <span className="text-[9px] uppercase tracking-widest text-secondary/50">Terms of Service</span>
                 </div>
-                <div className="flex items-center gap-8">
-                  {authUser && (
-                    <button
-                      onClick={() => {
-                        setIsMenuOpen(false);
-                        onSignOut();
-                      }}
-                      className="text-[9px] uppercase tracking-widest text-secondary/40 hover:text-primary transition-colors"
-                    >
-                      Sign Out
-                    </button>
-                  )}
-                  <p className="text-[9px] uppercase tracking-widest text-secondary/40">© 2026 The Green Team</p>
-                </div>
+                <p className="text-[9px] uppercase tracking-widest text-secondary/40">© 2026 The Green Team</p>
               </div>
             </motion.div>
           </>
@@ -3280,6 +3277,8 @@ export default function App() {
   const [isSubscribed, setIsSubscribed] = useState(() => {
     return localStorage.getItem('gt_subscribed') === 'true';
   });
+  // A logged-in user is always treated as a subscriber — no gates shown
+  const effectivelySubscribed = isSubscribed || !!authUser;
   const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('home');
   const [isDark, setIsDark] = useState(false);
@@ -3334,8 +3333,8 @@ export default function App() {
       onTouchEnd={onTouchEnd}
     >
       <Navbar
-        isSubscribed={isSubscribed}
-        onNewsletterClick={() => setIsNewsletterOpen(true)}
+        isSubscribed={effectivelySubscribed}
+        onNewsletterClick={() => { if (!effectivelySubscribed) setIsNewsletterOpen(true); }}
         onModeChange={handleViewChange}
         isDark={isDark}
         setIsDark={setIsDark}
@@ -3351,11 +3350,11 @@ export default function App() {
           {viewMode === 'admin' && authUser && <AdminDashboard onClose={() => handleViewChange('home')} user={authUser} />}
           {viewMode !== 'map' && viewMode !== 'admin' && (
             <div ref={scrollRef} className="h-full w-full overflow-y-auto">
-              {viewMode === 'home' && <HomeView isSubscribed={isSubscribed} onNewsletterClick={() => setIsNewsletterOpen(true)} />}
-              {viewMode === 'list' && <Sanctuaries isSubscribed={isSubscribed} onNewsletterClick={() => setIsNewsletterOpen(true)} isFullPage />}
+              {viewMode === 'home' && <HomeView isSubscribed={effectivelySubscribed} onNewsletterClick={() => { if (!effectivelySubscribed) setIsNewsletterOpen(true); }} />}
+              {viewMode === 'list' && <Sanctuaries isSubscribed={effectivelySubscribed} onNewsletterClick={() => { if (!effectivelySubscribed) setIsNewsletterOpen(true); }} isFullPage />}
               {viewMode === 'gallery' && <EcosystemPillars isFullPage />}
               {viewMode === 'analytics' && <Advantage isFullPage />}
-              {viewMode === 'syl' && <TheSIL isSubscribed={isSubscribed} onNewsletterClick={() => setIsNewsletterOpen(true)} isFullPage />}
+              {viewMode === 'syl' && <TheSIL isSubscribed={effectivelySubscribed} onNewsletterClick={() => { if (!effectivelySubscribed) setIsNewsletterOpen(true); }} isFullPage />}
             </div>
           )}
         </div>
