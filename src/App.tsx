@@ -884,13 +884,18 @@ const ZoomTracker = ({ onZoom }: { onZoom: (zoom: number) => void }) => {
   return null;
 };
 
-// Fixes always-mounted hidden map: forces Leaflet to recalculate container size
-const MapResizer = () => {
+// Tracks visibility of the always-mounted map: forces Leaflet to recalculate container size
+// and delays revealing the map until tiles have securely loaded
+const MapVisibilityTracker = ({ isVisible, onReady }: { isVisible?: boolean; onReady: () => void }) => {
   const map = useMap();
   useEffect(() => {
-    const t = setTimeout(() => { map.invalidateSize(); }, 50);
-    return () => clearTimeout(t);
-  }, [map]);
+    let t1: NodeJS.Timeout, t2: NodeJS.Timeout;
+    if (isVisible) {
+      t1 = setTimeout(() => { map.invalidateSize(); }, 150);
+      t2 = setTimeout(() => { map.invalidateSize(); onReady(); }, 1800); 
+    }
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, [isVisible, map, onReady]);
   return null;
 };
 
@@ -1368,7 +1373,8 @@ const RRRBlurOverlay: FC<{ rrrPath: [number, number][] }> = ({ rrrPath }) => {
   return null;
 };
 
-const SanctuaryMapLayout = () => {
+const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
+  const [isMapReady, setIsMapReady] = useState(false);
   const [isSatellite, setIsSatellite] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showAqi, setShowAqi] = useState(true);
@@ -2106,6 +2112,37 @@ const SanctuaryMapLayout = () => {
 
   return (
     <div className="h-full w-full relative overflow-hidden flex">
+      {/* Loading Overlay */}
+      <AnimatePresence>
+        {!isMapReady && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8, ease: "easeInOut" }}
+            className="absolute inset-0 z-[10000] bg-surface flex flex-col items-center justify-center pointer-events-none"
+          >
+            <motion.div
+              animate={{ scale: [0.95, 1.05, 0.95] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <Logo className="w-16 h-16 opacity-80" />
+            </motion.div>
+            <div className="mt-8 text-olive-800/40 text-[10px] tracking-[0.3em] uppercase font-bold text-center">
+              Awaiting Geographic Signal...
+            </div>
+            {/* Loading line */}
+            <div className="w-48 h-px bg-olive-800/10 mt-6 relative overflow-hidden">
+              <motion.div 
+                className="absolute top-0 left-0 h-full bg-olive-800/40"
+                initial={{ width: "0%" }}
+                animate={{ width: "100%" }}
+                transition={{ duration: 1.8, ease: "linear" }}
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="flex-1 relative">
         <AnimatePresence>
           {selectedSanctuary && (
@@ -2195,7 +2232,7 @@ const SanctuaryMapLayout = () => {
           maxBoundsViscosity={1.0}
         >
           <ZoomControl position="bottomleft" />
-          <MapResizer />
+          <MapVisibilityTracker isVisible={isVisible} onReady={() => setIsMapReady(true)} />
           {activeFilters.has('forest-zone') && NATURAL_FEATURES.map(feature => {
             const isForest = feature.type === 'forest';
             return (
@@ -3600,7 +3637,7 @@ export default function App() {
         <div className="flex-1 relative overflow-hidden bg-surface">
           {/* Map is always mounted to preserve Leaflet pan/zoom/filter state */}
           <div className={viewMode === 'map' ? 'absolute inset-0 z-10' : 'hidden'}>
-            <SanctuaryMapLayout />
+            <SanctuaryMapLayout isVisible={viewMode === 'map'} />
             <ChatBot data={{ sanctuaries: SANCTUARIES }} />
           </div>
           {viewMode === 'admin' && authUser && <AdminDashboard onClose={() => handleViewChange('home')} user={authUser} />}
