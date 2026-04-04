@@ -1367,16 +1367,11 @@ const SanctuaryMapLayout = () => {
   const [livePulse, setLivePulse] = useState(0);
   const [activeFilters, setActiveFilters] = useState<Set<string>>(new Set(['aqi-live']));
 
+  // ── 3 focused filters only ──────────────────────────────────────────────
   const FILTER_PILLS = [
-    { id: 'sanctuaries',  label: 'Sanctuaries',     icon: Home },
-    { id: 'orr-exits',    label: 'ORR Exits',        icon: Route },
-    { id: 'rrr-exits',    label: 'RRR Exits',        icon: RotateCcw },
-    { id: 'clean-air',    label: 'Clean Air',        icon: Leaf },
-    { id: 'aqi-live',     label: 'AQI Live',         icon: Activity },
-    { id: 'forest-zone',  label: 'Forest Zone',      icon: Trees },
-    { id: 'satellite',    label: 'Satellite',        icon: Globe2 },
-    { id: 'airport',      label: 'Airport Zone',     icon: Plane },
-    { id: 'regional',     label: 'Regional (RRR)',   icon: MapIcon },
+    { id: 'aqi-live',    label: 'AQI Live',      icon: Activity },
+    { id: 'sanctuaries', label: 'Sanctuaries',    icon: Home     },
+    { id: 'key-zones',   label: 'Key Zones',      icon: AlertTriangle },
   ];
 
   const toggleFilter = (filterId: string) => {
@@ -1385,10 +1380,7 @@ const SanctuaryMapLayout = () => {
       const next = new Set(prev);
       if (isCurrentlyActive) next.delete(filterId);
       else next.add(filterId);
-      if (filterId === 'aqi-live')  setShowAqi(!isCurrentlyActive);
-      if (filterId === 'satellite') setIsSatellite(!isCurrentlyActive);
-      if (filterId === 'regional')  setIsRegionalView(!isCurrentlyActive);
-      if (filterId === 'airport')   setIsAirportFocus(!isCurrentlyActive);
+      if (filterId === 'aqi-live') setShowAqi(!isCurrentlyActive);
       return next;
     });
   };
@@ -2065,27 +2057,28 @@ const SanctuaryMapLayout = () => {
     { id: "rrr-exit-7", type: 'rrr-exit', title: "RRR Proposed Exit", location: "Chevella Hub",          coords: [17.2600, 78.2360] as [number, number], aqi: 28 }
   ];
 
+  // ── Key hazard zones — industrial / traffic / pollution hotspots ─────────
+  const KEY_ZONES = [
+    { id: 'kz-sanath-nagar',  name: 'Sanath Nagar Industrial',   aqi: 198, noise: 82, hazard: 'critical', coords: [17.480, 78.442], tag: 'Heavy Industry' },
+    { id: 'kz-charminar',     name: 'Charminar Old City',         aqi: 175, noise: 88, hazard: 'critical', coords: [17.360, 78.480], tag: 'Dense Traffic + Industry' },
+    { id: 'kz-hitec',         name: 'HITEC City Tech Corridor',   aqi: 148, noise: 74, hazard: 'high',     coords: [17.440, 78.382], tag: 'Construction + Traffic' },
+    { id: 'kz-secunderabad',  name: 'Secunderabad Rail Hub',       aqi: 162, noise: 86, hazard: 'high',     coords: [17.442, 78.498], tag: 'Rail Emissions' },
+    { id: 'kz-airport',       name: 'Shamshabad Airport Zone',    aqi: 134, noise: 92, hazard: 'high',     coords: [17.240, 78.430], tag: 'Jet Noise + Fumes' },
+    { id: 'kz-kukatpally',    name: 'Kukatpally Industrial',      aqi: 155, noise: 79, hazard: 'high',     coords: [17.485, 78.408], tag: 'Mixed Industry' },
+    { id: 'kz-patancheru',    name: 'Patancheru Pharma Cluster',  aqi: 210, noise: 68, hazard: 'critical', coords: [17.530, 78.265], tag: 'Chemical / Pharma' },
+    { id: 'kz-jeedimetla',    name: 'Jeedimetla Industrial Estate',aqi: 188, noise: 72, hazard: 'critical', coords: [17.516, 78.423], tag: 'Heavy Industry' },
+    { id: 'kz-nacharam',      name: 'Nacharam Industrial Area',   aqi: 145, noise: 76, hazard: 'high',     coords: [17.412, 78.548], tag: 'Mixed Industry' },
+    { id: 'kz-uppal',         name: 'Uppal Industrial Zone',      aqi: 138, noise: 73, hazard: 'high',     coords: [17.398, 78.558], tag: 'Industrial Estates' },
+    { id: 'kz-lb-nagar',      name: 'LB Nagar Traffic Corridor',  aqi: 122, noise: 84, hazard: 'moderate', coords: [17.348, 78.558], tag: 'Dense Traffic' },
+    { id: 'kz-mehdipatnam',   name: 'Mehdipatnam Junction',       aqi: 118, noise: 80, hazard: 'moderate', coords: [17.392, 78.434], tag: 'Traffic Bottleneck' },
+  ];
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const filteredLocations = useMemo(() => {
-    const hasTypeFilter    = activeFilters.has('sanctuaries') || activeFilters.has('orr-exits') || activeFilters.has('rrr-exits');
-    const hasQualityFilter = activeFilters.has('clean-air')   || activeFilters.has('forest-zone');
-    if (!hasTypeFilter && !hasQualityFilter) return locations;
+    // Always show sanctuaries, show others based on filter
     return locations.filter(loc => {
-      let passesType    = !hasTypeFilter;
-      let passesQuality = !hasQualityFilter;
-      if (hasTypeFilter) {
-        passesType =
-          (activeFilters.has('sanctuaries') && loc.type === 'sanctuary') ||
-          (activeFilters.has('orr-exits')   && loc.type === 'exit')      ||
-          (activeFilters.has('rrr-exits')   && loc.type === 'rrr-exit');
-      }
-      if (hasQualityFilter) {
-        const fr = (loc as { forestRadius?: number }).forestRadius ?? 0;
-        passesQuality =
-          (activeFilters.has('clean-air')   && (loc.aqi ?? 999) <= 50) ||
-          (activeFilters.has('forest-zone') && loc.type === 'sanctuary' && fr >= 3000);
-      }
-      return passesType && passesQuality;
+      if (loc.type === 'sanctuary') return activeFilters.has('sanctuaries');
+      return false; // ORR/RRR exits hidden — not in active filter set
     });
   }, [activeFilters]); // locations is stable per render
 
@@ -2422,6 +2415,70 @@ const SanctuaryMapLayout = () => {
                   </Marker>
                 )}
               </React.Fragment>
+            );
+          })}
+          {/* ── Key Industrial / Pollution Zones \u2500 severity-coded markers \u2500\u2500\u2500\u2500\u2500\u2500\u2500 */}
+          {activeFilters.has('key-zones') && KEY_ZONES.map(zone => {
+            const isCritical = zone.hazard === 'critical';
+            const isHigh     = zone.hazard === 'high';
+            // Color: critical=red, high=orange, moderate=amber
+            const ringColor  = isCritical ? '#ef4444' : isHigh ? '#f97316' : '#eab308';
+            const bgColor    = isCritical ? '#7f1d1d' : isHigh ? '#7c2d12' : '#713f12';
+            const textColor  = '#fff';
+            const aqiBand    = zone.aqi >= 200 ? 'Hazardous' : zone.aqi >= 150 ? 'Very Unhealthy' : zone.aqi >= 100 ? 'Unhealthy' : 'Moderate';
+            const pulseAnim  = isCritical ? 'animate-ping' : '';
+
+            return (
+              <Marker
+                key={zone.id}
+                position={zone.coords as [number, number]}
+                icon={L.divIcon({
+                  className: '',
+                  html: `<div style="position:relative;display:flex;align-items:center;justify-content:center;width:40px;height:40px;">
+                    ${isCritical ? `<div style="position:absolute;inset:0;border-radius:50%;background:${ringColor};opacity:0.25;animation:ping 1.5s cubic-bezier(0,0,0.2,1) infinite;"></div>` : ''}
+                    <div style="
+                      width:${isCritical ? 32 : isHigh ? 28 : 24}px;
+                      height:${isCritical ? 32 : isHigh ? 28 : 24}px;
+                      background:${bgColor};
+                      border: 2px solid ${ringColor};
+                      border-radius:50%;
+                      display:flex;align-items:center;justify-content:center;
+                      box-shadow: 0 0 12px ${ringColor}88, 0 2px 8px rgba(0,0,0,0.4);
+                      position:relative;z-index:1;
+                    ">
+                      <span style="font-size:9px;font-weight:900;color:${textColor};letter-spacing:0;">${zone.aqi}</span>
+                    </div>
+                  </div>`,
+                  iconSize: [40, 40],
+                  iconAnchor: [20, 20],
+                  popupAnchor: [0, -22],
+                })}
+              >
+                <Popup className="custom-popup">
+                  <div style="padding:14px 16px;min-width:200px;font-family:inherit;">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+                      <div style="width:10px;height:10px;border-radius:50%;background:${ringColor};flex-shrink:0;"></div>
+                      <span style="font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:#1a1a1a;">${zone.name}</span>
+                    </div>
+                    <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.1em;color:#999;margin-bottom:12px;">${zone.tag}</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+                      <div style="background:${bgColor}22;border-radius:8px;padding:8px;text-align:center;">
+                        <div style="font-size:18px;font-weight:900;color:${ringColor};">${zone.aqi}</div>
+                        <div style="font-size:8px;text-transform:uppercase;letter-spacing:0.08em;color:#666;">AQI</div>
+                        <div style="font-size:7px;color:${ringColor};font-weight:700;margin-top:2px;">${aqiBand}</div>
+                      </div>
+                      <div style="background:#33333322;border-radius:8px;padding:8px;text-align:center;">
+                        <div style="font-size:18px;font-weight:900;color:#555;">${zone.noise}<span style="font-size:10px;">dB</span></div>
+                        <div style="font-size:8px;text-transform:uppercase;letter-spacing:0.08em;color:#666;">Noise</div>
+                        <div style="font-size:7px;color:#888;font-weight:700;margin-top:2px;">${zone.noise >= 85 ? 'Damaging' : zone.noise >= 75 ? 'Harmful' : 'Elevated'}</div>
+                      </div>
+                    </div>
+                    <div style="background:${ringColor}18;border:1px solid ${ringColor}44;border-radius:6px;padding:7px 10px;font-size:8px;color:#333;line-height:1.5;">
+                      ⚠ Health Risk: <strong style="color:${ringColor};text-transform:uppercase;">${zone.hazard}</strong> — prolonged exposure linked to respiratory illness, cardiovascular stress.
+                    </div>
+                  </div>
+                </Popup>
+              </Marker>
             );
           })}
         </MapContainer>
