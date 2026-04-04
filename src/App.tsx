@@ -89,6 +89,13 @@ interface Sanctuary {
   memberPrice: string;
   image: string;
   features?: string[];
+  tagline?: string;
+  description?: string;
+  plots?: number;
+  plotRange?: string;
+  amenityAcres?: string;
+  architect?: string;
+  plotImages?: string[];
 }
 
 // --- Mock Data ---
@@ -97,14 +104,29 @@ const SANCTUARIES: Sanctuary[] = [
   {
     id: 'agartha',
     title: 'MODCON Agartha',
-    location: 'Narsapur Forest Peripheral',
+    location: 'Narsapur Forest Peripheral, Hyderabad',
     aqi: 12,
     noise: 18,
     commute: '45 mins to Financial District',
     valuation: '₹2.2 Cr',
     memberPrice: '₹1.1 Cr',
-    image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=1200',
-    features: ['Forest Buffer', 'Solar Microgrid', 'Rainwater Harvest', 'Organic Farm']
+    image: 'https://images.unsplash.com/photo-1588880331179-bc9b93a8cb5e?auto=format&fit=crop&q=80&w=1200',
+    tagline: 'Where the forest becomes home.',
+    description: 'MODCON Agartha is a first-of-its-kind biomorphic residential community carved into the Narsapur forest periphery. 53 thoughtfully sized plots surround a 14,548 sq yd organic amenity core — featuring fluid earth architecture, solar-integrated curved roofs, and living canopies that blur the line between structure and forest. No two plots are the same. No straight lines anywhere.',
+    plots: 53,
+    plotRange: '808 – 5,097 sq yds',
+    amenityAcres: '14,548 sq yds',
+    architect: 'MODCON Builders',
+    features: [
+      'Biomorphic Architecture',
+      'Solar-Curved Rooftops',
+      'Narsapur Forest Buffer',
+      'Organic Amenity Core',
+      'Rainwater Harvesting',
+      'Earth & Bamboo Build',
+      'Zero Right-Angle Design',
+      'Private Plot Community',
+    ],
   },
   {
     id: 'syl',
@@ -849,112 +871,187 @@ const ZoomTracker = ({ onZoom }: { onZoom: (zoom: number) => void }) => {
   return null;
 };
 
-const PropertyDetailOverlay = ({ sanctuary, onClose }: { sanctuary: Sanctuary, onClose: () => void }) => {
-  const [showBadge, setShowBadge] = useState(true);
+const featureIcon = (f: string) => {
+  if (f.includes('Solar') || f.includes('Energy')) return <Sun className="w-4 h-4" />;
+  if (f.includes('Forest') || f.includes('Earth') || f.includes('Bamboo') || f.includes('Organic')) return <Leaf className="w-4 h-4" />;
+  if (f.includes('Rain') || f.includes('Water')) return <Droplets className="w-4 h-4" />;
+  if (f.includes('Zero') || f.includes('Private') || f.includes('Community')) return <Shield className="w-4 h-4" />;
+  if (f.includes('Biomorphic') || f.includes('Design') || f.includes('Vertical')) return <Award className="w-4 h-4" />;
+  return <Zap className="w-4 h-4" />;
+};
 
+const PropertyDetailOverlay = ({ sanctuary, onClose }: { sanctuary: Sanctuary, onClose: () => void }) => {
   return (
-    <motion.div 
+    <motion.div
       initial={{ x: '100%' }}
       animate={{ x: 0 }}
       exit={{ x: '100%' }}
       transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-      className="absolute top-0 right-0 bottom-0 w-full md:w-[450px] z-[1001] bg-surface shadow-[-10px_0_30px_rgba(0,0,0,0.1)] flex flex-col overflow-hidden"
+      className="fixed top-0 right-0 bottom-0 w-full md:w-[480px] z-[1001] bg-surface shadow-[-10px_0_40px_rgba(0,0,0,0.15)] flex flex-col overflow-hidden"
     >
-      <div className="relative h-72 w-full overflow-hidden">
-        <img 
-          src={sanctuary.image} 
-          alt={sanctuary.title} 
+      {/* Hero image */}
+      <div className="relative h-64 w-full overflow-hidden flex-shrink-0">
+        <img
+          src={sanctuary.image}
+          alt={sanctuary.title}
           className="w-full h-full object-cover"
           referrerPolicy="no-referrer"
         />
-        <div className="absolute top-6 right-6 flex gap-3">
-          <button className="p-2 bg-surface/80 backdrop-blur-md rounded-full shadow-lg hover:bg-surface transition-all">
-            <Shield className="w-4 h-4 text-primary" />
-          </button>
-          <button onClick={onClose} className="p-2 bg-surface/80 backdrop-blur-md rounded-full shadow-lg hover:bg-surface transition-all">
-            <X className="w-4 h-4 text-primary" />
-          </button>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+        <button
+          onClick={onClose}
+          className="absolute top-5 right-5 p-2 bg-black/40 backdrop-blur-sm rounded-full hover:bg-black/60 transition-all"
+        >
+          <X className="w-4 h-4 text-white" />
+        </button>
+        <div className="absolute bottom-5 left-6">
+          <span className="px-3 py-1 bg-primary text-on-primary text-[8px] uppercase tracking-widest font-bold rounded-full">
+            {sanctuary.id === 'syl' ? 'Upcoming' : 'Open for Expression of Interest'}
+          </span>
         </div>
-        {showBadge && (
-          <div className="absolute bottom-6 left-6 flex items-center gap-1">
-            <span className="px-3 py-1 bg-primary text-on-primary text-[8px] uppercase tracking-widest font-bold rounded-full">New Construction</span>
-            <button 
-              onClick={() => setShowBadge(false)}
-              className="p-1 bg-primary/80 text-on-surface rounded-full hover:bg-primary transition-all"
-            >
-              <X className="w-2 h-2" />
-            </button>
-          </div>
-        )}
       </div>
 
-      <div className="flex-1 overflow-y-auto p-8 space-y-8">
-        <div className="flex justify-between items-start">
-          <div>
-            <h2 className="text-3xl font-headline font-bold text-on-surface mb-2">{sanctuary.title}</h2>
-            <div className="flex items-center gap-2 text-secondary text-xs">
-              <MapPin className="w-3 h-3" />
-              {sanctuary.location}
+      {/* Scrollable body */}
+      <div className="flex-1 overflow-y-auto">
+        {/* Title + price */}
+        <div className="px-8 pt-8 pb-6 border-b border-outline/10">
+          <div className="flex justify-between items-start gap-4">
+            <div>
+              {sanctuary.tagline && (
+                <p className="text-[9px] uppercase tracking-[0.5em] text-primary font-bold mb-2">{sanctuary.tagline}</p>
+              )}
+              <h2 className="text-2xl font-headline font-bold text-on-surface leading-tight">{sanctuary.title}</h2>
+              <div className="flex items-center gap-2 text-secondary text-xs mt-2">
+                <MapPin className="w-3 h-3 flex-shrink-0" />
+                {sanctuary.location}
+              </div>
+            </div>
+            <div className="text-right flex-shrink-0">
+              <p className="text-[8px] uppercase tracking-widest text-secondary/50 mb-1">Member Price</p>
+              <p className="text-xl font-headline font-bold text-primary">{sanctuary.memberPrice}</p>
+              <p className="text-xs text-secondary/40 line-through">{sanctuary.valuation}</p>
             </div>
           </div>
-          <div className="text-right">
-            <p className="text-2xl font-headline font-bold text-primary">{sanctuary.memberPrice}</p>
-            <p className="text-[8px] uppercase tracking-widest text-secondary/60">Est. ₹24,500/mo</p>
+        </div>
+
+        {/* Key stats */}
+        <div className="grid grid-cols-3 divide-x divide-outline/10 border-b border-outline/10">
+          <div className="px-4 py-5 text-center">
+            <p className="text-[8px] uppercase tracking-widest text-secondary/50 mb-1">AQI</p>
+            <p className="text-lg font-bold text-primary">{sanctuary.aqi}</p>
+            <p className="text-[9px] text-secondary/50">Pure Air</p>
+          </div>
+          <div className="px-4 py-5 text-center">
+            <p className="text-[8px] uppercase tracking-widest text-secondary/50 mb-1">Noise</p>
+            <p className="text-lg font-bold text-on-surface">{sanctuary.noise} dB</p>
+            <p className="text-[9px] text-secondary/50">Near Silent</p>
+          </div>
+          <div className="px-4 py-5 text-center">
+            <p className="text-[8px] uppercase tracking-widest text-secondary/50 mb-1">Commute</p>
+            <p className="text-lg font-bold text-on-surface">45m</p>
+            <p className="text-[9px] text-secondary/50">to Fin. District</p>
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-4 py-6 border-y border-outline/10">
-          <div className="text-center">
-            <p className="text-[8px] uppercase tracking-widest text-secondary/60 mb-1">Living Space</p>
-            <p className="text-sm font-bold">5,420 <span className="text-[10px] font-normal text-secondary/60">sqft</span></p>
-          </div>
-          <div className="text-center border-x border-outline/10">
-            <p className="text-[8px] uppercase tracking-widest text-secondary/60 mb-1">Bedrooms</p>
-            <p className="text-sm font-bold">6 <span className="text-[10px] font-normal text-secondary/60">Beds</span></p>
-          </div>
-          <div className="text-center">
-            <p className="text-[8px] uppercase tracking-widest text-secondary/60 mb-1">Bathrooms</p>
-            <p className="text-sm font-bold">7.5 <span className="text-[10px] font-normal text-secondary/60">Baths</span></p>
-          </div>
-        </div>
+        <div className="px-8 py-8 space-y-8">
+          {/* Description */}
+          {sanctuary.description && (
+            <div>
+              <p className="text-sm text-secondary/80 leading-relaxed">{sanctuary.description}</p>
+            </div>
+          )}
 
-        <div>
-          <p className="text-[9px] uppercase tracking-[0.3em] text-secondary font-bold mb-6">Key Curated Features</p>
-          <div className="grid grid-cols-2 gap-4">
-            {sanctuary.features?.map((feature, i) => (
-              <div key={i} className="flex items-center gap-3 p-3 bg-surface-container-low rounded-xl border border-outline/5">
-                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                  {feature.includes('Forest') && <Leaf className="w-4 h-4" />}
-                  {feature.includes('Solar') && <Sun className="w-4 h-4" />}
-                  {feature.includes('Water') && <Droplets className="w-4 h-4" />}
-                  {feature.includes('Farm') && <Zap className="w-4 h-4" />}
-                  {feature.includes('Smart') && <Zap className="w-4 h-4" />}
-                  {feature.includes('Zero') && <Shield className="w-4 h-4" />}
-                  {feature.includes('Community') && <Award className="w-4 h-4" />}
-                  {feature.includes('Vertical') && <Leaf className="w-4 h-4" />}
-                </div>
-                <span className="text-[10px] font-medium text-on-surface-variant">{feature}</span>
+          {/* Plot community stats */}
+          {sanctuary.plots && (
+            <div className="grid grid-cols-3 gap-4">
+              <div className="p-4 bg-primary/5 rounded-2xl text-center">
+                <p className="text-2xl font-headline font-bold text-primary">{sanctuary.plots}</p>
+                <p className="text-[8px] uppercase tracking-widest text-secondary/60 mt-1">Private Plots</p>
               </div>
-            ))}
+              <div className="p-4 bg-primary/5 rounded-2xl text-center">
+                <p className="text-lg font-headline font-bold text-primary leading-tight">808–5,097</p>
+                <p className="text-[8px] uppercase tracking-widest text-secondary/60 mt-1">Sq Yds Range</p>
+              </div>
+              <div className="p-4 bg-primary/5 rounded-2xl text-center">
+                <p className="text-lg font-headline font-bold text-primary leading-tight">14,548</p>
+                <p className="text-[8px] uppercase tracking-widest text-secondary/60 mt-1">Sq Yds Amenity</p>
+              </div>
+            </div>
+          )}
+
+          {/* Features */}
+          {sanctuary.features && sanctuary.features.length > 0 && (
+            <div>
+              <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold mb-4">Curated Features</p>
+              <div className="grid grid-cols-2 gap-3">
+                {sanctuary.features.map((feature, i) => (
+                  <div key={i} className="flex items-center gap-3 p-3 rounded-xl border border-outline/10 bg-surface-container-low/50">
+                    <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
+                      {featureIcon(feature)}
+                    </div>
+                    <span className="text-[10px] font-medium text-on-surface leading-tight">{feature}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Environmental integrity */}
+          <div>
+            <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold mb-4">Environmental Integrity</p>
+            <div className="space-y-3">
+              {[
+                { label: 'Air Quality Index', value: `${sanctuary.aqi} — Pristine`, bar: (50 - sanctuary.aqi) / 50 },
+                { label: 'Ambient Noise', value: `${sanctuary.noise} dB — Near Silent`, bar: (50 - sanctuary.noise) / 50 },
+                { label: 'Forest Proximity', value: 'Direct Boundary Access', bar: 0.95 },
+              ].map(item => (
+                <div key={item.label}>
+                  <div className="flex justify-between text-[9px] mb-1">
+                    <span className="uppercase tracking-widest text-secondary/60">{item.label}</span>
+                    <span className="font-bold text-on-surface">{item.value}</span>
+                  </div>
+                  <div className="h-1 bg-outline/10 rounded-full overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${item.bar * 100}%` }}
+                      transition={{ delay: 0.3, duration: 0.8, ease: 'easeOut' }}
+                      className="h-full bg-primary rounded-full"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
 
-        <div>
-          <p className="text-[9px] uppercase tracking-[0.3em] text-secondary font-bold mb-4">Architectural Narrative</p>
-          <p className="text-xs text-secondary/80 leading-relaxed">
-            Designed by Studio Arca, {sanctuary.title} represents the pinnacle of cantilevered architecture. Featuring self-sustaining ecosystems and private forest buffers.
-          </p>
-        </div>
+          {/* By MODCON */}
+          {sanctuary.architect && (
+            <div className="flex items-center gap-3 p-4 border border-outline/10 rounded-2xl">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Award className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-[8px] uppercase tracking-widest text-secondary/50">Developed by</p>
+                <p className="text-sm font-bold text-on-surface">{sanctuary.architect}</p>
+              </div>
+            </div>
+          )}
 
-        <div className="space-y-4 pt-4">
-          <button className="w-full py-4 bg-primary text-on-primary text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all flex items-center justify-center gap-3">
-            <Clock className="w-4 h-4" />
-            Schedule Private Tour
-          </button>
-          <button className="w-full py-4 bg-surface-container-highest text-on-surface text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl hover:bg-surface-container-high transition-all flex items-center justify-center gap-3">
-            <MessageSquare className="w-4 h-4" />
-            Inquire with Listing Agent
-          </button>
+          {/* CTAs */}
+          <div className="space-y-3 pb-4">
+            <a
+              href="https://www.modconbuilders.com/agartha"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full py-4 bg-primary text-on-primary text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all flex items-center justify-center gap-3"
+            >
+              <ArrowRight className="w-4 h-4" />
+              View Full Brochure
+            </a>
+            <button className="w-full py-4 border border-outline/20 text-on-surface text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl hover:bg-primary/5 transition-all flex items-center justify-center gap-3">
+              <MessageSquare className="w-4 h-4" />
+              Request Private Briefing
+            </button>
+          </div>
         </div>
       </div>
     </motion.div>
