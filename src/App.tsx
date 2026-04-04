@@ -132,9 +132,9 @@ const Logo = ({ className = "w-10 h-10", textClassName = "text-xl md:text-2xl", 
       </svg>
     </div>
     {!iconOnly && (
-      <div className="flex flex-col">
-        <span className={cn("font-headline font-bold tracking-widest text-on-surface uppercase transition-all duration-700", textClassName)}>The Green Team</span>
-        <span className="text-[8px] md:text-[10px] uppercase tracking-[0.4em] md:tracking-[0.6em] text-primary font-bold -mt-0.5 md:-mt-1 hidden sm:block">Independent Sanctuary Curators</span>
+      <div className="flex flex-col min-w-0">
+        <span className={cn("font-headline font-bold text-on-surface uppercase whitespace-nowrap transition-all duration-700", textClassName)}>The Green Team</span>
+        <span className="text-[7px] md:text-[9px] uppercase tracking-[0.35em] md:tracking-[0.6em] text-primary font-bold hidden sm:block">Independent Sanctuary Curators</span>
       </div>
     )}
   </div>
@@ -163,54 +163,58 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
   ];
 
   return (
-    <nav className="relative z-50 px-4 md:px-8 flex items-center h-16 md:h-20 bg-cream border-b border-outline/10 shadow-sm">
-      {/* Left: Brand Name */}
-      <div className="flex-1 flex items-center">
-        <Logo 
-          className="w-8 h-8" 
-          textClassName="text-lg md:text-xl"
-        />
+    <nav className="relative z-50 px-4 md:px-8 flex items-center h-14 md:h-20 bg-cream border-b border-outline/10 shadow-sm">
+      {/* Left: Brand */}
+      <div className="flex-1 min-w-0 flex items-center">
+        <Logo className="w-7 h-7 md:w-9 md:h-9" textClassName="text-[11px] tracking-wide md:text-xl md:tracking-widest" />
       </div>
 
-      {/* Right: Actions (Sign In + Menu) */}
-      <div className="flex items-center gap-4 md:gap-8">
-        <button 
+      {/* Right: Actions */}
+      <div className="flex items-center gap-2 md:gap-5 shrink-0">
+        {/* Dark mode toggle */}
+        <button
           onClick={() => setIsDark(!isDark)}
-          className="p-2 rounded-full hover:bg-olive-800/10 transition-colors"
+          className="p-1.5 rounded-full hover:bg-olive-800/10 transition-colors"
         >
-          {isDark ? <Sun className="w-5 h-5 text-gold" /> : <Moon className="w-5 h-5 text-olive-900" />}
+          {isDark ? <Sun className="w-4 h-4 text-gold" /> : <Moon className="w-4 h-4 text-olive-900" />}
         </button>
+
+        {/* Auth state */}
         {authUser ? (
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2 text-xs text-olive-800/60">
-              <div className="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-[10px] uppercase shrink-0">
-                {(authUser.displayName?.[0] || authUser.email?.[0] || authUser.phoneNumber?.[1] || '?').toUpperCase()}
-              </div>
-              <span className="hidden md:block max-w-[140px] truncate font-medium">{authUser.displayName || authUser.email || authUser.phoneNumber}</span>
+            <div className="w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-[10px] uppercase shrink-0">
+              {(authUser.displayName?.[0] || authUser.email?.[0] || authUser.phoneNumber?.[1] || '?').toUpperCase()}
             </div>
+            <span className="hidden md:block max-w-[120px] truncate text-xs text-olive-800/60">
+              {authUser.displayName || authUser.email || authUser.phoneNumber}
+            </span>
             <button
               onClick={onSignOut}
-              className="text-[10px] uppercase tracking-[0.2em] font-bold border border-primary/30 text-primary hover:bg-primary hover:text-on-primary transition-all px-3 py-1.5 rounded-full"
+              className="flex items-center gap-1.5 text-[9px] md:text-[10px] uppercase tracking-[0.2em] font-bold border border-primary/30 text-primary hover:bg-primary hover:text-on-primary transition-all px-2.5 md:px-3 py-1.5 rounded-full"
             >
-              Sign Out
+              <LogOut className="w-3.5 h-3.5" />
+              <span className="hidden sm:block">Sign Out</span>
             </button>
           </div>
         ) : (
-          <button onClick={onSignInClick} className="text-xs uppercase tracking-[0.2em] font-bold bg-primary text-on-primary hover:bg-olive-900 transition-all px-6 py-2.5 rounded-full shadow-sm hover:shadow-md">
+          <button
+            onClick={onSignInClick}
+            className="text-[10px] uppercase tracking-[0.15em] font-bold bg-primary text-on-primary hover:bg-olive-900 transition-all px-4 md:px-6 py-2 rounded-full shadow-sm"
+          >
             Sign In
           </button>
         )}
-        
-        <button 
+
+        {/* Hamburger */}
+        <button
           onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="px-4 py-2 hover:bg-primary/5 border border-transparent hover:border-primary/20 rounded-full transition-all group flex items-center gap-3"
+          className="p-2 hover:bg-primary/5 rounded-full transition-all"
         >
-          <div className="space-y-1.5">
-            <div className={cn("w-6 h-[2px] bg-primary transition-all", isMenuOpen && "rotate-45 translate-y-[8px]")}></div>
-            <div className={cn("w-4 h-[2px] bg-primary transition-all", isMenuOpen && "opacity-0")}></div>
-            <div className={cn("w-6 h-[2px] bg-primary transition-all", isMenuOpen && "-rotate-45 -translate-y-[8px]")}></div>
+          <div className="space-y-[5px]">
+            <div className={cn("w-5 h-[2px] bg-primary transition-all", isMenuOpen && "rotate-45 translate-y-[7px]")} />
+            <div className={cn("w-3.5 h-[2px] bg-primary transition-all ml-auto", isMenuOpen && "opacity-0")} />
+            <div className={cn("w-5 h-[2px] bg-primary transition-all", isMenuOpen && "-rotate-45 -translate-y-[7px]")} />
           </div>
-          <span className="hidden sm:block font-headline text-xs tracking-widest uppercase font-bold text-primary">Menu</span>
         </button>
       </div>
 
@@ -362,45 +366,43 @@ const SideNavBar = ({ activeMode, onModeChange }: { activeMode: string, onModeCh
 
 const Hero = () => {
   return (
-    <section className="relative flex flex-col justify-start px-6 md:px-24 pt-6 pb-12 overflow-hidden cashew-gradient">
+    <section className="relative flex flex-col justify-start px-5 md:px-24 pt-5 pb-10 md:pb-14 overflow-hidden cashew-gradient">
       <div className="absolute inset-0 z-0 opacity-10 mix-blend-multiply">
-        <img 
-          src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&q=80&w=1920" 
-          alt="Atmospheric landscape" 
+        <img
+          src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&q=80&w=1920"
+          alt="Atmospheric landscape"
           className="w-full h-full object-cover grayscale"
           referrerPolicy="no-referrer"
         />
       </div>
-      
+
       <div className="relative z-10 max-w-6xl">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.2, ease: "circOut" }}
+          transition={{ duration: 0.9, ease: "circOut" }}
         >
-          <div className="flex items-center gap-3 md:gap-4 mb-4 md:mb-6">
-            <div className="w-8 md:w-12 h-px bg-olive-800/40"></div>
-            <span className="text-olive-800 text-[8px] md:text-[10px] font-bold uppercase tracking-[0.4em] md:tracking-[0.6em]">Independent Sanctuary Curators</span>
+          <div className="flex items-center gap-3 mb-3 md:mb-6">
+            <div className="w-6 md:w-12 h-px bg-olive-800/40" />
+            <span className="text-olive-800 text-[8px] md:text-[10px] font-bold uppercase tracking-[0.4em]">Independent Sanctuary Curators</span>
           </div>
-          
-          <h1 className="text-5xl sm:text-7xl md:text-[8rem] font-light text-olive-900 mb-8 md:mb-12 leading-[1.1] md:leading-[0.9] tracking-tighter">
-            The Science of <br />
-            <span className="italic text-olive-800 font-medium">Early Entry.</span>
+
+          <h1 className="text-4xl sm:text-6xl md:text-[8rem] font-light text-olive-900 mb-5 md:mb-10 leading-[1.1] md:leading-[0.9] tracking-tighter">
+            The Science of{' '}
+            <span className="italic text-olive-800 font-medium block sm:inline">Early Entry.</span>
           </h1>
-          
-          <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-end">
-            <p className="text-lg md:text-2xl font-normal text-olive-900/90 leading-relaxed max-w-xl">
-              A growing community in Hyderabad and India's metropolitans, securing self-sustaining sanctuaries where food, water, and energy are curated for the future.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 md:gap-8 pt-4">
-              <button className="btn-membership btn-olive group w-full sm:w-auto shadow-lg hover:shadow-xl shadow-olive-900/20">
-                Apply for Membership <ArrowUpRight className="inline-block ml-2 w-4 h-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
-              </button>
-              <button className="btn-membership btn-outline-olive w-full sm:w-auto hover:shadow-lg">
-                The Green Team Advantage
-              </button>
-            </div>
+
+          <p className="text-base md:text-2xl font-normal text-olive-900/80 leading-relaxed max-w-xl mb-6 md:mb-10">
+            A growing community in Hyderabad and India's metropolitans, securing self-sustaining sanctuaries where food, water, and energy are curated for the future.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-3 md:gap-6">
+            <button className="btn-membership btn-olive group shadow-lg shadow-olive-900/20">
+              Apply for Membership <ArrowUpRight className="inline-block ml-2 w-4 h-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+            </button>
+            <button className="btn-membership btn-outline-olive hover:shadow-lg">
+              The Green Team Advantage
+            </button>
           </div>
         </motion.div>
       </div>
