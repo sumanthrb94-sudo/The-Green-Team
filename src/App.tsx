@@ -2240,10 +2240,11 @@ const SanctuaryMapLayout = () => {
               url="https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}"
             />
           ) : (
+            /* Google Maps road layer — real NH numbers, highways at every zoom */
             <TileLayer
-              attribution="&copy; OpenStreetMap contributors &copy; CARTO"
-              url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png"
-              className="map-premium-filter"
+              attribution="&copy; Google Maps"
+              url="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"
+              className="map-olive-filter"
             />
           )}
 
@@ -2313,11 +2314,93 @@ const SanctuaryMapLayout = () => {
 
 
 
+          {/* ── ORR exits — always visible, zoom-responsive labels ─────────── */}
+          {locations.filter(l => l.type === 'exit').map(loc => (
+            <Marker
+              key={loc.id}
+              position={loc.coords}
+              icon={L.divIcon({
+                className: '',
+                html: currentZoom >= 11
+                  ? `<div style="
+                      display:flex;align-items:center;gap:5px;
+                      background:#faf9f6;border:1.5px solid #2d3a1d;
+                      border-radius:20px;padding:3px 8px;
+                      box-shadow:0 2px 8px rgba(0,0,0,0.18);
+                      font-size:9px;font-weight:800;color:#1a2410;
+                      text-transform:uppercase;letter-spacing:0.05em;
+                      white-space:nowrap;
+                    ">
+                      <div style="width:6px;height:6px;border-radius:50%;background:#d97706;flex-shrink:0;"></div>
+                      ${loc.title.replace('ORR ', 'ORR ')}
+                    </div>`
+                  : `<div style="
+                      width:10px;height:10px;border-radius:50%;
+                      background:#d97706;border:1.5px solid #faf9f6;
+                      box-shadow:0 1px 4px rgba(0,0,0,0.3);
+                    "></div>`,
+                iconSize: currentZoom >= 11 ? [90, 22] : [10, 10],
+                iconAnchor: currentZoom >= 11 ? [45, 11] : [5, 5],
+                popupAnchor: [0, -14],
+              })}
+            >
+              <Popup className="custom-popup">
+                <div style="padding:12px 14px;min-width:160px;">
+                  <div style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:#1a2410;margin-bottom:4px;">{loc.title}</div>
+                  <div style="font-size:9px;color:#586062;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;">{loc.location}</div>
+                  <div style="display:flex;align-items:center;gap:6px;">
+                    <div style="width:8px;height:8px;border-radius:50%;background:${(loc.aqi ?? 0) <= 50 ? '#4ade80' : (loc.aqi ?? 0) <= 100 ? '#86efac' : (loc.aqi ?? 0) <= 150 ? '#fbbf24' : '#ef4444'};flex-shrink:0;"></div>
+                    <span style="font-size:9px;font-weight:700;text-transform:uppercase;color:#1a2410;">AQI ${loc.aqi ?? 'N/A'}</span>
+                  </div>
+                </div>
+              </Popup>
+            </Marker>
+          ))}
+
+          {/* ── RRR exits — always visible ─────────────────────────────────── */}
+          {locations.filter(l => l.type === 'rrr-exit').map(loc => (
+            <Marker
+              key={loc.id}
+              position={loc.coords}
+              icon={L.divIcon({
+                className: '',
+                html: currentZoom >= 9
+                  ? `<div style="
+                      display:flex;align-items:center;gap:5px;
+                      background:#1a2410;border:1.5px solid #fcd34d;
+                      border-radius:20px;padding:3px 9px;
+                      box-shadow:0 2px 10px rgba(0,0,0,0.3);
+                      font-size:8px;font-weight:900;color:#faf9f6;
+                      text-transform:uppercase;letter-spacing:0.06em;
+                      white-space:nowrap;
+                    ">
+                      <div style="width:5px;height:5px;border-radius:50%;background:#fcd34d;flex-shrink:0;"></div>
+                      RRR · ${loc.location}
+                    </div>`
+                  : `<div style="
+                      width:8px;height:8px;border-radius:50%;
+                      background:#fcd34d;border:1.5px solid #1a2410;
+                      box-shadow:0 1px 4px rgba(0,0,0,0.3);
+                    "></div>`,
+                iconSize: currentZoom >= 9 ? [110, 20] : [8, 8],
+                iconAnchor: currentZoom >= 9 ? [55, 10] : [4, 4],
+                popupAnchor: [0, -12],
+              })}
+            >
+              <Popup className="custom-popup">
+                <div style="padding:12px 14px;min-width:160px;">
+                  <div style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:#1a2410;margin-bottom:4px;">RRR Proposed Exit</div>
+                  <div style="font-size:9px;color:#586062;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;">{loc.location}</div>
+                  <div style="font-size:8px;color:#2d3a1d;font-weight:700;">Proposed alignment. Under construction.</div>
+                </div>
+              </Popup>
+            </Marker>
+          ))}
+
+          {/* ── Sanctuary markers (filter-gated) ─────────────────────────── */}
           {filteredLocations.map((loc) => {
             const isPremium = loc.type === 'sanctuary';
-            const isExit = loc.type === 'exit' || loc.type === 'rrr-exit';
-            
-            if (!isPremium && !isExit) return null;
+            if (!isPremium) return null;
 
             return (
               <React.Fragment key={loc.id}>
@@ -2350,67 +2433,6 @@ const SanctuaryMapLayout = () => {
                   >
                     <Popup className="custom-popup">
                       <SanctuaryPopupContent loc={loc} />
-                    </Popup>
-                  </Marker>
-                )}
-                {isExit && (
-                  <Marker
-                    position={loc.coords}
-                    icon={L.divIcon({
-                      className: '',
-                      html: currentZoom >= 13
-                        // High zoom: full label pill
-                        ? `<div style="
-                            background: rgba(255,255,255,0.92);
-                            backdrop-filter: blur(8px);
-                            border: 1px solid rgba(217,119,6,0.40);
-                            border-radius: 6px;
-                            padding: 3px 8px;
-                            display: flex;
-                            flex-direction: column;
-                            align-items: center;
-                            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-                            white-space: nowrap;
-                          ">
-                            <span style="font-size:9px;font-weight:900;color:#92400e;text-transform:uppercase;letter-spacing:0.05em;">
-                              ${loc.type === 'exit' ? loc.title.replace('ORR Exit ', 'E') : 'R'}: ${loc.location}
-                            </span>
-                          </div>`
-                        : currentZoom >= 11
-                        // Medium zoom: compact number badge
-                        ? `<div style="
-                            width: 26px; height: 26px;
-                            background: #d97706;
-                            border: 2px solid rgba(255,255,255,0.9);
-                            border-radius: 50%;
-                            display: flex; align-items: center; justify-content: center;
-                            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-                          ">
-                            <span style="font-size:8px;font-weight:900;color:#fff;">
-                              ${loc.type === 'exit' ? loc.title.replace('ORR Exit ', '') : '↺'}
-                            </span>
-                          </div>`
-                        // Low zoom: tiny minimal dot
-                        : `<div style="
-                            width: 8px; height: 8px;
-                            background: #d97706;
-                            border: 1.5px solid rgba(255,255,255,0.8);
-                            border-radius: 50%;
-                            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-                          "></div>`,
-                      iconSize: currentZoom >= 13 ? [140, 28] : currentZoom >= 11 ? [26, 26] : [8, 8],
-                      iconAnchor: currentZoom >= 13 ? [70, 14] : currentZoom >= 11 ? [13, 13] : [4, 4],
-                    })}
-                  >
-                    <Popup className="custom-popup">
-                      <div className="p-3">
-                        <h4 className="font-headline font-bold text-sm uppercase tracking-wider">{loc.title}</h4>
-                        <p className="text-[10px] text-secondary/60 uppercase tracking-widest mb-2">{loc.location}</p>
-                        <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 rounded-full bg-green-500" />
-                          <span className="text-[9px] font-bold uppercase tracking-widest">AQI: {loc.aqi}</span>
-                        </div>
-                      </div>
                     </Popup>
                   </Marker>
                 )}
