@@ -965,7 +965,7 @@ const AagarthaInteractiveLayout: FC<{ onClose: () => void }> = ({ onClose }) => 
           </button>
         </div>
 
-        {/* Numbered hotspot markers */}
+        {/* Dot markers — no numbers, clean */}
         {AGARTHA_HOTSPOTS.map((h) => {
           const isActive = active.id === h.id;
           return (
@@ -976,37 +976,15 @@ const AagarthaInteractiveLayout: FC<{ onClose: () => void }> = ({ onClose }) => 
               onClick={() => setActive(h)}
             >
               <span className={cn(
-                "relative flex items-center justify-center rounded-full font-bold text-[10px] border-2 transition-all duration-200 shadow-lg",
-                isActive
-                  ? "w-8 h-8 bg-primary border-white text-white scale-110"
-                  : "w-6 h-6 bg-black/50 border-white/50 text-white/80 hover:border-white hover:bg-black/70"
-              )}>
-                {h.num}
-              </span>
+                "relative block rounded-full border-2 border-white shadow-lg transition-all duration-200",
+                isActive ? "w-4 h-4 bg-primary scale-125" : "w-3 h-3 bg-white/60 hover:bg-white hover:scale-125"
+              )} />
               {isActive && (
-                <span className="absolute inset-0 rounded-full bg-primary/40 animate-ping pointer-events-none" />
+                <span className="absolute inset-0 rounded-full bg-primary/50 animate-ping pointer-events-none" />
               )}
             </button>
           );
         })}
-
-        {/* Compact number legend — bottom of image */}
-        <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 px-4">
-          {AGARTHA_HOTSPOTS.map(h => (
-            <button
-              key={h.id}
-              onClick={() => setActive(h)}
-              className={cn(
-                "flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[8px] font-bold backdrop-blur-sm transition-all border",
-                active.id === h.id
-                  ? "bg-primary border-primary text-white"
-                  : "bg-black/40 border-white/15 text-white/50 hover:text-white/80"
-              )}
-            >
-              <span>{h.num}</span>
-            </button>
-          ))}
-        </div>
       </div>
 
       {/* ── RIGHT: Info panel ── */}
@@ -1023,12 +1001,7 @@ const AagarthaInteractiveLayout: FC<{ onClose: () => void }> = ({ onClose }) => 
               transition={{ duration: 0.18 }}
               className="space-y-5"
             >
-              <div className="flex items-center gap-3">
-                <span className="w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center text-xs font-bold flex-shrink-0">
-                  {active.num}
-                </span>
-                <span className="text-[8px] uppercase tracking-[0.4em] text-secondary/50 font-bold">{active.tag}</span>
-              </div>
+              <span className="text-[8px] uppercase tracking-[0.4em] text-secondary/50 font-bold">{active.tag}</span>
 
               <h3 className="text-xl font-headline font-bold text-on-surface leading-snug">{active.label}</h3>
 
@@ -1043,15 +1016,13 @@ const AagarthaInteractiveLayout: FC<{ onClose: () => void }> = ({ onClose }) => 
                 ))}
               </div>
 
-              {/* Other hotspots as simple number chips */}
               <div className="flex gap-2 flex-wrap pt-2">
                 {AGARTHA_HOTSPOTS.filter(h => h.id !== active.id).map(h => (
                   <button
                     key={h.id}
                     onClick={() => setActive(h)}
-                    className="flex items-center gap-1.5 text-[8px] uppercase tracking-widest font-bold px-3 py-1.5 rounded-full border border-outline/15 text-secondary/50 hover:text-primary hover:border-primary/30 transition-all"
+                    className="text-[8px] uppercase tracking-widest font-bold px-3 py-1.5 rounded-full border border-outline/15 text-secondary/50 hover:text-primary hover:border-primary/30 transition-all"
                   >
-                    <span className="w-4 h-4 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[9px] font-bold">{h.num}</span>
                     {h.label.split(' ').slice(0, 2).join(' ')}
                   </button>
                 ))}
