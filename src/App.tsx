@@ -2211,23 +2211,17 @@ const TrustSignals = () => {
     <section className="py-24 px-6 md:px-24 bg-surface border-y border-outline/10 text-center">
       <div className="max-w-4xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-          <span className="text-olive-800 text-xs font-bold uppercase tracking-[0.6em] mb-4 block">Proven Legacy</span>
-          <h2 className="text-3xl md:text-5xl font-medium text-olive-900 mb-16 italic">Trusted by Visionaries.</h2>
+          <span className="text-olive-800 text-xs font-bold uppercase tracking-[0.6em] mb-4 block">Native Excellence</span>
+          <h2 className="text-3xl md:text-5xl font-medium text-olive-900 mb-16 italic">Hyderabad's Resource Legacy.</h2>
         </motion.div>
         
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 opacity-60 grayscale hover:grayscale-0 transition-all duration-700">
-          <div className="flex items-center justify-center h-20">
-            <h3 className="font-headline font-bold text-xl tracking-widest uppercase">Forbes</h3>
-          </div>
-          <div className="flex items-center justify-center h-20">
-            <h3 className="font-headline font-bold text-xl tracking-widest uppercase">Vogue</h3>
-          </div>
-          <div className="flex items-center justify-center h-20">
-            <h3 className="font-headline font-bold text-xl tracking-widest uppercase">ArchDigest</h3>
-          </div>
-          <div className="flex items-center justify-center h-20">
-            <h3 className="font-headline font-bold text-xl tracking-widest uppercase">Bloomberg</h3>
-          </div>
+        <div className="relative overflow-hidden mb-16 rounded-2xl shadow-xl grayscale hover:grayscale-0 transition-all duration-700 max-w-3xl mx-auto group border border-olive-800/10">
+          <img 
+            src="/hyderabad_logos.png" 
+            alt="Trusted local brands: MODCON, Agartha, Deccan Chronicle, Telangana Today" 
+            className="w-full h-auto object-contain transition-all duration-700 group-hover:scale-[1.02]"
+            referrerPolicy="no-referrer"
+          />
         </div>
         
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }} className="mt-20 p-12 bg-cream/30 rounded-3xl border border-olive-800/5 relative shadow-sm">
