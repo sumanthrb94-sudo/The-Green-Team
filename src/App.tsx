@@ -96,7 +96,7 @@ interface Sanctuary {
   amenityAcres?: string;
   architect?: string;
   plotImages?: string[];
-  pricePerSft?: number;
+  pricePerSqYd?: number;
 }
 
 // --- Mock Data ---
@@ -109,9 +109,9 @@ const SANCTUARIES: Sanctuary[] = [
     aqi: 12,
     noise: 18,
     commute: '45 mins to Financial District',
-    pricePerSft: 7999,
-    valuation: '₹9.36 Cr',
-    memberPrice: 'From ₹5.82 Cr',
+    pricePerSqYd: 7999,
+    valuation: '₹1.04 Cr',
+    memberPrice: 'From ₹64.6 L',
     image: 'https://images.unsplash.com/photo-1588880331179-bc9b93a8cb5e?auto=format&fit=crop&q=80&w=1200',
     tagline: 'Where the forest becomes home.',
     description: 'MODCON Agartha is a first-of-its-kind biomorphic residential community carved into the Narsapur forest periphery. 53 thoughtfully sized plots surround a 14,548 sq yd organic amenity core — featuring fluid earth architecture, solar-integrated curved roofs, and living canopies that blur the line between structure and forest. No two plots are the same. No straight lines anywhere.',
@@ -731,11 +731,11 @@ const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewslet
             <h3 className="text-3xl font-headline font-bold text-on-surface">{sanctuary.title}</h3>
           </div>
           <div className="text-right">
-            {sanctuary.pricePerSft ? (
+            {sanctuary.pricePerSqYd ? (
               <>
-                <p className="text-[9px] uppercase tracking-[0.4em] text-secondary mb-1">₹{sanctuary.pricePerSft.toLocaleString('en-IN')}/sft</p>
+                <p className="text-[9px] uppercase tracking-[0.4em] text-secondary mb-1">₹{sanctuary.pricePerSqYd.toLocaleString('en-IN')}/sq yd</p>
                 <p className="text-2xl font-headline text-on-surface font-bold">{sanctuary.memberPrice}</p>
-                <p className="text-[9px] text-secondary/40">Typical plot ~{sanctuary.valuation}</p>
+                <p className="text-[9px] text-secondary/40">Typical ~{sanctuary.valuation}</p>
               </>
             ) : (
               <>
@@ -1173,8 +1173,8 @@ const AagarthaInteractiveLayout: FC<{ onClose: () => void }> = ({ onClose }) => 
               <p className="text-[8px] uppercase tracking-widest text-secondary/50">AQI</p>
             </div>
             <div>
-              <p className="text-base font-bold text-primary leading-tight">₹7,999<span className="text-[9px] font-normal">/sft</span></p>
-              <p className="text-[8px] uppercase tracking-widest text-secondary/50">From ₹5.82Cr</p>
+              <p className="text-base font-bold text-primary leading-tight">₹7,999<span className="text-[9px] font-normal">/sq yd</span></p>
+              <p className="text-[8px] uppercase tracking-widest text-secondary/50">From ₹64.6 L</p>
             </div>
           </div>
           <a
@@ -1256,10 +1256,10 @@ const PropertyDetailOverlay = ({ sanctuary, onClose }: { sanctuary: Sanctuary, o
               </div>
             </div>
             <div className="text-right flex-shrink-0">
-              {sanctuary.pricePerSft ? (
+              {sanctuary.pricePerSqYd ? (
                 <>
                   <p className="text-[8px] uppercase tracking-widest text-secondary/50 mb-1">Rate</p>
-                  <p className="text-xl font-headline font-bold text-primary">₹{sanctuary.pricePerSft.toLocaleString('en-IN')}<span className="text-xs font-normal text-secondary/60">/sft</span></p>
+                  <p className="text-xl font-headline font-bold text-primary">₹{sanctuary.pricePerSqYd.toLocaleString('en-IN')}<span className="text-xs font-normal text-secondary/60">/sq yd</span></p>
                   <p className="text-[9px] text-secondary/50 mt-0.5">{sanctuary.memberPrice}</p>
                 </>
               ) : (
@@ -1319,10 +1319,10 @@ const PropertyDetailOverlay = ({ sanctuary, onClose }: { sanctuary: Sanctuary, o
           )}
 
           {/* Price breakdown table */}
-          {sanctuary.pricePerSft && (
+          {sanctuary.pricePerSqYd && (
             <div>
               <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold mb-4">
-                Price Calculator — ₹{sanctuary.pricePerSft.toLocaleString('en-IN')}/sft
+                Price Calculator — ₹{sanctuary.pricePerSqYd.toLocaleString('en-IN')}/sq yd
               </p>
               <div className="rounded-2xl overflow-hidden border border-outline/10">
                 {[
@@ -1332,18 +1332,20 @@ const PropertyDetailOverlay = ({ sanctuary, onClose }: { sanctuary: Sanctuary, o
                   { label: 'Premium Plot', sqYds: 3000 },
                   { label: 'Plot 15 (Largest)', sqYds: 5097 },
                 ].map((row, i) => {
-                  const sqFt = row.sqYds * 9;
-                  const price = (sqFt * sanctuary.pricePerSft!) / 1e7; // in Cr
+                  const totalRs = row.sqYds * sanctuary.pricePerSqYd!;
+                  const display = totalRs >= 1e7
+                    ? `₹${(totalRs / 1e7).toFixed(2)} Cr`
+                    : `₹${(totalRs / 1e5).toFixed(1)} L`;
                   return (
                     <div key={i} className={cn("grid grid-cols-3 px-4 py-3 text-[10px]", i % 2 === 0 ? "bg-primary/3" : "bg-transparent")}>
                       <span className="text-secondary/60 font-medium">{row.label}</span>
                       <span className="text-center font-bold text-on-surface">{row.sqYds.toLocaleString('en-IN')} sq yds</span>
-                      <span className="text-right font-bold text-primary">₹{price.toFixed(2)} Cr</span>
+                      <span className="text-right font-bold text-primary">{display}</span>
                     </div>
                   );
                 })}
               </div>
-              <p className="text-[8px] text-secondary/40 mt-2">1 sq yd = 9 sq ft · Rate: ₹{sanctuary.pricePerSft.toLocaleString('en-IN')}/sft</p>
+              <p className="text-[8px] text-secondary/40 mt-2">Rate: ₹7,999/sq yd</p>
             </div>
           )}
 
