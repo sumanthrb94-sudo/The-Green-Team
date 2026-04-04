@@ -1513,8 +1513,8 @@ const SanctuaryMapLayout = () => {
         const nLat = (lat - CX) / AX;
         const nLng = (lng - CY) / AY;
         const nd = Math.sqrt(nLat * nLat + nLng * nLng);
-        if (nd >= 1.0) continue; // outside ellipse → skip
-        const boundaryFade = nd < FADE_START ? 1 : 1 - ((nd - FADE_START) / (1.0 - FADE_START));
+        if (nd >= 1.4) continue; // Blend smoothly out past the RRR
+        const boundaryFade = nd < FADE_START ? 1 : 1 - ((nd - FADE_START) / (1.4 - FADE_START));
         points.push({ lat, lng, boundaryFade });
       }
     }
@@ -2183,17 +2183,17 @@ const SanctuaryMapLayout = () => {
 
         <MapContainer
           center={[17.49, 78.48]}
-          zoom={10}
+          zoom={9}
           scrollWheelZoom={true}
           zoomControl={false}
-          className="h-full w-full"
+          className="h-full w-full absolute inset-0 z-0"
           preferCanvas={true}
-          minZoom={6}
+          minZoom={9}
           maxBounds={[
-            [15.0, 76.0],
-            [20.0, 81.0]
+            [16.7, 77.5],
+            [18.3, 79.5]
           ]}
-          maxBoundsViscosity={0.9}
+          maxBoundsViscosity={1.0}
         >
           <ZoomControl position="bottomleft" />
           <MapResizer />
@@ -3005,10 +3005,9 @@ const ChatBot = ({ data }: { data: any }) => {
     <>
       <button 
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-8 right-8 z-[100] w-16 h-16 bg-olive-900 text-cream rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-all duration-500 group overflow-hidden"
+        className="absolute bottom-8 right-8 z-[1000] w-12 h-12 bg-surface text-olive-900 border border-outline/10 rounded-full shadow-lg flex items-center justify-center hover:bg-olive-900 hover:text-cream transition-all duration-300 group"
       >
-        <div className="absolute inset-0 bg-primary/20 scale-0 group-hover:scale-100 transition-transform duration-500 rounded-full"></div>
-        <MessageSquare className="w-8 h-8 relative z-10" />
+        <MessageSquare className="w-5 h-5 relative z-10" />
       </button>
 
       <AnimatePresence>
@@ -3020,13 +3019,13 @@ const ChatBot = ({ data }: { data: any }) => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsOpen(false)}
-              className="fixed inset-0 z-[95] bg-black/10 backdrop-blur-[1px]"
+              className="absolute inset-0 z-[995] bg-black/10 backdrop-blur-[1px]"
             />
             <motion.div
-              initial={{ opacity: 0, y: 100, scale: 0.9 }}
+              initial={{ opacity: 0, y: 50, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 100, scale: 0.9 }}
-              className="fixed bottom-32 right-8 z-[100] w-[400px] max-w-[calc(100vw-4rem)] h-[600px] bg-surface shadow-2xl border border-olive-800/10 flex flex-col overflow-hidden rounded-3xl"
+              exit={{ opacity: 0, y: 50, scale: 0.95 }}
+              className="absolute bottom-24 right-8 z-[1000] w-[340px] max-w-[calc(100vw-3rem)] h-[500px] bg-surface shadow-2xl border border-olive-800/10 flex flex-col overflow-hidden rounded-2xl"
             >
               <div className="bg-olive-900 p-6 text-cream flex justify-between items-center">
                 <div className="flex items-center gap-4">
@@ -3601,8 +3600,9 @@ export default function App() {
         {/* Center - Map or other views */}
         <div className="flex-1 relative overflow-hidden bg-surface">
           {/* Map is always mounted to preserve Leaflet pan/zoom/filter state */}
-          <div className={viewMode === 'map' ? 'h-full w-full' : 'hidden'}>
+          <div className={viewMode === 'map' ? 'absolute inset-0 z-10' : 'hidden'}>
             <SanctuaryMapLayout />
+            <ChatBot data={{ sanctuaries: SANCTUARIES }} />
           </div>
           {viewMode === 'admin' && authUser && <AdminDashboard onClose={() => handleViewChange('home')} user={authUser} />}
           {viewMode !== 'map' && viewMode !== 'admin' && (
@@ -3616,8 +3616,6 @@ export default function App() {
           )}
         </div>
       </main>
-
-      <ChatBot data={{ sanctuaries: SANCTUARIES }} />
 
       <AuthModal
         isOpen={isAuthOpen}
