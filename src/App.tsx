@@ -1355,9 +1355,9 @@ const RRRBlurOverlay: FC<{ rrrPath: [number, number][] }> = ({ rrrPath }) => {
 };
 
 const SanctuaryMapLayout = () => {
-  const [isSatellite, setIsSatellite] = useState(true);
+  const [isSatellite, setIsSatellite] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [showAqi, setShowAqi] = useState(false);
+  const [showAqi, setShowAqi] = useState(true);
   const [showOrr, setShowOrr] = useState(false);
   const [isAirportFocus, setIsAirportFocus] = useState(false);
   const [isRegionalView, setIsRegionalView] = useState(false);
@@ -1365,7 +1365,7 @@ const SanctuaryMapLayout = () => {
   const [targetView, setTargetView] = useState<{ center: [number, number], zoom: number } | null>(null);
   const [currentZoom, setCurrentZoom] = useState(10);
   const [livePulse, setLivePulse] = useState(0);
-  const [activeFilters, setActiveFilters] = useState<Set<string>>(new Set(['satellite']));
+  const [activeFilters, setActiveFilters] = useState<Set<string>>(new Set(['aqi-live']));
 
   const FILTER_PILLS = [
     { id: 'sanctuaries',  label: 'Sanctuaries',     icon: Home },
