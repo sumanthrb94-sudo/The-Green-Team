@@ -218,16 +218,16 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
       <AnimatePresence>
         {isMenuOpen && (
           <>
-            {/* Click-off area (Backdrop) */}
-            <motion.div 
+            <motion.div
+              key="nav-backdrop"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsMenuOpen(false)}
               className="fixed inset-0 bg-black/60 backdrop-blur-md z-[55]"
             />
-            
             <motion.div
+              key="nav-panel"
               initial={{ opacity: 0, y: '-100%' }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: '-100%' }}
@@ -919,6 +919,16 @@ const PropertyDetailOverlay = ({ sanctuary, onClose }: { sanctuary: Sanctuary, o
             Inquire with Listing Agent
           </button>
         </div>
+      </div>
+
+      {/* Sticky bottom close bar — visible on mobile only */}
+      <div className="md:hidden shrink-0 px-6 py-4 border-t border-outline/10 bg-surface">
+        <button
+          onClick={onClose}
+          className="w-full py-3 text-[10px] uppercase tracking-[0.4em] font-bold border border-olive-800/20 text-olive-800 hover:bg-olive-800 hover:text-cream transition-all flex items-center justify-center gap-2 rounded-xl"
+        >
+          <X className="w-4 h-4" /> Close
+        </button>
       </div>
     </motion.div>
   );
@@ -2935,6 +2945,13 @@ export default function App() {
     });
     return unsub;
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Body scroll lock when any overlay is open
+  useEffect(() => {
+    const locked = isNewsletterOpen || isAuthOpen;
+    document.body.classList.toggle('modal-open', locked);
+    return () => document.body.classList.remove('modal-open');
+  }, [isNewsletterOpen, isAuthOpen]);
 
   const handleSignOut = async () => {
     await signOut(auth);
