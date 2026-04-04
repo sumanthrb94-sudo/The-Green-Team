@@ -181,16 +181,16 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
           {isDark ? <Sun className="w-5 h-5 text-gold" /> : <Moon className="w-5 h-5 text-olive-900" />}
         </button>
         {authUser ? (
-          <div className="flex items-center gap-3">
-            <div className="hidden sm:flex items-center gap-2 text-xs text-olive-800/60">
-              <div className="w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-[10px] uppercase">
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 text-xs text-olive-800/60">
+              <div className="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-[10px] uppercase shrink-0">
                 {(authUser.displayName?.[0] || authUser.email?.[0] || authUser.phoneNumber?.[1] || '?').toUpperCase()}
               </div>
-              <span className="max-w-[120px] truncate">{authUser.displayName || authUser.email || authUser.phoneNumber}</span>
+              <span className="hidden md:block max-w-[140px] truncate font-medium">{authUser.displayName || authUser.email || authUser.phoneNumber}</span>
             </div>
             <button
               onClick={onSignOut}
-              className="text-xs uppercase tracking-[0.2em] font-bold border border-primary/30 text-primary hover:bg-primary hover:text-on-primary transition-all px-4 py-2 rounded-full"
+              className="text-[10px] uppercase tracking-[0.2em] font-bold border border-primary/30 text-primary hover:bg-primary hover:text-on-primary transition-all px-3 py-1.5 rounded-full"
             >
               Sign Out
             </button>
@@ -268,8 +268,11 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
 
                 <div className="flex flex-col justify-end pt-12 md:pt-0 border-t md:border-t-0 md:border-l border-outline/10 md:pl-24">
                   <div className="grid grid-cols-1 gap-4">
-                    <button className="w-full text-[11px] uppercase tracking-[0.5em] font-bold bg-primary text-on-primary px-8 py-5 hover:shadow-xl hover:shadow-primary/20 transition-all rounded-2xl mb-2">
-                      Sign In to Collective
+                    <button
+                      onClick={() => { setIsMenuOpen(false); onSignInClick(); }}
+                      className="w-full text-[11px] uppercase tracking-[0.5em] font-bold bg-primary text-on-primary px-8 py-5 hover:shadow-xl hover:shadow-primary/20 transition-all rounded-2xl mb-2"
+                    >
+                      {authUser ? 'My Account' : 'Sign In to Collective'}
                     </button>
                     <div className="flex items-center gap-6 mb-6">
                       <MessageSquare className="w-5 h-5 text-secondary cursor-pointer hover:text-primary transition-colors" />
@@ -2001,19 +2004,20 @@ const NewsletterModal = ({ isOpen, onClose, onSubscribe }: { isOpen: boolean, on
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
-          <motion.div 
+        <div className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center p-0 sm:p-6">
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
             className="absolute inset-0 bg-olive-900/90 backdrop-blur-xl"
           />
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="relative bg-cream w-full max-w-xl p-12 md:p-20 shadow-2xl border border-olive-800/10"
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 40 }}
+            transition={{ type: 'spring', damping: 30, stiffness: 320 }}
+            className="relative bg-cream w-full sm:max-w-xl max-h-[92dvh] overflow-y-auto p-8 sm:p-14 md:p-20 shadow-2xl border border-olive-800/10 rounded-t-3xl sm:rounded-none"
           >
             <button onClick={onClose} className="absolute top-8 right-8 text-olive-900/40 hover:text-olive-900 transition-all">
               <VolumeX className="w-6 h-6 rotate-45" />
@@ -2315,6 +2319,12 @@ const ChatBot = ({ data }: { data: any }) => {
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to latest message
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, loading]);
 
   const handleSend = async () => {
     if (!input.trim() || loading) return;
@@ -2358,54 +2368,61 @@ const ChatBot = ({ data }: { data: any }) => {
 
   return (
     <>
-      <button 
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-8 right-8 z-[100] w-16 h-16 bg-olive-900 text-cream rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-all duration-500 group overflow-hidden"
-      >
-        <div className="absolute inset-0 bg-primary/20 scale-0 group-hover:scale-100 transition-transform duration-500 rounded-full"></div>
-        <MessageSquare className="w-8 h-8 relative z-10" />
-      </button>
+      {/* FAB — sits above map controls but below modals */}
+      {!isOpen && (
+        <button
+          onClick={() => setIsOpen(true)}
+          className="fixed bottom-6 right-5 z-[65] w-14 h-14 bg-olive-900 text-cream rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-all duration-300 group overflow-hidden"
+        >
+          <div className="absolute inset-0 bg-primary/20 scale-0 group-hover:scale-100 transition-transform duration-500 rounded-full" />
+          <MessageSquare className="w-6 h-6 relative z-10" />
+        </button>
+      )}
 
       <AnimatePresence>
         {isOpen && (
           <>
-            {/* Click-off area for ChatBot - Minimizes */}
-            <motion.div 
+            <motion.div
+              key="chatbot-backdrop"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsOpen(false)}
-              className="fixed inset-0 z-[95] bg-black/10 backdrop-blur-[1px]"
+              className="fixed inset-0 z-[66] bg-black/10"
             />
             <motion.div
-              initial={{ opacity: 0, y: 100, scale: 0.9 }}
+              key="chatbot-panel"
+              initial={{ opacity: 0, y: 24, scale: 0.97 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 100, scale: 0.9 }}
-              className="fixed bottom-32 right-8 z-[100] w-[400px] max-w-[calc(100vw-4rem)] h-[600px] bg-surface shadow-2xl border border-olive-800/10 flex flex-col overflow-hidden rounded-3xl"
+              exit={{ opacity: 0, y: 24, scale: 0.97 }}
+              transition={{ type: 'spring', damping: 28, stiffness: 320 }}
+              className="fixed bottom-6 right-5 z-[67] w-[min(400px,calc(100vw-1.5rem))] h-[min(600px,calc(100dvh-5rem))] bg-surface shadow-2xl border border-olive-800/10 flex flex-col overflow-hidden rounded-2xl"
             >
-              <div className="bg-olive-900 p-6 text-cream flex justify-between items-center">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
-                    <Leaf className="w-5 h-5 text-primary" />
+              {/* Header */}
+              <div className="bg-olive-900 px-5 py-4 text-cream flex justify-between items-center shrink-0">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
+                    <Leaf className="w-4 h-4 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-headline font-bold text-xl tracking-tight">Groot</h3>
-                    <p className="text-[8px] uppercase tracking-[0.3em] text-cream/60">Sanctuary AI Advisor</p>
+                    <h3 className="font-headline font-bold text-base tracking-tight">Groot</h3>
+                    <p className="text-[8px] uppercase tracking-[0.3em] text-cream/50">Sanctuary AI Advisor</p>
                   </div>
                 </div>
-                <button onClick={handleClose} className="p-2 hover:bg-surface/10 transition-all rounded-full">
-                  <X className="w-5 h-5" />
+                <button onClick={handleClose} className="p-2 hover:bg-white/10 transition-all rounded-full">
+                  <X className="w-4 h-4" />
                 </button>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-cream/10">
+              {/* Messages */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 {messages.map((m, i) => (
                   <div key={i} className={cn("flex flex-col", m.role === 'user' ? "items-end" : "items-start")}>
                     <div className={cn(
-                      "max-w-[85%] p-4 text-sm leading-relaxed rounded-2xl shadow-sm",
-                      m.role === 'user' 
-                        ? "bg-olive-900 text-cream rounded-tr-none" 
-                        : "bg-surface text-olive-900 border border-outline/10 rounded-tl-none"
+                      "max-w-[85%] px-4 py-3 text-sm leading-relaxed rounded-2xl shadow-sm",
+                      m.role === 'user'
+                        ? "bg-olive-900 text-cream rounded-tr-sm"
+                        : "bg-cream text-olive-900 border border-outline/10 rounded-tl-sm"
                     )}>
                       {m.text}
                     </div>
@@ -2413,34 +2430,34 @@ const ChatBot = ({ data }: { data: any }) => {
                 ))}
                 {loading && (
                   <div className="flex items-start">
-                    <div className="bg-surface border border-outline/10 p-4 rounded-2xl rounded-tl-none shadow-sm">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-medium text-olive-800/60 italic">Groot is thinking...</span>
-                        <div className="flex gap-1">
-                          <motion.div animate={{ opacity: [0, 1, 0] }} transition={{ repeat: Infinity, duration: 1 }} className="w-1 h-1 bg-primary rounded-full" />
-                          <motion.div animate={{ opacity: [0, 1, 0] }} transition={{ repeat: Infinity, duration: 1, delay: 0.2 }} className="w-1 h-1 bg-primary rounded-full" />
-                          <motion.div animate={{ opacity: [0, 1, 0] }} transition={{ repeat: Infinity, duration: 1, delay: 0.4 }} className="w-1 h-1 bg-primary rounded-full" />
-                        </div>
+                    <div className="bg-cream border border-outline/10 px-4 py-3 rounded-2xl rounded-tl-sm shadow-sm flex items-center gap-2">
+                      <span className="text-xs text-olive-800/50 italic">Groot is thinking</span>
+                      <div className="flex gap-1">
+                        {[0, 0.2, 0.4].map(delay => (
+                          <motion.div key={delay} animate={{ opacity: [0.2, 1, 0.2] }} transition={{ repeat: Infinity, duration: 1.2, delay }} className="w-1.5 h-1.5 bg-primary rounded-full" />
+                        ))}
                       </div>
                     </div>
                   </div>
                 )}
+                <div ref={messagesEndRef} />
               </div>
 
-              <div className="p-6 bg-surface border-t border-outline/10">
-                <div className="relative flex items-center">
-                  <input 
-                    type="text" 
+              {/* Input */}
+              <div className="px-4 py-3 bg-surface border-t border-outline/10 shrink-0">
+                <div className="relative flex items-center gap-2">
+                  <input
+                    type="text"
                     value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                    placeholder="Ask Groot about sanctuaries..."
-                    className="w-full bg-cream/20 border border-outline/20 rounded-2xl py-4 pl-6 pr-16 text-sm focus:outline-none focus:border-primary/50 transition-all"
+                    onChange={e => setInput(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
+                    placeholder="Ask Groot about sanctuaries…"
+                    className="flex-1 bg-cream/50 border border-outline/20 rounded-xl py-3 px-4 text-sm focus:outline-none focus:border-primary/50 transition-all"
                   />
-                  <button 
+                  <button
                     onClick={handleSend}
                     disabled={loading || !input.trim()}
-                    className="absolute right-2 p-3 bg-olive-900 text-cream rounded-xl hover:bg-primary transition-all disabled:opacity-50"
+                    className="shrink-0 p-3 bg-olive-900 text-cream rounded-xl hover:bg-primary transition-all disabled:opacity-40"
                   >
                     <Send className="w-4 h-4" />
                   </button>
@@ -2588,17 +2605,18 @@ const AuthModal = ({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+        <div className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center p-0 sm:p-6">
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-olive-900/90 backdrop-blur-xl"
+            className="absolute inset-0 bg-olive-900/80 backdrop-blur-xl"
           />
           <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="relative bg-cream w-full max-w-md p-10 md:p-14 shadow-2xl border border-olive-800/10"
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 40 }}
+            transition={{ type: 'spring', damping: 30, stiffness: 320 }}
+            className="relative bg-cream w-full sm:max-w-md max-h-[92dvh] overflow-y-auto p-8 sm:p-12 shadow-2xl border border-olive-800/10 rounded-t-3xl sm:rounded-none"
           >
             <button onClick={onClose} className="absolute top-6 right-6 text-olive-900/40 hover:text-olive-900 transition-all">
               <X className="w-5 h-5" />
@@ -2826,11 +2844,11 @@ const AdminDashboard = ({ onClose, user }: { onClose: () => void; user: User }) 
 
           {/* Leads table */}
           {tab === 'leads' && (
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto -mx-6 md:mx-0 px-6 md:px-0">
               {leads.length === 0 ? (
                 <p className="text-olive-800/40 text-sm py-12 text-center">No leads yet.</p>
               ) : (
-                <table className="w-full text-sm">
+                <table className="w-full min-w-[560px] text-sm">
                   <thead>
                     <tr className="text-[9px] uppercase tracking-[0.4em] text-olive-800/40 border-b border-outline/10">
                       <th className="text-left py-3 pr-6">Name</th>
@@ -2858,11 +2876,11 @@ const AdminDashboard = ({ onClose, user }: { onClose: () => void; user: User }) 
 
           {/* Newsletter table */}
           {tab === 'newsletter' && (
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto -mx-6 md:mx-0 px-6 md:px-0">
               {subs.length === 0 ? (
                 <p className="text-olive-800/40 text-sm py-12 text-center">No subscribers yet.</p>
               ) : (
-                <table className="w-full text-sm">
+                <table className="w-full min-w-[560px] text-sm">
                   <thead>
                     <tr className="text-[9px] uppercase tracking-[0.4em] text-olive-800/40 border-b border-outline/10">
                       <th className="text-left py-3 pr-6">Email</th>
