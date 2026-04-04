@@ -89,6 +89,14 @@ interface Sanctuary {
   memberPrice: string;
   image: string;
   features?: string[];
+  tagline?: string;
+  description?: string;
+  plots?: number;
+  plotRange?: string;
+  amenityAcres?: string;
+  architect?: string;
+  plotImages?: string[];
+  pricePerSqYd?: number;
 }
 
 // --- Mock Data ---
@@ -97,18 +105,34 @@ const SANCTUARIES: Sanctuary[] = [
   {
     id: 'agartha',
     title: 'MODCON Agartha',
-    location: 'Narsapur Forest Peripheral',
+    location: 'Narsapur Forest Peripheral, Hyderabad',
     aqi: 12,
     noise: 18,
     commute: '45 mins to Financial District',
-    valuation: '₹2.2 Cr',
-    memberPrice: '₹1.1 Cr',
-    image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=1200',
-    features: ['Forest Buffer', 'Solar Microgrid', 'Rainwater Harvest', 'Organic Farm']
+    pricePerSqYd: 7999,
+    valuation: '₹1.04 Cr',
+    memberPrice: 'From ₹64.6 L',
+    image: 'https://images.unsplash.com/photo-1588880331179-bc9b93a8cb5e?auto=format&fit=crop&q=80&w=1200',
+    tagline: 'Where the forest becomes home.',
+    description: 'MODCON Agartha is a first-of-its-kind biomorphic residential community carved into the Narsapur forest periphery. 53 thoughtfully sized plots surround a 14,548 sq yd organic amenity core — featuring fluid earth architecture, solar-integrated curved roofs, and living canopies that blur the line between structure and forest. No two plots are the same. No straight lines anywhere.',
+    plots: 53,
+    plotRange: '808 – 5,097 sq yds',
+    amenityAcres: '14,548 sq yds',
+    architect: 'MODCON Builders',
+    features: [
+      'Biomorphic Architecture',
+      'Solar-Curved Rooftops',
+      'Narsapur Forest Buffer',
+      'Organic Amenity Core',
+      'Rainwater Harvesting',
+      'Earth & Bamboo Build',
+      'Zero Right-Angle Design',
+      'Private Plot Community',
+    ],
   },
   {
-    id: 'the-sil',
-    title: 'The SIL: Vertical Villament',
+    id: 'syl',
+    title: 'SYL: Vertical Villament',
     location: 'Tukkuguda (Future City)',
     aqi: 22,
     noise: 24,
@@ -132,9 +156,9 @@ const Logo = ({ className = "w-10 h-10", textClassName = "text-xl md:text-2xl", 
       </svg>
     </div>
     {!iconOnly && (
-      <div className="flex flex-col min-w-0">
-        <span className={cn("font-headline font-bold text-on-surface uppercase whitespace-nowrap transition-all duration-700", textClassName)}>The Green Team</span>
-        <span className="text-[7px] md:text-[9px] uppercase tracking-[0.35em] md:tracking-[0.6em] text-primary font-bold hidden sm:block">Independent Sanctuary Curators</span>
+      <div className="flex flex-col">
+        <span className={cn("font-headline font-bold tracking-widest text-on-surface uppercase transition-all duration-700", textClassName)}>The Green Team</span>
+        <span className="text-[8px] md:text-[10px] uppercase tracking-[0.4em] md:tracking-[0.6em] text-primary font-bold -mt-0.5 md:-mt-1 hidden sm:block">Independent Sanctuary Curators</span>
       </div>
     )}
   </div>
@@ -158,67 +182,46 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
     { name: 'Advantage', id: 'analytics' },
     { name: 'Ecosystems', id: 'gallery' },
     { name: 'Agartha', id: 'list' },
-    { name: 'The SIL', id: 'the-sil' },
-    { name: 'Membership', id: 'membership' }
+    { name: 'SYL', id: 'syl' },
+    { name: 'Membership', id: 'membership' },
   ];
 
+  const avatarLetter = (authUser?.displayName?.[0] || authUser?.email?.[0] || authUser?.phoneNumber?.[1] || '?').toUpperCase();
+
   return (
-    <nav className="relative z-50 px-4 md:px-8 flex items-center h-14 md:h-20 bg-cream border-b border-outline/10 shadow-sm">
-      {/* Left: Brand */}
-      <div className="flex-1 min-w-0 flex items-center">
-        <Logo className="w-7 h-7 md:w-9 md:h-9" textClassName="text-[11px] tracking-wide md:text-xl md:tracking-widest" />
-      </div>
+    <nav className="relative z-50 px-6 md:px-10 flex items-center justify-between h-16 md:h-20 bg-cream border-b border-outline/10">
+      {/* Left: Brand only */}
+      <Logo className="w-7 h-7" textClassName="text-base md:text-lg" />
 
-      {/* Right: Actions */}
-      <div className="flex items-center gap-2 md:gap-5 shrink-0">
-        {/* Dark mode toggle */}
-        <button
-          onClick={() => setIsDark(!isDark)}
-          className="p-1.5 rounded-full hover:bg-olive-800/10 transition-colors"
-        >
-          {isDark ? <Sun className="w-4 h-4 text-gold" /> : <Moon className="w-4 h-4 text-olive-900" />}
-        </button>
-
-        {/* Auth state */}
+      {/* Right: single trigger — avatar (logged in) or hamburger (logged out) */}
+      <button
+        onClick={() => setIsMenuOpen(!isMenuOpen)}
+        aria-label="Open menu"
+        className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-primary/5 transition-colors"
+      >
         {authUser ? (
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-[10px] uppercase shrink-0">
-              {(authUser.displayName?.[0] || authUser.email?.[0] || authUser.phoneNumber?.[1] || '?').toUpperCase()}
+          authUser.photoURL ? (
+            <img
+              src={authUser.photoURL}
+              referrerPolicy="no-referrer"
+              alt="Profile"
+              className="w-9 h-9 rounded-full object-cover ring-2 ring-primary/20"
+            />
+          ) : (
+            <div className="w-9 h-9 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-sm uppercase select-none">
+              {avatarLetter}
             </div>
-            <span className="hidden md:block max-w-[120px] truncate text-xs text-olive-800/60">
-              {authUser.displayName || authUser.email || authUser.phoneNumber}
-            </span>
-            <button
-              onClick={onSignOut}
-              className="flex items-center gap-1.5 text-[9px] md:text-[10px] uppercase tracking-[0.2em] font-bold border border-primary/30 text-primary hover:bg-primary hover:text-on-primary transition-all px-2.5 md:px-3 py-1.5 rounded-full"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-              <span className="hidden sm:block">Sign Out</span>
-            </button>
-          </div>
+          )
         ) : (
-          <button
-            onClick={onSignInClick}
-            className="text-[10px] uppercase tracking-[0.15em] font-bold bg-primary text-on-primary hover:bg-olive-900 transition-all px-4 md:px-6 py-2 rounded-full shadow-sm"
-          >
-            Sign In
-          </button>
-        )}
-
-        {/* Hamburger */}
-        <button
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="p-2 hover:bg-primary/5 rounded-full transition-all"
-        >
-          <div className="space-y-[5px]">
-            <div className={cn("w-5 h-[2px] bg-primary transition-all", isMenuOpen && "rotate-45 translate-y-[7px]")} />
-            <div className={cn("w-3.5 h-[2px] bg-primary transition-all ml-auto", isMenuOpen && "opacity-0")} />
-            <div className={cn("w-5 h-[2px] bg-primary transition-all", isMenuOpen && "-rotate-45 -translate-y-[7px]")} />
+          <div className="space-y-[5px] py-1">
+            <div className={cn("w-6 h-[2px] bg-primary transition-all duration-300", isMenuOpen && "rotate-45 translate-y-[7px]")} />
+            <div className={cn("w-4 h-[2px] bg-primary transition-all duration-300", isMenuOpen && "opacity-0 w-6")} />
+            <div className={cn("w-6 h-[2px] bg-primary transition-all duration-300", isMenuOpen && "-rotate-45 -translate-y-[7px]")} />
           </div>
-        </button>
-      </div>
+        )}
+      </button>
 
-      {/* Mobile/Master Menu Overlay */}
+      {/* Full-screen menu overlay */}
       <AnimatePresence>
         {isMenuOpen && (
           <>
@@ -230,17 +233,19 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
               onClick={() => setIsMenuOpen(false)}
               className="fixed inset-0 bg-black/60 backdrop-blur-md z-[55]"
             />
+
             <motion.div
               key="nav-panel"
               initial={{ opacity: 0, y: '-100%' }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: '-100%' }}
-              transition={{ type: "spring", damping: 30, stiffness: 300 }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
               className="fixed top-0 left-0 right-0 bg-surface z-[60] flex flex-col p-8 md:p-16 shadow-2xl rounded-b-[40px] max-h-[95vh] overflow-y-auto"
             >
+              {/* Panel header */}
               <div className="flex items-center justify-between mb-12">
                 <Logo className="w-8 h-8" textClassName="text-lg" />
-                <button 
+                <button
                   onClick={() => setIsMenuOpen(false)}
                   className="p-3 hover:bg-primary/5 rounded-full transition-all"
                 >
@@ -249,14 +254,15 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
               </div>
 
               <div className="grid md:grid-cols-2 gap-12 md:gap-24">
+                {/* Nav links */}
                 <div className="flex flex-col gap-6">
-                  <p className="text-[10px] uppercase tracking-[0.6em] text-secondary font-bold mb-4 opacity-40">Navigation Hub</p>
+                  <p className="text-[10px] uppercase tracking-[0.6em] text-secondary font-bold opacity-40">Explore</p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-6">
                     {navItems.map((item) => (
-                      <button 
-                        key={item.id} 
+                      <button
+                        key={item.id}
                         onClick={() => {
-                          if (['home', 'map', 'analytics', 'gallery', 'list', 'the-sil'].includes(item.id)) {
+                          if (['home', 'map', 'analytics', 'gallery', 'list', 'syl'].includes(item.id)) {
                             onModeChange(item.id as any);
                           }
                           setIsMenuOpen(false);
@@ -270,43 +276,90 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
                   </div>
                 </div>
 
-                <div className="flex flex-col justify-end pt-12 md:pt-0 border-t md:border-t-0 md:border-l border-outline/10 md:pl-24">
-                  <div className="grid grid-cols-1 gap-4">
-                    <button
-                      onClick={() => { setIsMenuOpen(false); onSignInClick(); }}
-                      className="w-full text-[11px] uppercase tracking-[0.5em] font-bold bg-primary text-on-primary px-8 py-5 hover:shadow-xl hover:shadow-primary/20 transition-all rounded-2xl mb-2"
-                    >
-                      {authUser ? 'My Account' : 'Sign In to Collective'}
-                    </button>
-                    <div className="flex items-center gap-6 mb-6">
-                      <MessageSquare className="w-5 h-5 text-secondary cursor-pointer hover:text-primary transition-colors" />
-                      <Shield className="w-5 h-5 text-secondary cursor-pointer hover:text-primary transition-colors" />
-                      <span className="text-[10px] uppercase tracking-widest text-secondary font-bold">Support & Security</span>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <button className="w-full text-[11px] uppercase tracking-[0.5em] font-bold text-primary border-2 border-primary/20 px-8 py-5 hover:bg-primary hover:text-on-surface hover:border-primary transition-all rounded-2xl text-center">
-                        Member Portal
-                      </button>
-                      <button 
+                {/* CTA / Account section */}
+                <div className="flex flex-col justify-end pt-12 md:pt-0 border-t md:border-t-0 md:border-l border-outline/10 md:pl-24 gap-4">
+                  {authUser ? (
+                    /* Logged-in state */
+                    <>
+                      <div className="flex items-center gap-4 mb-4">
+                        {authUser.photoURL ? (
+                          <img src={authUser.photoURL} referrerPolicy="no-referrer" alt="Profile" className="w-12 h-12 rounded-full object-cover ring-2 ring-primary/20" />
+                        ) : (
+                          <div className="w-12 h-12 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-lg uppercase select-none">
+                            {avatarLetter}
+                          </div>
+                        )}
+                        <div>
+                          <p className="text-sm font-bold text-on-surface truncate max-w-[180px]">{authUser.displayName || authUser.email || authUser.phoneNumber}</p>
+                          <p className="text-[10px] uppercase tracking-widest text-secondary/60 mt-0.5">Member</p>
+                        </div>
+                      </div>
+                      <button
                         onClick={() => {
                           setIsMenuOpen(false);
                           onNewsletterClick();
                         }}
-                        className="w-full text-[11px] uppercase tracking-[0.5em] font-bold text-secondary border-2 border-transparent px-8 py-5 hover:text-primary transition-all text-center"
+                        className="w-full text-[11px] uppercase tracking-[0.5em] font-bold bg-primary text-on-primary px-8 py-5 hover:shadow-xl hover:shadow-primary/20 transition-all rounded-2xl"
                       >
-                        List Property
+                        Explore Sanctuaries
                       </button>
-                    </div>
-                  </div>
+                    </>
+                  ) : (
+                    /* Logged-out state — conversion CTA */
+                    <>
+                      <p className="text-[10px] uppercase tracking-[0.4em] text-secondary/50 font-bold mb-2">Join The Collective</p>
+                      <button
+                        onClick={() => {
+                          setIsMenuOpen(false);
+                          onSignInClick();
+                        }}
+                        className="w-full text-[11px] uppercase tracking-[0.5em] font-bold bg-primary text-on-primary px-8 py-5 hover:shadow-xl hover:shadow-primary/20 transition-all rounded-2xl"
+                      >
+                        Sign In
+                      </button>
+                      <button
+                        onClick={() => {
+                          setIsMenuOpen(false);
+                          onNewsletterClick();
+                        }}
+                        className="w-full text-[11px] uppercase tracking-[0.5em] font-bold text-primary border-2 border-primary/20 px-8 py-5 hover:bg-primary hover:text-on-primary hover:border-primary transition-all rounded-2xl text-center"
+                      >
+                        Get Early Access
+                      </button>
+                    </>
+                  )}
+
+                  {/* Dark mode toggle — blended in */}
+                  <button
+                    onClick={() => setIsDark(!isDark)}
+                    className="flex items-center gap-3 text-[10px] uppercase tracking-[0.4em] text-secondary/50 font-bold hover:text-primary transition-colors mt-2 self-start"
+                  >
+                    {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                    {isDark ? 'Light Mode' : 'Dark Mode'}
+                  </button>
                 </div>
               </div>
 
-              <div className="mt-16 pt-8 border-t border-outline/10 flex flex-col md:flex-row justify-between items-center gap-8">
+              {/* Footer row */}
+              <div className="mt-16 pt-8 border-t border-outline/10 flex flex-col md:flex-row justify-between items-center gap-6">
                 <div className="flex gap-8">
-                  <span className="text-[9px] uppercase tracking-widest text-secondary/60">Privacy Policy</span>
-                  <span className="text-[9px] uppercase tracking-widest text-secondary/60">Terms of Service</span>
+                  <span className="text-[9px] uppercase tracking-widest text-secondary/50">Privacy Policy</span>
+                  <span className="text-[9px] uppercase tracking-widest text-secondary/50">Terms of Service</span>
                 </div>
-                <p className="text-[9px] uppercase tracking-widest text-secondary/40">© 2026 The Green Team • Independent Sanctuary Curators</p>
+                <div className="flex items-center gap-8">
+                  {authUser && (
+                    <button
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        onSignOut();
+                      }}
+                      className="text-[9px] uppercase tracking-widest text-secondary/40 hover:text-primary transition-colors"
+                    >
+                      Sign Out
+                    </button>
+                  )}
+                  <p className="text-[9px] uppercase tracking-widest text-secondary/40">© 2026 The Green Team</p>
+                </div>
               </div>
             </motion.div>
           </>
@@ -322,7 +375,7 @@ const SideNavBar = ({ activeMode, onModeChange }: { activeMode: string, onModeCh
     { name: 'Advantage', id: 'analytics', icon: TrendingDown },
     { name: 'Ecosystems', id: 'gallery', icon: Leaf },
     { name: 'Agartha', id: 'list', icon: Layers },
-    { name: 'The SIL', id: 'the-sil', icon: Shield },
+    { name: 'SYL', id: 'syl', icon: Shield },
   ];
 
   return (
@@ -366,43 +419,45 @@ const SideNavBar = ({ activeMode, onModeChange }: { activeMode: string, onModeCh
 
 const Hero = () => {
   return (
-    <section className="relative flex flex-col justify-start px-5 md:px-24 pt-5 pb-10 md:pb-14 overflow-hidden cashew-gradient">
+    <section className="relative flex flex-col justify-start px-6 md:px-24 pt-6 pb-12 overflow-hidden cashew-gradient">
       <div className="absolute inset-0 z-0 opacity-10 mix-blend-multiply">
-        <img
-          src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&q=80&w=1920"
-          alt="Atmospheric landscape"
+        <img 
+          src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&q=80&w=1920" 
+          alt="Atmospheric landscape" 
           className="w-full h-full object-cover grayscale"
           referrerPolicy="no-referrer"
         />
       </div>
-
+      
       <div className="relative z-10 max-w-6xl">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, ease: "circOut" }}
+          transition={{ duration: 1.2, ease: "circOut" }}
         >
-          <div className="flex items-center gap-3 mb-3 md:mb-6">
-            <div className="w-6 md:w-12 h-px bg-olive-800/40" />
-            <span className="text-olive-800 text-[8px] md:text-[10px] font-bold uppercase tracking-[0.4em]">Independent Sanctuary Curators</span>
+          <div className="flex items-center gap-3 md:gap-4 mb-4 md:mb-6">
+            <div className="w-8 md:w-12 h-px bg-olive-800/40"></div>
+            <span className="text-olive-800 text-[8px] md:text-[10px] font-bold uppercase tracking-[0.4em] md:tracking-[0.6em]">Independent Sanctuary Curators</span>
           </div>
-
-          <h1 className="text-4xl sm:text-6xl md:text-[8rem] font-light text-olive-900 mb-5 md:mb-10 leading-[1.1] md:leading-[0.9] tracking-tighter">
-            The Science of{' '}
-            <span className="italic text-olive-800 font-medium block sm:inline">Early Entry.</span>
+          
+          <h1 className="text-5xl sm:text-7xl md:text-[8rem] font-light text-olive-900 mb-8 md:mb-12 leading-[1.1] md:leading-[0.9] tracking-tighter">
+            The Science of <br />
+            <span className="italic text-olive-800 font-medium">Early Entry.</span>
           </h1>
-
-          <p className="text-base md:text-2xl font-normal text-olive-900/80 leading-relaxed max-w-xl mb-6 md:mb-10">
-            A growing community in Hyderabad and India's metropolitans, securing self-sustaining sanctuaries where food, water, and energy are curated for the future.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-3 md:gap-6">
-            <button className="btn-membership btn-olive group shadow-lg shadow-olive-900/20">
-              Apply for Membership <ArrowUpRight className="inline-block ml-2 w-4 h-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
-            </button>
-            <button className="btn-membership btn-outline-olive hover:shadow-lg">
-              The Green Team Advantage
-            </button>
+          
+          <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-end">
+            <p className="text-lg md:text-2xl font-normal text-olive-900/90 leading-relaxed max-w-xl">
+              A growing community in Hyderabad and India's metropolitans, securing self-sustaining sanctuaries where food, water, and energy are curated for the future.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 md:gap-8 pt-4">
+              <button className="btn-membership btn-olive group w-full sm:w-auto shadow-lg hover:shadow-xl shadow-olive-900/20">
+                Apply for Membership <ArrowUpRight className="inline-block ml-2 w-4 h-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+              </button>
+              <button className="btn-membership btn-outline-olive w-full sm:w-auto hover:shadow-lg">
+                The Green Team Advantage
+              </button>
+            </div>
           </div>
         </motion.div>
       </div>
@@ -552,7 +607,7 @@ const Advantage = ({ isFullPage = false }: { isFullPage?: boolean }) => {
 
 const TheSIL = ({ isSubscribed, onNewsletterClick, isFullPage = false }: { isSubscribed: boolean, onNewsletterClick: () => void, isFullPage?: boolean }) => {
   return (
-    <section id="the-sil" className={cn(
+    <section id="syl" className={cn(
       "px-12 md:px-24 bg-olive-900 text-cream relative overflow-hidden",
       isFullPage ? "py-16" : "py-14"
     )}>
@@ -561,7 +616,7 @@ const TheSIL = ({ isSubscribed, onNewsletterClick, isFullPage = false }: { isSub
           <Shield className="w-16 h-16 text-gold mb-8" />
           <h2 className="text-4xl md:text-6xl font-serif italic mb-6">Exclusive Access Required.</h2>
           <p className="text-cream/60 max-w-md mb-12 text-lg font-light leading-relaxed">
-            The SIL is a restricted landmark. Sign up for our monthly newsletter to unlock the full architectural briefing and coordinates.
+            SYL is a restricted landmark. Sign up for our monthly newsletter to unlock the full architectural briefing and coordinates.
           </p>
           <button 
             onClick={onNewsletterClick}
@@ -583,9 +638,9 @@ const TheSIL = ({ isSubscribed, onNewsletterClick, isFullPage = false }: { isSub
               <span className="px-3 py-1 bg-gold text-olive-900 text-[9px] font-bold uppercase tracking-widest">Upcoming Landmark</span>
               <span className="text-cream/40 text-[9px] uppercase tracking-[0.4em]">Tukkuguda</span>
             </div>
-            <h2 className="text-5xl md:text-7xl font-medium mb-6">The <span className="italic text-gold">SIL</span> <br />Villament.</h2>
+            <h2 className="text-5xl md:text-7xl font-medium mb-6">SYL<br />Villament.</h2>
             <p className="text-lg md:text-xl font-light text-cream/60 leading-relaxed mb-6">
-              Imagine an 18-floor masterpiece where **two floors equal one villa**. Amidst a landscape of traditional villas, The SIL stands as the only tower—a soaring statement of exclusivity in Tukkuguda.
+              Imagine an 18-floor masterpiece where **two floors equal one villa**. Amidst a landscape of traditional villas, SYL stands as the only tower—a soaring statement of exclusivity in Tukkuguda.
             </p>
             
             <div className="grid grid-cols-2 gap-6 mb-8">
@@ -629,19 +684,20 @@ const TheSIL = ({ isSubscribed, onNewsletterClick, isFullPage = false }: { isSub
   );
 };
 
-const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewsletterClick: () => void }> = ({ sanctuary, isSubscribed, onNewsletterClick }) => {
-  const isGated = sanctuary.id === '2' && !isSubscribed;
+const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewsletterClick: () => void, onOpen: () => void }> = ({ sanctuary, isSubscribed, onNewsletterClick, onOpen }) => {
+  const isGated = sanctuary.id === 'syl' && !isSubscribed;
 
   return (
-    <motion.div 
+    <motion.div
       whileHover={{ y: -10 }}
-      className="group membership-card bg-surface relative overflow-hidden"
+      className="group membership-card bg-surface relative overflow-hidden cursor-pointer"
+      onClick={() => { if (!isGated) onOpen(); }}
     >
       {isGated && (
         <div className="absolute inset-0 z-10 bg-surface/60 backdrop-blur-sm flex flex-col items-center justify-center p-8 text-center">
           <Shield className="w-12 h-12 text-primary mb-6" />
           <h4 className="text-2xl font-headline font-bold text-on-surface mb-4">Locked Landmark.</h4>
-          <p className="text-xs text-secondary mb-8 max-w-[200px]">Sign up for our newsletter to view the SIL details.</p>
+          <p className="text-xs text-secondary mb-8 max-w-[200px]">Sign up for our newsletter to view the SYL details.</p>
           <button 
             onClick={onNewsletterClick}
             className="px-6 py-3 bg-primary text-on-primary text-[9px] uppercase tracking-widest font-bold rounded-lg"
@@ -663,7 +719,7 @@ const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewslet
         />
         <div className="absolute top-6 left-6">
           <div className="bg-primary text-on-primary px-4 py-1 text-[9px] uppercase tracking-[0.4em] font-bold rounded-full">
-            {sanctuary.id === '2' ? 'Upcoming' : 'Live'}
+            {sanctuary.id === 'syl' ? 'Upcoming' : 'Live'}
           </div>
         </div>
       </div>
@@ -675,9 +731,19 @@ const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewslet
             <h3 className="text-3xl font-headline font-bold text-on-surface">{sanctuary.title}</h3>
           </div>
           <div className="text-right">
-            <p className="text-[9px] uppercase tracking-[0.4em] text-secondary mb-1">Market Valuation</p>
-            <p className="text-xl font-headline text-secondary/40 line-through">{sanctuary.valuation}</p>
-            <p className="text-2xl font-headline text-on-surface font-bold">{sanctuary.memberPrice}</p>
+            {sanctuary.pricePerSqYd ? (
+              <>
+                <p className="text-[9px] uppercase tracking-[0.4em] text-secondary mb-1">₹{sanctuary.pricePerSqYd.toLocaleString('en-IN')}/sq yd</p>
+                <p className="text-2xl font-headline text-on-surface font-bold">{sanctuary.memberPrice}</p>
+                <p className="text-[9px] text-secondary/40">Typical ~{sanctuary.valuation}</p>
+              </>
+            ) : (
+              <>
+                <p className="text-[9px] uppercase tracking-[0.4em] text-secondary mb-1">Market Valuation</p>
+                <p className="text-xl font-headline text-secondary/40 line-through">{sanctuary.valuation}</p>
+                <p className="text-2xl font-headline text-on-surface font-bold">{sanctuary.memberPrice}</p>
+              </>
+            )}
           </div>
         </div>
         
@@ -692,8 +758,11 @@ const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewslet
           </div>
         </div>
 
-        <button className="w-full py-5 bg-olive-800 text-cream text-xs uppercase tracking-[0.3em] font-bold hover:bg-olive-900 rounded-lg hover:shadow-lg hover:shadow-olive-900/20 transition-all duration-300 transform hover:-translate-y-1 mt-2">
-          Request Briefing
+        <button
+          onClick={(e) => { e.stopPropagation(); if (!isGated) onOpen(); }}
+          className="w-full py-5 bg-olive-800 text-cream text-xs uppercase tracking-[0.3em] font-bold hover:bg-olive-900 rounded-lg hover:shadow-lg hover:shadow-olive-900/20 transition-all duration-300 transform hover:-translate-y-1 mt-2"
+        >
+          View Prospectus
         </button>
       </div>
     </motion.div>
@@ -814,123 +883,546 @@ const ZoomTracker = ({ onZoom }: { onZoom: (zoom: number) => void }) => {
   return null;
 };
 
-const PropertyDetailOverlay = ({ sanctuary, onClose }: { sanctuary: Sanctuary, onClose: () => void }) => {
-  const [showBadge, setShowBadge] = useState(true);
+// ─── Agartha Interactive Layout ──────────────────────────────────────────────
+
+interface Hotspot {
+  id: string;
+  x: number; // % from left
+  y: number; // % from top
+  label: string;
+  tag: string;
+  color: string;
+  detail: string;
+  stats: { label: string; value: string }[];
+}
+
+const AGARTHA_HOTSPOTS: Hotspot[] = [
+  {
+    id: 'amenity-core',
+    x: 44, y: 48,
+    label: 'Organic Amenity Core',
+    tag: '14,548 Sq Yds',
+    color: '#2d3a1d',
+    detail: 'The biomorphic heart of Agartha. Zero right angles — every curve echoes the surrounding forest. Infinity lap pool, social pavilions, canopy walkways, and co-working pods, all wrapped in earth and bamboo.',
+    stats: [
+      { label: 'Size', value: '14,548 sq yds' },
+      { label: 'Architecture', value: 'Biomorphic' },
+      { label: 'Material', value: 'Earth + Bamboo' },
+    ],
+  },
+  {
+    id: 'forest-buffer',
+    x: 6, y: 42,
+    label: 'Narsapur Forest Buffer',
+    tag: 'AQI 12 — Pristine',
+    color: '#3a5c2a',
+    detail: 'Direct boundary access to the Narsapur forest reserve. AQI 12 — one of the cleanest micro-climates in the Hyderabad metro. Native bird corridors, zero industrial proximity, natural white noise.',
+    stats: [
+      { label: 'AQI', value: '12 — Pristine' },
+      { label: 'Noise', value: '18 dB ambient' },
+      { label: 'Forest Type', value: 'Native Dry Deciduous' },
+    ],
+  },
+  {
+    id: 'grand-entry',
+    x: 46, y: 7,
+    label: 'Grand Entry Boulevard',
+    tag: 'Private Gated Access',
+    color: '#b8860b',
+    detail: 'A landscaped, winding approach designed to decompress before you arrive. Lined with native canopy trees, the boulevard curves through the forest edge — no straight lines anywhere, including the road in.',
+    stats: [
+      { label: 'Access', value: 'Single gated entry' },
+      { label: 'Landscape', value: 'Native canopy' },
+      { label: 'Design', value: 'No straight lines' },
+    ],
+  },
+  {
+    id: 'premium-corner',
+    x: 16, y: 70,
+    label: 'Premium Corner — Plot 15',
+    tag: '5,097 Sq Yds',
+    color: '#7c5c1e',
+    detail: 'The largest private residential plot in Agartha at 5,097 sq yds. Corner positioning gives maximum forest frontage on two sides, dual road access, and the greatest separation from neighbours.',
+    stats: [
+      { label: 'Plot Size', value: '5,097 sq yds' },
+      { label: 'Frontage', value: 'Dual forest-facing' },
+      { label: 'Plot #', value: '15' },
+    ],
+  },
+  {
+    id: 'east-enclave',
+    x: 88, y: 26,
+    label: 'East Forest Enclave',
+    tag: 'Plots 52 & 53',
+    color: '#3a5c2a',
+    detail: 'The most secluded plots in the community. Plot 52 at 4,500 sq yds and Plot 53 at 2,655 sq yds sit deep in the east forest fringe — maximum canopy cover, maximum privacy.',
+    stats: [
+      { label: 'Plot 52', value: '4,500 sq yds' },
+      { label: 'Plot 53', value: '2,655 sq yds' },
+      { label: 'Character', value: 'Maximum seclusion' },
+    ],
+  },
+  {
+    id: 'solar-rooftops',
+    x: 42, y: 38,
+    label: 'Solar-Curved Rooftops',
+    tag: 'Net-Zero Target',
+    color: '#b8860b',
+    detail: 'Every structure — residential and amenity alike — uses curved solar-integrated roofing that doubles as architectural identity. The panels follow the biomorphic form, not a grid. Net-zero energy community target.',
+    stats: [
+      { label: 'Type', value: 'Curved solar integration' },
+      { label: 'Goal', value: 'Net-zero community' },
+      { label: 'Material', value: 'Earth + Solar composite' },
+    ],
+  },
+  {
+    id: 'plot-community',
+    x: 58, y: 62,
+    label: '53-Plot Private Community',
+    tag: '808 – 5,097 Sq Yds',
+    color: '#2d3a1d',
+    detail: 'Exactly 53 plots — each unique in shape and size, no two the same. Ranging from 808 sq yds to 5,097 sq yds with plot sizes averaging ~1,300 sq yds. A true private forest community, not a subdivision.',
+    stats: [
+      { label: 'Total Plots', value: '53' },
+      { label: 'Smallest', value: '808 sq yds' },
+      { label: 'Largest', value: '5,097 sq yds' },
+    ],
+  },
+];
+
+const AagarthaInteractiveLayout: FC<{ onClose: () => void }> = ({ onClose }) => {
+  const [activeHotspot, setActiveHotspot] = useState<Hotspot | null>(AGARTHA_HOTSPOTS[0]);
+  const [infoVisible, setInfoVisible] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setInfoVisible(true), 400);
+    return () => clearTimeout(t);
+  }, []);
+
+  const handleHotspot = (h: Hotspot) => {
+    setInfoVisible(false);
+    setTimeout(() => {
+      setActiveHotspot(h);
+      setInfoVisible(true);
+    }, 150);
+  };
 
   return (
-    <motion.div 
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[90] bg-surface flex flex-col md:flex-row overflow-hidden"
+    >
+      {/* ── LEFT: Site Plan ── */}
+      <div className="relative flex-1 overflow-hidden bg-olive-900 min-h-[55vw] md:min-h-0">
+        <img
+          src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&q=80&w=1600"
+          alt="Agartha Layout"
+          className="w-full h-full object-cover opacity-80"
+          referrerPolicy="no-referrer"
+        />
+        {/* Dark vignette to help markers pop */}
+        <div className="absolute inset-0 bg-gradient-to-br from-black/30 via-transparent to-black/20 pointer-events-none" />
+
+        {/* Top bar */}
+        <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-6 py-4 bg-gradient-to-b from-black/60 to-transparent">
+          <div>
+            <p className="text-[9px] uppercase tracking-[0.5em] text-cream/60 font-bold">Interactive Site Plan</p>
+            <h2 className="text-lg font-headline font-bold text-cream mt-0.5">MODCON Agartha</h2>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 bg-black/40 backdrop-blur-sm rounded-full hover:bg-black/60 transition-all"
+          >
+            <X className="w-5 h-5 text-white" />
+          </button>
+        </div>
+
+        {/* Hotspot markers */}
+        {AGARTHA_HOTSPOTS.map((h) => {
+          const isActive = activeHotspot?.id === h.id;
+          return (
+            <button
+              key={h.id}
+              style={{ left: `${h.x}%`, top: `${h.y}%` }}
+              className="absolute -translate-x-1/2 -translate-y-1/2 group"
+              onMouseEnter={() => handleHotspot(h)}
+              onClick={() => handleHotspot(h)}
+            >
+              {/* Pulse ring */}
+              <span
+                className="absolute inset-0 rounded-full animate-ping"
+                style={{ backgroundColor: h.color, opacity: isActive ? 0.4 : 0.2 }}
+              />
+              {/* Dot */}
+              <span
+                className={cn(
+                  "relative flex items-center justify-center w-5 h-5 rounded-full border-2 border-white/80 transition-all duration-300 shadow-lg",
+                  isActive ? "w-6 h-6 shadow-xl" : "group-hover:w-6 group-hover:h-6"
+                )}
+                style={{ backgroundColor: h.color }}
+              />
+              {/* Label bubble on active */}
+              {isActive && (
+                <motion.span
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="absolute left-1/2 -translate-x-1/2 mt-3 top-full whitespace-nowrap px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest text-white shadow-lg pointer-events-none"
+                  style={{ backgroundColor: h.color }}
+                >
+                  {h.tag}
+                </motion.span>
+              )}
+            </button>
+          );
+        })}
+
+        {/* Legend */}
+        <div className="absolute bottom-5 left-5 flex flex-wrap gap-3">
+          {AGARTHA_HOTSPOTS.map(h => (
+            <button
+              key={h.id}
+              onClick={() => handleHotspot(h)}
+              className={cn(
+                "flex items-center gap-2 px-3 py-1.5 rounded-full text-[8px] uppercase tracking-widest font-bold backdrop-blur-sm transition-all border",
+                activeHotspot?.id === h.id
+                  ? "text-white border-white/40 bg-black/60"
+                  : "text-white/60 border-white/10 bg-black/30 hover:text-white/90"
+              )}
+            >
+              <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: h.color }} />
+              {h.label.split('—')[0].trim()}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* ── RIGHT: Feature Info Panel ── */}
+      <div className="w-full md:w-[380px] lg:w-[420px] flex-shrink-0 bg-surface border-l border-outline/10 flex flex-col overflow-hidden">
+        {/* Fixed header */}
+        <div className="px-8 pt-8 pb-6 border-b border-outline/10 flex-shrink-0">
+          <p className="text-[9px] uppercase tracking-[0.5em] text-secondary/50 font-bold mb-1">Narsapur Forest Peripheral</p>
+          <p className="text-xs text-secondary/60">Hover a marker to explore</p>
+        </div>
+
+        {/* Animated feature content */}
+        <div className="flex-1 overflow-y-auto px-8 py-6">
+          <AnimatePresence mode="wait">
+            {activeHotspot && infoVisible && (
+              <motion.div
+                key={activeHotspot.id}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.2 }}
+                className="space-y-6"
+              >
+                {/* Feature pill */}
+                <span
+                  className="inline-block px-3 py-1 rounded-full text-[8px] uppercase tracking-[0.4em] font-bold text-white"
+                  style={{ backgroundColor: activeHotspot.color }}
+                >
+                  {activeHotspot.tag}
+                </span>
+
+                <h3 className="text-2xl font-headline font-bold text-on-surface leading-tight">
+                  {activeHotspot.label}
+                </h3>
+
+                <p className="text-sm text-secondary/70 leading-relaxed">
+                  {activeHotspot.detail}
+                </p>
+
+                {/* Stats */}
+                <div className="space-y-3 pt-2">
+                  {activeHotspot.stats.map(s => (
+                    <div key={s.label} className="flex justify-between items-center py-3 border-b border-outline/10">
+                      <span className="text-[9px] uppercase tracking-[0.4em] text-secondary/50 font-bold">{s.label}</span>
+                      <span className="text-sm font-bold text-on-surface">{s.value}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Navigation between hotspots */}
+                <div className="flex gap-2 pt-4 flex-wrap">
+                  {AGARTHA_HOTSPOTS.filter(h => h.id !== activeHotspot.id).map(h => (
+                    <button
+                      key={h.id}
+                      onClick={() => handleHotspot(h)}
+                      className="text-[8px] uppercase tracking-widest font-bold px-3 py-2 rounded-lg border border-outline/15 text-secondary/60 hover:text-primary hover:border-primary/30 transition-all"
+                    >
+                      {h.label.split(' ').slice(0, 2).join(' ')}
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Fixed CTAs */}
+        <div className="px-8 py-6 border-t border-outline/10 flex-shrink-0 space-y-3">
+          <div className="grid grid-cols-3 gap-3 text-center mb-4">
+            <div>
+              <p className="text-xl font-bold text-primary">53</p>
+              <p className="text-[8px] uppercase tracking-widest text-secondary/50">Plots</p>
+            </div>
+            <div>
+              <p className="text-xl font-bold text-primary">12</p>
+              <p className="text-[8px] uppercase tracking-widest text-secondary/50">AQI</p>
+            </div>
+            <div>
+              <p className="text-base font-bold text-primary leading-tight">₹7,999<span className="text-[9px] font-normal">/sq yd</span></p>
+              <p className="text-[8px] uppercase tracking-widest text-secondary/50">From ₹64.6 L</p>
+            </div>
+          </div>
+          <a
+            href="https://www.modconbuilders.com/agartha"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full py-4 bg-primary text-on-primary text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-primary/90 transition-all"
+          >
+            <ArrowRight className="w-4 h-4" />
+            Full Brochure on MODCON
+          </a>
+          <button
+            onClick={onClose}
+            className="w-full py-3 text-[10px] uppercase tracking-[0.4em] font-bold text-secondary/50 hover:text-primary transition-all"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+const featureIcon = (f: string) => {
+  if (f.includes('Solar') || f.includes('Energy')) return <Sun className="w-4 h-4" />;
+  if (f.includes('Forest') || f.includes('Earth') || f.includes('Bamboo') || f.includes('Organic')) return <Leaf className="w-4 h-4" />;
+  if (f.includes('Rain') || f.includes('Water')) return <Droplets className="w-4 h-4" />;
+  if (f.includes('Zero') || f.includes('Private') || f.includes('Community')) return <Shield className="w-4 h-4" />;
+  if (f.includes('Biomorphic') || f.includes('Design') || f.includes('Vertical')) return <Award className="w-4 h-4" />;
+  return <Zap className="w-4 h-4" />;
+};
+
+const PropertyDetailOverlay = ({ sanctuary, onClose }: { sanctuary: Sanctuary, onClose: () => void }) => {
+  return (
+    <motion.div
       initial={{ x: '100%' }}
       animate={{ x: 0 }}
       exit={{ x: '100%' }}
       transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-      className="absolute top-0 right-0 bottom-0 w-full md:w-[450px] z-[1001] bg-surface shadow-[-10px_0_30px_rgba(0,0,0,0.1)] flex flex-col overflow-hidden"
+      className="fixed top-0 right-0 bottom-0 w-full md:w-[480px] z-[1001] bg-surface shadow-[-10px_0_40px_rgba(0,0,0,0.15)] flex flex-col overflow-hidden"
     >
-      <div className="relative h-72 w-full overflow-hidden">
-        <img 
-          src={sanctuary.image} 
-          alt={sanctuary.title} 
+      {/* Hero image */}
+      <div className="relative h-64 w-full overflow-hidden flex-shrink-0">
+        <img
+          src={sanctuary.image}
+          alt={sanctuary.title}
           className="w-full h-full object-cover"
           referrerPolicy="no-referrer"
         />
-        <div className="absolute top-6 right-6 flex gap-3">
-          <button className="p-2 bg-surface/80 backdrop-blur-md rounded-full shadow-lg hover:bg-surface transition-all">
-            <Shield className="w-4 h-4 text-primary" />
-          </button>
-          <button onClick={onClose} className="p-2 bg-surface/80 backdrop-blur-md rounded-full shadow-lg hover:bg-surface transition-all">
-            <X className="w-4 h-4 text-primary" />
-          </button>
-        </div>
-        {showBadge && (
-          <div className="absolute bottom-6 left-6 flex items-center gap-1">
-            <span className="px-3 py-1 bg-primary text-on-primary text-[8px] uppercase tracking-widest font-bold rounded-full">New Construction</span>
-            <button 
-              onClick={() => setShowBadge(false)}
-              className="p-1 bg-primary/80 text-on-surface rounded-full hover:bg-primary transition-all"
-            >
-              <X className="w-2 h-2" />
-            </button>
-          </div>
-        )}
-      </div>
-
-      <div className="flex-1 overflow-y-auto p-8 space-y-8">
-        <div className="flex justify-between items-start">
-          <div>
-            <h2 className="text-3xl font-headline font-bold text-on-surface mb-2">{sanctuary.title}</h2>
-            <div className="flex items-center gap-2 text-secondary text-xs">
-              <MapPin className="w-3 h-3" />
-              {sanctuary.location}
-            </div>
-          </div>
-          <div className="text-right">
-            <p className="text-2xl font-headline font-bold text-primary">{sanctuary.memberPrice}</p>
-            <p className="text-[8px] uppercase tracking-widest text-secondary/60">Est. ₹24,500/mo</p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-3 gap-4 py-6 border-y border-outline/10">
-          <div className="text-center">
-            <p className="text-[8px] uppercase tracking-widest text-secondary/60 mb-1">Living Space</p>
-            <p className="text-sm font-bold">5,420 <span className="text-[10px] font-normal text-secondary/60">sqft</span></p>
-          </div>
-          <div className="text-center border-x border-outline/10">
-            <p className="text-[8px] uppercase tracking-widest text-secondary/60 mb-1">Bedrooms</p>
-            <p className="text-sm font-bold">6 <span className="text-[10px] font-normal text-secondary/60">Beds</span></p>
-          </div>
-          <div className="text-center">
-            <p className="text-[8px] uppercase tracking-widest text-secondary/60 mb-1">Bathrooms</p>
-            <p className="text-sm font-bold">7.5 <span className="text-[10px] font-normal text-secondary/60">Baths</span></p>
-          </div>
-        </div>
-
-        <div>
-          <p className="text-[9px] uppercase tracking-[0.3em] text-secondary font-bold mb-6">Key Curated Features</p>
-          <div className="grid grid-cols-2 gap-4">
-            {sanctuary.features?.map((feature, i) => (
-              <div key={i} className="flex items-center gap-3 p-3 bg-surface-container-low rounded-xl border border-outline/5">
-                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                  {feature.includes('Forest') && <Leaf className="w-4 h-4" />}
-                  {feature.includes('Solar') && <Sun className="w-4 h-4" />}
-                  {feature.includes('Water') && <Droplets className="w-4 h-4" />}
-                  {feature.includes('Farm') && <Zap className="w-4 h-4" />}
-                  {feature.includes('Smart') && <Zap className="w-4 h-4" />}
-                  {feature.includes('Zero') && <Shield className="w-4 h-4" />}
-                  {feature.includes('Community') && <Award className="w-4 h-4" />}
-                  {feature.includes('Vertical') && <Leaf className="w-4 h-4" />}
-                </div>
-                <span className="text-[10px] font-medium text-on-surface-variant">{feature}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <p className="text-[9px] uppercase tracking-[0.3em] text-secondary font-bold mb-4">Architectural Narrative</p>
-          <p className="text-xs text-secondary/80 leading-relaxed">
-            Designed by Studio Arca, {sanctuary.title} represents the pinnacle of cantilevered architecture. Featuring self-sustaining ecosystems and private forest buffers.
-          </p>
-        </div>
-
-        <div className="space-y-4 pt-4">
-          <button className="w-full py-4 bg-primary text-on-primary text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all flex items-center justify-center gap-3">
-            <Clock className="w-4 h-4" />
-            Schedule Private Tour
-          </button>
-          <button className="w-full py-4 bg-surface-container-highest text-on-surface text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl hover:bg-surface-container-high transition-all flex items-center justify-center gap-3">
-            <MessageSquare className="w-4 h-4" />
-            Inquire with Listing Agent
-          </button>
-        </div>
-      </div>
-
-      {/* Sticky bottom close bar — visible on mobile only */}
-      <div className="md:hidden shrink-0 px-6 py-4 border-t border-outline/10 bg-surface">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
         <button
           onClick={onClose}
-          className="w-full py-3 text-[10px] uppercase tracking-[0.4em] font-bold border border-olive-800/20 text-olive-800 hover:bg-olive-800 hover:text-cream transition-all flex items-center justify-center gap-2 rounded-xl"
+          className="absolute top-5 right-5 p-2 bg-black/40 backdrop-blur-sm rounded-full hover:bg-black/60 transition-all"
         >
-          <X className="w-4 h-4" /> Close
+          <X className="w-4 h-4 text-white" />
         </button>
+        <div className="absolute bottom-5 left-6">
+          <span className="px-3 py-1 bg-primary text-on-primary text-[8px] uppercase tracking-widest font-bold rounded-full">
+            {sanctuary.id === 'syl' ? 'Upcoming' : 'Open for Expression of Interest'}
+          </span>
+        </div>
+      </div>
+
+      {/* Scrollable body */}
+      <div className="flex-1 overflow-y-auto">
+        {/* Title + price */}
+        <div className="px-8 pt-8 pb-6 border-b border-outline/10">
+          <div className="flex justify-between items-start gap-4">
+            <div>
+              {sanctuary.tagline && (
+                <p className="text-[9px] uppercase tracking-[0.5em] text-primary font-bold mb-2">{sanctuary.tagline}</p>
+              )}
+              <h2 className="text-2xl font-headline font-bold text-on-surface leading-tight">{sanctuary.title}</h2>
+              <div className="flex items-center gap-2 text-secondary text-xs mt-2">
+                <MapPin className="w-3 h-3 flex-shrink-0" />
+                {sanctuary.location}
+              </div>
+            </div>
+            <div className="text-right flex-shrink-0">
+              {sanctuary.pricePerSqYd ? (
+                <>
+                  <p className="text-[8px] uppercase tracking-widest text-secondary/50 mb-1">Rate</p>
+                  <p className="text-xl font-headline font-bold text-primary">₹{sanctuary.pricePerSqYd.toLocaleString('en-IN')}<span className="text-xs font-normal text-secondary/60">/sq yd</span></p>
+                  <p className="text-[9px] text-secondary/50 mt-0.5">{sanctuary.memberPrice}</p>
+                </>
+              ) : (
+                <>
+                  <p className="text-[8px] uppercase tracking-widest text-secondary/50 mb-1">Member Price</p>
+                  <p className="text-xl font-headline font-bold text-primary">{sanctuary.memberPrice}</p>
+                  <p className="text-xs text-secondary/40 line-through">{sanctuary.valuation}</p>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Key stats */}
+        <div className="grid grid-cols-3 divide-x divide-outline/10 border-b border-outline/10">
+          <div className="px-4 py-5 text-center">
+            <p className="text-[8px] uppercase tracking-widest text-secondary/50 mb-1">AQI</p>
+            <p className="text-lg font-bold text-primary">{sanctuary.aqi}</p>
+            <p className="text-[9px] text-secondary/50">Pure Air</p>
+          </div>
+          <div className="px-4 py-5 text-center">
+            <p className="text-[8px] uppercase tracking-widest text-secondary/50 mb-1">Noise</p>
+            <p className="text-lg font-bold text-on-surface">{sanctuary.noise} dB</p>
+            <p className="text-[9px] text-secondary/50">Near Silent</p>
+          </div>
+          <div className="px-4 py-5 text-center">
+            <p className="text-[8px] uppercase tracking-widest text-secondary/50 mb-1">Commute</p>
+            <p className="text-lg font-bold text-on-surface">45m</p>
+            <p className="text-[9px] text-secondary/50">to Fin. District</p>
+          </div>
+        </div>
+
+        <div className="px-8 py-8 space-y-8">
+          {/* Description */}
+          {sanctuary.description && (
+            <div>
+              <p className="text-sm text-secondary/80 leading-relaxed">{sanctuary.description}</p>
+            </div>
+          )}
+
+          {/* Plot community stats */}
+          {sanctuary.plots && (
+            <div className="grid grid-cols-3 gap-4">
+              <div className="p-4 bg-primary/5 rounded-2xl text-center">
+                <p className="text-2xl font-headline font-bold text-primary">{sanctuary.plots}</p>
+                <p className="text-[8px] uppercase tracking-widest text-secondary/60 mt-1">Private Plots</p>
+              </div>
+              <div className="p-4 bg-primary/5 rounded-2xl text-center">
+                <p className="text-lg font-headline font-bold text-primary leading-tight">808–5,097</p>
+                <p className="text-[8px] uppercase tracking-widest text-secondary/60 mt-1">Sq Yds Range</p>
+              </div>
+              <div className="p-4 bg-primary/5 rounded-2xl text-center">
+                <p className="text-lg font-headline font-bold text-primary leading-tight">14,548</p>
+                <p className="text-[8px] uppercase tracking-widest text-secondary/60 mt-1">Sq Yds Amenity</p>
+              </div>
+            </div>
+          )}
+
+          {/* Price breakdown table */}
+          {sanctuary.pricePerSqYd && (
+            <div>
+              <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold mb-4">
+                Price Calculator — ₹{sanctuary.pricePerSqYd.toLocaleString('en-IN')}/sq yd
+              </p>
+              <div className="rounded-2xl overflow-hidden border border-outline/10">
+                {[
+                  { label: 'Plot 01 (Smallest)', sqYds: 808 },
+                  { label: 'Typical Plot', sqYds: 1300 },
+                  { label: 'Large Plot', sqYds: 2000 },
+                  { label: 'Premium Plot', sqYds: 3000 },
+                  { label: 'Plot 15 (Largest)', sqYds: 5097 },
+                ].map((row, i) => {
+                  const totalRs = row.sqYds * sanctuary.pricePerSqYd!;
+                  const display = totalRs >= 1e7
+                    ? `₹${(totalRs / 1e7).toFixed(2)} Cr`
+                    : `₹${(totalRs / 1e5).toFixed(1)} L`;
+                  return (
+                    <div key={i} className={cn("grid grid-cols-3 px-4 py-3 text-[10px]", i % 2 === 0 ? "bg-primary/3" : "bg-transparent")}>
+                      <span className="text-secondary/60 font-medium">{row.label}</span>
+                      <span className="text-center font-bold text-on-surface">{row.sqYds.toLocaleString('en-IN')} sq yds</span>
+                      <span className="text-right font-bold text-primary">{display}</span>
+                    </div>
+                  );
+                })}
+              </div>
+              <p className="text-[8px] text-secondary/40 mt-2">Rate: ₹7,999/sq yd</p>
+            </div>
+          )}
+
+          {/* Features */}
+          {sanctuary.features && sanctuary.features.length > 0 && (
+            <div>
+              <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold mb-4">Curated Features</p>
+              <div className="grid grid-cols-2 gap-3">
+                {sanctuary.features.map((feature, i) => (
+                  <div key={i} className="flex items-center gap-3 p-3 rounded-xl border border-outline/10 bg-surface-container-low/50">
+                    <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
+                      {featureIcon(feature)}
+                    </div>
+                    <span className="text-[10px] font-medium text-on-surface leading-tight">{feature}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Environmental integrity */}
+          <div>
+            <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold mb-4">Environmental Integrity</p>
+            <div className="space-y-3">
+              {[
+                { label: 'Air Quality Index', value: `${sanctuary.aqi} — Pristine`, bar: (50 - sanctuary.aqi) / 50 },
+                { label: 'Ambient Noise', value: `${sanctuary.noise} dB — Near Silent`, bar: (50 - sanctuary.noise) / 50 },
+                { label: 'Forest Proximity', value: 'Direct Boundary Access', bar: 0.95 },
+              ].map(item => (
+                <div key={item.label}>
+                  <div className="flex justify-between text-[9px] mb-1">
+                    <span className="uppercase tracking-widest text-secondary/60">{item.label}</span>
+                    <span className="font-bold text-on-surface">{item.value}</span>
+                  </div>
+                  <div className="h-1 bg-outline/10 rounded-full overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${item.bar * 100}%` }}
+                      transition={{ delay: 0.3, duration: 0.8, ease: 'easeOut' }}
+                      className="h-full bg-primary rounded-full"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* By MODCON */}
+          {sanctuary.architect && (
+            <div className="flex items-center gap-3 p-4 border border-outline/10 rounded-2xl">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Award className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-[8px] uppercase tracking-widest text-secondary/50">Developed by</p>
+                <p className="text-sm font-bold text-on-surface">{sanctuary.architect}</p>
+              </div>
+            </div>
+          )}
+
+          {/* CTAs */}
+          <div className="space-y-3 pb-4">
+            <a
+              href="https://www.modconbuilders.com/agartha"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full py-4 bg-primary text-on-primary text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all flex items-center justify-center gap-3"
+            >
+              <ArrowRight className="w-4 h-4" />
+              View Full Brochure
+            </a>
+            <button className="w-full py-4 border border-outline/20 text-on-surface text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl hover:bg-primary/5 transition-all flex items-center justify-center gap-3">
+              <MessageSquare className="w-4 h-4" />
+              Request Private Briefing
+            </button>
+          </div>
+        </div>
       </div>
     </motion.div>
   );
@@ -1069,7 +1561,7 @@ const SanctuaryMapLayout = () => {
     { lat: 17.33, lng: 78.58, strength: 0.60 }, // Mahavir Harina Vanasthali
     { lat: 17.52, lng: 78.33, strength: 0.65 }, // Ameenpur Lake biodiversity site
     { lat: 17.31, lng: 77.85, strength: 0.65 }, // Ananthagiri Hills
-    { lat: 17.24, lng: 78.48, strength: 0.55 }, // Tukkuguda green belt        ← The SIL
+    { lat: 17.24, lng: 78.48, strength: 0.55 }, // Tukkuguda green belt        ← SYL
   ];
 
   // ── Net AQI intensity: range -0.5 (very clean/blue) → +1.0 (polluted/red)
@@ -1488,9 +1980,9 @@ const SanctuaryMapLayout = () => {
       description: "A forest-peripheral sanctuary nestled within the dense Narsapur reserve forest canopy."
     },
     {
-      id: "the-sil",
+      id: "syl",
       type: 'sanctuary',
-      title: "The SIL",
+      title: "SYL",
       location: "Tukkuguda (Future City)",
       coords: [17.24, 78.48] as [number, number],
       aqi: 22,
@@ -1906,6 +2398,9 @@ const SanctuaryMapLayout = () => {
 };
 
 const Sanctuaries = ({ isSubscribed, onNewsletterClick, isFullPage = false }: { isSubscribed: boolean, onNewsletterClick: () => void, isFullPage?: boolean }) => {
+  const [selectedSanctuary, setSelectedSanctuary] = useState<Sanctuary | null>(null);
+  const [showAagarthaLayout, setShowAagarthaLayout] = useState(false);
+
   return (
     <section id="agartha" className={cn(
       "px-12 md:px-24",
@@ -1924,15 +2419,42 @@ const Sanctuaries = ({ isSubscribed, onNewsletterClick, isFullPage = false }: { 
 
         <div className="grid lg:grid-cols-2 gap-12">
           {SANCTUARIES.map(s => (
-            <SanctuaryCard 
-              key={s.id} 
-              sanctuary={s} 
-              isSubscribed={isSubscribed} 
-              onNewsletterClick={onNewsletterClick} 
+            <SanctuaryCard
+              key={s.id}
+              sanctuary={s}
+              isSubscribed={isSubscribed}
+              onNewsletterClick={onNewsletterClick}
+              onOpen={() => {
+                if (s.id === 'agartha') setShowAagarthaLayout(true);
+                else setSelectedSanctuary(s);
+              }}
             />
           ))}
         </div>
       </div>
+
+      {/* Agartha interactive layout */}
+      <AnimatePresence>
+        {showAagarthaLayout && (
+          <AagarthaInteractiveLayout onClose={() => setShowAagarthaLayout(false)} />
+        )}
+      </AnimatePresence>
+
+      {/* Property detail overlay (non-Agartha) */}
+      <AnimatePresence>
+        {selectedSanctuary && (
+          <div className="fixed inset-0 z-[80] overflow-hidden">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedSanctuary(null)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            />
+            <PropertyDetailOverlay sanctuary={selectedSanctuary} onClose={() => setSelectedSanctuary(null)} />
+          </div>
+        )}
+      </AnimatePresence>
     </section>
   );
 };
@@ -2016,20 +2538,19 @@ const NewsletterModal = ({ isOpen, onClose, onSubscribe }: { isOpen: boolean, on
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center p-0 sm:p-6">
-          <motion.div
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+          <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
             className="absolute inset-0 bg-olive-900/90 backdrop-blur-xl"
           />
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 40 }}
-            transition={{ type: 'spring', damping: 30, stiffness: 320 }}
-            className="relative bg-cream w-full sm:max-w-xl max-h-[92dvh] overflow-y-auto p-8 sm:p-14 md:p-20 shadow-2xl border border-olive-800/10 rounded-t-3xl sm:rounded-none"
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            className="relative bg-cream w-full max-w-xl p-12 md:p-20 shadow-2xl border border-olive-800/10"
           >
             <button onClick={onClose} className="absolute top-8 right-8 text-olive-900/40 hover:text-olive-900 transition-all">
               <VolumeX className="w-6 h-6 rotate-45" />
@@ -2061,7 +2582,7 @@ const NewsletterModal = ({ isOpen, onClose, onSubscribe }: { isOpen: boolean, on
                 {isSubmitting ? "Authenticating..." : "Join Newsletter & Unlock"}
               </button>
               <p className="text-[8px] uppercase tracking-[0.3em] text-olive-800/30 text-center">
-                Unlocks access to The SIL and future landmarks.
+                Unlocks access to SYL and future landmarks.
               </p>
             </form>
           </motion.div>
@@ -2152,7 +2673,7 @@ const Footer = () => {
               <Logo className="w-10 h-10 text-cream" />
             </div>
             <p className="text-xl font-light text-cream/30 max-w-md leading-relaxed">
-              Independent collective curating India's most exclusive organic sanctuaries. Featuring MODCON Agartha and The SIL at Tukkuguda.
+              Independent collective curating India's most exclusive organic sanctuaries. Featuring MODCON Agartha and SYL at Tukkuguda.
             </p>
           </div>
           
@@ -2163,7 +2684,7 @@ const Footer = () => {
               <li><a href="#ecosystems" className="hover:text-cream transition-all">Ecosystems</a></li>
               <li><a href="#map" className="hover:text-cream transition-all">Map</a></li>
               <li><a href="#agartha" className="hover:text-cream transition-all">Agartha</a></li>
-              <li><a href="#the-sil" className="hover:text-cream transition-all">The SIL</a></li>
+              <li><a href="#syl" className="hover:text-cream transition-all">SYL</a></li>
               <li><a href="#apply" className="hover:text-cream transition-all">Apply</a></li>
             </ul>
           </div>
@@ -2213,17 +2734,23 @@ const TrustSignals = () => {
     <section className="py-24 px-6 md:px-24 bg-surface border-y border-outline/10 text-center">
       <div className="max-w-4xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-          <span className="text-olive-800 text-xs font-bold uppercase tracking-[0.6em] mb-4 block">Native Excellence</span>
-          <h2 className="text-3xl md:text-5xl font-medium text-olive-900 mb-16 italic">Hyderabad's Resource Legacy.</h2>
+          <span className="text-olive-800 text-xs font-bold uppercase tracking-[0.6em] mb-4 block">Proven Legacy</span>
+          <h2 className="text-3xl md:text-5xl font-medium text-olive-900 mb-16 italic">Trusted by Visionaries.</h2>
         </motion.div>
         
-        <div className="relative overflow-hidden mb-16 rounded-2xl shadow-xl grayscale hover:grayscale-0 transition-all duration-700 max-w-3xl mx-auto group border border-olive-800/10">
-          <img 
-            src="/hyderabad_logos.png" 
-            alt="Trusted local brands: MODCON, Agartha, Deccan Chronicle, Telangana Today" 
-            className="w-full h-auto object-contain transition-all duration-700 group-hover:scale-[1.02]"
-            referrerPolicy="no-referrer"
-          />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 opacity-60 grayscale hover:grayscale-0 transition-all duration-700">
+          <div className="flex items-center justify-center h-20">
+            <h3 className="font-headline font-bold text-xl tracking-widest uppercase">Forbes</h3>
+          </div>
+          <div className="flex items-center justify-center h-20">
+            <h3 className="font-headline font-bold text-xl tracking-widest uppercase">Vogue</h3>
+          </div>
+          <div className="flex items-center justify-center h-20">
+            <h3 className="font-headline font-bold text-xl tracking-widest uppercase">ArchDigest</h3>
+          </div>
+          <div className="flex items-center justify-center h-20">
+            <h3 className="font-headline font-bold text-xl tracking-widest uppercase">Bloomberg</h3>
+          </div>
         </div>
         
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }} className="mt-20 p-12 bg-cream/30 rounded-3xl border border-olive-800/5 relative shadow-sm">
@@ -2325,12 +2852,6 @@ const ChatBot = ({ data }: { data: any }) => {
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  // Auto-scroll to latest message
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, loading]);
 
   const handleSend = async () => {
     if (!input.trim() || loading) return;
@@ -2374,61 +2895,54 @@ const ChatBot = ({ data }: { data: any }) => {
 
   return (
     <>
-      {/* FAB — sits above map controls but below modals */}
-      {!isOpen && (
-        <button
-          onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-5 z-[65] w-14 h-14 bg-olive-900 text-cream rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-all duration-300 group overflow-hidden"
-        >
-          <div className="absolute inset-0 bg-primary/20 scale-0 group-hover:scale-100 transition-transform duration-500 rounded-full" />
-          <MessageSquare className="w-6 h-6 relative z-10" />
-        </button>
-      )}
+      <button 
+        onClick={() => setIsOpen(true)}
+        className="fixed bottom-8 right-8 z-[100] w-16 h-16 bg-olive-900 text-cream rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-all duration-500 group overflow-hidden"
+      >
+        <div className="absolute inset-0 bg-primary/20 scale-0 group-hover:scale-100 transition-transform duration-500 rounded-full"></div>
+        <MessageSquare className="w-8 h-8 relative z-10" />
+      </button>
 
       <AnimatePresence>
         {isOpen && (
           <>
-            <motion.div
-              key="chatbot-backdrop"
+            {/* Click-off area for ChatBot - Minimizes */}
+            <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsOpen(false)}
-              className="fixed inset-0 z-[66] bg-black/10"
+              className="fixed inset-0 z-[95] bg-black/10 backdrop-blur-[1px]"
             />
             <motion.div
-              key="chatbot-panel"
-              initial={{ opacity: 0, y: 24, scale: 0.97 }}
+              initial={{ opacity: 0, y: 100, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 24, scale: 0.97 }}
-              transition={{ type: 'spring', damping: 28, stiffness: 320 }}
-              className="fixed bottom-6 right-5 z-[67] w-[min(400px,calc(100vw-1.5rem))] h-[min(600px,calc(100dvh-5rem))] bg-surface shadow-2xl border border-olive-800/10 flex flex-col overflow-hidden rounded-2xl"
+              exit={{ opacity: 0, y: 100, scale: 0.9 }}
+              className="fixed bottom-32 right-8 z-[100] w-[400px] max-w-[calc(100vw-4rem)] h-[600px] bg-surface shadow-2xl border border-olive-800/10 flex flex-col overflow-hidden rounded-3xl"
             >
-              {/* Header */}
-              <div className="bg-olive-900 px-5 py-4 text-cream flex justify-between items-center shrink-0">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
-                    <Leaf className="w-4 h-4 text-primary" />
+              <div className="bg-olive-900 p-6 text-cream flex justify-between items-center">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
+                    <Leaf className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-headline font-bold text-base tracking-tight">Groot</h3>
-                    <p className="text-[8px] uppercase tracking-[0.3em] text-cream/50">Sanctuary AI Advisor</p>
+                    <h3 className="font-headline font-bold text-xl tracking-tight">Groot</h3>
+                    <p className="text-[8px] uppercase tracking-[0.3em] text-cream/60">Sanctuary AI Advisor</p>
                   </div>
                 </div>
-                <button onClick={handleClose} className="p-2 hover:bg-white/10 transition-all rounded-full">
-                  <X className="w-4 h-4" />
+                <button onClick={handleClose} className="p-2 hover:bg-surface/10 transition-all rounded-full">
+                  <X className="w-5 h-5" />
                 </button>
               </div>
 
-              {/* Messages */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-cream/10">
                 {messages.map((m, i) => (
                   <div key={i} className={cn("flex flex-col", m.role === 'user' ? "items-end" : "items-start")}>
                     <div className={cn(
-                      "max-w-[85%] px-4 py-3 text-sm leading-relaxed rounded-2xl shadow-sm",
-                      m.role === 'user'
-                        ? "bg-olive-900 text-cream rounded-tr-sm"
-                        : "bg-cream text-olive-900 border border-outline/10 rounded-tl-sm"
+                      "max-w-[85%] p-4 text-sm leading-relaxed rounded-2xl shadow-sm",
+                      m.role === 'user' 
+                        ? "bg-olive-900 text-cream rounded-tr-none" 
+                        : "bg-surface text-olive-900 border border-outline/10 rounded-tl-none"
                     )}>
                       {m.text}
                     </div>
@@ -2436,34 +2950,34 @@ const ChatBot = ({ data }: { data: any }) => {
                 ))}
                 {loading && (
                   <div className="flex items-start">
-                    <div className="bg-cream border border-outline/10 px-4 py-3 rounded-2xl rounded-tl-sm shadow-sm flex items-center gap-2">
-                      <span className="text-xs text-olive-800/50 italic">Groot is thinking</span>
-                      <div className="flex gap-1">
-                        {[0, 0.2, 0.4].map(delay => (
-                          <motion.div key={delay} animate={{ opacity: [0.2, 1, 0.2] }} transition={{ repeat: Infinity, duration: 1.2, delay }} className="w-1.5 h-1.5 bg-primary rounded-full" />
-                        ))}
+                    <div className="bg-surface border border-outline/10 p-4 rounded-2xl rounded-tl-none shadow-sm">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-medium text-olive-800/60 italic">Groot is thinking...</span>
+                        <div className="flex gap-1">
+                          <motion.div animate={{ opacity: [0, 1, 0] }} transition={{ repeat: Infinity, duration: 1 }} className="w-1 h-1 bg-primary rounded-full" />
+                          <motion.div animate={{ opacity: [0, 1, 0] }} transition={{ repeat: Infinity, duration: 1, delay: 0.2 }} className="w-1 h-1 bg-primary rounded-full" />
+                          <motion.div animate={{ opacity: [0, 1, 0] }} transition={{ repeat: Infinity, duration: 1, delay: 0.4 }} className="w-1 h-1 bg-primary rounded-full" />
+                        </div>
                       </div>
                     </div>
                   </div>
                 )}
-                <div ref={messagesEndRef} />
               </div>
 
-              {/* Input */}
-              <div className="px-4 py-3 bg-surface border-t border-outline/10 shrink-0">
-                <div className="relative flex items-center gap-2">
-                  <input
-                    type="text"
+              <div className="p-6 bg-surface border-t border-outline/10">
+                <div className="relative flex items-center">
+                  <input 
+                    type="text" 
                     value={input}
-                    onChange={e => setInput(e.target.value)}
-                    onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
-                    placeholder="Ask Groot about sanctuaries…"
-                    className="flex-1 bg-cream/50 border border-outline/20 rounded-xl py-3 px-4 text-sm focus:outline-none focus:border-primary/50 transition-all"
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                    placeholder="Ask Groot about sanctuaries..."
+                    className="w-full bg-cream/20 border border-outline/20 rounded-2xl py-4 pl-6 pr-16 text-sm focus:outline-none focus:border-primary/50 transition-all"
                   />
-                  <button
+                  <button 
                     onClick={handleSend}
                     disabled={loading || !input.trim()}
-                    className="shrink-0 p-3 bg-olive-900 text-cream rounded-xl hover:bg-primary transition-all disabled:opacity-40"
+                    className="absolute right-2 p-3 bg-olive-900 text-cream rounded-xl hover:bg-primary transition-all disabled:opacity-50"
                   >
                     <Send className="w-4 h-4" />
                   </button>
@@ -2578,20 +3092,6 @@ const AuthModal = ({
     }
   };
 
-  const handleGoogleSignIn = async () => {
-    setError('');
-    setLoading(true);
-    try {
-      const cred = await signInWithPopup(auth, googleProvider);
-      onSuccess(cred.user);
-      onClose();
-    } catch (err: any) {
-      if (err.code !== 'auth/popup-closed-by-user') setError(friendlyAuthError(err.code));
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!confirmResult) return;
@@ -2611,18 +3111,17 @@ const AuthModal = ({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center p-0 sm:p-6">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-olive-900/80 backdrop-blur-xl"
+            className="absolute inset-0 bg-olive-900/90 backdrop-blur-xl"
           />
           <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 40 }}
-            transition={{ type: 'spring', damping: 30, stiffness: 320 }}
-            className="relative bg-cream w-full sm:max-w-md max-h-[92dvh] overflow-y-auto p-8 sm:p-12 shadow-2xl border border-olive-800/10 rounded-t-3xl sm:rounded-none"
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            className="relative bg-cream w-full max-w-md p-10 md:p-14 shadow-2xl border border-olive-800/10"
           >
             <button onClick={onClose} className="absolute top-6 right-6 text-olive-900/40 hover:text-olive-900 transition-all">
               <X className="w-5 h-5" />
@@ -2631,29 +3130,6 @@ const AuthModal = ({
             <div className="text-center mb-10">
               <h2 className="text-3xl font-serif italic text-olive-900 mb-2">Member Access</h2>
               <p className="text-olive-800/50 text-sm font-light">Sign in to unlock the sanctuaries.</p>
-            </div>
-
-            {/* Google Sign-In */}
-            <button
-              onClick={handleGoogleSignIn}
-              disabled={loading}
-              className="w-full flex items-center justify-center gap-3 border border-olive-800/15 bg-white hover:bg-surface py-3.5 px-6 transition-all shadow-sm mb-6"
-            >
-              <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24" aria-hidden="true">
-                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
-                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-              </svg>
-              <span className="text-[10px] uppercase tracking-[0.4em] font-bold text-olive-900">
-                {loading ? 'Please wait…' : 'Continue with Google'}
-              </span>
-            </button>
-
-            <div className="flex items-center gap-4 mb-6">
-              <div className="flex-1 h-px bg-outline/10" />
-              <span className="text-[9px] uppercase tracking-[0.4em] text-olive-800/30">or</span>
-              <div className="flex-1 h-px bg-outline/10" />
             </div>
 
             {/* Tabs */}
@@ -2850,11 +3326,11 @@ const AdminDashboard = ({ onClose, user }: { onClose: () => void; user: User }) 
 
           {/* Leads table */}
           {tab === 'leads' && (
-            <div className="overflow-x-auto -mx-6 md:mx-0 px-6 md:px-0">
+            <div className="overflow-x-auto">
               {leads.length === 0 ? (
                 <p className="text-olive-800/40 text-sm py-12 text-center">No leads yet.</p>
               ) : (
-                <table className="w-full min-w-[560px] text-sm">
+                <table className="w-full text-sm">
                   <thead>
                     <tr className="text-[9px] uppercase tracking-[0.4em] text-olive-800/40 border-b border-outline/10">
                       <th className="text-left py-3 pr-6">Name</th>
@@ -2882,11 +3358,11 @@ const AdminDashboard = ({ onClose, user }: { onClose: () => void; user: User }) 
 
           {/* Newsletter table */}
           {tab === 'newsletter' && (
-            <div className="overflow-x-auto -mx-6 md:mx-0 px-6 md:px-0">
+            <div className="overflow-x-auto">
               {subs.length === 0 ? (
                 <p className="text-olive-800/40 text-sm py-12 text-center">No subscribers yet.</p>
               ) : (
-                <table className="w-full min-w-[560px] text-sm">
+                <table className="w-full text-sm">
                   <thead>
                     <tr className="text-[9px] uppercase tracking-[0.4em] text-olive-800/40 border-b border-outline/10">
                       <th className="text-left py-3 pr-6">Email</th>
@@ -2923,37 +3399,33 @@ const AdminDashboard = ({ onClose, user }: { onClose: () => void; user: User }) 
 // ─── App ─────────────────────────────────────────────────────────────────────
 
 export default function App() {
-  type ViewMode = 'home' | 'map' | 'list' | 'gallery' | 'analytics' | 'the-sil' | 'admin';
-  const VIEW_ORDER: ViewMode[] = ['home', 'list', 'gallery', 'analytics', 'the-sil', 'map'];
+  type ViewMode = 'home' | 'map' | 'list' | 'gallery' | 'analytics' | 'syl' | 'admin';
+  const VIEW_ORDER: ViewMode[] = ['home', 'list', 'gallery', 'analytics', 'syl', 'map'];
 
-  const [authUser, setAuthUser]     = useState<User | null>(null);
+  const [authUser, setAuthUser]   = useState<User | null>(null);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
-  const [isSubscribed, setIsSubscribed] = useState(() => localStorage.getItem('gt_subscribed') === 'true');
-  const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
-  const [viewMode, setViewMode]     = useState<ViewMode>('home');
-  const [isDark, setIsDark]         = useState(false);
 
-  // Global auth state — declared after all useState so setViewMode is in scope
+  // Global auth state listener
   useEffect(() => {
-    if (!auth) return; // Firebase not configured — skip auth listener
     const unsub = onAuthStateChanged(auth, u => {
       setAuthUser(u);
+      // Auto-redirect admin to dashboard after sign-in
       if (u?.email === ADMIN_EMAIL) setViewMode('admin');
     });
     return unsub;
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Body scroll lock when any overlay is open
-  useEffect(() => {
-    const locked = isNewsletterOpen || isAuthOpen;
-    document.body.classList.toggle('modal-open', locked);
-    return () => document.body.classList.remove('modal-open');
-  }, [isNewsletterOpen, isAuthOpen]);
+  }, []);
 
   const handleSignOut = async () => {
-    if (auth) await signOut(auth);
+    await signOut(auth);
     setViewMode('home');
   };
+
+  const [isSubscribed, setIsSubscribed] = useState(() => {
+    return localStorage.getItem('gt_subscribed') === 'true';
+  });
+  const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>('home');
+  const [isDark, setIsDark] = useState(false);
 
   // ── Scroll-position memory ────────────────────────────────────────────────
   const scrollPositions = useRef<Partial<Record<ViewMode, number>>>({});
@@ -3026,7 +3498,7 @@ export default function App() {
               {viewMode === 'list' && <Sanctuaries isSubscribed={isSubscribed} onNewsletterClick={() => setIsNewsletterOpen(true)} isFullPage />}
               {viewMode === 'gallery' && <EcosystemPillars isFullPage />}
               {viewMode === 'analytics' && <Advantage isFullPage />}
-              {viewMode === 'the-sil' && <TheSIL isSubscribed={isSubscribed} onNewsletterClick={() => setIsNewsletterOpen(true)} isFullPage />}
+              {viewMode === 'syl' && <TheSIL isSubscribed={isSubscribed} onNewsletterClick={() => setIsNewsletterOpen(true)} isFullPage />}
             </div>
           )}
         </div>
@@ -3037,10 +3509,10 @@ export default function App() {
       <AuthModal
         isOpen={isAuthOpen}
         onClose={() => setIsAuthOpen(false)}
-        onSuccess={u => {
-          setAuthUser(u);
+        onSuccess={user => {
+          setAuthUser(user);
           setIsAuthOpen(false);
-          if (u.email === ADMIN_EMAIL) setViewMode('admin');
+          if (user.email === ADMIN_EMAIL) handleViewChange('admin');
         }}
       />
 
