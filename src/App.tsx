@@ -660,13 +660,14 @@ const TheSIL = ({ isSubscribed, onNewsletterClick, isFullPage = false }: { isSub
   );
 };
 
-const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewsletterClick: () => void }> = ({ sanctuary, isSubscribed, onNewsletterClick }) => {
+const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewsletterClick: () => void, onOpen: () => void }> = ({ sanctuary, isSubscribed, onNewsletterClick, onOpen }) => {
   const isGated = sanctuary.id === 'syl' && !isSubscribed;
 
   return (
-    <motion.div 
+    <motion.div
       whileHover={{ y: -10 }}
-      className="group membership-card bg-surface relative overflow-hidden"
+      className="group membership-card bg-surface relative overflow-hidden cursor-pointer"
+      onClick={() => { if (!isGated) onOpen(); }}
     >
       {isGated && (
         <div className="absolute inset-0 z-10 bg-surface/60 backdrop-blur-sm flex flex-col items-center justify-center p-8 text-center">
@@ -723,8 +724,11 @@ const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewslet
           </div>
         </div>
 
-        <button className="w-full py-5 bg-olive-800 text-cream text-xs uppercase tracking-[0.3em] font-bold hover:bg-olive-900 rounded-lg hover:shadow-lg hover:shadow-olive-900/20 transition-all duration-300 transform hover:-translate-y-1 mt-2">
-          Request Briefing
+        <button
+          onClick={(e) => { e.stopPropagation(); if (!isGated) onOpen(); }}
+          className="w-full py-5 bg-olive-800 text-cream text-xs uppercase tracking-[0.3em] font-bold hover:bg-olive-900 rounded-lg hover:shadow-lg hover:shadow-olive-900/20 transition-all duration-300 transform hover:-translate-y-1 mt-2"
+        >
+          View Prospectus
         </button>
       </div>
     </motion.div>
@@ -1927,6 +1931,8 @@ const SanctuaryMapLayout = () => {
 };
 
 const Sanctuaries = ({ isSubscribed, onNewsletterClick, isFullPage = false }: { isSubscribed: boolean, onNewsletterClick: () => void, isFullPage?: boolean }) => {
+  const [selectedSanctuary, setSelectedSanctuary] = useState<Sanctuary | null>(null);
+
   return (
     <section id="agartha" className={cn(
       "px-12 md:px-24",
@@ -1945,15 +1951,32 @@ const Sanctuaries = ({ isSubscribed, onNewsletterClick, isFullPage = false }: { 
 
         <div className="grid lg:grid-cols-2 gap-12">
           {SANCTUARIES.map(s => (
-            <SanctuaryCard 
-              key={s.id} 
-              sanctuary={s} 
-              isSubscribed={isSubscribed} 
-              onNewsletterClick={onNewsletterClick} 
+            <SanctuaryCard
+              key={s.id}
+              sanctuary={s}
+              isSubscribed={isSubscribed}
+              onNewsletterClick={onNewsletterClick}
+              onOpen={() => setSelectedSanctuary(s)}
             />
           ))}
         </div>
       </div>
+
+      {/* Property detail overlay */}
+      <AnimatePresence>
+        {selectedSanctuary && (
+          <div className="fixed inset-0 z-[80] overflow-hidden">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedSanctuary(null)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            />
+            <PropertyDetailOverlay sanctuary={selectedSanctuary} onClose={() => setSelectedSanctuary(null)} />
+          </div>
+        )}
+      </AnimatePresence>
     </section>
   );
 };
