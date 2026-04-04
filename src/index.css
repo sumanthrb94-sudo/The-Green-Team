@@ -33,46 +33,46 @@
 
 @layer base {
   :root {
-    --primary: #00694e;
+    --primary: #2d3a1d;       /* Deep Olive */
     --on-primary: #ffffff;
-    --background: #f5fafe;
-    --surface: #f5fafe;
-    --on-surface: #161c1f;
+    --background: #faf9f6;    /* Warm Ivory */
+    --surface: #faf9f6;
+    --on-surface: #1a1c1a;    /* Charcoal Forest */
     --secondary: #586062;
     --tertiary: #984138;
-    --surface-container: #e9eff3;
-    --surface-container-low: #eff4f8;
-    --surface-container-highest: #dee3e7;
-    --outline: #8a9990;
+    --surface-container: #f2f4f2; /* Soft Bone */
+    --surface-container-low: #f8faf8;
+    --surface-container-highest: #e0e4e0;
+    --outline: #8c9c8c;
 
-    --olive-900: #2d3a1d;
-    --olive-800: #3d5229;
-    --olive-700: #556b2f;
-    --cashew: #e8f3ee;
-    --cream: #f2f8f5;
-    --gold: #d4af37;
+    --olive-900: #1a2410;     /* Deep Shadow */
+    --olive-800: #2d3a1d;     /* Main Olive */
+    --olive-700: #4a5c3d;     /* Mid Olive */
+    --cashew: #f2f4f2;        /* Soft Sage */
+    --cream: #faf9f6;         /* Ivory */
+    --gold: #b8860b;          /* Muted Gold */
     --charcoal: #1a1a1a;
   }
 
   .dark {
-    --primary: #4ade80;
-    --on-primary: #152219;
-    --background: #0f1412;
-    --surface: #0f1412;
-    --on-surface: #f2f8f5;
-    --secondary: #a0acab;
+    --primary: #a3b18a;       /* Sage Accent */
+    --on-primary: #1a1c1a;
+    --background: #151b15;    /* Deep Forest */
+    --surface: #151b15;
+    --on-surface: #eae6da;    /* Warm Bone */
+    --secondary: #98a698;
     --tertiary: #fecaca;
-    --surface-container: #1e2622;
-    --surface-container-low: #151b19;
-    --surface-container-highest: #2b3630;
+    --surface-container: #222b22;
+    --surface-container-low: #1a221a;
+    --surface-container-highest: #2b362b;
     --outline: #6d7a73;
 
-    --olive-900: #eef5e6;
-    --olive-800: #d1e0c2;
-    --olive-700: #aebf9c;
-    --cashew: #152219;
-    --cream: #101712;
-    --gold: #edd282;
+    --olive-900: #faf9f6;     /* Contrast Ivory */
+    --olive-800: #eae6da;     /* Warm Bone */
+    --olive-700: #daddd8;
+    --cashew: #1a221a;
+    --cream: #151b15;
+    --gold: #edd282;          /* Pale Gold */
     --charcoal: #f9fafb;
   }
 
