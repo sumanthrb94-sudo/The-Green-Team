@@ -2208,7 +2208,7 @@ const SanctuaryMapLayout = () => {
           maxBoundsViscosity={0.9}
         >
           <ZoomControl position="bottomleft" />
-          {showForests && NATURAL_FEATURES.map(feature => {
+          {activeFilters.has('forest-zone') && NATURAL_FEATURES.map(feature => {
             const isForest = feature.type === 'forest';
             return (
               <Polygon
