@@ -2187,7 +2187,6 @@ const SanctuaryMapLayout = () => {
           scrollWheelZoom={true}
           zoomControl={false}
           className="h-full w-full absolute inset-0 z-0"
-          preferCanvas={true}
           minZoom={9}
           maxBounds={[
             [16.7, 77.5],
@@ -2264,7 +2263,7 @@ const SanctuaryMapLayout = () => {
                 {showAqi && (
                   <Circle
                     center={[point.lat, point.lng]}
-                    radius={isTelanganaView ? 12000 : 3500}
+                    radius={isTelanganaView ? 12000 : currentZoom >= 13 ? 1300 : currentZoom >= 11 ? 2200 : currentZoom >= 9 ? 3500 : 7000}
                     className="trichome-glass-mesh"
                     pathOptions={{
                       fillColor,
