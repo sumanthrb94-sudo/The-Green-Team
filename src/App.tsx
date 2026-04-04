@@ -887,308 +887,193 @@ const ZoomTracker = ({ onZoom }: { onZoom: (zoom: number) => void }) => {
 
 interface Hotspot {
   id: string;
-  x: number; // % from left
-  y: number; // % from top
+  num: number;
+  x: number;
+  y: number;
   label: string;
   tag: string;
-  color: string;
   detail: string;
   stats: { label: string; value: string }[];
 }
 
 const AGARTHA_HOTSPOTS: Hotspot[] = [
   {
-    id: 'amenity-core',
-    x: 44, y: 48,
+    id: 'amenity-core', num: 1, x: 44, y: 50,
     label: 'Organic Amenity Core',
     tag: '14,548 Sq Yds',
-    color: '#2d3a1d',
-    detail: 'The biomorphic heart of Agartha. Zero right angles — every curve echoes the surrounding forest. Infinity lap pool, social pavilions, canopy walkways, and co-working pods, all wrapped in earth and bamboo.',
-    stats: [
-      { label: 'Size', value: '14,548 sq yds' },
-      { label: 'Architecture', value: 'Biomorphic' },
-      { label: 'Material', value: 'Earth + Bamboo' },
-    ],
+    detail: 'The biomorphic heart of Agartha. Zero right angles — every curve echoes the surrounding forest. Infinity lap pool, social pavilions, canopy walkways, all in earth and bamboo.',
+    stats: [{ label: 'Size', value: '14,548 sq yds' }, { label: 'Style', value: 'Biomorphic' }, { label: 'Material', value: 'Earth + Bamboo' }],
   },
   {
-    id: 'forest-buffer',
-    x: 6, y: 42,
+    id: 'forest-buffer', num: 2, x: 8, y: 40,
     label: 'Narsapur Forest Buffer',
-    tag: 'AQI 12 — Pristine',
-    color: '#3a5c2a',
-    detail: 'Direct boundary access to the Narsapur forest reserve. AQI 12 — one of the cleanest micro-climates in the Hyderabad metro. Native bird corridors, zero industrial proximity, natural white noise.',
-    stats: [
-      { label: 'AQI', value: '12 — Pristine' },
-      { label: 'Noise', value: '18 dB ambient' },
-      { label: 'Forest Type', value: 'Native Dry Deciduous' },
-    ],
+    tag: 'AQI 12',
+    detail: 'Direct boundary with the Narsapur forest reserve. AQI 12 — one of the cleanest micro-climates in the Hyderabad metro. Native bird corridors, natural white noise.',
+    stats: [{ label: 'AQI', value: '12 — Pristine' }, { label: 'Noise', value: '18 dB' }, { label: 'Forest', value: 'Native Dry Deciduous' }],
   },
   {
-    id: 'grand-entry',
-    x: 46, y: 7,
+    id: 'grand-entry', num: 3, x: 48, y: 8,
     label: 'Grand Entry Boulevard',
-    tag: 'Private Gated Access',
-    color: '#b8860b',
-    detail: 'A landscaped, winding approach designed to decompress before you arrive. Lined with native canopy trees, the boulevard curves through the forest edge — no straight lines anywhere, including the road in.',
-    stats: [
-      { label: 'Access', value: 'Single gated entry' },
-      { label: 'Landscape', value: 'Native canopy' },
-      { label: 'Design', value: 'No straight lines' },
-    ],
+    tag: 'Gated Access',
+    detail: 'A winding, landscaped approach lined with native canopy trees. No straight lines — the boulevard curves through the forest edge before revealing the community.',
+    stats: [{ label: 'Access', value: 'Single gated entry' }, { label: 'Landscape', value: 'Native canopy' }, { label: 'Design', value: 'No straight lines' }],
   },
   {
-    id: 'premium-corner',
-    x: 16, y: 70,
+    id: 'premium-corner', num: 4, x: 14, y: 72,
     label: 'Premium Corner — Plot 15',
-    tag: '5,097 Sq Yds',
-    color: '#7c5c1e',
-    detail: 'The largest private residential plot in Agartha at 5,097 sq yds. Corner positioning gives maximum forest frontage on two sides, dual road access, and the greatest separation from neighbours.',
-    stats: [
-      { label: 'Plot Size', value: '5,097 sq yds' },
-      { label: 'Frontage', value: 'Dual forest-facing' },
-      { label: 'Plot #', value: '15' },
-    ],
+    tag: '5,097 Sq Yds · ₹4.08 Cr',
+    detail: 'The largest plot in Agartha. Corner positioning gives dual forest frontage and the greatest separation from neighbours. At ₹7,999/sq yd: ₹4.08 Cr.',
+    stats: [{ label: 'Size', value: '5,097 sq yds' }, { label: 'Price', value: '₹4.08 Cr' }, { label: 'Frontage', value: 'Dual forest-facing' }],
   },
   {
-    id: 'east-enclave',
-    x: 88, y: 26,
-    label: 'East Forest Enclave',
-    tag: 'Plots 52 & 53',
-    color: '#3a5c2a',
-    detail: 'The most secluded plots in the community. Plot 52 at 4,500 sq yds and Plot 53 at 2,655 sq yds sit deep in the east forest fringe — maximum canopy cover, maximum privacy.',
-    stats: [
-      { label: 'Plot 52', value: '4,500 sq yds' },
-      { label: 'Plot 53', value: '2,655 sq yds' },
-      { label: 'Character', value: 'Maximum seclusion' },
-    ],
-  },
-  {
-    id: 'solar-rooftops',
-    x: 42, y: 38,
-    label: 'Solar-Curved Rooftops',
-    tag: 'Net-Zero Target',
-    color: '#b8860b',
-    detail: 'Every structure — residential and amenity alike — uses curved solar-integrated roofing that doubles as architectural identity. The panels follow the biomorphic form, not a grid. Net-zero energy community target.',
-    stats: [
-      { label: 'Type', value: 'Curved solar integration' },
-      { label: 'Goal', value: 'Net-zero community' },
-      { label: 'Material', value: 'Earth + Solar composite' },
-    ],
-  },
-  {
-    id: 'plot-community',
-    x: 58, y: 62,
+    id: 'plot-community', num: 5, x: 62, y: 60,
     label: '53-Plot Private Community',
-    tag: '808 – 5,097 Sq Yds',
-    color: '#2d3a1d',
-    detail: 'Exactly 53 plots — each unique in shape and size, no two the same. Ranging from 808 sq yds to 5,097 sq yds with plot sizes averaging ~1,300 sq yds. A true private forest community, not a subdivision.',
-    stats: [
-      { label: 'Total Plots', value: '53' },
-      { label: 'Smallest', value: '808 sq yds' },
-      { label: 'Largest', value: '5,097 sq yds' },
-    ],
+    tag: 'From ₹64.6 L',
+    detail: '53 plots, each unique — no two the same. Sizes from 808 to 5,097 sq yds at ₹7,999/sq yd. A true private forest community, not a subdivision.',
+    stats: [{ label: 'Total Plots', value: '53' }, { label: 'Starting', value: '₹64.6 L (808 sq yds)' }, { label: 'Rate', value: '₹7,999/sq yd' }],
   },
 ];
 
 const AagarthaInteractiveLayout: FC<{ onClose: () => void }> = ({ onClose }) => {
-  const [activeHotspot, setActiveHotspot] = useState<Hotspot | null>(AGARTHA_HOTSPOTS[0]);
-  const [infoVisible, setInfoVisible] = useState(false);
-
-  useEffect(() => {
-    const t = setTimeout(() => setInfoVisible(true), 400);
-    return () => clearTimeout(t);
-  }, []);
-
-  const handleHotspot = (h: Hotspot) => {
-    setInfoVisible(false);
-    setTimeout(() => {
-      setActiveHotspot(h);
-      setInfoVisible(true);
-    }, 150);
-  };
+  const [active, setActive] = useState<Hotspot>(AGARTHA_HOTSPOTS[0]);
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[90] bg-surface flex flex-col md:flex-row overflow-hidden"
+      className="fixed inset-0 z-[90] bg-[#0e1409] flex flex-col md:flex-row overflow-hidden"
     >
-      {/* ── LEFT: Site Plan ── */}
-      <div className="relative flex-1 overflow-hidden bg-olive-900 min-h-[55vw] md:min-h-0">
+      {/* ── LEFT: Site Plan image ── */}
+      <div className="relative w-full md:flex-1 h-[48vh] md:h-auto overflow-hidden">
         <img
-          src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&q=80&w=1600"
-          alt="Agartha Layout"
-          className="w-full h-full object-cover opacity-80"
+          src="https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&q=80&w=1600"
+          alt="Agartha site plan"
+          className="w-full h-full object-cover opacity-60"
           referrerPolicy="no-referrer"
         />
-        {/* Dark vignette to help markers pop */}
-        <div className="absolute inset-0 bg-gradient-to-br from-black/30 via-transparent to-black/20 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/40 pointer-events-none" />
 
-        {/* Top bar */}
-        <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-6 py-4 bg-gradient-to-b from-black/60 to-transparent">
+        {/* Header */}
+        <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-5 py-4">
           <div>
-            <p className="text-[9px] uppercase tracking-[0.5em] text-cream/60 font-bold">Interactive Site Plan</p>
-            <h2 className="text-lg font-headline font-bold text-cream mt-0.5">MODCON Agartha</h2>
+            <p className="text-[8px] uppercase tracking-[0.5em] text-white/40 font-bold">Site Plan</p>
+            <p className="text-sm font-bold text-white mt-0.5">MODCON Agartha</p>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 bg-black/40 backdrop-blur-sm rounded-full hover:bg-black/60 transition-all"
-          >
-            <X className="w-5 h-5 text-white" />
+          <button onClick={onClose} className="p-2 bg-white/10 backdrop-blur-sm rounded-full hover:bg-white/20 transition-all">
+            <X className="w-4 h-4 text-white" />
           </button>
         </div>
 
-        {/* Hotspot markers */}
+        {/* Numbered hotspot markers */}
         {AGARTHA_HOTSPOTS.map((h) => {
-          const isActive = activeHotspot?.id === h.id;
+          const isActive = active.id === h.id;
           return (
             <button
               key={h.id}
               style={{ left: `${h.x}%`, top: `${h.y}%` }}
-              className="absolute -translate-x-1/2 -translate-y-1/2 group"
-              onMouseEnter={() => handleHotspot(h)}
-              onClick={() => handleHotspot(h)}
+              className="absolute -translate-x-1/2 -translate-y-1/2"
+              onClick={() => setActive(h)}
             >
-              {/* Pulse ring */}
-              <span
-                className="absolute inset-0 rounded-full animate-ping"
-                style={{ backgroundColor: h.color, opacity: isActive ? 0.4 : 0.2 }}
-              />
-              {/* Dot */}
-              <span
-                className={cn(
-                  "relative flex items-center justify-center w-5 h-5 rounded-full border-2 border-white/80 transition-all duration-300 shadow-lg",
-                  isActive ? "w-6 h-6 shadow-xl" : "group-hover:w-6 group-hover:h-6"
-                )}
-                style={{ backgroundColor: h.color }}
-              />
-              {/* Label bubble on active */}
+              <span className={cn(
+                "relative flex items-center justify-center rounded-full font-bold text-[10px] border-2 transition-all duration-200 shadow-lg",
+                isActive
+                  ? "w-8 h-8 bg-primary border-white text-white scale-110"
+                  : "w-6 h-6 bg-black/50 border-white/50 text-white/80 hover:border-white hover:bg-black/70"
+              )}>
+                {h.num}
+              </span>
               {isActive && (
-                <motion.span
-                  initial={{ opacity: 0, y: 4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="absolute left-1/2 -translate-x-1/2 mt-3 top-full whitespace-nowrap px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest text-white shadow-lg pointer-events-none"
-                  style={{ backgroundColor: h.color }}
-                >
-                  {h.tag}
-                </motion.span>
+                <span className="absolute inset-0 rounded-full bg-primary/40 animate-ping pointer-events-none" />
               )}
             </button>
           );
         })}
 
-        {/* Legend */}
-        <div className="absolute bottom-5 left-5 flex flex-wrap gap-3">
+        {/* Compact number legend — bottom of image */}
+        <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 px-4">
           {AGARTHA_HOTSPOTS.map(h => (
             <button
               key={h.id}
-              onClick={() => handleHotspot(h)}
+              onClick={() => setActive(h)}
               className={cn(
-                "flex items-center gap-2 px-3 py-1.5 rounded-full text-[8px] uppercase tracking-widest font-bold backdrop-blur-sm transition-all border",
-                activeHotspot?.id === h.id
-                  ? "text-white border-white/40 bg-black/60"
-                  : "text-white/60 border-white/10 bg-black/30 hover:text-white/90"
+                "flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[8px] font-bold backdrop-blur-sm transition-all border",
+                active.id === h.id
+                  ? "bg-primary border-primary text-white"
+                  : "bg-black/40 border-white/15 text-white/50 hover:text-white/80"
               )}
             >
-              <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: h.color }} />
-              {h.label.split('—')[0].trim()}
+              <span>{h.num}</span>
             </button>
           ))}
         </div>
       </div>
 
-      {/* ── RIGHT: Feature Info Panel ── */}
-      <div className="w-full md:w-[380px] lg:w-[420px] flex-shrink-0 bg-surface border-l border-outline/10 flex flex-col overflow-hidden">
-        {/* Fixed header */}
-        <div className="px-8 pt-8 pb-6 border-b border-outline/10 flex-shrink-0">
-          <p className="text-[9px] uppercase tracking-[0.5em] text-secondary/50 font-bold mb-1">Narsapur Forest Peripheral</p>
-          <p className="text-xs text-secondary/60">Hover a marker to explore</p>
-        </div>
+      {/* ── RIGHT: Info panel ── */}
+      <div className="w-full md:w-[360px] flex-shrink-0 bg-surface flex flex-col overflow-hidden">
 
-        {/* Animated feature content */}
-        <div className="flex-1 overflow-y-auto px-8 py-6">
+        {/* Feature content */}
+        <div className="flex-1 overflow-y-auto px-7 py-8">
           <AnimatePresence mode="wait">
-            {activeHotspot && infoVisible && (
-              <motion.div
-                key={activeHotspot.id}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.2 }}
-                className="space-y-6"
-              >
-                {/* Feature pill */}
-                <span
-                  className="inline-block px-3 py-1 rounded-full text-[8px] uppercase tracking-[0.4em] font-bold text-white"
-                  style={{ backgroundColor: activeHotspot.color }}
-                >
-                  {activeHotspot.tag}
+            <motion.div
+              key={active.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.18 }}
+              className="space-y-5"
+            >
+              <div className="flex items-center gap-3">
+                <span className="w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center text-xs font-bold flex-shrink-0">
+                  {active.num}
                 </span>
+                <span className="text-[8px] uppercase tracking-[0.4em] text-secondary/50 font-bold">{active.tag}</span>
+              </div>
 
-                <h3 className="text-2xl font-headline font-bold text-on-surface leading-tight">
-                  {activeHotspot.label}
-                </h3>
+              <h3 className="text-xl font-headline font-bold text-on-surface leading-snug">{active.label}</h3>
 
-                <p className="text-sm text-secondary/70 leading-relaxed">
-                  {activeHotspot.detail}
-                </p>
+              <p className="text-sm text-secondary/70 leading-relaxed">{active.detail}</p>
 
-                {/* Stats */}
-                <div className="space-y-3 pt-2">
-                  {activeHotspot.stats.map(s => (
-                    <div key={s.label} className="flex justify-between items-center py-3 border-b border-outline/10">
-                      <span className="text-[9px] uppercase tracking-[0.4em] text-secondary/50 font-bold">{s.label}</span>
-                      <span className="text-sm font-bold text-on-surface">{s.value}</span>
-                    </div>
-                  ))}
-                </div>
+              <div className="pt-2 space-y-0">
+                {active.stats.map(s => (
+                  <div key={s.label} className="flex justify-between items-center py-3 border-b border-outline/10 last:border-0">
+                    <span className="text-[9px] uppercase tracking-[0.3em] text-secondary/40 font-bold">{s.label}</span>
+                    <span className="text-sm font-bold text-on-surface">{s.value}</span>
+                  </div>
+                ))}
+              </div>
 
-                {/* Navigation between hotspots */}
-                <div className="flex gap-2 pt-4 flex-wrap">
-                  {AGARTHA_HOTSPOTS.filter(h => h.id !== activeHotspot.id).map(h => (
-                    <button
-                      key={h.id}
-                      onClick={() => handleHotspot(h)}
-                      className="text-[8px] uppercase tracking-widest font-bold px-3 py-2 rounded-lg border border-outline/15 text-secondary/60 hover:text-primary hover:border-primary/30 transition-all"
-                    >
-                      {h.label.split(' ').slice(0, 2).join(' ')}
-                    </button>
-                  ))}
-                </div>
-              </motion.div>
-            )}
+              {/* Other hotspots as simple number chips */}
+              <div className="flex gap-2 flex-wrap pt-2">
+                {AGARTHA_HOTSPOTS.filter(h => h.id !== active.id).map(h => (
+                  <button
+                    key={h.id}
+                    onClick={() => setActive(h)}
+                    className="flex items-center gap-1.5 text-[8px] uppercase tracking-widest font-bold px-3 py-1.5 rounded-full border border-outline/15 text-secondary/50 hover:text-primary hover:border-primary/30 transition-all"
+                  >
+                    <span className="w-4 h-4 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[9px] font-bold">{h.num}</span>
+                    {h.label.split(' ').slice(0, 2).join(' ')}
+                  </button>
+                ))}
+              </div>
+            </motion.div>
           </AnimatePresence>
         </div>
 
-        {/* Fixed CTAs */}
-        <div className="px-8 py-6 border-t border-outline/10 flex-shrink-0 space-y-3">
-          <div className="grid grid-cols-3 gap-3 text-center mb-4">
-            <div>
-              <p className="text-xl font-bold text-primary">53</p>
-              <p className="text-[8px] uppercase tracking-widest text-secondary/50">Plots</p>
-            </div>
-            <div>
-              <p className="text-xl font-bold text-primary">12</p>
-              <p className="text-[8px] uppercase tracking-widest text-secondary/50">AQI</p>
-            </div>
-            <div>
-              <p className="text-base font-bold text-primary leading-tight">₹7,999<span className="text-[9px] font-normal">/sq yd</span></p>
-              <p className="text-[8px] uppercase tracking-widest text-secondary/50">From ₹64.6 L</p>
-            </div>
-          </div>
+        {/* Footer */}
+        <div className="px-7 py-5 border-t border-outline/10 space-y-2 flex-shrink-0">
           <a
             href="https://www.modconbuilders.com/agartha"
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full py-4 bg-primary text-on-primary text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-primary/90 transition-all"
+            className="w-full py-3.5 bg-primary text-on-primary text-[9px] uppercase tracking-[0.4em] font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-primary/90 transition-all"
           >
-            <ArrowRight className="w-4 h-4" />
-            Full Brochure on MODCON
+            <ArrowRight className="w-3.5 h-3.5" />
+            View Brochure — MODCON
           </a>
           <button
             onClick={onClose}
-            className="w-full py-3 text-[10px] uppercase tracking-[0.4em] font-bold text-secondary/50 hover:text-primary transition-all"
+            className="w-full py-2.5 text-[9px] uppercase tracking-widest font-bold text-secondary/40 hover:text-primary transition-all"
           >
             Close
           </button>
