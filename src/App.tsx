@@ -2208,6 +2208,36 @@ const SanctuaryMapLayout = () => {
           maxBoundsViscosity={0.9}
         >
           <ZoomControl position="bottomleft" />
+          {showForests && NATURAL_FEATURES.map(feature => {
+            const isForest = feature.type === 'forest';
+            return (
+              <Polygon
+                key={feature.id}
+                positions={feature.boundary}
+                interactive={false}
+                pathOptions={isForest ? {
+                  // Olive-mint — matches site palette (olive-900 / primary green)
+                  fillColor: '#3d5c35',
+                  fillOpacity: 0.12,
+                  color: '#4a6741',
+                  weight: 1,
+                  opacity: 0.45,
+                  dashArray: undefined,
+                  lineCap: 'round',
+                  lineJoin: 'round',
+                } : {
+                  // Slate-blue — muted water tone
+                  fillColor: '#334e68',
+                  fillOpacity: 0.14,
+                  color: '#4a6fa5',
+                  weight: 1,
+                  opacity: 0.40,
+                  lineCap: 'round',
+                  lineJoin: 'round',
+                }}
+              />
+            );
+          })}
           <MapController targetView={targetView} />
           <ZoomTracker onZoom={setCurrentZoom} />
           {isSatellite ? (
@@ -2225,49 +2255,6 @@ const SanctuaryMapLayout = () => {
           )}
 
 
-
-          {/* ── Forests & Water Bodies — thick Google Maps-style filled overlays ── */}
-          {NATURAL_FEATURES.map(feature => {
-            const isForest = feature.type === 'forest';
-            return (
-              <React.Fragment key={feature.id}>
-                <Polygon
-                  positions={feature.boundary}
-                  interactive={false}
-                  pathOptions={isForest ? {
-                    // Deep forest green — matches Google Maps park/forest palette
-                    fillColor: '#14532d',
-                    fillOpacity: 0.62,
-                    color: '#15803d',
-                    weight: 2.5,
-                    dashArray: undefined,
-                  } : {
-                    // Water blue
-                    fillColor: '#1e3a8a',
-                    fillOpacity: 0.50,
-                    color: '#1d4ed8',
-                    weight: 2,
-                  }}
-                />
-                {/* Soft inner glow ring for depth */}
-                <Polygon
-                  positions={feature.boundary}
-                  interactive={false}
-                  pathOptions={isForest ? {
-                    fillColor: '#16a34a',
-                    fillOpacity: 0.18,
-                    color: 'transparent',
-                    weight: 0,
-                  } : {
-                    fillColor: '#3b82f6',
-                    fillOpacity: 0.15,
-                    color: 'transparent',
-                    weight: 0,
-                  }}
-                />
-              </React.Fragment>
-            );
-          })}
 
           {/* Real-time Environmental Mesh — blue near forests, red near industry */}
           {gridPoints.map((point, idx) => {
