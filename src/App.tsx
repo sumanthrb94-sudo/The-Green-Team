@@ -950,6 +950,7 @@ const AagarthaInteractiveLayout: FC<{ onClose: () => void }> = ({ onClose }) => 
           src="/agartha-layout.jpg"
           alt="Agartha site plan"
           className="w-full h-full object-cover"
+          onError={(e) => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&q=80&w=1600'; }}
           referrerPolicy="no-referrer"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/40 pointer-events-none" />
