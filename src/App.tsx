@@ -1489,7 +1489,16 @@ const SanctuaryMapLayout = () => {
   // smoothly into the RRR boundary rather than cutting off abruptly.
   const gridPoints = useMemo(() => {
     const points: { lat: number; lng: number; boundaryFade: number }[] = [];
-    const step = isTelanganaView ? 0.2 : 0.03;
+    
+    // Zoom-responsive grid: lazy loading, gradually updates accuracy as we zoom in
+    let step = 0.08;
+    if (currentZoom >= 13) step = 0.015;
+    else if (currentZoom >= 11) step = 0.025;
+    else if (currentZoom >= 9) step = 0.04;
+    else step = 0.08;
+
+    if (isTelanganaView) step = 0.2;
+
     const latRange = isTelanganaView ? [15.8, 19.8] : [16.9, 17.9];
     const lngRange = isTelanganaView ? [77.1, 81.1] : [78.0, 79.1];
 
@@ -1510,7 +1519,7 @@ const SanctuaryMapLayout = () => {
       }
     }
     return points;
-  }, [isTelanganaView]);
+  }, [isTelanganaView, currentZoom]);
 
   // Hyderabad Outer Ring Road (ORR) — refined 158 km trace aligned to satellite road
   const ORR_PATH: [number, number][] = [
@@ -2116,29 +2125,6 @@ const SanctuaryMapLayout = () => {
           )}
         </AnimatePresence>
 
-        {/* Floating Map Controls */}
-        <div className="absolute top-6 left-6 z-[1000] flex flex-col gap-3">
-          <div className="bg-surface/90 backdrop-blur-md p-1 rounded-xl shadow-xl border border-outline/10 flex items-center">
-            <div className="p-2 hover:bg-primary/10 rounded-lg transition-colors cursor-pointer text-primary">
-              <Search className="w-4 h-4" />
-            </div>
-            <input 
-              type="text" 
-              placeholder="Search projects..." 
-              value={selectedId || ''}
-              onChange={(e) => handleSearch(e.target.value)}
-              className="bg-transparent border-none focus:ring-0 text-[10px] font-headline tracking-widest uppercase font-bold w-48 px-2"
-            />
-          </div>
-          <div className="bg-surface/90 backdrop-blur-md p-2 rounded-xl shadow-xl border border-outline/10 flex flex-col gap-4">
-            <div className="p-2 hover:bg-primary/10 rounded-lg transition-colors cursor-pointer text-secondary hover:text-primary">
-              <Navigation className="w-4 h-4" />
-            </div>
-            <div className="p-2 hover:bg-primary/10 rounded-lg transition-colors cursor-pointer text-secondary hover:text-primary">
-              <Layers className="w-4 h-4" />
-            </div>
-          </div>
-        </div>
 
         {/* Live AQI badge — visible when AQI Live filter is active */}
         <AnimatePresence>
@@ -2195,22 +2181,18 @@ const SanctuaryMapLayout = () => {
           </motion.div>
         </div>
 
-        {/* Bottom Right Action */}
-        <div className="absolute bottom-6 right-6 z-[1000]">
-          <button className="px-6 py-3 bg-olive-900 text-cream text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl shadow-2xl flex items-center gap-3 hover:scale-105 transition-all">
-            <Layers className="w-4 h-4" />
-            View Site Plan
-          </button>
-        </div>
-
         <MapContainer
           center={[17.49, 78.48]}
           zoom={10}
           scrollWheelZoom={true}
           zoomControl={false}
           className="h-full w-full"
-          style={{ background: '#0a0f14' }}
-          maxBounds={[[17.0, 77.75], [18.0, 79.15]]}
+          preferCanvas={true}
+          minZoom={6}
+          maxBounds={[
+            [15.0, 76.0],
+            [20.0, 81.0]
+          ]}
           maxBoundsViscosity={0.9}
         >
           <ZoomControl position="bottomleft" />
