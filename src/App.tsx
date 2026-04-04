@@ -107,8 +107,8 @@ const SANCTUARIES: Sanctuary[] = [
     features: ['Forest Buffer', 'Solar Microgrid', 'Rainwater Harvest', 'Organic Farm']
   },
   {
-    id: 'the-sil',
-    title: 'The SIL: Vertical Villament',
+    id: 'syl',
+    title: 'SYL: Vertical Villament',
     location: 'Tukkuguda (Future City)',
     aqi: 22,
     noise: 24,
@@ -158,7 +158,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
     { name: 'Advantage', id: 'analytics' },
     { name: 'Ecosystems', id: 'gallery' },
     { name: 'Agartha', id: 'list' },
-    { name: 'The SIL', id: 'the-sil' },
+    { name: 'SYL', id: 'syl' },
     { name: 'Membership', id: 'membership' }
   ];
 
@@ -252,7 +252,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
                       <button 
                         key={item.id} 
                         onClick={() => {
-                          if (['home', 'map', 'analytics', 'gallery', 'list', 'the-sil'].includes(item.id)) {
+                          if (['home', 'map', 'analytics', 'gallery', 'list', 'syl'].includes(item.id)) {
                             onModeChange(item.id as any);
                           }
                           setIsMenuOpen(false);
@@ -315,7 +315,7 @@ const SideNavBar = ({ activeMode, onModeChange }: { activeMode: string, onModeCh
     { name: 'Advantage', id: 'analytics', icon: TrendingDown },
     { name: 'Ecosystems', id: 'gallery', icon: Leaf },
     { name: 'Agartha', id: 'list', icon: Layers },
-    { name: 'The SIL', id: 'the-sil', icon: Shield },
+    { name: 'SYL', id: 'syl', icon: Shield },
   ];
 
   return (
@@ -547,7 +547,7 @@ const Advantage = ({ isFullPage = false }: { isFullPage?: boolean }) => {
 
 const TheSIL = ({ isSubscribed, onNewsletterClick, isFullPage = false }: { isSubscribed: boolean, onNewsletterClick: () => void, isFullPage?: boolean }) => {
   return (
-    <section id="the-sil" className={cn(
+    <section id="syl" className={cn(
       "px-12 md:px-24 bg-olive-900 text-cream relative overflow-hidden",
       isFullPage ? "py-16" : "py-14"
     )}>
@@ -556,7 +556,7 @@ const TheSIL = ({ isSubscribed, onNewsletterClick, isFullPage = false }: { isSub
           <Shield className="w-16 h-16 text-gold mb-8" />
           <h2 className="text-4xl md:text-6xl font-serif italic mb-6">Exclusive Access Required.</h2>
           <p className="text-cream/60 max-w-md mb-12 text-lg font-light leading-relaxed">
-            The SIL is a restricted landmark. Sign up for our monthly newsletter to unlock the full architectural briefing and coordinates.
+            SYL is a restricted landmark. Sign up for our monthly newsletter to unlock the full architectural briefing and coordinates.
           </p>
           <button 
             onClick={onNewsletterClick}
@@ -578,9 +578,9 @@ const TheSIL = ({ isSubscribed, onNewsletterClick, isFullPage = false }: { isSub
               <span className="px-3 py-1 bg-gold text-olive-900 text-[9px] font-bold uppercase tracking-widest">Upcoming Landmark</span>
               <span className="text-cream/40 text-[9px] uppercase tracking-[0.4em]">Tukkuguda</span>
             </div>
-            <h2 className="text-5xl md:text-7xl font-medium mb-6">The <span className="italic text-gold">SIL</span> <br />Villament.</h2>
+            <h2 className="text-5xl md:text-7xl font-medium mb-6">SYL<br />Villament.</h2>
             <p className="text-lg md:text-xl font-light text-cream/60 leading-relaxed mb-6">
-              Imagine an 18-floor masterpiece where **two floors equal one villa**. Amidst a landscape of traditional villas, The SIL stands as the only tower—a soaring statement of exclusivity in Tukkuguda.
+              Imagine an 18-floor masterpiece where **two floors equal one villa**. Amidst a landscape of traditional villas, SYL stands as the only tower—a soaring statement of exclusivity in Tukkuguda.
             </p>
             
             <div className="grid grid-cols-2 gap-6 mb-8">
@@ -625,7 +625,7 @@ const TheSIL = ({ isSubscribed, onNewsletterClick, isFullPage = false }: { isSub
 };
 
 const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewsletterClick: () => void }> = ({ sanctuary, isSubscribed, onNewsletterClick }) => {
-  const isGated = sanctuary.id === 'the-sil' && !isSubscribed;
+  const isGated = sanctuary.id === 'syl' && !isSubscribed;
 
   return (
     <motion.div 
@@ -636,7 +636,7 @@ const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewslet
         <div className="absolute inset-0 z-10 bg-surface/60 backdrop-blur-sm flex flex-col items-center justify-center p-8 text-center">
           <Shield className="w-12 h-12 text-primary mb-6" />
           <h4 className="text-2xl font-headline font-bold text-on-surface mb-4">Locked Landmark.</h4>
-          <p className="text-xs text-secondary mb-8 max-w-[200px]">Sign up for our newsletter to view the SIL details.</p>
+          <p className="text-xs text-secondary mb-8 max-w-[200px]">Sign up for our newsletter to view the SYL details.</p>
           <button 
             onClick={onNewsletterClick}
             className="px-6 py-3 bg-primary text-on-primary text-[9px] uppercase tracking-widest font-bold rounded-lg"
@@ -658,7 +658,7 @@ const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewslet
         />
         <div className="absolute top-6 left-6">
           <div className="bg-primary text-on-primary px-4 py-1 text-[9px] uppercase tracking-[0.4em] font-bold rounded-full">
-            {sanctuary.id === 'the-sil' ? 'Upcoming' : 'Live'}
+            {sanctuary.id === 'syl' ? 'Upcoming' : 'Live'}
           </div>
         </div>
       </div>
@@ -1054,7 +1054,7 @@ const SanctuaryMapLayout = () => {
     { lat: 17.33, lng: 78.58, strength: 0.60 }, // Mahavir Harina Vanasthali
     { lat: 17.52, lng: 78.33, strength: 0.65 }, // Ameenpur Lake biodiversity site
     { lat: 17.31, lng: 77.85, strength: 0.65 }, // Ananthagiri Hills
-    { lat: 17.24, lng: 78.48, strength: 0.55 }, // Tukkuguda green belt        ← The SIL
+    { lat: 17.24, lng: 78.48, strength: 0.55 }, // Tukkuguda green belt        ← SYL
   ];
 
   // ── Net AQI intensity: range -0.5 (very clean/blue) → +1.0 (polluted/red)
@@ -1473,9 +1473,9 @@ const SanctuaryMapLayout = () => {
       description: "A forest-peripheral sanctuary nestled within the dense Narsapur reserve forest canopy."
     },
     {
-      id: "the-sil",
+      id: "syl",
       type: 'sanctuary',
-      title: "The SIL",
+      title: "SYL",
       location: "Tukkuguda (Future City)",
       coords: [17.24, 78.48] as [number, number],
       aqi: 22,
@@ -2045,7 +2045,7 @@ const NewsletterModal = ({ isOpen, onClose, onSubscribe }: { isOpen: boolean, on
                 {isSubmitting ? "Authenticating..." : "Join Newsletter & Unlock"}
               </button>
               <p className="text-[8px] uppercase tracking-[0.3em] text-olive-800/30 text-center">
-                Unlocks access to The SIL and future landmarks.
+                Unlocks access to SYL and future landmarks.
               </p>
             </form>
           </motion.div>
@@ -2136,7 +2136,7 @@ const Footer = () => {
               <Logo className="w-10 h-10 text-cream" />
             </div>
             <p className="text-xl font-light text-cream/30 max-w-md leading-relaxed">
-              Independent collective curating India's most exclusive organic sanctuaries. Featuring MODCON Agartha and The SIL at Tukkuguda.
+              Independent collective curating India's most exclusive organic sanctuaries. Featuring MODCON Agartha and SYL at Tukkuguda.
             </p>
           </div>
           
@@ -2147,7 +2147,7 @@ const Footer = () => {
               <li><a href="#ecosystems" className="hover:text-cream transition-all">Ecosystems</a></li>
               <li><a href="#map" className="hover:text-cream transition-all">Map</a></li>
               <li><a href="#agartha" className="hover:text-cream transition-all">Agartha</a></li>
-              <li><a href="#the-sil" className="hover:text-cream transition-all">The SIL</a></li>
+              <li><a href="#syl" className="hover:text-cream transition-all">SYL</a></li>
               <li><a href="#apply" className="hover:text-cream transition-all">Apply</a></li>
             </ul>
           </div>
@@ -2862,8 +2862,8 @@ const AdminDashboard = ({ onClose, user }: { onClose: () => void; user: User }) 
 // ─── App ─────────────────────────────────────────────────────────────────────
 
 export default function App() {
-  type ViewMode = 'home' | 'map' | 'list' | 'gallery' | 'analytics' | 'the-sil' | 'admin';
-  const VIEW_ORDER: ViewMode[] = ['home', 'list', 'gallery', 'analytics', 'the-sil', 'map'];
+  type ViewMode = 'home' | 'map' | 'list' | 'gallery' | 'analytics' | 'syl' | 'admin';
+  const VIEW_ORDER: ViewMode[] = ['home', 'list', 'gallery', 'analytics', 'syl', 'map'];
 
   const [authUser, setAuthUser]   = useState<User | null>(null);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -2961,7 +2961,7 @@ export default function App() {
               {viewMode === 'list' && <Sanctuaries isSubscribed={isSubscribed} onNewsletterClick={() => setIsNewsletterOpen(true)} isFullPage />}
               {viewMode === 'gallery' && <EcosystemPillars isFullPage />}
               {viewMode === 'analytics' && <Advantage isFullPage />}
-              {viewMode === 'the-sil' && <TheSIL isSubscribed={isSubscribed} onNewsletterClick={() => setIsNewsletterOpen(true)} isFullPage />}
+              {viewMode === 'syl' && <TheSIL isSubscribed={isSubscribed} onNewsletterClick={() => setIsNewsletterOpen(true)} isFullPage />}
             </div>
           )}
         </div>
