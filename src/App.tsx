@@ -189,7 +189,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
   const avatarLetter = (authUser?.displayName?.[0] || authUser?.email?.[0] || authUser?.phoneNumber?.[1] || '?').toUpperCase();
 
   return (
-    <nav className="relative z-50 px-6 md:px-10 flex items-center justify-between h-16 md:h-20 bg-cream border-b border-outline/10">
+    <nav className="relative z-[9990] px-6 md:px-10 flex items-center justify-between h-16 md:h-20 bg-cream border-b border-outline/10">
       {/* Left: Brand only */}
       <Logo className="w-7 h-7" textClassName="text-base md:text-lg" />
 
@@ -231,7 +231,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsMenuOpen(false)}
-              className="fixed inset-0 bg-black/60 backdrop-blur-md z-[55]"
+              className="fixed inset-0 bg-black/60 backdrop-blur-md z-[9999]"
             />
 
             <motion.div
@@ -240,7 +240,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: '-100%' }}
               transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-              className="fixed top-0 left-0 right-0 bg-surface z-[60] flex flex-col p-8 md:p-16 shadow-2xl rounded-b-[40px] max-h-[95vh] overflow-y-auto"
+              className="fixed top-0 left-0 right-0 bg-surface z-[10000] flex flex-col p-8 md:p-16 shadow-2xl rounded-b-[40px] max-h-[95vh] overflow-y-auto"
             >
               {/* Panel header */}
               <div className="flex items-center justify-between mb-12">
@@ -3582,7 +3582,10 @@ export default function App() {
       <main className="flex-1 flex overflow-hidden relative">
         {/* Center - Map or other views */}
         <div className="flex-1 relative overflow-hidden bg-surface">
-          {viewMode === 'map' && <SanctuaryMapLayout />}
+          {/* Map is always mounted to preserve Leaflet pan/zoom/filter state */}
+          <div className={viewMode === 'map' ? 'h-full w-full' : 'hidden'}>
+            <SanctuaryMapLayout />
+          </div>
           {viewMode === 'admin' && authUser && <AdminDashboard onClose={() => handleViewChange('home')} user={authUser} />}
           {viewMode !== 'map' && viewMode !== 'admin' && (
             <div ref={scrollRef} className="h-full w-full overflow-y-auto">
