@@ -1208,6 +1208,98 @@ const AGARTHA_HOTSPOTS: Hotspot[] = [
   },
 ];
 
+// ─── Agartha: 53 individual plot dots ────────────────────────────────────────
+// Positions (x%, y%) map onto the portrait site plan image.
+// Sizes reflect the actual MODCON plot range (808–5,097 sq yds).
+// Plot 15 = landmark premium corner (dual forest frontage, 5,097 sq yds).
+
+interface PlotDot { id: number; sqYds: number; x: number; y: number }
+
+const AGARTHA_PLOTS: PlotDot[] = [
+  // ── North outer arc (near Grand Entry boulevard) ──
+  { id:1,  sqYds:1050, x:22, y:22 },
+  { id:2,  sqYds:980,  x:30, y:18 },
+  { id:3,  sqYds:920,  x:38, y:16 },
+  { id:4,  sqYds:900,  x:46, y:17 },
+  { id:5,  sqYds:950,  x:54, y:19 },
+  { id:6,  sqYds:1100, x:62, y:22 },
+  // ── North-East outer ──
+  { id:7,  sqYds:1300, x:70, y:26 },
+  { id:8,  sqYds:1400, x:76, y:32 },
+  { id:9,  sqYds:1500, x:79, y:38 },
+  { id:10, sqYds:1550, x:80, y:44 },
+  { id:11, sqYds:1600, x:79, y:50 },
+  { id:12, sqYds:1500, x:77, y:56 },
+  // ── South-East outer ──
+  { id:13, sqYds:1800, x:73, y:62 },
+  { id:14, sqYds:2000, x:68, y:68 },
+  // ── PLOT 15 — Premium Corner (largest, dual forest frontage) ──
+  { id:15, sqYds:5097, x:14, y:72 },
+  // ── South arc ──
+  { id:16, sqYds:2200, x:62, y:75 },
+  { id:17, sqYds:1900, x:54, y:79 },
+  { id:18, sqYds:1700, x:46, y:81 },
+  { id:19, sqYds:1500, x:38, y:80 },
+  { id:20, sqYds:1350, x:30, y:77 },
+  // ── South-West outer (forest edge) ──
+  { id:21, sqYds:1800, x:24, y:73 },
+  { id:22, sqYds:2400, x:18, y:67 },
+  { id:23, sqYds:2800, x:13, y:61 },
+  // ── West outer (Narsapur forest buffer boundary) ──
+  { id:24, sqYds:3200, x:11, y:54 },
+  { id:25, sqYds:2900, x:9,  y:47 },
+  { id:26, sqYds:2600, x:11, y:40 },
+  // ── North-West outer ──
+  { id:27, sqYds:1700, x:15, y:33 },
+  { id:28, sqYds:1400, x:19, y:26 },
+  { id:29, sqYds:1200, x:15, y:19 },
+  // ── North inner ring ──
+  { id:30, sqYds:870,  x:29, y:30 },
+  { id:31, sqYds:850,  x:36, y:27 },
+  { id:32, sqYds:840,  x:43, y:26 },
+  { id:33, sqYds:855,  x:50, y:28 },
+  { id:34, sqYds:900,  x:57, y:31 },
+  { id:35, sqYds:940,  x:63, y:35 },
+  // ── East inner ring ──
+  { id:36, sqYds:960,  x:66, y:40 },
+  { id:37, sqYds:970,  x:67, y:46 },
+  { id:38, sqYds:980,  x:66, y:52 },
+  { id:39, sqYds:1000, x:63, y:57 },
+  // ── South-East inner ──
+  { id:40, sqYds:1050, x:58, y:62 },
+  { id:41, sqYds:1100, x:52, y:65 },
+  { id:42, sqYds:1150, x:45, y:66 },
+  { id:43, sqYds:1120, x:38, y:64 },
+  // ── South-West inner ──
+  { id:44, sqYds:1080, x:32, y:61 },
+  { id:45, sqYds:1020, x:27, y:57 },
+  { id:46, sqYds:990,  x:25, y:51 },
+  { id:47, sqYds:960,  x:26, y:45 },
+  // ── West inner ──
+  { id:48, sqYds:940,  x:27, y:38 },
+  { id:49, sqYds:920,  x:21, y:40 },
+  { id:50, sqYds:908,  x:21, y:47 },
+  { id:51, sqYds:915,  x:22, y:54 },
+  // ── NW inner + smallest plots ──
+  { id:52, sqYds:880,  x:25, y:34 },
+  { id:53, sqYds:808,  x:33, y:36 },
+];
+
+const AGARTHA_OLD_RATE = 6199;   // ₹/sq yd — VIP pre-launch rate (2 yrs ago)
+const AGARTHA_NOW_RATE = 7999;   // ₹/sq yd — current rate
+
+/** dot diameter: scales linearly from 7px (808 sq yd) to 18px (5097 sq yd) */
+const plotDotSize = (sqYds: number) =>
+  7 + ((sqYds - 808) / (5097 - 808)) * 11;
+
+const formatRs = (rs: number) =>
+  rs >= 1e7 ? `₹${(rs / 1e7).toFixed(2)} Cr` : `₹${(rs / 1e5).toFixed(1)} L`;
+
+/** lookup: sanctuary id → its 53 plot dots */
+const SANCTUARY_PLOTS: Record<string, PlotDot[]> = {
+  agartha: AGARTHA_PLOTS,
+};
+
 /**
  * SANCTUARY_HOTSPOTS — maps sanctuary id → its interactive site plan dots.
  * Add any new property here when it has a site plan.
@@ -1676,12 +1768,15 @@ const featureIcon = (f: string) => {
 };
 
 const PropertyDetailOverlay = ({ sanctuary, onClose }: { sanctuary: Sanctuary, onClose: () => void }) => {
-  const hotspots = SANCTUARY_HOTSPOTS[sanctuary.id] ?? null;
-  const [activeSpot, setActiveSpot] = useState<Hotspot | null>(hotspots?.[0] ?? null);
-  const [leadName, setLeadName] = useState('');
-  const [leadPhone, setLeadPhone] = useState('');
+  const hotspots  = SANCTUARY_HOTSPOTS[sanctuary.id] ?? null;
+  const plotDots  = SANCTUARY_PLOTS[sanctuary.id]    ?? null;
+  const [activeSpot, setActiveSpot]   = useState<Hotspot | null>(hotspots?.[0] ?? null);
+  const [activePlot, setActivePlot]   = useState<PlotDot | null>(null);
+  const [mapMode, setMapMode]         = useState<'plots' | 'features'>(plotDots ? 'plots' : 'features');
+  const [leadName, setLeadName]       = useState('');
+  const [leadPhone, setLeadPhone]     = useState('');
   const [leadSubmitted, setLeadSubmitted] = useState(false);
-  const [leadLoading, setLeadLoading] = useState(false);
+  const [leadLoading, setLeadLoading]    = useState(false);
 
   // Parse "45 mins to Financial District" → { time: '45m', dest: 'Fin. District' }
   const commuteTime = sanctuary.commute.match(/\d+/)?.[0] ?? '—';
@@ -1805,65 +1900,223 @@ const PropertyDetailOverlay = ({ sanctuary, onClose }: { sanctuary: Sanctuary, o
             </div>
           )}
 
-          {/* ── Interactive Site Plan (shown when property has a site plan) ── */}
-          {sanctuary.sitePlanSrc && hotspots && (
+          {/* ── Interactive Site Plan ── */}
+          {sanctuary.sitePlanSrc && (plotDots || hotspots) && (
             <div>
-              <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold mb-4">Interactive Site Plan</p>
-              <div className="rounded-2xl overflow-hidden border border-outline/10 bg-[#0a0f07]">
-                {/* Map image with dots */}
-                <div className="relative">
-                  <img src={sanctuary.sitePlanSrc} alt="Site plan"
-                    className="w-full h-auto object-contain" referrerPolicy="no-referrer" />
-                  {hotspots.map(h => {
-                    const isActive = activeSpot?.id === h.id;
-                    return (
-                      <button key={h.id}
-                        style={{ left: `${h.x}%`, top: `${h.y}%` }}
-                        className="absolute -translate-x-1/2 -translate-y-1/2"
-                        onClick={() => setActiveSpot(h)}>
-                        <span className={cn(
-                          "relative block rounded-full border-2 border-white shadow-lg transition-all duration-200",
-                          isActive ? "w-4 h-4 bg-primary scale-125" : "w-3 h-3 bg-white/60 hover:bg-white hover:scale-125"
-                        )} />
-                        {isActive && <span className="absolute inset-0 rounded-full bg-primary/50 animate-ping pointer-events-none" />}
-                      </button>
-                    );
-                  })}
-                </div>
-                {/* Feature chip row */}
-                <div className="flex gap-2 overflow-x-auto px-4 py-3 border-t border-white/5 no-scrollbar">
-                  {hotspots.map(h => (
-                    <button key={h.id} onClick={() => setActiveSpot(h)}
-                      className={cn(
-                        "flex-shrink-0 text-[8px] uppercase tracking-widest font-bold px-3 py-1.5 rounded-full border transition-all",
-                        activeSpot?.id === h.id
-                          ? "bg-primary border-primary text-on-primary"
-                          : "border-white/15 text-white/40 hover:border-primary/40 hover:text-primary"
-                      )}>
-                      {h.label.split(' ').slice(0, 2).join(' ')}
+              {/* Section header + mode toggle */}
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold">
+                  {mapMode === 'plots' ? `Site Plan — ${plotDots?.length ?? 0} Plots` : 'Site Plan — Features'}
+                </p>
+                {plotDots && hotspots && (
+                  <div className="flex rounded-full border border-outline/15 overflow-hidden text-[8px] uppercase tracking-widest font-bold">
+                    <button onClick={() => setMapMode('plots')}
+                      className={cn("px-3 py-1.5 transition-all",
+                        mapMode === 'plots' ? "bg-primary text-on-primary" : "text-secondary/50 hover:text-secondary")}>
+                      Plots
                     </button>
-                  ))}
-                </div>
-                {/* Active hotspot info */}
-                {activeSpot && (
-                  <AnimatePresence mode="wait">
-                    <motion.div key={activeSpot.id}
-                      initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-                      transition={{ duration: 0.15 }}
-                      className="px-5 py-4 border-t border-white/5 space-y-2">
-                      <p className="text-[8px] uppercase tracking-[0.4em] text-primary/60 font-bold">{activeSpot.tag}</p>
-                      <h4 className="text-sm font-headline font-bold text-white">{activeSpot.label}</h4>
-                      <p className="text-[11px] text-white/50 leading-relaxed">{activeSpot.detail}</p>
-                      <div className="grid grid-cols-3 gap-2 pt-1">
-                        {activeSpot.stats.map(s => (
-                          <div key={s.label} className="bg-white/5 rounded-lg px-2 py-2 text-center">
-                            <p className="text-[7px] uppercase tracking-wider text-white/30 font-bold mb-0.5">{s.label}</p>
-                            <p className="text-[10px] font-bold text-white">{s.value}</p>
-                          </div>
-                        ))}
+                    <button onClick={() => setMapMode('features')}
+                      className={cn("px-3 py-1.5 transition-all",
+                        mapMode === 'features' ? "bg-primary text-on-primary" : "text-secondary/50 hover:text-secondary")}>
+                      Features
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <div className="rounded-2xl overflow-hidden border border-outline/10 bg-[#0a0f07]">
+
+                {/* ── PLOTS MODE ── */}
+                {mapMode === 'plots' && plotDots && (
+                  <>
+                    {/* Map with 53 sized dots */}
+                    <div className="relative">
+                      <img src={sanctuary.sitePlanSrc} alt="Site plan"
+                        className="w-full h-auto object-contain" referrerPolicy="no-referrer" />
+
+                      {/* Investor legend strip at top of image */}
+                      <div className="absolute top-2 left-2 right-2 flex items-center gap-2 flex-wrap">
+                        <span className="bg-black/60 backdrop-blur-sm text-[7px] uppercase tracking-widest font-bold text-white/70 px-2 py-1 rounded-full">
+                          Tap a plot to see its investment snapshot
+                        </span>
                       </div>
-                    </motion.div>
-                  </AnimatePresence>
+
+                      {plotDots.map(p => {
+                        const sz     = plotDotSize(p.sqYds);
+                        const isActive = activePlot?.id === p.id;
+                        const isPremium = p.sqYds >= 3000;
+                        const isLandmark = p.id === 15;
+                        return (
+                          <button
+                            key={p.id}
+                            style={{
+                              left: `${p.x}%`, top: `${p.y}%`,
+                              width: sz, height: sz,
+                            }}
+                            className={cn(
+                              "absolute -translate-x-1/2 -translate-y-1/2 rounded-full border transition-all duration-150 shadow-md",
+                              isLandmark
+                                ? "border-amber-400 bg-amber-400/90 scale-110"
+                                : isPremium
+                                ? "border-amber-500/80 bg-amber-500/70"
+                                : isActive
+                                ? "border-primary bg-primary scale-125"
+                                : "border-primary/80 bg-primary/60 hover:bg-primary hover:scale-110"
+                            )}
+                            onClick={() => setActivePlot(isActive ? null : p)}
+                          >
+                            {isActive && (
+                              <span className="absolute inset-0 rounded-full bg-primary/40 animate-ping pointer-events-none" />
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Legend */}
+                    <div className="flex items-center gap-4 px-4 py-2.5 border-t border-white/5">
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-2.5 h-2.5 rounded-full bg-primary/70 border border-primary/80" />
+                        <span className="text-[8px] text-white/40 uppercase tracking-wider font-bold">Standard</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-3.5 h-3.5 rounded-full bg-amber-500/70 border border-amber-500/80" />
+                        <span className="text-[8px] text-white/40 uppercase tracking-wider font-bold">Premium (3,000+ sq yds)</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-4 h-4 rounded-full bg-amber-400/90 border border-amber-400" />
+                        <span className="text-[8px] text-amber-400/80 uppercase tracking-wider font-bold">Plot 15</span>
+                      </div>
+                    </div>
+
+                    {/* Investment snapshot — shown when plot is tapped */}
+                    <AnimatePresence mode="wait">
+                      {activePlot && (() => {
+                        const oldVal  = activePlot.sqYds * AGARTHA_OLD_RATE;
+                        const nowVal  = activePlot.sqYds * AGARTHA_NOW_RATE;
+                        const gain    = nowVal - oldVal;
+                        const pct     = ((gain / oldVal) * 100).toFixed(1);
+                        const annPct  = (parseFloat(pct) / 2).toFixed(1);
+                        return (
+                          <motion.div
+                            key={activePlot.id}
+                            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 4 }}
+                            transition={{ duration: 0.18 }}
+                            className="border-t border-white/8 bg-[#0d1409]"
+                          >
+                            {/* Plot header */}
+                            <div className="flex items-start justify-between px-5 pt-4 pb-3">
+                              <div>
+                                <p className="text-[8px] uppercase tracking-[0.5em] text-primary/50 font-bold">
+                                  Plot {activePlot.id} · {activePlot.sqYds.toLocaleString('en-IN')} sq yds
+                                  {activePlot.id === 15 && <span className="ml-2 text-amber-400">★ Premium Corner</span>}
+                                </p>
+                                <p className="text-xl font-headline font-bold text-white mt-0.5">{formatRs(nowVal)}</p>
+                                <p className="text-[10px] text-white/40">at ₹{AGARTHA_NOW_RATE.toLocaleString('en-IN')}/sq yd</p>
+                              </div>
+                              <button onClick={() => setActivePlot(null)} className="p-1.5 rounded-full bg-white/5 hover:bg-white/10 transition-all mt-0.5">
+                                <X className="w-3 h-3 text-white/40" />
+                              </button>
+                            </div>
+
+                            {/* Price comparison bar */}
+                            <div className="px-5 pb-3">
+                              <div className="rounded-xl bg-white/4 border border-white/5 overflow-hidden">
+                                {/* Two-year-ago row */}
+                                <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
+                                  <div>
+                                    <p className="text-[8px] uppercase tracking-widest text-white/30 font-bold">VIP Pre-Launch · 2022</p>
+                                    <p className="text-base font-headline font-bold text-white/60 mt-0.5">{formatRs(oldVal)}</p>
+                                  </div>
+                                  <p className="text-[9px] text-white/30">₹{AGARTHA_OLD_RATE.toLocaleString('en-IN')}/sq yd</p>
+                                </div>
+                                {/* Current row */}
+                                <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
+                                  <div>
+                                    <p className="text-[8px] uppercase tracking-widest text-primary/60 font-bold">Today · 2024</p>
+                                    <p className="text-base font-headline font-bold text-white mt-0.5">{formatRs(nowVal)}</p>
+                                  </div>
+                                  <p className="text-[9px] text-primary/60">₹{AGARTHA_NOW_RATE.toLocaleString('en-IN')}/sq yd</p>
+                                </div>
+                                {/* Gain row */}
+                                <div className="px-4 py-3 bg-primary/8 flex items-center justify-between">
+                                  <div className="flex items-center gap-2">
+                                    <TrendingDown className="w-4 h-4 text-primary rotate-180" />
+                                    <div>
+                                      <p className="text-[8px] uppercase tracking-widest text-primary/70 font-bold">Early Investor Gain</p>
+                                      <p className="text-lg font-headline font-bold text-primary">{formatRs(gain)}</p>
+                                    </div>
+                                  </div>
+                                  <div className="text-right">
+                                    <p className="text-xl font-headline font-bold text-primary">+{pct}%</p>
+                                    <p className="text-[9px] text-primary/50">in 2 years</p>
+                                    <p className="text-[9px] text-primary/40">({annPct}% p.a.)</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Context copy */}
+                            <div className="px-5 pb-4">
+                              <p className="text-[10px] text-white/35 leading-relaxed">
+                                An investor who booked this exact plot at pre-launch in 2022 has seen a paper gain of <span className="text-primary/70 font-bold">{formatRs(gain)}</span> without doing anything — simply because Agartha's land value grew <span className="text-primary/70 font-bold">+{pct}% in 2 years</span>. Today's buyers get the same compounding advantage for the next cycle.
+                              </p>
+                            </div>
+                          </motion.div>
+                        );
+                      })()}
+                    </AnimatePresence>
+                  </>
+                )}
+
+                {/* ── FEATURES MODE ── */}
+                {mapMode === 'features' && hotspots && (
+                  <>
+                    <div className="relative">
+                      <img src={sanctuary.sitePlanSrc} alt="Site plan"
+                        className="w-full h-auto object-contain" referrerPolicy="no-referrer" />
+                      {hotspots.map(h => {
+                        const isActive = activeSpot?.id === h.id;
+                        return (
+                          <button key={h.id} style={{ left: `${h.x}%`, top: `${h.y}%` }}
+                            className="absolute -translate-x-1/2 -translate-y-1/2" onClick={() => setActiveSpot(h)}>
+                            <span className={cn(
+                              "relative block rounded-full border-2 border-white shadow-lg transition-all duration-200",
+                              isActive ? "w-4 h-4 bg-primary scale-125" : "w-3 h-3 bg-white/60 hover:bg-white hover:scale-125"
+                            )} />
+                            {isActive && <span className="absolute inset-0 rounded-full bg-primary/50 animate-ping pointer-events-none" />}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <div className="flex gap-2 overflow-x-auto px-4 py-3 border-t border-white/5 no-scrollbar">
+                      {hotspots.map(h => (
+                        <button key={h.id} onClick={() => setActiveSpot(h)}
+                          className={cn("flex-shrink-0 text-[8px] uppercase tracking-widest font-bold px-3 py-1.5 rounded-full border transition-all",
+                            activeSpot?.id === h.id ? "bg-primary border-primary text-on-primary" : "border-white/15 text-white/40 hover:border-primary/40 hover:text-primary")}>
+                          {h.label.split(' ').slice(0, 2).join(' ')}
+                        </button>
+                      ))}
+                    </div>
+                    {activeSpot && (
+                      <AnimatePresence mode="wait">
+                        <motion.div key={activeSpot.id} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                          transition={{ duration: 0.15 }} className="px-5 py-4 border-t border-white/5 space-y-2">
+                          <p className="text-[8px] uppercase tracking-[0.4em] text-primary/60 font-bold">{activeSpot.tag}</p>
+                          <h4 className="text-sm font-headline font-bold text-white">{activeSpot.label}</h4>
+                          <p className="text-[11px] text-white/50 leading-relaxed">{activeSpot.detail}</p>
+                          <div className="grid grid-cols-3 gap-2 pt-1">
+                            {activeSpot.stats.map(s => (
+                              <div key={s.label} className="bg-white/5 rounded-lg px-2 py-2 text-center">
+                                <p className="text-[7px] uppercase tracking-wider text-white/30 font-bold mb-0.5">{s.label}</p>
+                                <p className="text-[10px] font-bold text-white">{s.value}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </motion.div>
+                      </AnimatePresence>
+                    )}
+                  </>
                 )}
               </div>
             </div>
