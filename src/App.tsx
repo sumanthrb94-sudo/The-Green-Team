@@ -3824,20 +3824,24 @@ const TrustSignals = () => {
         </motion.div>
         
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 opacity-60 grayscale hover:grayscale-0 transition-all duration-700">
-          <div className="flex items-center justify-center h-20">
-            <h3 className="font-headline font-bold text-xl tracking-widest uppercase">Forbes</h3>
+          <div className="flex flex-col items-center justify-center h-20 gap-1">
+            <h3 className="font-headline font-bold text-xl tracking-widest uppercase">MODCON</h3>
+            <p className="text-[8px] uppercase tracking-widest text-olive-800/50">Builders</p>
           </div>
-          <div className="flex items-center justify-center h-20">
-            <h3 className="font-headline font-bold text-xl tracking-widest uppercase">Vogue</h3>
+          <div className="flex flex-col items-center justify-center h-20 gap-1">
+            <h3 className="font-headline font-bold text-xl tracking-widest uppercase">Agartha</h3>
+            <p className="text-[8px] uppercase tracking-widest text-olive-800/50">Forest Community</p>
           </div>
-          <div className="flex items-center justify-center h-20">
-            <h3 className="font-headline font-bold text-xl tracking-widest uppercase">ArchDigest</h3>
+          <div className="flex flex-col items-center justify-center h-20 gap-1">
+            <h3 className="font-headline font-bold text-xl tracking-widest uppercase">Griha</h3>
+            <p className="text-[8px] uppercase tracking-widest text-olive-800/50">Telangana Homes</p>
           </div>
-          <div className="flex items-center justify-center h-20">
-            <h3 className="font-headline font-bold text-xl tracking-widest uppercase">Bloomberg</h3>
+          <div className="flex flex-col items-center justify-center h-20 gap-1">
+            <h3 className="font-headline font-bold text-xl tracking-widest uppercase">Vastu</h3>
+            <p className="text-[8px] uppercase tracking-widest text-olive-800/50">Hyderabad Realty</p>
           </div>
         </div>
-        
+
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }} className="mt-20 p-12 bg-cream/30 rounded-3xl border border-olive-800/5 relative shadow-sm">
           <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-surface w-12 h-12 rounded-full flex items-center justify-center text-gold shadow-sm border border-olive-800/10">
             <span className="text-3xl font-serif leading-none mt-2">"</span>
@@ -3847,11 +3851,11 @@ const TrustSignals = () => {
           </p>
           <div className="flex items-center justify-center gap-4">
             <div className="w-10 h-10 rounded-full overflow-hidden bg-olive-800/20 border-2 border-white">
-              <img src="https://picsum.photos/seed/ark/100/100" alt="Member" className="w-full h-full object-cover" />
+              <img src="https://picsum.photos/seed/kushal/100/100" alt="Member" className="w-full h-full object-cover" />
             </div>
             <div className="text-left">
-              <p className="font-bold text-olive-900 text-sm uppercase tracking-wider">A. R. Krishnan</p>
-              <p className="text-[10px] text-olive-800/60 uppercase tracking-widest font-bold">Early Member, Agartha</p>
+              <p className="font-bold text-olive-900 text-sm uppercase tracking-wider">Kushal</p>
+              <p className="text-[10px] text-olive-800/60 uppercase tracking-widest font-bold">Lead Developer, BHEL · Early Member, Agartha</p>
             </div>
           </div>
         </motion.div>
