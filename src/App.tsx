@@ -3492,7 +3492,7 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
   );
 };
 
-const Sanctuaries = ({ isSubscribed, onNewsletterClick, isFullPage = false }: { isSubscribed: boolean, onNewsletterClick: () => void, isFullPage?: boolean }) => {
+const Sanctuaries = ({ isSubscribed, onNewsletterClick, isFullPage = false, sanctuaries = SANCTUARIES }: { isSubscribed: boolean, onNewsletterClick: () => void, isFullPage?: boolean, sanctuaries?: Sanctuary[] }) => {
   const [selectedSanctuary, setSelectedSanctuary] = useState<Sanctuary | null>(null);
 
 
@@ -3513,7 +3513,7 @@ const Sanctuaries = ({ isSubscribed, onNewsletterClick, isFullPage = false }: { 
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
-          {allSanctuaries.map(s => (
+          {sanctuaries.map(s => (
             <SanctuaryCard
               key={s.id}
               sanctuary={s}
@@ -4075,12 +4075,12 @@ const ChatBot = ({ data }: { data: any }) => {
   );
 };
 
-const HomeView = ({ isSubscribed, onNewsletterClick }: { isSubscribed: boolean, onNewsletterClick: () => void }) => (
+const HomeView = ({ isSubscribed, onNewsletterClick, sanctuaries = SANCTUARIES }: { isSubscribed: boolean, onNewsletterClick: () => void, sanctuaries?: Sanctuary[] }) => (
   <div className="flex flex-col">
     <Hero />
     <Advantage />
     <EcosystemPillars />
-    <Sanctuaries isSubscribed={isSubscribed} onNewsletterClick={onNewsletterClick} />
+    <Sanctuaries isSubscribed={isSubscribed} onNewsletterClick={onNewsletterClick} sanctuaries={sanctuaries} />
     <TheSIL isSubscribed={isSubscribed} onNewsletterClick={onNewsletterClick} />
     <TrustSignals />
     <NewsletterHighlight onSubscribe={onNewsletterClick} />
@@ -4640,8 +4640,8 @@ export default function App() {
           </div>
           {viewMode !== 'map' && (
             <div ref={scrollRef} className="h-full w-full overflow-y-auto">
-              {viewMode === 'home' && <HomeView isSubscribed={effectivelySubscribed} onNewsletterClick={() => { if (!effectivelySubscribed) setIsNewsletterOpen(true); }} />}
-              {viewMode === 'list' && <Sanctuaries isSubscribed={effectivelySubscribed} onNewsletterClick={() => { if (!effectivelySubscribed) setIsNewsletterOpen(true); }} isFullPage />}
+              {viewMode === 'home' && <HomeView isSubscribed={effectivelySubscribed} onNewsletterClick={() => { if (!effectivelySubscribed) setIsNewsletterOpen(true); }} sanctuaries={allSanctuaries} />}
+              {viewMode === 'list' && <Sanctuaries isSubscribed={effectivelySubscribed} onNewsletterClick={() => { if (!effectivelySubscribed) setIsNewsletterOpen(true); }} isFullPage sanctuaries={allSanctuaries} />}
               {viewMode === 'gallery' && <EcosystemPillars isFullPage />}
               {viewMode === 'analytics' && <Advantage isFullPage />}
               {viewMode === 'syl' && <TheSIL isSubscribed={effectivelySubscribed} onNewsletterClick={() => { if (!effectivelySubscribed) setIsNewsletterOpen(true); }} isFullPage />}
