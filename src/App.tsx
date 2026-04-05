@@ -58,6 +58,8 @@ import type { User, ConfirmationResult } from 'firebase/auth';
 import { auth, googleProvider } from './lib/firebase';
 import { saveLead, saveNewsletter, getLeads, getNewsletterSubs } from './lib/leads';
 import type { Lead, NewsletterEntry } from './lib/leads';
+import { subscribeProperties, createProperty, updateProperty, deleteProperty } from './lib/properties';
+import type { PropertyDoc, PropertyInput } from './lib/properties';
 
 // Fix Leaflet icon issue
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
@@ -169,7 +171,7 @@ const Logo = ({ className = "w-10 h-10", textClassName = "text-xl md:text-2xl", 
   </div>
 );
 
-const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDark, onSignInClick, authUser, onSignOut }: {
+const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDark, onSignInClick, authUser, onSignOut, isAdmin, onAdminClick }: {
   isSubscribed: boolean;
   onNewsletterClick: () => void;
   onModeChange: (mode: any) => void;
@@ -178,6 +180,8 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
   onSignInClick: () => void;
   authUser: User | null;
   onSignOut: () => void;
+  isAdmin: boolean;
+  onAdminClick: () => void;
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -198,7 +202,15 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
       {/* Left: Brand only */}
       <Logo className="w-7 h-7" textClassName="text-base md:text-lg" />
 
-      {/* Right: single trigger — avatar (logged in) or hamburger (logged out) */}
+      {/* Right: admin badge (admin only) + menu/avatar trigger */}
+      <div className="flex items-center gap-2">
+        {isAdmin && (
+          <button onClick={onAdminClick}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary text-[8px] uppercase tracking-widest font-bold rounded-full hover:bg-primary/20 transition-all"
+          >
+            <ShieldCheck className="w-3 h-3" /> Admin
+          </button>
+        )}
       <button
         onClick={() => setIsMenuOpen(!isMenuOpen)}
         aria-label="Open menu"
@@ -225,6 +237,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
           </div>
         )}
       </button>
+      </div>
 
       {/* Full-screen menu overlay */}
       <AnimatePresence>
@@ -296,9 +309,17 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
                         )}
                         <div>
                           <p className="text-sm font-bold text-on-surface truncate max-w-[180px]">{authUser.displayName || authUser.email || authUser.phoneNumber}</p>
-                          <p className="text-[10px] uppercase tracking-widest text-secondary/60 mt-0.5">Member</p>
+                          <p className="text-[10px] uppercase tracking-widest text-secondary/60 mt-0.5">{isAdmin ? 'Admin' : 'Member'}</p>
                         </div>
                       </div>
+                      {isAdmin && (
+                        <button
+                          onClick={() => { setIsMenuOpen(false); onAdminClick(); }}
+                          className="w-full text-[11px] uppercase tracking-[0.5em] font-bold bg-primary/10 text-primary border-2 border-primary/20 px-8 py-4 hover:bg-primary hover:text-on-primary hover:border-primary transition-all rounded-2xl flex items-center justify-center gap-3"
+                        >
+                          <ShieldCheck className="w-4 h-4" /> Admin Dashboard
+                        </button>
+                      )}
                       <button
                         onClick={() => {
                           setIsMenuOpen(false);
@@ -1211,6 +1232,440 @@ const AagarthaInteractiveLayout: FC<{ onClose: () => void }> = ({ onClose }) => 
 
 // ─────────────────────────────────────────────────────────────────────────────
 
+// ─── Admin ────────────────────────────────────────────────────────────────────
+const ADMIN_EMAIL = 'sumanthbolla97@gmail.com';
+
+const EMPTY_FORM: PropertyInput = {
+  title: '', location: '', lat: undefined, lng: undefined,
+  aqi: 12, noise: 18, commute: '',
+  valuation: '', memberPrice: '', image: '',
+  tagline: '', description: '', plots: undefined,
+  plotRange: '', amenityAcres: '', architect: '',
+  features: [], pricePerSqYd: undefined,
+  sitePlanSrc: '', brochureUrl: '', status: 'draft',
+};
+
+const AdminDashboard: FC<{
+  onClose: () => void;
+  authUser: User;
+  leads: Lead[];
+  newsletter: NewsletterEntry[];
+  firestoreProps: PropertyDoc[];
+}> = ({ onClose, leads, newsletter, firestoreProps }) => {
+  const [tab, setTab] = useState<'properties' | 'leads' | 'newsletter'>('properties');
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [form, setForm] = useState<PropertyInput>(EMPTY_FORM);
+  const [featInput, setFeatInput] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState<string | null>(null);
+  const [msg, setMsg] = useState('');
+
+  const set = (k: keyof PropertyInput, v: unknown) =>
+    setForm(f => ({ ...f, [k]: v }));
+
+  const openNew = () => { setForm(EMPTY_FORM); setEditingId(null); setShowForm(true); setMsg(''); };
+  const openEdit = (p: PropertyDoc) => {
+    const { id: _id, createdAt: _c, ...rest } = p;
+    setForm(rest as PropertyInput);
+    setEditingId(p.id);
+    setShowForm(true);
+    setMsg('');
+  };
+
+  const addFeature = () => {
+    const f = featInput.trim();
+    if (!f) return;
+    set('features', [...(form.features ?? []), f]);
+    setFeatInput('');
+  };
+  const removeFeature = (i: number) =>
+    set('features', (form.features ?? []).filter((_, idx) => idx !== i));
+
+  const handleSave = async () => {
+    if (!form.title || !form.location) { setMsg('Title and Location are required.'); return; }
+    setSaving(true);
+    try {
+      if (editingId) await updateProperty(editingId, form);
+      else await createProperty(form);
+      setShowForm(false);
+      setMsg('');
+    } catch (e: unknown) {
+      setMsg(`Error: ${e instanceof Error ? e.message : String(e)}`);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Delete this property? This cannot be undone.')) return;
+    setDeleting(id);
+    try { await deleteProperty(id); } finally { setDeleting(null); }
+  };
+
+  const toggleStatus = async (p: PropertyDoc) => {
+    await updateProperty(p.id, { status: p.status === 'live' ? 'draft' : 'live' });
+  };
+
+  const inputCls = "w-full bg-surface border border-outline/20 rounded-xl px-4 py-3 text-sm text-on-surface placeholder-secondary/30 focus:outline-none focus:border-primary/60 transition-colors";
+  const labelCls = "block text-[9px] uppercase tracking-[0.4em] font-bold text-secondary/50 mb-1.5";
+
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[9995] bg-black/60 backdrop-blur-sm flex items-stretch justify-end">
+      <motion.div
+        initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
+        transition={{ type: 'spring', damping: 28, stiffness: 220 }}
+        className="w-full md:w-[640px] bg-surface flex flex-col overflow-hidden shadow-2xl"
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-8 py-5 border-b border-outline/10 flex-shrink-0">
+          <div>
+            <p className="text-[8px] uppercase tracking-[0.5em] text-primary/60 font-bold">Admin Panel</p>
+            <h2 className="text-xl font-headline font-bold text-on-surface mt-0.5">The Green Team</h2>
+          </div>
+          <button onClick={onClose} className="p-2 rounded-full hover:bg-primary/5 transition-all">
+            <X className="w-5 h-5 text-on-surface" />
+          </button>
+        </div>
+
+        {/* Tabs */}
+        <div className="flex border-b border-outline/10 flex-shrink-0">
+          {(['properties', 'leads', 'newsletter'] as const).map(t => (
+            <button key={t} onClick={() => setTab(t)}
+              className={cn(
+                "flex-1 py-3.5 text-[9px] uppercase tracking-[0.4em] font-bold transition-all",
+                tab === t ? "text-primary border-b-2 border-primary" : "text-secondary/40 hover:text-secondary"
+              )}>
+              {t === 'properties' ? `Properties (${firestoreProps.length})` :
+               t === 'leads' ? `Leads (${leads.length})` : `Newsletter (${newsletter.length})`}
+            </button>
+          ))}
+        </div>
+
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto">
+
+          {/* ── Properties Tab ── */}
+          {tab === 'properties' && !showForm && (
+            <div className="p-6 space-y-4">
+              <div className="flex items-center justify-between">
+                <p className="text-[9px] uppercase tracking-[0.4em] text-secondary/50 font-bold">
+                  Live properties appear on home + sanctuaries pages
+                </p>
+                <button onClick={openNew}
+                  className="flex items-center gap-2 px-4 py-2.5 bg-primary text-on-primary text-[9px] uppercase tracking-widest font-bold rounded-xl hover:bg-primary/90 transition-all">
+                  <ArrowRight className="w-3 h-3" /> Add Property
+                </button>
+              </div>
+
+              {firestoreProps.length === 0 && (
+                <div className="text-center py-16 text-secondary/30 text-sm">No properties yet. Add your first one.</div>
+              )}
+
+              {firestoreProps.map(p => (
+                <div key={p.id} className="flex gap-4 p-4 border border-outline/10 rounded-2xl bg-surface-container-low/30 hover:border-outline/20 transition-all">
+                  {/* Thumbnail */}
+                  <div className="w-20 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-outline/10">
+                    {p.image && <img src={p.image} alt={p.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" />}
+                  </div>
+                  {/* Info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <h4 className="text-sm font-bold text-on-surface truncate">{p.title}</h4>
+                        <p className="text-[10px] text-secondary/50 mt-0.5 flex items-center gap-1">
+                          <MapPin className="w-2.5 h-2.5" />{p.location}
+                        </p>
+                        {(p.lat && p.lng) && (
+                          <p className="text-[9px] text-secondary/30 mt-0.5">{p.lat.toFixed(4)}, {p.lng.toFixed(4)}</p>
+                        )}
+                      </div>
+                      {/* Live toggle */}
+                      <button onClick={() => toggleStatus(p)}
+                        className={cn(
+                          "flex-shrink-0 px-3 py-1 rounded-full text-[8px] uppercase tracking-widest font-bold transition-all",
+                          p.status === 'live'
+                            ? "bg-primary/10 text-primary"
+                            : "bg-outline/10 text-secondary/40"
+                        )}>
+                        {p.status === 'live' ? '● Live' : '○ Draft'}
+                      </button>
+                    </div>
+                    <div className="flex gap-2 mt-3">
+                      <button onClick={() => openEdit(p)}
+                        className="text-[9px] uppercase tracking-widest font-bold text-secondary/60 hover:text-primary transition-colors px-3 py-1.5 border border-outline/15 rounded-lg">
+                        Edit
+                      </button>
+                      <button onClick={() => handleDelete(p.id)} disabled={deleting === p.id}
+                        className="text-[9px] uppercase tracking-widest font-bold text-error/60 hover:text-error transition-colors px-3 py-1.5 border border-error/10 rounded-lg hover:border-error/30 disabled:opacity-40">
+                        {deleting === p.id ? 'Deleting…' : 'Delete'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* ── Property Form ── */}
+          {tab === 'properties' && showForm && (
+            <div className="p-6 space-y-6">
+              <div className="flex items-center gap-3">
+                <button onClick={() => setShowForm(false)}
+                  className="p-2 rounded-full hover:bg-primary/5 transition-all">
+                  <X className="w-4 h-4 text-secondary" />
+                </button>
+                <h3 className="text-base font-bold text-on-surface">
+                  {editingId ? 'Edit Property' : 'New Property'}
+                </h3>
+              </div>
+
+              {msg && <p className="text-xs text-error bg-error/5 border border-error/10 rounded-xl px-4 py-3">{msg}</p>}
+
+              {/* Section: Basic */}
+              <div className="space-y-4">
+                <p className="text-[8px] uppercase tracking-[0.5em] text-secondary/40 font-bold border-b border-outline/10 pb-2">Basic Info</p>
+                <div>
+                  <label className={labelCls}>Property Title *</label>
+                  <input className={inputCls} placeholder="e.g. MODCON Agartha" value={form.title}
+                    onChange={e => set('title', e.target.value)} />
+                </div>
+                <div>
+                  <label className={labelCls}>Location *</label>
+                  <input className={inputCls} placeholder="e.g. Narsapur Forest Peripheral, Hyderabad" value={form.location}
+                    onChange={e => set('location', e.target.value)} />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className={labelCls}>Latitude</label>
+                    <input type="number" step="any" className={inputCls} placeholder="17.4700" value={form.lat ?? ''}
+                      onChange={e => set('lat', e.target.value ? parseFloat(e.target.value) : undefined)} />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Longitude</label>
+                    <input type="number" step="any" className={inputCls} placeholder="78.2500" value={form.lng ?? ''}
+                      onChange={e => set('lng', e.target.value ? parseFloat(e.target.value) : undefined)} />
+                  </div>
+                </div>
+                <p className="text-[9px] text-secondary/30 -mt-2">Get from Google Maps → right-click → copy coordinates</p>
+              </div>
+
+              {/* Section: Media */}
+              <div className="space-y-4">
+                <p className="text-[8px] uppercase tracking-[0.5em] text-secondary/40 font-bold border-b border-outline/10 pb-2">Media &amp; Links</p>
+                <div>
+                  <label className={labelCls}>Hero Image URL</label>
+                  <input className={inputCls} placeholder="https://..." value={form.image}
+                    onChange={e => set('image', e.target.value)} />
+                  {form.image && (
+                    <img src={form.image} alt="preview" referrerPolicy="no-referrer"
+                      className="mt-2 w-full h-28 object-cover rounded-xl border border-outline/10" />
+                  )}
+                </div>
+                <div>
+                  <label className={labelCls}>Site Plan Image URL</label>
+                  <input className={inputCls} placeholder="https://... or /filename.jpg" value={form.sitePlanSrc ?? ''}
+                    onChange={e => set('sitePlanSrc', e.target.value)} />
+                </div>
+                <div>
+                  <label className={labelCls}>Brochure URL</label>
+                  <input className={inputCls} placeholder="https://..." value={form.brochureUrl ?? ''}
+                    onChange={e => set('brochureUrl', e.target.value)} />
+                </div>
+              </div>
+
+              {/* Section: Stats */}
+              <div className="space-y-4">
+                <p className="text-[8px] uppercase tracking-[0.5em] text-secondary/40 font-bold border-b border-outline/10 pb-2">Environment &amp; Commute</p>
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <label className={labelCls}>AQI</label>
+                    <input type="number" className={inputCls} placeholder="12" value={form.aqi}
+                      onChange={e => set('aqi', parseInt(e.target.value) || 0)} />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Noise (dB)</label>
+                    <input type="number" className={inputCls} placeholder="18" value={form.noise}
+                      onChange={e => set('noise', parseInt(e.target.value) || 0)} />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Commute</label>
+                    <input className={inputCls} placeholder="45 mins to Fin. District" value={form.commute}
+                      onChange={e => set('commute', e.target.value)} />
+                  </div>
+                </div>
+              </div>
+
+              {/* Section: Pricing */}
+              <div className="space-y-4">
+                <p className="text-[8px] uppercase tracking-[0.5em] text-secondary/40 font-bold border-b border-outline/10 pb-2">Pricing</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className={labelCls}>Member Price</label>
+                    <input className={inputCls} placeholder="₹1.9 Cr" value={form.memberPrice}
+                      onChange={e => set('memberPrice', e.target.value)} />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Valuation / Strikethrough</label>
+                    <input className={inputCls} placeholder="₹4.0 Cr" value={form.valuation}
+                      onChange={e => set('valuation', e.target.value)} />
+                  </div>
+                </div>
+                <div>
+                  <label className={labelCls}>Price per Sq Yd (₹) — leave blank if not applicable</label>
+                  <input type="number" className={inputCls} placeholder="7999" value={form.pricePerSqYd ?? ''}
+                    onChange={e => set('pricePerSqYd', e.target.value ? parseInt(e.target.value) : undefined)} />
+                </div>
+              </div>
+
+              {/* Section: Content */}
+              <div className="space-y-4">
+                <p className="text-[8px] uppercase tracking-[0.5em] text-secondary/40 font-bold border-b border-outline/10 pb-2">Content</p>
+                <div>
+                  <label className={labelCls}>Tagline</label>
+                  <input className={inputCls} placeholder="Where the forest becomes home." value={form.tagline ?? ''}
+                    onChange={e => set('tagline', e.target.value)} />
+                </div>
+                <div>
+                  <label className={labelCls}>Description</label>
+                  <textarea rows={4} className={cn(inputCls, 'resize-none')}
+                    placeholder="Full description of the property…" value={form.description ?? ''}
+                    onChange={e => set('description', e.target.value)} />
+                </div>
+                <div>
+                  <label className={labelCls}>Developer / Architect</label>
+                  <input className={inputCls} placeholder="MODCON Builders" value={form.architect ?? ''}
+                    onChange={e => set('architect', e.target.value)} />
+                </div>
+              </div>
+
+              {/* Section: Community */}
+              <div className="space-y-4">
+                <p className="text-[8px] uppercase tracking-[0.5em] text-secondary/40 font-bold border-b border-outline/10 pb-2">Plot Community (optional)</p>
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <label className={labelCls}>No. of Plots</label>
+                    <input type="number" className={inputCls} placeholder="53" value={form.plots ?? ''}
+                      onChange={e => set('plots', e.target.value ? parseInt(e.target.value) : undefined)} />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Plot Range</label>
+                    <input className={inputCls} placeholder="808–5,097 sq yds" value={form.plotRange ?? ''}
+                      onChange={e => set('plotRange', e.target.value)} />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Amenity Sq Yds</label>
+                    <input className={inputCls} placeholder="14,548" value={form.amenityAcres ?? ''}
+                      onChange={e => set('amenityAcres', e.target.value)} />
+                  </div>
+                </div>
+              </div>
+
+              {/* Section: Features */}
+              <div className="space-y-4">
+                <p className="text-[8px] uppercase tracking-[0.5em] text-secondary/40 font-bold border-b border-outline/10 pb-2">Curated Features</p>
+                <div className="flex gap-2">
+                  <input className={cn(inputCls, 'flex-1')} placeholder="e.g. Vertical Forest" value={featInput}
+                    onChange={e => setFeatInput(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addFeature(); } }} />
+                  <button type="button" onClick={addFeature}
+                    className="px-4 py-3 bg-primary/10 text-primary text-[9px] font-bold rounded-xl hover:bg-primary/20 transition-all">
+                    Add
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {(form.features ?? []).map((f, i) => (
+                    <span key={i} className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/8 text-primary text-[9px] font-bold rounded-full">
+                      {f}
+                      <button onClick={() => removeFeature(i)} className="text-primary/50 hover:text-primary ml-1">
+                        <X className="w-2.5 h-2.5" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Status + Save */}
+              <div className="flex items-center justify-between pt-2 pb-6">
+                <div className="flex items-center gap-3">
+                  <button type="button" onClick={() => set('status', form.status === 'live' ? 'draft' : 'live')}
+                    className={cn(
+                      "relative w-12 h-6 rounded-full transition-colors",
+                      form.status === 'live' ? 'bg-primary' : 'bg-outline/20'
+                    )}>
+                    <span className={cn(
+                      "absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all",
+                      form.status === 'live' ? 'left-7' : 'left-1'
+                    )} />
+                  </button>
+                  <span className="text-xs font-bold text-on-surface">
+                    {form.status === 'live' ? 'Live — visible on site' : 'Draft — hidden'}
+                  </span>
+                </div>
+                <button onClick={handleSave} disabled={saving}
+                  className="px-6 py-3 bg-primary text-on-primary text-[9px] uppercase tracking-[0.4em] font-bold rounded-xl hover:bg-primary/90 transition-all disabled:opacity-50 flex items-center gap-2">
+                  <Check className="w-3.5 h-3.5" />
+                  {saving ? 'Saving…' : editingId ? 'Update' : 'Publish'}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* ── Leads Tab ── */}
+          {tab === 'leads' && (
+            <div className="p-6 space-y-3">
+              <p className="text-[9px] uppercase tracking-[0.4em] text-secondary/40 font-bold mb-4">{leads.length} total leads</p>
+              {leads.length === 0 && <p className="text-center py-16 text-secondary/30 text-sm">No leads yet.</p>}
+              {leads.map(l => (
+                <div key={l.id} className="p-4 border border-outline/10 rounded-2xl space-y-1">
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="text-sm font-bold text-on-surface">{l.name}</p>
+                    <p className="text-[9px] text-secondary/30 flex-shrink-0">
+                      {l.createdAt ? new Date(l.createdAt.seconds * 1000).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: '2-digit' }) : '—'}
+                    </p>
+                  </div>
+                  <p className="text-xs text-secondary/60 flex items-center gap-1.5">
+                    <Phone className="w-3 h-3" />{l.email}
+                  </p>
+                  {l.intent && (
+                    <p className="text-[10px] text-primary/60 font-medium">{l.intent}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* ── Newsletter Tab ── */}
+          {tab === 'newsletter' && (
+            <div className="p-6 space-y-3">
+              <p className="text-[9px] uppercase tracking-[0.4em] text-secondary/40 font-bold mb-4">{newsletter.length} subscribers</p>
+              {newsletter.length === 0 && <p className="text-center py-16 text-secondary/30 text-sm">No subscribers yet.</p>}
+              {newsletter.map(n => (
+                <div key={n.id} className="flex items-center justify-between p-4 border border-outline/10 rounded-2xl">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                      <MailIcon className="w-3.5 h-3.5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-on-surface">{n.email}</p>
+                      <p className="text-[9px] text-secondary/40 uppercase tracking-widest">{n.source}</p>
+                    </div>
+                  </div>
+                  <p className="text-[9px] text-secondary/30">
+                    {n.createdAt ? new Date(n.createdAt.seconds * 1000).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: '2-digit' }) : '—'}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+};
+
+// ─── Feature icon helper ───────────────────────────────────────────────────────
 const featureIcon = (f: string) => {
   if (f.includes('Solar') || f.includes('Energy')) return <Sun className="w-4 h-4" />;
   if (f.includes('Forest') || f.includes('Earth') || f.includes('Bamboo') || f.includes('Organic')) return <Leaf className="w-4 h-4" />;
@@ -2800,7 +3255,7 @@ const Sanctuaries = ({ isSubscribed, onNewsletterClick, isFullPage = false }: { 
         </div>
 
         <div className="grid lg:grid-cols-2 gap-12">
-          {SANCTUARIES.map(s => (
+          {allSanctuaries.map(s => (
             <SanctuaryCard
               key={s.id}
               sanctuary={s}
@@ -3612,11 +4067,9 @@ const AuthModal = ({
   );
 };
 
-// ─── Admin Dashboard ─────────────────────────────────────────────────────────
-
-const ADMIN_EMAIL = 'sumanthbolla97@gmail.com';
-
-const AdminDashboard = ({ onClose, user }: { onClose: () => void; user: User }) => {
+// ─── App (main) ──────────────────────────────────────────────────────────────
+// (Old AdminDashboard removed — superseded by AdminDashboard component above)
+const _dead = ({ onClose, user }: { onClose: () => void; user: User }) => {
   const [tab, setTab]           = useState<'leads' | 'newsletter'>('leads');
   const [leads, setLeads]       = useState<Lead[]>([]);
   const [subs, setSubs]         = useState<NewsletterEntry[]>([]);
@@ -3767,7 +4220,7 @@ const AdminDashboard = ({ onClose, user }: { onClose: () => void; user: User }) 
   );
 };
 
-// ─── App ─────────────────────────────────────────────────────────────────────
+// ─── App (main) ──────────────────────────────────────────────────────────────
 
 export default function App() {
   type ViewMode = 'home' | 'map' | 'list' | 'gallery' | 'analytics' | 'syl' | 'admin';
@@ -3799,6 +4252,56 @@ export default function App() {
   const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('home');
   const [isDark, setIsDark] = useState(false);
+  const [showAdmin, setShowAdmin] = useState(false);
+
+  // ── Admin: leads + newsletter (lazy-loaded when admin panel opens) ────────
+  const [adminLeads, setAdminLeads] = useState<Lead[]>([]);
+  const [adminNewsletter, setAdminNewsletter] = useState<NewsletterEntry[]>([]);
+  const fetchAdminData = useCallback(async () => {
+    if (!authUser || authUser.email !== ADMIN_EMAIL) return;
+    try {
+      const [l, n] = await Promise.all([getLeads(), getNewsletterSubs()]);
+      setAdminLeads(l);
+      setAdminNewsletter(n);
+    } catch {/* ignore */}
+  }, [authUser]);
+  useEffect(() => { if (showAdmin) fetchAdminData(); }, [showAdmin, fetchAdminData]);
+
+  // ── Firestore properties (real-time) ─────────────────────────────────────
+  const [firestoreProps, setFirestoreProps] = useState<PropertyDoc[]>([]);
+  useEffect(() => {
+    if (!db) return;
+    const unsub = subscribeProperties(setFirestoreProps);
+    return unsub;
+  }, []);
+
+  // Merge hardcoded + Firestore live properties into one list
+  const allSanctuaries = useMemo(() => {
+    const live = firestoreProps
+      .filter(p => p.status === 'live')
+      .map(p => ({
+        id: p.id,
+        title: p.title,
+        location: p.location,
+        aqi: p.aqi,
+        noise: p.noise,
+        commute: p.commute,
+        valuation: p.valuation,
+        memberPrice: p.memberPrice,
+        image: p.image,
+        tagline: p.tagline,
+        description: p.description,
+        plots: p.plots,
+        plotRange: p.plotRange,
+        amenityAcres: p.amenityAcres,
+        architect: p.architect,
+        features: p.features,
+        pricePerSqYd: p.pricePerSqYd,
+        sitePlanSrc: p.sitePlanSrc,
+        brochureUrl: p.brochureUrl,
+      } as typeof SANCTUARIES[0]));
+    return [...SANCTUARIES, ...live];
+  }, [firestoreProps]);
 
   // ── Scroll-position memory ────────────────────────────────────────────────
   const scrollPositions = useRef<Partial<Record<ViewMode, number>>>({});
@@ -3865,6 +4368,8 @@ export default function App() {
         onSignInClick={() => setIsAuthOpen(true)}
         authUser={authUser}
         onSignOut={handleSignOut}
+        isAdmin={authUser?.email === ADMIN_EMAIL}
+        onAdminClick={() => setShowAdmin(true)}
       />
 
       <main className="flex-1 flex overflow-hidden relative">
@@ -3875,8 +4380,7 @@ export default function App() {
             <SanctuaryMapLayout isVisible={viewMode === 'map'} />
             <ChatBot data={{ sanctuaries: SANCTUARIES }} />
           </div>
-          {viewMode === 'admin' && authUser && <AdminDashboard onClose={() => handleViewChange('home')} user={authUser} />}
-          {viewMode !== 'map' && viewMode !== 'admin' && (
+          {viewMode !== 'map' && (
             <div ref={scrollRef} className="h-full w-full overflow-y-auto">
               {viewMode === 'home' && <HomeView isSubscribed={effectivelySubscribed} onNewsletterClick={() => { if (!effectivelySubscribed) setIsNewsletterOpen(true); }} />}
               {viewMode === 'list' && <Sanctuaries isSubscribed={effectivelySubscribed} onNewsletterClick={() => { if (!effectivelySubscribed) setIsNewsletterOpen(true); }} isFullPage />}
@@ -3888,13 +4392,26 @@ export default function App() {
         </div>
       </main>
 
+      {/* Admin Dashboard overlay — only for sumanthbolla97@gmail.com */}
+      <AnimatePresence>
+        {showAdmin && authUser?.email === ADMIN_EMAIL && (
+          <AdminDashboard
+            onClose={() => setShowAdmin(false)}
+            authUser={authUser}
+            leads={adminLeads}
+            newsletter={adminNewsletter}
+            firestoreProps={firestoreProps}
+          />
+        )}
+      </AnimatePresence>
+
       <AuthModal
         isOpen={isAuthOpen}
         onClose={() => setIsAuthOpen(false)}
         onSuccess={user => {
           setAuthUser(user);
           setIsAuthOpen(false);
-          if (user.email === ADMIN_EMAIL) handleViewChange('admin');
+          if (user.email === ADMIN_EMAIL) setShowAdmin(true);
         }}
       />
 
