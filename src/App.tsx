@@ -4570,7 +4570,7 @@ const ProfileModal = ({
 // ─── App (main) ──────────────────────────────────────────────────────────────
 
 export default function App() {
-  type ViewMode = 'home' | 'map' | 'list' | 'gallery' | 'analytics' | 'syl';
+  type ViewMode = 'home' | 'map' | 'list' | 'gallery' | 'analytics' | 'syl' | 'membership';
   const VIEW_ORDER: ViewMode[] = ['home', 'list', 'gallery', 'analytics', 'syl', 'map'];
 
   const [authUser, setAuthUser]     = useState<User | null>(null);
@@ -4776,6 +4776,13 @@ export default function App() {
               {viewMode === 'gallery' && <EcosystemPillars isFullPage />}
               {viewMode === 'analytics' && <Advantage isFullPage />}
               {viewMode === 'syl' && <TheSIL isSubscribed={effectivelySubscribed} onNewsletterClick={() => { if (!effectivelySubscribed) setIsNewsletterOpen(true); }} isFullPage />}
+              {viewMode === 'membership' && (
+                <div className="flex flex-col">
+                  <Membership />
+                  <ApplicationForm />
+                  <Footer onModeChange={handleViewChange} />
+                </div>
+              )}
             </div>
           )}
         </div>
