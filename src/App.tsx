@@ -754,51 +754,62 @@ const TheSIL = ({ isSubscribed, onNewsletterClick, isFullPage = false }: { isSub
 };
 
 const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewsletterClick: () => void, onOpen: () => void }> = ({ sanctuary, isSubscribed, onNewsletterClick, onOpen }) => {
-  const isGated = sanctuary.id === 'syl' && !isSubscribed;
+  const isSyl = sanctuary.id === 'syl';
+  const isGated = isSyl && !isSubscribed;
 
   return (
     <motion.div
       whileHover={{ y: -4 }}
-      className="group relative aspect-square overflow-hidden rounded-3xl cursor-pointer bg-[#0e1409]"
+      className="group relative aspect-square overflow-hidden rounded-3xl cursor-pointer bg-[#1a1f0e]"
       onClick={() => { if (!isGated) onOpen(); }}
     >
-      {/* Full-bleed image */}
+      {/* Full-bleed image — always full color */}
       <img
         src={sanctuary.image}
         alt={sanctuary.title}
         className={cn(
-          "absolute inset-0 w-full h-full object-cover transition-all duration-1000",
-          isGated ? "grayscale brightness-50" : "grayscale brightness-75 group-hover:grayscale-0 group-hover:brightness-90 group-hover:scale-105"
+          "absolute inset-0 w-full h-full object-cover transition-all duration-700",
+          isGated
+            ? "brightness-40 scale-105 blur-sm"
+            : "brightness-80 group-hover:brightness-95 group-hover:scale-105"
         )}
         referrerPolicy="no-referrer"
       />
 
-      {/* Gradient overlay — strong at bottom, light at top */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-black/10 pointer-events-none" />
+      {/* Warm cream-olive gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a0a]/90 via-[#1a1a0a]/20 to-transparent pointer-events-none" />
 
-      {/* Gated overlay */}
+      {/* Gated overlay for SYL */}
       {isGated && (
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center p-8 text-center">
-          <Shield className="w-10 h-10 text-primary mb-4" />
-          <h4 className="text-xl font-headline font-bold text-white mb-2">Locked Landmark.</h4>
-          <p className="text-xs text-white/60 mb-6 max-w-[180px]">Sign up for our newsletter to view SYL details.</p>
+          <div className="w-14 h-14 rounded-2xl bg-[#c8a951]/15 border border-[#c8a951]/30 flex items-center justify-center mb-5">
+            <Shield className="w-6 h-6 text-[#c8a951]" />
+          </div>
+          <h4 className="text-xl font-headline font-bold text-white mb-2">Newsletter Access Required</h4>
+          <p className="text-xs text-white/50 mb-6 max-w-[200px] leading-relaxed">
+            SYL: Vertical Villament is reserved for our intelligence network subscribers.
+          </p>
           <button onClick={e => { e.stopPropagation(); onNewsletterClick(); }}
-            className="px-5 py-2.5 bg-primary text-on-primary text-[9px] uppercase tracking-widest font-bold rounded-xl">
-            Unlock Now
+            className="px-6 py-3 bg-[#c8a951] text-[#1a1a0a] text-[9px] uppercase tracking-widest font-bold rounded-xl hover:bg-white transition-all">
+            Subscribe to Unlock
           </button>
         </div>
       )}
 
       {/* Top badge */}
-      <div className="absolute top-5 left-5">
-        <span className="bg-primary text-on-primary px-3 py-1 text-[8px] uppercase tracking-[0.4em] font-bold rounded-full">
-          {sanctuary.id === 'syl' ? 'Upcoming' : 'Live'}
+      <div className="absolute top-5 left-5 z-20">
+        <span className={cn(
+          "px-3 py-1 text-[8px] uppercase tracking-[0.4em] font-bold rounded-full",
+          isSyl
+            ? "bg-[#c8a951] text-[#1a1a0a]"
+            : "bg-primary/90 text-on-primary backdrop-blur-sm"
+        )}>
+          {isSyl ? 'Newsletter Only' : 'Open Access'}
         </span>
       </div>
 
-      {/* Bottom info overlay */}
-      <div className="absolute bottom-0 left-0 right-0 px-6 pb-6 pt-10">
-        {/* Title + price row */}
+      {/* Bottom info — hide price for gated SYL */}
+      <div className={cn("absolute bottom-0 left-0 right-0 px-6 pb-6 pt-10 z-20", isGated && "opacity-0")}>
         <div className="flex items-end justify-between gap-3 mb-4">
           <div className="min-w-0">
             <p className="text-[8px] uppercase tracking-[0.4em] text-primary/80 font-bold mb-1 truncate">{sanctuary.commute}</p>
@@ -818,8 +829,6 @@ const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewslet
             )}
           </div>
         </div>
-
-        {/* Stats row + CTA */}
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5">
@@ -832,7 +841,7 @@ const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewslet
             </div>
           </div>
           <button
-            onClick={e => { e.stopPropagation(); if (!isGated) onOpen(); }}
+            onClick={e => { e.stopPropagation(); onOpen(); }}
             className="flex-shrink-0 px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white text-[8px] uppercase tracking-widest font-bold rounded-xl hover:bg-primary hover:border-primary transition-all"
           >
             View →
@@ -3849,69 +3858,164 @@ const NewsletterModal = ({ isOpen, onClose, onSubscribe }: { isOpen: boolean, on
   );
 };
 
-const ApplicationForm = () => {
-  const { register, handleSubmit, formState: { isSubmitting } } = useForm();
-  const [submitted, setSubmitted] = useState(false);
+const INVESTMENT_BRACKETS = [
+  '₹50 L – ₹1 Cr',
+  '₹1 Cr – ₹2 Cr',
+  '₹2 Cr – ₹5 Cr',
+  '₹5 Cr+',
+  'Prefer not to say',
+];
 
-  const onSubmit = async (data: any) => {
-    await saveLead({ name: data.name, email: data.email, intent: data.intent });
-    setSubmitted(true);
+const ApplicationForm = () => {
+  const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [form, setForm] = useState({
+    name: '', email: '', phone: '',
+    company: '', designation: '', investmentBracket: '',
+    intent: '',
+  });
+
+  const set = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }));
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.name || !form.email || !form.phone) return;
+    setLoading(true);
+    try {
+      // Save as premium lead with full profile
+      await saveLead({
+        name: form.name,
+        email: form.email,
+        intent: [
+          form.designation && `${form.designation}${form.company ? ' at ' + form.company : ''}`,
+          form.investmentBracket && `Budget: ${form.investmentBracket}`,
+          form.intent,
+        ].filter(Boolean).join(' | '),
+      });
+      // Auto-subscribe to newsletter — membership includes intelligence briefings
+      await saveNewsletter(form.email, 'modal');
+      setSubmitted(true);
+    } catch {/* silent */} finally {
+      setLoading(false);
+    }
   };
 
+  const inputCls = "w-full bg-transparent border-b border-olive-800/20 py-4 text-olive-900 text-sm font-light placeholder:text-olive-800/25 focus:outline-none focus:border-olive-800/60 transition-colors";
+  const labelCls = "block text-[8px] uppercase tracking-[0.5em] text-olive-800/40 font-bold mb-1";
+
   return (
-    <section id="apply" className="py-16 px-12 md:px-24 bg-cream">
-      <div className="max-w-5xl mx-auto">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          <div>
-            <h2 className="text-5xl md:text-7xl font-medium text-olive-900 mb-12">Apply for <br /><span className="italic text-olive-800">Membership.</span></h2>
-            <p className="text-xl md:text-2xl font-light text-olive-900/40 leading-relaxed">
-              We seek intelligent individuals who believe that a community's strength lies in its shared ethics and environmental stewardship.
+    <section id="apply" className="py-24 px-6 md:px-24 bg-[#f7f3ec]">
+      <div className="max-w-6xl mx-auto">
+        <div className="grid lg:grid-cols-5 gap-16 items-start">
+
+          {/* Left — copy */}
+          <div className="lg:col-span-2">
+            <span className="text-[9px] uppercase tracking-[0.6em] text-olive-800/40 font-bold block mb-8">Private Membership</span>
+            <h2 className="text-5xl md:text-6xl font-medium text-olive-900 leading-tight mb-8">
+              Apply for<br /><span className="italic text-olive-800">Concierge Access.</span>
+            </h2>
+            <p className="text-base font-light text-olive-900/50 leading-relaxed mb-12">
+              We curate India's most exclusive pre-launch sanctuaries for a private circle of 30 members. Our concierge will personally reach out within 24 hours.
+            </p>
+            <div className="space-y-6 border-t border-olive-800/10 pt-8">
+              {[
+                { label: 'Personal Call', desc: 'Your concierge contacts you within 24hrs' },
+                { label: 'Pre-Launch Pricing', desc: 'Access before public announcement' },
+                { label: 'Monthly Briefings', desc: 'Auto-enrolled in our intelligence network' },
+              ].map(i => (
+                <div key={i.label} className="flex gap-4">
+                  <div className="w-1.5 h-1.5 rounded-full bg-olive-800/40 mt-2 flex-shrink-0" />
+                  <div>
+                    <p className="text-sm font-bold text-olive-900">{i.label}</p>
+                    <p className="text-xs text-olive-800/40 mt-0.5">{i.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <p className="text-[9px] text-olive-800/30 uppercase tracking-widest mt-8 leading-relaxed">
+              By applying, your email is enrolled in our monthly sanctuary intelligence newsletter.
             </p>
           </div>
 
-          <div className="bg-surface p-12 md:p-20 shadow-2xl border border-olive-800/5">
+          {/* Right — form */}
+          <div className="lg:col-span-3">
             {submitted ? (
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="text-center py-12"
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-olive-900 text-cream p-16 text-center"
               >
-                <Check className="w-16 h-16 text-olive-800 mx-auto mb-8" />
-                <h3 className="text-3xl font-serif italic text-olive-900 mb-6">Application Logged.</h3>
-                <p className="text-olive-800/60 font-light leading-relaxed">
-                  Our membership board will review your profile. A relationship manager will contact you for a private briefing.
+                <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-8">
+                  <Check className="w-8 h-8 text-primary" />
+                </div>
+                <h3 className="text-3xl font-serif italic mb-4">Application Received.</h3>
+                <p className="text-cream/50 font-light leading-relaxed max-w-sm mx-auto">
+                  Our concierge will contact you within 24 hours for a private briefing. You're also now part of our monthly intelligence network.
                 </p>
               </motion.div>
             ) : (
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-12">
-                <div className="space-y-2">
-                  <label htmlFor="apply-name" className="text-[9px] uppercase tracking-[0.5em] text-olive-800/40">Full Name</label>
-                  <input id="apply-name" {...register("name", { required: true })} className="input-cashew" placeholder="Your Name" />
+              <form onSubmit={handleSubmit} className="bg-white p-10 md:p-14 shadow-xl border border-olive-800/5 space-y-8">
+                <div className="grid grid-cols-2 gap-8">
+                  <div>
+                    <label htmlFor="m-name" className={labelCls}>Full Name *</label>
+                    <input id="m-name" name="name" value={form.name} onChange={e => set('name', e.target.value)} required className={inputCls} placeholder="Your full name" />
+                  </div>
+                  <div>
+                    <label htmlFor="m-phone" className={labelCls}>Phone for Concierge *</label>
+                    <input id="m-phone" name="phone" type="tel" value={form.phone} onChange={e => set('phone', e.target.value)} required className={inputCls} placeholder="+91 98765 43210" />
+                  </div>
                 </div>
 
-                <div className="space-y-2">
-                  <label htmlFor="apply-email" className="text-[9px] uppercase tracking-[0.5em] text-olive-800/40">Private Email</label>
-                  <input id="apply-email" type="email" {...register("email", { required: true })} className="input-cashew" placeholder="email@domain.com" />
+                <div>
+                  <label htmlFor="m-email" className={labelCls}>Private Email *</label>
+                  <input id="m-email" name="email" type="email" value={form.email} onChange={e => set('email', e.target.value)} required className={inputCls} placeholder="email@company.com" />
                 </div>
 
-                <div className="space-y-2">
-                  <label htmlFor="apply-intent" className="text-[9px] uppercase tracking-[0.5em] text-olive-800/40">Ethical Intent</label>
-                  <textarea
-                    id="apply-intent"
-                    {...register("intent")}
-                    className="input-cashew min-h-[120px] resize-none"
-                    placeholder="Why does community ethics matter to you?"
-                  />
+                <div className="grid grid-cols-2 gap-8">
+                  <div>
+                    <label htmlFor="m-designation" className={labelCls}>Designation / Role</label>
+                    <input id="m-designation" name="designation" value={form.designation} onChange={e => set('designation', e.target.value)} className={inputCls} placeholder="e.g. Founder, Director" />
+                  </div>
+                  <div>
+                    <label htmlFor="m-company" className={labelCls}>Company / Venture</label>
+                    <input id="m-company" name="company" value={form.company} onChange={e => set('company', e.target.value)} className={inputCls} placeholder="Your organisation" />
+                  </div>
                 </div>
 
-                <button 
-                  type="submit" 
-                  disabled={isSubmitting}
-                  className="w-full btn-membership btn-olive flex items-center justify-center gap-4"
-                >
-                  {isSubmitting ? "Processing..." : "Submit Application"}
-                  <ArrowRight className="w-4 h-4" />
+                <div>
+                  <label className={labelCls}>Investment Appetite</label>
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    {INVESTMENT_BRACKETS.map(b => (
+                      <button
+                        key={b} type="button"
+                        onClick={() => set('investmentBracket', b)}
+                        className={cn(
+                          "px-3 py-1.5 text-[9px] uppercase tracking-widest font-bold border transition-all rounded-lg",
+                          form.investmentBracket === b
+                            ? "bg-olive-900 text-cream border-olive-900"
+                            : "border-olive-800/20 text-olive-800/50 hover:border-olive-800/50"
+                        )}
+                      >{b}</button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="m-intent" className={labelCls}>Why do you seek this?</label>
+                  <textarea id="m-intent" name="intent" value={form.intent} onChange={e => set('intent', e.target.value)} rows={3}
+                    className={cn(inputCls, "resize-none border-b-0 border border-olive-800/20 px-4 py-3 rounded-lg mt-1")}
+                    placeholder="Optional — what draws you to pre-launch sanctuary investing?" />
+                </div>
+
+                <button type="submit" disabled={loading}
+                  className="w-full py-5 bg-olive-900 text-cream text-[10px] uppercase tracking-[0.5em] font-bold hover:bg-primary transition-all flex items-center justify-center gap-4 disabled:opacity-60">
+                  {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <ArrowRight className="w-4 h-4" />}
+                  {loading ? 'Submitting…' : 'Request Concierge Call'}
                 </button>
+
+                <p className="text-[9px] text-center text-olive-800/25 uppercase tracking-widest">
+                  Submitting enrolls you in our monthly intelligence newsletter
+                </p>
               </form>
             )}
           </div>
@@ -4260,7 +4364,7 @@ const HomeView = ({ isSubscribed, onNewsletterClick, sanctuaries = SANCTUARIES, 
     <Advantage />
     <EcosystemPillars />
     <Sanctuaries isSubscribed={isSubscribed} onNewsletterClick={onNewsletterClick} sanctuaries={sanctuaries} />
-    <TheSIL isSubscribed={isSubscribed} onNewsletterClick={onNewsletterClick} />
+    {isSubscribed && <TheSIL isSubscribed={isSubscribed} onNewsletterClick={onNewsletterClick} />}
     <TrustSignals />
     <NewsletterHighlight onSubscribe={onNewsletterClick} />
     <ApplicationForm />
