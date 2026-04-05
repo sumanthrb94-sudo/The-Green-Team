@@ -899,18 +899,250 @@ const MapVisibilityTracker = ({ isVisible, onReady }: { isVisible?: boolean; onR
   return null;
 };
 
-// ─── Agartha Interactive Layout ──────────────────────────────────────────────
+// ─── Generic Property Interactive Layout ─────────────────────────────────────
 
 interface Hotspot {
   id: string;
   num: number;
-  x: number;
-  y: number;
+  x: number;  // % from left
+  y: number;  // % from top
   label: string;
   tag: string;
   detail: string;
   stats: { label: string; value: string }[];
 }
+
+interface PropertyLayoutConfig {
+  sitePlanSrc: string;
+  sitePlanFallback?: string;
+  hotspots: Hotspot[];
+  projectName: string;
+  developerTag: string;   // e.g. "MODCON Builders · Narsapur"
+  tagline: string;        // e.g. "53 plots · Forest community · From ₹64.6 L"
+  brochureUrl?: string;
+  intentPrefix: string;   // used in lead: "Agartha — Organic Amenity Core"
+}
+
+/**
+ * PropertyInteractiveLayout
+ * Reusable full-screen overlay: site plan left, feature info + lead form right.
+ * This is the template for ALL property cards — Agartha and future listings.
+ */
+const PropertyInteractiveLayout: FC<PropertyLayoutConfig & { onClose: () => void }> = ({
+  sitePlanSrc, sitePlanFallback, hotspots, projectName, developerTag, tagline,
+  brochureUrl, intentPrefix, onClose,
+}) => {
+  const [active, setActive] = useState<Hotspot>(hotspots[0]);
+  const [leadName, setLeadName] = useState('');
+  const [leadPhone, setLeadPhone] = useState('');
+  const [leadSubmitted, setLeadSubmitted] = useState(false);
+  const [leadLoading, setLeadLoading] = useState(false);
+
+  const handleLeadSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!leadName.trim() || !leadPhone.trim()) return;
+    setLeadLoading(true);
+    try {
+      await saveLead({ name: leadName.trim(), email: leadPhone.trim(), intent: `${intentPrefix} — ${active.label}` });
+    } catch {/* fire and forget */} finally {
+      setLeadLoading(false);
+      setLeadSubmitted(true);
+    }
+  };
+
+  const LeadForm = () => leadSubmitted ? (
+    <div className="text-center py-6 space-y-3">
+      <div className="w-12 h-12 rounded-full bg-primary/15 flex items-center justify-center mx-auto">
+        <Check className="w-6 h-6 text-primary" />
+      </div>
+      <p className="text-sm font-bold text-white">We'll be in touch soon.</p>
+      <p className="text-[11px] text-white/40">Our team will call you within 24 hours.</p>
+      {brochureUrl && (
+        <a href={brochureUrl} target="_blank" rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 text-[9px] uppercase tracking-widest font-bold text-primary/70 hover:text-primary transition-colors mt-2">
+          View full brochure <ArrowRight className="w-3 h-3" />
+        </a>
+      )}
+    </div>
+  ) : (
+    <form onSubmit={handleLeadSubmit} className="space-y-3">
+      <input type="text" placeholder="Your Name" value={leadName}
+        onChange={e => setLeadName(e.target.value)}
+        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-primary/50 transition-colors" />
+      <input type="tel" placeholder="Phone Number" value={leadPhone}
+        onChange={e => setLeadPhone(e.target.value)}
+        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-primary/50 transition-colors" />
+      <button type="submit" disabled={leadLoading || !leadName.trim() || !leadPhone.trim()}
+        className="w-full py-3.5 bg-primary text-on-primary text-[9px] uppercase tracking-[0.4em] font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-primary/90 transition-all disabled:opacity-50">
+        <ArrowRight className="w-3.5 h-3.5" />
+        {leadLoading ? 'Sending…' : 'Request Site Visit'}
+      </button>
+      {brochureUrl && (
+        <a href={brochureUrl} target="_blank" rel="noopener noreferrer"
+          className="block text-center text-[9px] uppercase tracking-widest font-bold text-white/25 hover:text-white/50 transition-colors pt-1">
+          View Brochure Instead →
+        </a>
+      )}
+    </form>
+  );
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[90] bg-[#0a0f07] flex flex-col md:flex-row overflow-hidden"
+    >
+      {/* ── LEFT: Full Site Plan — scrollable on mobile, fills screen on desktop ── */}
+      <div className="relative w-full md:flex-1 md:h-full overflow-y-auto md:overflow-hidden flex flex-col">
+
+        {/* Sticky header over the plan */}
+        <div className="sticky top-0 z-10 flex items-center justify-between px-4 py-3 bg-gradient-to-b from-black/70 to-transparent md:absolute md:top-0 md:left-0 md:right-0">
+          <div>
+            <p className="text-[8px] uppercase tracking-[0.5em] text-white/50 font-bold">Site Layout</p>
+            <p className="text-sm font-bold text-white mt-0.5">{projectName}</p>
+          </div>
+          <button onClick={onClose} className="p-2 bg-white/10 backdrop-blur-sm rounded-full hover:bg-white/20 transition-all flex-shrink-0">
+            <X className="w-4 h-4 text-white" />
+          </button>
+        </div>
+
+        {/* Site plan image — full portrait, no cropping */}
+        <div className="relative flex-1 md:absolute md:inset-0 md:flex md:items-center md:justify-center">
+          <img
+            src={sitePlanSrc}
+            alt={`${projectName} site plan`}
+            className="w-full h-auto md:max-h-full md:w-auto md:max-w-full object-contain"
+            onError={(e) => {
+              if (sitePlanFallback) (e.target as HTMLImageElement).src = sitePlanFallback;
+            }}
+            referrerPolicy="no-referrer"
+          />
+
+          {/* Interactive dot markers */}
+          {hotspots.map((h) => {
+            const isActive = active.id === h.id;
+            return (
+              <button key={h.id} style={{ left: `${h.x}%`, top: `${h.y}%` }}
+                className="absolute -translate-x-1/2 -translate-y-1/2" onClick={() => setActive(h)}>
+                <span className={cn(
+                  "relative block rounded-full border-2 border-white shadow-lg transition-all duration-200",
+                  isActive ? "w-4 h-4 bg-primary scale-125" : "w-3 h-3 bg-white/60 hover:bg-white hover:scale-125"
+                )} />
+                {isActive && <span className="absolute inset-0 rounded-full bg-primary/50 animate-ping pointer-events-none" />}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Mobile-only: feature strip + lead form below the site plan */}
+        <div className="md:hidden bg-[#0a0f07] px-5 py-4 border-t border-white/10">
+          <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+            {hotspots.map(h => (
+              <button key={h.id} onClick={() => setActive(h)}
+                className={cn(
+                  "flex-shrink-0 text-[8px] uppercase tracking-widest font-bold px-3 py-2 rounded-full border transition-all",
+                  active.id === h.id
+                    ? "bg-primary border-primary text-on-primary"
+                    : "border-white/15 text-white/50 hover:border-primary/40 hover:text-primary"
+                )}>
+                {h.label.split(' ').slice(0, 2).join(' ')}
+              </button>
+            ))}
+          </div>
+
+          <AnimatePresence mode="wait">
+            <motion.div key={active.id}
+              initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }} className="mt-4 space-y-3">
+              <p className="text-[8px] uppercase tracking-[0.4em] text-primary/60 font-bold">{active.tag}</p>
+              <h3 className="text-lg font-headline font-bold text-white leading-snug">{active.label}</h3>
+              <p className="text-sm text-white/60 leading-relaxed">{active.detail}</p>
+              <div className="grid grid-cols-3 gap-2 pt-1">
+                {active.stats.map(s => (
+                  <div key={s.label} className="bg-white/5 rounded-lg px-3 py-2 text-center">
+                    <p className="text-[8px] uppercase tracking-wider text-white/30 font-bold mb-1">{s.label}</p>
+                    <p className="text-xs font-bold text-white">{s.value}</p>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </AnimatePresence>
+
+          <div className="mt-6 border-t border-white/10 pt-5">
+            <p className="text-[9px] uppercase tracking-[0.4em] text-white/40 font-bold mb-3">Express Interest</p>
+            <LeadForm />
+          </div>
+        </div>
+      </div>
+
+      {/* ── RIGHT: Info + Lead panel (desktop only) ── */}
+      <div className="hidden md:flex w-[380px] flex-shrink-0 bg-[#0e1409] flex-col overflow-hidden border-l border-white/5">
+        <div className="flex-1 overflow-y-auto px-7 py-8 space-y-8">
+
+          {/* Project header */}
+          <div>
+            <p className="text-[8px] uppercase tracking-[0.5em] text-primary/50 font-bold mb-2">{developerTag}</p>
+            <h2 className="text-2xl font-headline font-bold text-white leading-tight">{projectName}</h2>
+            <p className="text-sm text-white/50 mt-1">{tagline}</p>
+          </div>
+
+          {/* Feature selector */}
+          <div>
+            <p className="text-[8px] uppercase tracking-[0.35em] text-white/30 font-bold mb-3">Explore Features</p>
+            <div className="flex flex-wrap gap-2 mb-5">
+              {hotspots.map(h => (
+                <button key={h.id} onClick={() => setActive(h)}
+                  className={cn(
+                    "text-[8px] uppercase tracking-widest font-bold px-3 py-1.5 rounded-full border transition-all",
+                    active.id === h.id
+                      ? "bg-primary border-primary text-on-primary"
+                      : "border-white/10 text-white/40 hover:border-primary/40 hover:text-primary"
+                  )}>
+                  {h.label.split(' ').slice(0, 2).join(' ')}
+                </button>
+              ))}
+            </div>
+
+            <AnimatePresence mode="wait">
+              <motion.div key={active.id}
+                initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                transition={{ duration: 0.18 }} className="space-y-4">
+                <span className="text-[8px] uppercase tracking-[0.4em] text-primary/60 font-bold">{active.tag}</span>
+                <h3 className="text-lg font-headline font-bold text-white leading-snug">{active.label}</h3>
+                <p className="text-sm text-white/60 leading-relaxed">{active.detail}</p>
+                <div className="space-y-0">
+                  {active.stats.map(s => (
+                    <div key={s.label} className="flex justify-between items-center py-3 border-b border-white/5 last:border-0">
+                      <span className="text-[9px] uppercase tracking-[0.3em] text-white/30 font-bold">{s.label}</span>
+                      <span className="text-sm font-bold text-white">{s.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* Lead capture */}
+          <div className="border-t border-white/5 pt-6">
+            <p className="text-[8px] uppercase tracking-[0.4em] text-white/30 font-bold mb-1">Reserve Your Plot</p>
+            <p className="text-xs text-white/40 mb-4 leading-relaxed">
+              Express interest and our team will reach out within 24 hours.
+            </p>
+            <LeadForm />
+          </div>
+        </div>
+
+        <div className="px-7 py-4 border-t border-white/5 flex-shrink-0">
+          <button onClick={onClose}
+            className="w-full py-2.5 text-[9px] uppercase tracking-widest font-bold text-white/20 hover:text-white/50 transition-all">
+            Close
+          </button>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
 
 const AGARTHA_HOTSPOTS: Hotspot[] = [
   {
@@ -950,126 +1182,19 @@ const AGARTHA_HOTSPOTS: Hotspot[] = [
   },
 ];
 
-const AagarthaInteractiveLayout: FC<{ onClose: () => void }> = ({ onClose }) => {
-  const [active, setActive] = useState<Hotspot>(AGARTHA_HOTSPOTS[0]);
-
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[90] bg-[#0e1409] flex flex-col md:flex-row overflow-hidden"
-    >
-      {/* ── LEFT: Site Plan image ── */}
-      <div className="relative w-full md:flex-1 h-[48vh] md:h-auto overflow-hidden">
-        <img
-          src="/agartha-layout.jpg"
-          alt="Agartha site plan"
-          className="w-full h-full object-cover"
-          onError={(e) => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&q=80&w=1600'; }}
-          referrerPolicy="no-referrer"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/40 pointer-events-none" />
-
-        {/* Header */}
-        <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-5 py-4">
-          <div>
-            <p className="text-[8px] uppercase tracking-[0.5em] text-white/40 font-bold">Site Plan</p>
-            <p className="text-sm font-bold text-white mt-0.5">MODCON Agartha</p>
-          </div>
-          <button onClick={onClose} className="p-2 bg-white/10 backdrop-blur-sm rounded-full hover:bg-white/20 transition-all">
-            <X className="w-4 h-4 text-white" />
-          </button>
-        </div>
-
-        {/* Dot markers — no numbers, clean */}
-        {AGARTHA_HOTSPOTS.map((h) => {
-          const isActive = active.id === h.id;
-          return (
-            <button
-              key={h.id}
-              style={{ left: `${h.x}%`, top: `${h.y}%` }}
-              className="absolute -translate-x-1/2 -translate-y-1/2"
-              onClick={() => setActive(h)}
-            >
-              <span className={cn(
-                "relative block rounded-full border-2 border-white shadow-lg transition-all duration-200",
-                isActive ? "w-4 h-4 bg-primary scale-125" : "w-3 h-3 bg-white/60 hover:bg-white hover:scale-125"
-              )} />
-              {isActive && (
-                <span className="absolute inset-0 rounded-full bg-primary/50 animate-ping pointer-events-none" />
-              )}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* ── RIGHT: Info panel ── */}
-      <div className="w-full md:w-[360px] flex-shrink-0 bg-surface flex flex-col overflow-hidden">
-
-        {/* Feature content */}
-        <div className="flex-1 overflow-y-auto px-7 py-8">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={active.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.18 }}
-              className="space-y-5"
-            >
-              <span className="text-[8px] uppercase tracking-[0.4em] text-secondary/50 font-bold">{active.tag}</span>
-
-              <h3 className="text-xl font-headline font-bold text-on-surface leading-snug">{active.label}</h3>
-
-              <p className="text-sm text-secondary/70 leading-relaxed">{active.detail}</p>
-
-              <div className="pt-2 space-y-0">
-                {active.stats.map(s => (
-                  <div key={s.label} className="flex justify-between items-center py-3 border-b border-outline/10 last:border-0">
-                    <span className="text-[9px] uppercase tracking-[0.3em] text-secondary/40 font-bold">{s.label}</span>
-                    <span className="text-sm font-bold text-on-surface">{s.value}</span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="flex gap-2 flex-wrap pt-2">
-                {AGARTHA_HOTSPOTS.filter(h => h.id !== active.id).map(h => (
-                  <button
-                    key={h.id}
-                    onClick={() => setActive(h)}
-                    className="text-[8px] uppercase tracking-widest font-bold px-3 py-1.5 rounded-full border border-outline/15 text-secondary/50 hover:text-primary hover:border-primary/30 transition-all"
-                  >
-                    {h.label.split(' ').slice(0, 2).join(' ')}
-                  </button>
-                ))}
-              </div>
-            </motion.div>
-          </AnimatePresence>
-        </div>
-
-        {/* Footer */}
-        <div className="px-7 py-5 border-t border-outline/10 space-y-2 flex-shrink-0">
-          <a
-            href="https://www.modconbuilders.com/agartha"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full py-3.5 bg-primary text-on-primary text-[9px] uppercase tracking-[0.4em] font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-primary/90 transition-all"
-          >
-            <ArrowRight className="w-3.5 h-3.5" />
-            View Brochure — MODCON
-          </a>
-          <button
-            onClick={onClose}
-            className="w-full py-2.5 text-[9px] uppercase tracking-widest font-bold text-secondary/40 hover:text-primary transition-all"
-          >
-            Close
-          </button>
-        </div>
-      </div>
-    </motion.div>
-  );
-};
+/** Agartha-specific wrapper — delegates to the generic PropertyInteractiveLayout */
+const AagarthaInteractiveLayout: FC<{ onClose: () => void }> = ({ onClose }) => (
+  <PropertyInteractiveLayout
+    sitePlanSrc="/agartha-layout.jpg"
+    hotspots={AGARTHA_HOTSPOTS}
+    projectName="Agartha"
+    developerTag="MODCON Builders · Narsapur"
+    tagline="53 plots · Forest community · From ₹64.6 L"
+    brochureUrl="https://www.modconbuilders.com/agartha"
+    intentPrefix="Agartha"
+    onClose={onClose}
+  />
+);
 
 // ─────────────────────────────────────────────────────────────────────────────
 
