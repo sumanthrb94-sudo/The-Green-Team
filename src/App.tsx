@@ -3712,19 +3712,26 @@ export default function App() {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollPositions.current[viewMode] ?? 0;
   }, [viewMode]);
 
-  // ── Swipe navigation (horizontal > 60 px, dominant over vertical) ────────
-  const touchStart = useRef<{ x: number; y: number } | null>(null);
+  // ── Edge-only swipe navigation (Android-style) ───────────────────────────
+  // Only triggers when the touch STARTS within EDGE_ZONE px of the left or right
+  // screen edge — mid-screen swipes are ignored entirely.
+  const EDGE_ZONE = 24; // px from either edge that counts as an edge swipe
+  const touchStart = useRef<{ x: number; y: number; fromEdge: boolean } | null>(null);
 
   const onTouchStart = useCallback((e: React.TouchEvent) => {
-    touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    const x = e.touches[0].clientX;
+    const fromEdge = x <= EDGE_ZONE || x >= window.innerWidth - EDGE_ZONE;
+    touchStart.current = { x, y: e.touches[0].clientY, fromEdge };
   }, []);
 
   const onTouchEnd = useCallback((e: React.TouchEvent) => {
     if (!touchStart.current) return;
-    const dx = e.changedTouches[0].clientX - touchStart.current.x;
-    const dy = Math.abs(e.changedTouches[0].clientY - touchStart.current.y);
+    const { fromEdge, x: startX, y: startY } = touchStart.current;
     touchStart.current = null;
-    if (Math.abs(dx) < 60 || Math.abs(dx) < dy * 1.5) return; // vertical scroll, ignore
+    if (!fromEdge) return; // mid-screen swipe — do nothing
+    const dx = e.changedTouches[0].clientX - startX;
+    const dy = Math.abs(e.changedTouches[0].clientY - startY);
+    if (Math.abs(dx) < 40 || Math.abs(dx) < dy * 1.2) return; // too short or mostly vertical
     const idx = VIEW_ORDER.indexOf(viewMode);
     if (dx < 0 && idx < VIEW_ORDER.length - 1) handleViewChange(VIEW_ORDER[idx + 1]); // swipe left → next
     if (dx > 0 && idx > 0)                     handleViewChange(VIEW_ORDER[idx - 1]); // swipe right → prev
