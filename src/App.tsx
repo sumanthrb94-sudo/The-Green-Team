@@ -3734,7 +3734,7 @@ const Membership = () => {
         </svg>
       ),
       title: "Limited Collective",
-      desc: "We accommodate only 20-30 premium clients total for The Green Team membership. Exclusivity is our core mandate."
+      desc: "A deliberately reserved investor circle — no public roster, no published count. Exclusivity is our core mandate."
     },
     {
       icon: (
@@ -3746,7 +3746,7 @@ const Membership = () => {
         </svg>
       ),
       title: "Project Scarcity",
-      desc: "Maximum of 20 slots per project. Early entry is not just an advantage; it's a requirement for the elite circle."
+      desc: "A finite number of seats per project, never disclosed publicly. Early entry is not just an advantage — it's a prerequisite."
     },
     {
       icon: (
@@ -3773,7 +3773,7 @@ const Membership = () => {
             </p>
             <div className="p-8 border border-gold/20 bg-gold/5 inline-block">
               <p className="text-gold text-[10px] uppercase tracking-[0.4em] font-bold mb-2">Current Capacity</p>
-              <p className="text-3xl font-serif italic">Limited to 30 Premium Clients Total</p>
+              <p className="text-3xl font-serif italic">A Reserved Investor Circle — By Invitation Only</p>
             </div>
           </div>
           
@@ -3915,7 +3915,7 @@ const ApplicationForm = () => {
               Apply for<br /><span className="italic text-olive-800">Concierge Access.</span>
             </h2>
             <p className="text-base font-light text-olive-900/50 leading-relaxed mb-12">
-              We curate India's most exclusive pre-launch sanctuaries for a private circle of 30 members. Our concierge will personally reach out within 24 hours.
+              We curate India's most exclusive pre-launch sanctuaries for a reserved investor circle. Our concierge will personally reach out within 24 hours.
             </p>
             <div className="space-y-6 border-t border-olive-800/10 pt-8">
               {[
@@ -4032,7 +4032,7 @@ const Footer = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
     { label: 'Sanctuary Map', sub: 'Environmental heatmap · AQI · Noise', mode: 'map' },
     { label: 'MODCON Agartha', sub: 'Narsapur Forest · Open access', mode: 'list' },
     { label: 'SYL Villament', sub: 'Tukkuguda · Newsletter only', mode: 'syl' },
-    { label: 'Concierge Membership', sub: 'Private circle · 30 seats only', mode: 'membership' },
+    { label: 'Concierge Membership', sub: 'Reserved investor circle · By invitation', mode: 'membership' },
   ];
 
   return (
