@@ -712,81 +712,86 @@ const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewslet
 
   return (
     <motion.div
-      whileHover={{ y: -10 }}
-      className="group membership-card bg-surface relative overflow-hidden cursor-pointer"
+      whileHover={{ y: -4 }}
+      className="group relative aspect-square overflow-hidden rounded-3xl cursor-pointer bg-[#0e1409]"
       onClick={() => { if (!isGated) onOpen(); }}
     >
+      {/* Full-bleed image */}
+      <img
+        src={sanctuary.image}
+        alt={sanctuary.title}
+        className={cn(
+          "absolute inset-0 w-full h-full object-cover transition-all duration-1000",
+          isGated ? "grayscale brightness-50" : "grayscale brightness-75 group-hover:grayscale-0 group-hover:brightness-90 group-hover:scale-105"
+        )}
+        referrerPolicy="no-referrer"
+      />
+
+      {/* Gradient overlay — strong at bottom, light at top */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-black/10 pointer-events-none" />
+
+      {/* Gated overlay */}
       {isGated && (
-        <div className="absolute inset-0 z-10 bg-surface/60 backdrop-blur-sm flex flex-col items-center justify-center p-8 text-center">
-          <Shield className="w-12 h-12 text-primary mb-6" />
-          <h4 className="text-2xl font-headline font-bold text-on-surface mb-4">Locked Landmark.</h4>
-          <p className="text-xs text-secondary mb-8 max-w-[200px]">Sign up for our newsletter to view the SYL details.</p>
-          <button 
-            onClick={onNewsletterClick}
-            className="px-6 py-3 bg-primary text-on-primary text-[9px] uppercase tracking-widest font-bold rounded-lg"
-          >
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center p-8 text-center">
+          <Shield className="w-10 h-10 text-primary mb-4" />
+          <h4 className="text-xl font-headline font-bold text-white mb-2">Locked Landmark.</h4>
+          <p className="text-xs text-white/60 mb-6 max-w-[180px]">Sign up for our newsletter to view SYL details.</p>
+          <button onClick={e => { e.stopPropagation(); onNewsletterClick(); }}
+            className="px-5 py-2.5 bg-primary text-on-primary text-[9px] uppercase tracking-widest font-bold rounded-xl">
             Unlock Now
           </button>
         </div>
       )}
 
-      <div className="relative h-[500px] overflow-hidden mb-8 rounded-2xl">
-        <img 
-          src={sanctuary.image} 
-          alt={sanctuary.title} 
-          className={cn(
-            "w-full h-full object-cover grayscale brightness-90 transition-all duration-1000",
-            !isGated && "group-hover:grayscale-0 group-hover:scale-105"
-          )}
-          referrerPolicy="no-referrer"
-        />
-        <div className="absolute top-6 left-6">
-          <div className="bg-primary text-on-primary px-4 py-1 text-[9px] uppercase tracking-[0.4em] font-bold rounded-full">
-            {sanctuary.id === 'syl' ? 'Upcoming' : 'Live'}
-          </div>
-        </div>
+      {/* Top badge */}
+      <div className="absolute top-5 left-5">
+        <span className="bg-primary text-on-primary px-3 py-1 text-[8px] uppercase tracking-[0.4em] font-bold rounded-full">
+          {sanctuary.id === 'syl' ? 'Upcoming' : 'Live'}
+        </span>
       </div>
 
-      <div className="space-y-6">
-        <div className="flex justify-between items-start">
-          <div>
-            <p className="text-primary text-[10px] font-bold uppercase tracking-[0.5em] mb-2">{sanctuary.commute}</p>
-            <h3 className="text-3xl font-headline font-bold text-on-surface">{sanctuary.title}</h3>
+      {/* Bottom info overlay */}
+      <div className="absolute bottom-0 left-0 right-0 px-6 pb-6 pt-10">
+        {/* Title + price row */}
+        <div className="flex items-end justify-between gap-3 mb-4">
+          <div className="min-w-0">
+            <p className="text-[8px] uppercase tracking-[0.4em] text-primary/80 font-bold mb-1 truncate">{sanctuary.commute}</p>
+            <h3 className="text-2xl font-headline font-bold text-white leading-tight">{sanctuary.title}</h3>
           </div>
-          <div className="text-right">
+          <div className="text-right flex-shrink-0">
             {sanctuary.pricePerSqYd ? (
               <>
-                <p className="text-[9px] uppercase tracking-[0.4em] text-secondary mb-1">₹{sanctuary.pricePerSqYd.toLocaleString('en-IN')}/sq yd</p>
-                <p className="text-2xl font-headline text-on-surface font-bold">{sanctuary.memberPrice}</p>
-                <p className="text-[9px] text-secondary/40">Typical ~{sanctuary.valuation}</p>
+                <p className="text-[8px] text-white/40 mb-0.5">₹{sanctuary.pricePerSqYd.toLocaleString('en-IN')}/sq yd</p>
+                <p className="text-xl font-headline font-bold text-white">{sanctuary.memberPrice}</p>
               </>
             ) : (
               <>
-                <p className="text-[9px] uppercase tracking-[0.4em] text-secondary mb-1">Market Valuation</p>
-                <p className="text-xl font-headline text-secondary/40 line-through">{sanctuary.valuation}</p>
-                <p className="text-2xl font-headline text-on-surface font-bold">{sanctuary.memberPrice}</p>
+                <p className="text-sm text-white/40 line-through">{sanctuary.valuation}</p>
+                <p className="text-xl font-headline font-bold text-white">{sanctuary.memberPrice}</p>
               </>
             )}
           </div>
         </div>
-        
-        <div className="flex gap-8 py-6 border-y border-outline/10">
-          <div className="flex items-center gap-2">
-            <Wind className="w-5 h-5 text-primary" />
-            <span className="text-xs uppercase tracking-widest font-bold text-on-surface">AQI: {sanctuary.aqi}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <VolumeX className="w-5 h-5 text-olive-800/60" />
-            <span className="text-xs uppercase tracking-widest font-bold text-olive-900">{sanctuary.noise}dB</span>
-          </div>
-        </div>
 
-        <button
-          onClick={(e) => { e.stopPropagation(); if (!isGated) onOpen(); }}
-          className="w-full py-5 bg-olive-800 text-cream text-xs uppercase tracking-[0.3em] font-bold hover:bg-olive-900 rounded-lg hover:shadow-lg hover:shadow-olive-900/20 transition-all duration-300 transform hover:-translate-y-1 mt-2"
-        >
-          View Prospectus
-        </button>
+        {/* Stats row + CTA */}
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1.5">
+              <Wind className="w-3.5 h-3.5 text-primary" />
+              <span className="text-[9px] uppercase tracking-widest font-bold text-white/70">AQI {sanctuary.aqi}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <VolumeX className="w-3.5 h-3.5 text-white/40" />
+              <span className="text-[9px] uppercase tracking-widest font-bold text-white/70">{sanctuary.noise} dB</span>
+            </div>
+          </div>
+          <button
+            onClick={e => { e.stopPropagation(); if (!isGated) onOpen(); }}
+            className="flex-shrink-0 px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white text-[8px] uppercase tracking-widest font-bold rounded-xl hover:bg-primary hover:border-primary transition-all"
+          >
+            View →
+          </button>
+        </div>
       </div>
     </motion.div>
   );
@@ -3507,7 +3512,7 @@ const Sanctuaries = ({ isSubscribed, onNewsletterClick, isFullPage = false }: { 
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
           {allSanctuaries.map(s => (
             <SanctuaryCard
               key={s.id}
