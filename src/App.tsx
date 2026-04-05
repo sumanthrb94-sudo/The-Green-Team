@@ -486,7 +486,7 @@ const SideNavBar = ({ activeMode, onModeChange }: { activeMode: string, onModeCh
   );
 };
 
-const Hero = () => {
+const Hero = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
   return (
     <section className="relative flex flex-col justify-start px-6 md:px-24 pt-6 pb-12 overflow-hidden cashew-gradient">
       <div className="absolute inset-0 z-0 opacity-10 mix-blend-multiply">
@@ -520,10 +520,10 @@ const Hero = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 md:gap-8 pt-4">
-              <button className="btn-membership btn-olive group w-full sm:w-auto shadow-lg hover:shadow-xl shadow-olive-900/20">
+              <button onClick={() => onModeChange('membership')} className="btn-membership btn-olive group w-full sm:w-auto shadow-lg hover:shadow-xl shadow-olive-900/20">
                 Apply for Membership <ArrowUpRight className="inline-block ml-2 w-4 h-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
               </button>
-              <button className="btn-membership btn-outline-olive w-full sm:w-auto hover:shadow-lg">
+              <button onClick={() => onModeChange('analytics')} className="btn-membership btn-outline-olive w-full sm:w-auto hover:shadow-lg">
                 The Green Team Advantage
               </button>
             </div>
@@ -723,7 +723,7 @@ const TheSIL = ({ isSubscribed, onNewsletterClick, isFullPage = false }: { isSub
               </div>
             </div>
 
-            <button className="btn-membership bg-gold text-olive-900 border-gold hover:bg-cream hover:text-olive-900">
+            <button onClick={onNewsletterClick} className="btn-membership bg-gold text-olive-900 border-gold hover:bg-cream hover:text-olive-900">
               Request Early Access Briefing
             </button>
           </div>
@@ -4256,7 +4256,7 @@ const ChatBot = ({ data }: { data: any }) => {
 
 const HomeView = ({ isSubscribed, onNewsletterClick, sanctuaries = SANCTUARIES, onModeChange }: { isSubscribed: boolean, onNewsletterClick: () => void, sanctuaries?: Sanctuary[], onModeChange: (mode: string) => void }) => (
   <div className="flex flex-col">
-    <Hero />
+    <Hero onModeChange={onModeChange} />
     <Advantage />
     <EcosystemPillars />
     <Sanctuaries isSubscribed={isSubscribed} onNewsletterClick={onNewsletterClick} sanctuaries={sanctuaries} />
