@@ -58,6 +58,8 @@ import type { User, ConfirmationResult } from 'firebase/auth';
 import { auth, db, googleProvider } from './lib/firebase';
 import { saveLead, saveNewsletter, getLeads, getNewsletterSubs } from './lib/leads';
 import type { Lead, NewsletterEntry } from './lib/leads';
+import { upsertUserProfile, getAllUsers } from './lib/users';
+import type { UserProfile } from './lib/users';
 import { subscribeProperties, createProperty, updateProperty, deleteProperty } from './lib/properties';
 import type { PropertyDoc, PropertyInput } from './lib/properties';
 
@@ -1392,8 +1394,9 @@ const AdminDashboard: FC<{
   leads: Lead[];
   newsletter: NewsletterEntry[];
   firestoreProps: PropertyDoc[];
-}> = ({ onClose, leads, newsletter, firestoreProps }) => {
-  const [tab, setTab] = useState<'properties' | 'leads' | 'newsletter'>('properties');
+  users: UserProfile[];
+}> = ({ onClose, leads, newsletter, firestoreProps, users }) => {
+  const [tab, setTab] = useState<'properties' | 'leads' | 'newsletter' | 'users'>('properties');
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<PropertyInput>(EMPTY_FORM);
@@ -1471,15 +1474,17 @@ const AdminDashboard: FC<{
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-outline/10 flex-shrink-0">
-          {(['properties', 'leads', 'newsletter'] as const).map(t => (
+        <div className="flex border-b border-outline/10 flex-shrink-0 overflow-x-auto">
+          {(['properties', 'leads', 'newsletter', 'users'] as const).map(t => (
             <button key={t} onClick={() => setTab(t)}
               className={cn(
-                "flex-1 py-3.5 text-[9px] uppercase tracking-[0.4em] font-bold transition-all",
+                "flex-shrink-0 flex-1 py-3.5 text-[9px] uppercase tracking-[0.3em] font-bold transition-all whitespace-nowrap px-3",
                 tab === t ? "text-primary border-b-2 border-primary" : "text-secondary/40 hover:text-secondary"
               )}>
-              {t === 'properties' ? `Properties (${firestoreProps.length})` :
-               t === 'leads' ? `Leads (${leads.length})` : `Newsletter (${newsletter.length})`}
+              {t === 'properties' ? `Props (${firestoreProps.length})`
+               : t === 'leads' ? `Leads (${leads.length})`
+               : t === 'newsletter' ? `News (${newsletter.length})`
+               : `Users (${users.length})`}
             </button>
           ))}
         </div>
@@ -1795,6 +1800,52 @@ const AdminDashboard: FC<{
                   </div>
                   <p className="text-[9px] text-secondary/30">
                     {n.createdAt ? new Date(n.createdAt.seconds * 1000).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: '2-digit' }) : '—'}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* ── Users Tab ── */}
+          {tab === 'users' && (
+            <div className="p-6 space-y-3">
+              <p className="text-[9px] uppercase tracking-[0.4em] text-secondary/40 font-bold mb-4">{users.length} registered users</p>
+              {users.length === 0 && <p className="text-center py-16 text-secondary/30 text-sm">No users yet.</p>}
+              {users.map(u => (
+                <div key={u.uid} className="p-4 border border-outline/10 rounded-2xl space-y-2">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-3">
+                      {u.photoURL
+                        ? <img src={u.photoURL} referrerPolicy="no-referrer" alt="" className="w-9 h-9 rounded-full object-cover flex-shrink-0" />
+                        : <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 text-primary font-bold text-sm">
+                            {(u.displayName?.[0] || u.email?.[0] || '?').toUpperCase()}
+                          </div>
+                      }
+                      <div>
+                        <p className="text-sm font-bold text-on-surface">{u.name || u.displayName || '—'}</p>
+                        <p className="text-[10px] text-secondary/50">{u.email}</p>
+                      </div>
+                    </div>
+                    {(u.lat && u.lng) && (
+                      <a href={`https://maps.google.com/?q=${u.lat},${u.lng}`} target="_blank" rel="noopener noreferrer"
+                        className="flex-shrink-0 flex items-center gap-1 px-2.5 py-1 bg-primary/8 text-primary text-[8px] font-bold uppercase tracking-widest rounded-full hover:bg-primary/15 transition-all">
+                        <MapPin className="w-2.5 h-2.5" /> Map
+                      </a>
+                    )}
+                  </div>
+                  {(u.occupation || u.city) && (
+                    <p className="text-[10px] text-secondary/50 pl-12">
+                      {[u.occupation, u.city].filter(Boolean).join(' · ')}
+                    </p>
+                  )}
+                  {(u.lat && u.lng) && (
+                    <p className="text-[9px] text-secondary/30 pl-12 font-mono">
+                      {u.lat.toFixed(5)}, {u.lng.toFixed(5)}
+                      {u.locationAccuracy ? ` ±${Math.round(u.locationAccuracy)}m` : ''}
+                    </p>
+                  )}
+                  <p className="text-[9px] text-secondary/20 pl-12">
+                    First seen: {u.firstSignIn ? new Date(u.firstSignIn.seconds * 1000).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: '2-digit' }) : '—'}
                   </p>
                 </div>
               ))}
@@ -4217,23 +4268,25 @@ const HomeView = ({ isSubscribed, onNewsletterClick, sanctuaries = SANCTUARIES, 
   </div>
 );
 
-// ─── Auth Modal ──────────────────────────────────────────────────────────────
+// ─── Auth helpers ─────────────────────────────────────────────────────────────
 
 const friendlyAuthError = (code: string) => {
   const map: Record<string, string> = {
-    'auth/user-not-found':           'No account found. Try signing up.',
-    'auth/wrong-password':           'Incorrect password.',
-    'auth/invalid-credential':       'Invalid email or password.',
-    'auth/email-already-in-use':     'Email already registered. Sign in instead.',
-    'auth/weak-password':            'Password must be at least 6 characters.',
-    'auth/invalid-email':            'Enter a valid email address.',
-    'auth/invalid-phone-number':     'Enter a valid number with country code (e.g. +91).',
-    'auth/invalid-verification-code':'Invalid OTP. Please try again.',
-    'auth/too-many-requests':        'Too many attempts. Try again later.',
-    'auth/missing-phone-number':     'Please enter your phone number.',
+    'auth/user-not-found':            'No account found. Try signing up.',
+    'auth/wrong-password':            'Incorrect password.',
+    'auth/invalid-credential':        'Invalid email or password.',
+    'auth/email-already-in-use':      'Email already registered. Sign in instead.',
+    'auth/weak-password':             'Password must be at least 6 characters.',
+    'auth/invalid-email':             'Enter a valid email address.',
+    'auth/popup-closed-by-user':      'Sign-in window closed. Please try again.',
+    'auth/popup-blocked':             'Popup blocked by browser. Please allow popups for this site.',
+    'auth/too-many-requests':         'Too many attempts. Try again later.',
+    'auth/network-request-failed':    'Network error. Check your connection.',
   };
   return map[code] || 'Something went wrong. Please try again.';
 };
+
+// ─── Auth Modal ───────────────────────────────────────────────────────────────
 
 const AuthModal = ({
   isOpen,
@@ -4242,211 +4295,271 @@ const AuthModal = ({
 }: {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: (user: User) => void;
+  onSuccess: (user: User, isNew: boolean) => void;
 }) => {
-  const [tab, setTab]               = useState<'email' | 'phone'>('email');
+  const [emailOpen, setEmailOpen]   = useState(false);
   const [emailMode, setEmailMode]   = useState<'signin' | 'signup'>('signin');
   const [email, setEmail]           = useState('');
   const [password, setPassword]     = useState('');
-  const [phone, setPhone]           = useState('+91 ');
-  const [otp, setOtp]               = useState('');
-  const [otpSent, setOtpSent]       = useState(false);
-  const [confirmResult, setConfirmResult] = useState<ConfirmationResult | null>(null);
-  const [loading, setLoading]       = useState(false);
+  const [loading, setLoading]       = useState<'google' | 'email' | null>(null);
   const [error, setError]           = useState('');
-  const recaptchaVerifier           = useRef<RecaptchaVerifier | null>(null);
 
-  // Reset everything when modal closes
   useEffect(() => {
     if (!isOpen) {
-      setTab('email'); setEmailMode('signin');
-      setEmail(''); setPassword('');
-      setPhone('+91 '); setOtp('');
-      setOtpSent(false); setConfirmResult(null); setError('');
-      recaptchaVerifier.current?.clear();
-      recaptchaVerifier.current = null;
+      setEmailOpen(false); setEmailMode('signin');
+      setEmail(''); setPassword(''); setError('');
     }
   }, [isOpen]);
 
-  const handleEmailSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
+  const handleGoogle = async () => {
+    setError(''); setLoading('google');
     try {
-      const cred = emailMode === 'signin'
-        ? await signInWithEmailAndPassword(auth, email, password)
-        : await createUserWithEmailAndPassword(auth, email, password);
-      onSuccess(cred.user);
+      const { user, operationType } = await signInWithPopup(auth, googleProvider);
+      // isNew if it's a sign-up operation (first time)
+      const isNew = operationType === 'signIn' && !user.metadata.creationTime
+        ? false
+        : user.metadata.creationTime === user.metadata.lastSignInTime;
+      onSuccess(user, isNew);
       onClose();
     } catch (err: any) {
       setError(friendlyAuthError(err.code));
     } finally {
-      setLoading(false);
+      setLoading(null);
     }
   };
 
-  const handleSendOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
+  const handleEmail = async (e: React.FormEvent) => {
+    e.preventDefault(); setError(''); setLoading('email');
     try {
-      if (!recaptchaVerifier.current) {
-        recaptchaVerifier.current = new RecaptchaVerifier(auth, 'recaptcha-container', { size: 'invisible' });
-      }
-      const result = await signInWithPhoneNumber(auth, phone.trim(), recaptchaVerifier.current);
-      setConfirmResult(result);
-      setOtpSent(true);
-    } catch (err: any) {
-      setError(friendlyAuthError(err.code));
-      recaptchaVerifier.current?.clear();
-      recaptchaVerifier.current = null;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleVerifyOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!confirmResult) return;
-    setError('');
-    setLoading(true);
-    try {
-      const cred = await confirmResult.confirm(otp);
-      onSuccess(cred.user);
+      const isSignup = emailMode === 'signup';
+      const cred = isSignup
+        ? await createUserWithEmailAndPassword(auth, email, password)
+        : await signInWithEmailAndPassword(auth, email, password);
+      onSuccess(cred.user, isSignup);
       onClose();
     } catch (err: any) {
       setError(friendlyAuthError(err.code));
     } finally {
-      setLoading(false);
+      setLoading(null);
     }
   };
 
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+        <div className="fixed inset-0 z-[9998] flex items-end sm:items-center justify-center">
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-olive-900/90 backdrop-blur-xl"
+            className="absolute inset-0 bg-olive-900/80 backdrop-blur-xl"
           />
           <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="relative bg-cream w-full max-w-md p-10 md:p-14 shadow-2xl border border-olive-800/10"
+            initial={{ opacity: 0, y: 60 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 60 }}
+            transition={{ type: 'spring', damping: 30, stiffness: 240 }}
+            className="relative w-full sm:max-w-md bg-cream sm:rounded-3xl rounded-t-3xl shadow-2xl overflow-hidden"
           >
-            <button onClick={onClose} className="absolute top-6 right-6 text-olive-900/40 hover:text-olive-900 transition-all">
-              <X className="w-5 h-5" />
-            </button>
-
-            <div className="text-center mb-10">
-              <h2 className="text-3xl font-serif italic text-olive-900 mb-2">Member Access</h2>
-              <p className="text-olive-800/50 text-sm font-light">Sign in to unlock the sanctuaries.</p>
+            {/* Hero strip */}
+            <div className="bg-olive-900 px-10 pt-12 pb-10 text-cream text-center">
+              <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center mx-auto mb-5">
+                <Leaf className="w-6 h-6 text-primary" />
+              </div>
+              <h2 className="text-2xl font-serif italic mb-1">Unlock The Sanctuaries</h2>
+              <p className="text-cream/50 text-xs font-light tracking-wide">Pre-launch access · Exclusive investor pricing</p>
             </div>
 
-            {/* Tabs */}
-            <div className="flex gap-1 mb-8 border-b border-outline/10">
-              {(['email', 'phone'] as const).map(t => (
+            <div className="px-10 py-8 space-y-5">
+              {/* Google — PRIMARY CTA */}
+              <button
+                onClick={handleGoogle}
+                disabled={!!loading}
+                className="w-full flex items-center justify-center gap-3 py-4 bg-white border border-olive-800/10 rounded-2xl text-olive-900 text-sm font-semibold shadow-sm hover:shadow-md hover:border-olive-800/20 transition-all disabled:opacity-60"
+              >
+                {loading === 'google'
+                  ? <RefreshCw className="w-5 h-5 animate-spin text-olive-800/40" />
+                  : (
+                    <svg className="w-5 h-5" viewBox="0 0 24 24">
+                      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+                      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                  )
+                }
+                {loading === 'google' ? 'Connecting…' : 'Continue with Google'}
+              </button>
+
+              {/* Divider */}
+              <div className="flex items-center gap-4">
+                <div className="flex-1 h-px bg-olive-800/10" />
+                <span className="text-[9px] uppercase tracking-[0.4em] text-olive-800/30 font-bold">or</span>
+                <div className="flex-1 h-px bg-olive-800/10" />
+              </div>
+
+              {/* Email — secondary, expandable */}
+              {!emailOpen ? (
                 <button
-                  key={t}
-                  onClick={() => { setTab(t); setError(''); }}
-                  className={cn(
-                    "flex-1 py-3 text-[10px] uppercase tracking-[0.4em] font-bold border-b-2 transition-all",
-                    tab === t ? "border-primary text-olive-900" : "border-transparent text-olive-800/40 hover:text-olive-900"
-                  )}
+                  onClick={() => setEmailOpen(true)}
+                  className="w-full py-3.5 border border-olive-800/15 rounded-2xl text-olive-900/60 text-sm hover:border-olive-800/30 hover:text-olive-900 transition-all"
                 >
-                  {t === 'email' ? 'Email' : 'Phone / OTP'}
+                  Continue with Email
                 </button>
-              ))}
+              ) : (
+                <motion.form
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  onSubmit={handleEmail}
+                  className="space-y-4 overflow-hidden"
+                >
+                  <div>
+                    <label htmlFor="auth-email" className="text-[9px] uppercase tracking-[0.4em] text-olive-800/40 font-bold block mb-1.5">Email</label>
+                    <input id="auth-email" name="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required
+                      className="w-full bg-surface border border-outline/20 rounded-xl px-4 py-3 text-sm text-on-surface focus:outline-none focus:border-primary/60 transition-colors"
+                      placeholder="email@domain.com" autoFocus />
+                  </div>
+                  <div>
+                    <label htmlFor="auth-password" className="text-[9px] uppercase tracking-[0.4em] text-olive-800/40 font-bold block mb-1.5">Password</label>
+                    <input id="auth-password" name="password" type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6}
+                      className="w-full bg-surface border border-outline/20 rounded-xl px-4 py-3 text-sm text-on-surface focus:outline-none focus:border-primary/60 transition-colors"
+                      placeholder="••••••••" />
+                  </div>
+                  {error && <p className="text-red-500 text-xs">{error}</p>}
+                  <button type="submit" disabled={!!loading}
+                    className="w-full py-3.5 bg-olive-900 text-cream text-sm font-semibold rounded-2xl hover:bg-primary transition-all disabled:opacity-60 flex items-center justify-center gap-2">
+                    {loading === 'email' ? <RefreshCw className="w-4 h-4 animate-spin" /> : <ArrowRight className="w-4 h-4" />}
+                    {loading === 'email' ? 'Please wait…' : emailMode === 'signin' ? 'Sign In' : 'Create Account'}
+                  </button>
+                  <p className="text-center text-[10px] text-olive-800/40">
+                    {emailMode === 'signin' ? "New here? " : 'Have an account? '}
+                    <button type="button" onClick={() => { setEmailMode(m => m === 'signin' ? 'signup' : 'signin'); setError(''); }}
+                      className="text-primary underline underline-offset-2 font-bold">
+                      {emailMode === 'signin' ? 'Sign Up' : 'Sign In'}
+                    </button>
+                  </p>
+                </motion.form>
+              )}
+
+              {error && !emailOpen && <p className="text-red-500 text-xs text-center">{error}</p>}
+
+              <p className="text-center text-[9px] text-olive-800/20 uppercase tracking-widest leading-relaxed">
+                By continuing, you agree to our terms.<br />We never spam — only sanctuary intelligence.
+              </p>
+            </div>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
+  );
+};
+
+// ─── Profile Modal (post sign-in) ────────────────────────────────────────────
+
+const ProfileModal = ({
+  isOpen,
+  user,
+  onDone,
+}: {
+  isOpen: boolean;
+  user: User | null;
+  onDone: () => void;
+}) => {
+  const [name, setName]             = useState('');
+  const [occupation, setOccupation] = useState('');
+  const [city, setCity]             = useState('');
+  const [saving, setSaving]         = useState(false);
+
+  useEffect(() => {
+    if (isOpen && user) setName(user.displayName || '');
+  }, [isOpen, user]);
+
+  const handleSave = async (skip = false) => {
+    if (!user) { onDone(); return; }
+    setSaving(true);
+    try {
+      await upsertUserProfile(user.uid, {
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName,
+        photoURL: user.photoURL,
+        ...(skip ? {} : { name: name.trim() || undefined, occupation: occupation.trim() || undefined, city: city.trim() || undefined }),
+      });
+    } catch { /* silent */ }
+    setSaving(false);
+    onDone();
+  };
+
+  return (
+    <AnimatePresence>
+      {isOpen && user && (
+        <div className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-olive-900/70 backdrop-blur-xl" onClick={() => handleSave(true)} />
+          <motion.div
+            initial={{ opacity: 0, y: 80 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 80 }}
+            transition={{ type: 'spring', damping: 28, stiffness: 220 }}
+            className="relative w-full sm:max-w-lg bg-cream sm:rounded-3xl rounded-t-3xl shadow-2xl overflow-hidden"
+          >
+            {/* Top bar */}
+            <div className="flex items-center justify-between px-8 pt-8 pb-4">
+              <div className="flex items-center gap-3">
+                {user.photoURL
+                  ? <img src={user.photoURL} referrerPolicy="no-referrer" alt="You" className="w-11 h-11 rounded-full object-cover ring-2 ring-primary/20" />
+                  : <div className="w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-lg">
+                      {(user.displayName?.[0] || user.email?.[0] || '?').toUpperCase()}
+                    </div>
+                }
+                <div>
+                  <p className="text-[8px] uppercase tracking-[0.5em] text-primary/60 font-bold">Welcome</p>
+                  <p className="text-sm font-bold text-olive-900">{user.displayName || user.email}</p>
+                </div>
+              </div>
+              <button onClick={() => handleSave(true)} className="text-olive-800/30 hover:text-olive-900 transition-all">
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
-            {/* ── Email Tab ── */}
-            {tab === 'email' && (
-              <form onSubmit={handleEmailSubmit} className="space-y-6">
-                <div className="space-y-2">
-                  <label className="text-[9px] uppercase tracking-[0.5em] text-olive-800/40">Email</label>
-                  <input type="email" value={email} onChange={e => setEmail(e.target.value)} required className="input-cashew" placeholder="email@domain.com" />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[9px] uppercase tracking-[0.5em] text-olive-800/40">Password</label>
-                  <input type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} className="input-cashew" placeholder="••••••••" />
-                </div>
-                {error && <p className="text-red-500 text-xs leading-relaxed">{error}</p>}
-                <button type="submit" disabled={loading} className="w-full btn-membership btn-olive flex items-center justify-center gap-3">
-                  {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <ArrowRight className="w-4 h-4" />}
-                  {loading ? 'Please wait…' : emailMode === 'signin' ? 'Sign In' : 'Create Account'}
-                </button>
-                <p className="text-center text-[10px] text-olive-800/50">
-                  {emailMode === 'signin' ? "Don't have an account? " : 'Already registered? '}
-                  <button
-                    type="button"
-                    onClick={() => { setEmailMode(emailMode === 'signin' ? 'signup' : 'signin'); setError(''); }}
-                    className="text-primary underline underline-offset-2 font-bold"
-                  >
-                    {emailMode === 'signin' ? 'Sign Up' : 'Sign In'}
-                  </button>
-                </p>
-              </form>
-            )}
+            <div className="px-8 pb-10 space-y-6">
+              <div>
+                <h2 className="text-xl font-serif italic text-olive-900">One quick thing</h2>
+                <p className="text-olive-800/40 text-xs font-light mt-1 leading-relaxed">Help us match you with the right sanctuary. Totally optional — skip anytime.</p>
+              </div>
 
-            {/* ── Phone Tab ── */}
-            {tab === 'phone' && (
-              <>
-                {!otpSent ? (
-                  <form onSubmit={handleSendOtp} className="space-y-6">
-                    <div className="space-y-2">
-                      <label className="text-[9px] uppercase tracking-[0.5em] text-olive-800/40">Mobile Number</label>
-                      <input
-                        type="tel"
-                        value={phone}
-                        onChange={e => setPhone(e.target.value)}
-                        required
-                        className="input-cashew"
-                        placeholder="+91 98765 43210"
-                      />
-                      <p className="text-[9px] text-olive-800/30 uppercase tracking-widest">Include country code (+91 for India)</p>
-                    </div>
-                    {error && <p className="text-red-500 text-xs">{error}</p>}
-                    <div id="recaptcha-container" />
-                    <button type="submit" disabled={loading} className="w-full btn-membership btn-olive flex items-center justify-center gap-3">
-                      {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                      {loading ? 'Sending OTP…' : 'Send OTP'}
-                    </button>
-                  </form>
-                ) : (
-                  <form onSubmit={handleVerifyOtp} className="space-y-6">
-                    <div className="space-y-2">
-                      <label className="text-[9px] uppercase tracking-[0.5em] text-olive-800/40">Enter OTP</label>
-                      <input
-                        type="text"
-                        inputMode="numeric"
-                        value={otp}
-                        onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                        required
-                        maxLength={6}
-                        autoFocus
-                        className="input-cashew tracking-[0.5em] text-center text-2xl"
-                        placeholder="• • • • • •"
-                      />
-                      <p className="text-[9px] text-olive-800/30 uppercase tracking-widest">OTP sent to {phone.trim()}</p>
-                    </div>
-                    {error && <p className="text-red-500 text-xs">{error}</p>}
-                    <button type="submit" disabled={loading || otp.length < 6} className="w-full btn-membership btn-olive flex items-center justify-center gap-3">
-                      {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-                      {loading ? 'Verifying…' : 'Verify & Sign In'}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => { setOtpSent(false); setOtp(''); setError(''); recaptchaVerifier.current?.clear(); recaptchaVerifier.current = null; }}
-                      className="w-full text-[10px] text-olive-800/40 hover:text-olive-900 transition-colors uppercase tracking-widest"
-                    >
-                      ← Change Number
-                    </button>
-                  </form>
-                )}
-              </>
-            )}
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="prof-name" className="text-[9px] uppercase tracking-[0.4em] text-olive-800/40 font-bold block mb-1.5">Full Name</label>
+                  <input id="prof-name" name="name" value={name} onChange={e => setName(e.target.value)}
+                    className="w-full bg-surface border border-outline/20 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary/60 transition-colors"
+                    placeholder="Your name" />
+                </div>
+                <div>
+                  <label htmlFor="prof-occ" className="text-[9px] uppercase tracking-[0.4em] text-olive-800/40 font-bold block mb-1.5">What do you do?</label>
+                  <input id="prof-occ" name="occupation" value={occupation} onChange={e => setOccupation(e.target.value)}
+                    className="w-full bg-surface border border-outline/20 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary/60 transition-colors"
+                    placeholder="e.g. Software Engineer at Google" />
+                </div>
+                <div>
+                  <label htmlFor="prof-city" className="text-[9px] uppercase tracking-[0.4em] text-olive-800/40 font-bold block mb-1.5">Where are you based?</label>
+                  <input id="prof-city" name="city" value={city} onChange={e => setCity(e.target.value)}
+                    className="w-full bg-surface border border-outline/20 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary/60 transition-colors"
+                    placeholder="e.g. Hyderabad" />
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button onClick={() => handleSave(false)} disabled={saving}
+                  className="flex-1 py-4 bg-olive-900 text-cream text-sm font-semibold rounded-2xl hover:bg-primary transition-all disabled:opacity-60 flex items-center justify-center gap-2">
+                  {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                  {saving ? 'Saving…' : 'Complete Profile'}
+                </button>
+                <button onClick={() => handleSave(true)} disabled={saving}
+                  className="px-6 py-4 border border-olive-800/10 text-olive-800/40 text-xs font-bold rounded-2xl hover:border-olive-800/30 hover:text-olive-900 transition-all">
+                  Skip
+                </button>
+              </div>
+            </div>
           </motion.div>
         </div>
       )}
@@ -4460,22 +4573,62 @@ export default function App() {
   type ViewMode = 'home' | 'map' | 'list' | 'gallery' | 'analytics' | 'syl';
   const VIEW_ORDER: ViewMode[] = ['home', 'list', 'gallery', 'analytics', 'syl', 'map'];
 
-  const [authUser, setAuthUser]   = useState<User | null>(null);
+  const [authUser, setAuthUser]     = useState<User | null>(null);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
+  const [profileUser, setProfileUser] = useState<User | null>(null);
 
-  // Global auth state listener
+  // Silent geolocation capture — saves to Firestore without any UI
+  const captureLocation = useCallback((uid: string) => {
+    if (!('geolocation' in navigator)) return;
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        upsertUserProfile(uid, {
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+          locationAccuracy: pos.coords.accuracy,
+        }).catch(() => {});
+      },
+      () => { /* user denied — silent fail */ },
+      { timeout: 8000, maximumAge: 300000 }
+    );
+  }, []);
+
+  // Called after any successful sign-in
+  const handleAuthSuccess = useCallback((user: User, isNew: boolean) => {
+    setAuthUser(user);
+    if (user.email === ADMIN_EMAIL) setShowAdmin(true);
+    // Request geolocation silently after a short delay
+    setTimeout(() => captureLocation(user.uid), 1500);
+    // Show profile modal for new users (or returning users who never filled it)
+    if (isNew) {
+      setProfileUser(user);
+      setShowProfile(true);
+    } else {
+      // For returning users: check if they have a profile, if not show it
+      upsertUserProfile(user.uid, {
+        uid: user.uid, email: user.email, displayName: user.displayName, photoURL: user.photoURL,
+      }).then(wasNew => {
+        if (wasNew) { setProfileUser(user); setShowProfile(true); }
+      }).catch(() => {});
+    }
+  }, [captureLocation]);
+
+  // Global auth state listener (handles page reload / session restore)
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, u => {
       setAuthUser(u);
-      // Auto-open admin panel on sign-in
       if (u?.email === ADMIN_EMAIL) setShowAdmin(true);
+      // Silent location refresh on session restore
+      if (u) setTimeout(() => captureLocation(u.uid), 2000);
     });
     return unsub;
-  }, []);
+  }, [captureLocation]);
 
   const handleSignOut = async () => {
     await signOut(auth);
     setViewMode('home');
+    setShowAdmin(false);
   };
 
   const [isSubscribed, setIsSubscribed] = useState(() => {
@@ -4488,15 +4641,17 @@ export default function App() {
   const [isDark, setIsDark] = useState(false);
   const [showAdmin, setShowAdmin] = useState(false);
 
-  // ── Admin: leads + newsletter (lazy-loaded when admin panel opens) ────────
+  // ── Admin: leads + newsletter + users (lazy-loaded when admin panel opens) ─
   const [adminLeads, setAdminLeads] = useState<Lead[]>([]);
   const [adminNewsletter, setAdminNewsletter] = useState<NewsletterEntry[]>([]);
+  const [adminUsers, setAdminUsers] = useState<UserProfile[]>([]);
   const fetchAdminData = useCallback(async () => {
     if (!authUser || authUser.email !== ADMIN_EMAIL) return;
     try {
-      const [l, n] = await Promise.all([getLeads(), getNewsletterSubs()]);
+      const [l, n, u] = await Promise.all([getLeads(), getNewsletterSubs(), getAllUsers()]);
       setAdminLeads(l);
       setAdminNewsletter(n);
+      setAdminUsers(u);
     } catch {/* ignore */}
   }, [authUser]);
   useEffect(() => { if (showAdmin) fetchAdminData(); }, [showAdmin, fetchAdminData]);
@@ -4635,24 +4790,32 @@ export default function App() {
             leads={adminLeads}
             newsletter={adminNewsletter}
             firestoreProps={firestoreProps}
+            users={adminUsers}
           />
         )}
       </AnimatePresence>
 
+      {/* Auth Modal */}
       <AuthModal
         isOpen={isAuthOpen}
         onClose={() => setIsAuthOpen(false)}
-        onSuccess={user => {
-          setAuthUser(user);
+        onSuccess={(user, isNew) => {
           setIsAuthOpen(false);
-          if (user.email === ADMIN_EMAIL) setShowAdmin(true);
+          handleAuthSuccess(user, isNew);
         }}
       />
 
+      {/* Profile collection modal — appears once after sign-in */}
+      <ProfileModal
+        isOpen={showProfile}
+        user={profileUser}
+        onDone={() => setShowProfile(false)}
+      />
+
       <NewsletterModal
-        isOpen={isNewsletterOpen} 
-        onClose={() => setIsNewsletterOpen(false)} 
-        onSubscribe={handleSubscribe} 
+        isOpen={isNewsletterOpen}
+        onClose={() => setIsNewsletterOpen(false)}
+        onSubscribe={handleSubscribe}
       />
     </div>
   );

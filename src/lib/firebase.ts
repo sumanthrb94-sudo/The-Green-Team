@@ -24,7 +24,13 @@ const app = firebaseConfig.apiKey
 
 export const auth           = app ? getAuth(app) : null as any;
 export const db             = app ? getFirestore(app) : null as any;
-export const googleProvider = new GoogleAuthProvider();
+export const googleProvider = (() => {
+  const p = new GoogleAuthProvider();
+  p.addScope('profile');
+  p.addScope('email');
+  p.setCustomParameters({ prompt: 'select_account' });
+  return p;
+})();
 
 if (app) {
   isSupported().then(yes => { if (yes) getAnalytics(app); });
