@@ -184,23 +184,42 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
   onAdminClick: () => void;
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [sanctuariesOpen, setSanctuariesOpen] = useState(false);
 
   const navItems = [
     { name: 'Home', id: 'home' },
     { name: 'Map', id: 'map' },
     { name: 'Advantage', id: 'analytics' },
     { name: 'Ecosystems', id: 'gallery' },
-    { name: 'Agartha', id: 'list' },
-    { name: 'SYL', id: 'syl' },
     { name: 'Membership', id: 'membership' },
+  ];
+
+  const sanctuaryItems = [
+    { name: 'MODCON Agartha', id: 'list', sub: 'Narsapur Forest · From ₹64.6 L', img: '/agartha-render.jpg' },
+    { name: 'SYL: Vertical Villament', id: 'syl', sub: 'Tukkuguda · From ₹1.9 Cr', img: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=400' },
   ];
 
   const avatarLetter = (authUser?.displayName?.[0] || authUser?.email?.[0] || authUser?.phoneNumber?.[1] || '?').toUpperCase();
 
   return (
     <nav className="relative z-[9990] px-6 md:px-10 flex items-center justify-between h-16 md:h-20 bg-cream border-b border-outline/10">
-      {/* Left: Brand only */}
-      <Logo className="w-7 h-7" textClassName="text-base md:text-lg" />
+      {/* Left: Brand + dark mode toggle */}
+      <div className="flex items-center gap-3">
+        <Logo className="w-7 h-7" textClassName="text-base md:text-lg" />
+        <button
+          onClick={() => setIsDark(!isDark)}
+          title={isDark ? 'Light mode' : 'Dark mode'}
+          className={cn(
+            "flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border text-[8px] uppercase tracking-widest font-bold transition-all",
+            isDark
+              ? "bg-primary/10 border-primary/20 text-primary"
+              : "bg-outline/8 border-outline/20 text-secondary/60 hover:border-primary/30 hover:text-primary"
+          )}
+        >
+          {isDark ? <Sun className="w-3 h-3" /> : <Moon className="w-3 h-3" />}
+          <span className="hidden sm:inline">{isDark ? 'Light' : 'Dark'}</span>
+        </button>
+      </div>
 
       {/* Right: admin badge (admin only) + menu/avatar trigger */}
       <div className="flex items-center gap-2">
@@ -261,36 +280,67 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
               className="fixed top-0 left-0 right-0 bg-surface z-[10000] flex flex-col p-8 md:p-16 shadow-2xl rounded-b-[40px] max-h-[95vh] overflow-y-auto"
             >
               {/* Panel header */}
-              <div className="flex items-center justify-between mb-12">
+              <div className="flex items-center justify-between mb-10">
                 <Logo className="w-8 h-8" textClassName="text-lg" />
-                <button
-                  onClick={() => setIsMenuOpen(false)}
-                  className="p-3 hover:bg-primary/5 rounded-full transition-all"
-                >
+                <button onClick={() => setIsMenuOpen(false)} className="p-3 hover:bg-primary/5 rounded-full transition-all">
                   <X className="w-6 h-6 text-on-surface" />
                 </button>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-12 md:gap-24">
+              <div className="grid md:grid-cols-2 gap-10 md:gap-24">
                 {/* Nav links */}
-                <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-5">
                   <p className="text-[10px] uppercase tracking-[0.6em] text-secondary font-bold opacity-40">Explore</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-6">
+                  <div className="flex flex-col gap-5">
                     {navItems.map((item) => (
-                      <button
-                        key={item.id}
-                        onClick={() => {
-                          if (['home', 'map', 'analytics', 'gallery', 'list', 'syl'].includes(item.id)) {
-                            onModeChange(item.id as any);
-                          }
-                          setIsMenuOpen(false);
-                        }}
+                      <button key={item.id}
+                        onClick={() => { onModeChange(item.id as any); setIsMenuOpen(false); }}
                         className="text-2xl md:text-3xl uppercase tracking-[0.1em] font-headline font-bold text-on-surface hover:text-primary transition-all flex items-center justify-between group text-left"
                       >
                         <span className="group-hover:translate-x-2 transition-transform duration-500">{item.name}</span>
                         <ArrowRight className="w-5 h-5 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500" />
                       </button>
                     ))}
+
+                    {/* Sanctuaries — expandable dropdown */}
+                    <div>
+                      <button
+                        onClick={() => setSanctuariesOpen(v => !v)}
+                        className="text-2xl md:text-3xl uppercase tracking-[0.1em] font-headline font-bold text-on-surface hover:text-primary transition-all flex items-center justify-between w-full group"
+                      >
+                        <span className="group-hover:translate-x-2 transition-transform duration-500">Sanctuaries</span>
+                        <ChevronDown className={cn("w-5 h-5 text-primary transition-transform duration-300", sanctuariesOpen && "rotate-180")} />
+                      </button>
+
+                      <AnimatePresence>
+                        {sanctuariesOpen && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.25 }}
+                            className="overflow-hidden mt-4"
+                          >
+                            <div className="flex flex-col gap-3 pl-2 border-l-2 border-primary/20">
+                              {sanctuaryItems.map(s => (
+                                <button key={s.id}
+                                  onClick={() => { onModeChange(s.id as any); setIsMenuOpen(false); setSanctuariesOpen(false); }}
+                                  className="flex items-center gap-4 group/item text-left hover:translate-x-1 transition-transform duration-200"
+                                >
+                                  <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-outline/10">
+                                    <img src={s.img} alt={s.name} referrerPolicy="no-referrer" className="w-full h-full object-cover grayscale group-hover/item:grayscale-0 transition-all duration-500" />
+                                  </div>
+                                  <div>
+                                    <p className="font-headline font-bold text-sm text-on-surface group-hover/item:text-primary transition-colors">{s.name}</p>
+                                    <p className="text-[9px] uppercase tracking-widest text-secondary/50">{s.sub}</p>
+                                  </div>
+                                </button>
+                              ))}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
                   </div>
                 </div>
 
@@ -365,14 +415,6 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
                     </>
                   )}
 
-                  {/* Dark mode toggle — blended in */}
-                  <button
-                    onClick={() => setIsDark(!isDark)}
-                    className="flex items-center gap-3 text-[10px] uppercase tracking-[0.4em] text-secondary/50 font-bold hover:text-primary transition-colors mt-2 self-start"
-                  >
-                    {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-                    {isDark ? 'Light Mode' : 'Dark Mode'}
-                  </button>
                 </div>
               </div>
 
@@ -1772,7 +1814,12 @@ const featureIcon = (f: string) => {
   return <Zap className="w-4 h-4" />;
 };
 
-const PropertyDetailOverlay = ({ sanctuary, onClose }: { sanctuary: Sanctuary, onClose: () => void }) => {
+const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNewsletterSignup }: {
+  sanctuary: Sanctuary;
+  onClose: () => void;
+  isSubscribed?: boolean;
+  onNewsletterSignup?: () => void;
+}) => {
   const hotspots  = SANCTUARY_HOTSPOTS[sanctuary.id] ?? null;
   const plotDots  = SANCTUARY_PLOTS[sanctuary.id]    ?? null;
   const [activeSpot, setActiveSpot]   = useState<Hotspot | null>(hotspots?.[0] ?? null);
@@ -1782,6 +1829,31 @@ const PropertyDetailOverlay = ({ sanctuary, onClose }: { sanctuary: Sanctuary, o
   const [leadPhone, setLeadPhone]     = useState('');
   const [leadSubmitted, setLeadSubmitted] = useState(false);
   const [leadLoading, setLeadLoading]    = useState(false);
+
+  // Timed newsletter prompt — appears after 25s if not already subscribed
+  const [showNewsletterPrompt, setShowNewsletterPrompt] = useState(false);
+  const [nlEmail, setNlEmail]     = useState('');
+  const [nlDone, setNlDone]       = useState(false);
+  const [nlLoading, setNlLoading] = useState(false);
+  useEffect(() => {
+    if (isSubscribed) return;
+    const t = setTimeout(() => setShowNewsletterPrompt(true), 25000);
+    return () => clearTimeout(t);
+  }, [isSubscribed]);
+
+  const handleNlSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!nlEmail.trim()) return;
+    setNlLoading(true);
+    try {
+      await saveNewsletter(nlEmail.trim(), 'modal');
+      await saveLead({ name: nlEmail.trim(), email: nlEmail.trim(), intent: `${sanctuary.title} — Newsletter Prompt` });
+      onNewsletterSignup?.();
+    } catch {/* ignore */} finally {
+      setNlLoading(false);
+      setNlDone(true);
+    }
+  };
 
   // Parse "45 mins to Financial District" → { time: '45m', dest: 'Fin. District' }
   const commuteTime = sanctuary.commute.match(/\d+/)?.[0] ?? '—';
@@ -2248,6 +2320,53 @@ const PropertyDetailOverlay = ({ sanctuary, onClose }: { sanctuary: Sanctuary, o
           </div>
         </div>
       </div>
+
+      {/* ── Timed newsletter prompt (slides up after 25s) ── */}
+      <AnimatePresence>
+        {showNewsletterPrompt && !nlDone && (
+          <motion.div
+            initial={{ y: '100%', opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: '100%', opacity: 0 }}
+            transition={{ type: 'spring', damping: 28, stiffness: 220 }}
+            className="absolute bottom-0 left-0 right-0 bg-[#0a0f07] border-t border-primary/20 px-6 py-5 z-10"
+          >
+            <button onClick={() => setShowNewsletterPrompt(false)}
+              className="absolute top-3 right-4 p-1 text-white/30 hover:text-white/60 transition-colors">
+              <X className="w-4 h-4" />
+            </button>
+            <p className="text-[8px] uppercase tracking-[0.5em] text-primary/60 font-bold mb-1">Still exploring?</p>
+            <p className="text-sm font-headline font-bold text-white mb-3">
+              Get exclusive {sanctuary.title} updates — pricing alerts, site visit slots &amp; VIP access.
+            </p>
+            <form onSubmit={handleNlSubmit} className="flex gap-2">
+              <input
+                type="email" placeholder="your@email.com" value={nlEmail}
+                onChange={e => setNlEmail(e.target.value)}
+                className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-primary/50 transition-colors"
+              />
+              <button type="submit" disabled={nlLoading || !nlEmail.trim()}
+                className="px-4 py-2.5 bg-primary text-on-primary text-[9px] uppercase tracking-widest font-bold rounded-xl hover:bg-primary/90 transition-all disabled:opacity-50 flex-shrink-0">
+                {nlLoading ? '…' : 'Notify Me'}
+              </button>
+            </form>
+          </motion.div>
+        )}
+        {nlDone && showNewsletterPrompt && (
+          <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
+            transition={{ type: 'spring', damping: 28, stiffness: 220 }}
+            className="absolute bottom-0 left-0 right-0 bg-[#0a0f07] border-t border-primary/20 px-6 py-5 z-10 flex items-center gap-3">
+            <Check className="w-5 h-5 text-primary flex-shrink-0" />
+            <div>
+              <p className="text-sm font-bold text-white">You're on the list.</p>
+              <p className="text-[10px] text-white/40">We'll reach out within 24 hours.</p>
+            </div>
+            <button onClick={() => setShowNewsletterPrompt(false)} className="ml-auto text-white/30 hover:text-white/60">
+              <X className="w-4 h-4" />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };
@@ -3536,7 +3655,7 @@ const Sanctuaries = ({ isSubscribed, onNewsletterClick, isFullPage = false, sanc
               onClick={() => setSelectedSanctuary(null)}
               className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             />
-            <PropertyDetailOverlay sanctuary={selectedSanctuary} onClose={() => setSelectedSanctuary(null)} />
+            <PropertyDetailOverlay sanctuary={selectedSanctuary} onClose={() => setSelectedSanctuary(null)} isSubscribed={isSubscribed} onNewsletterSignup={onNewsletterClick} />
           </div>
         )}
       </AnimatePresence>
