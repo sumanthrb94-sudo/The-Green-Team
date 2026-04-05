@@ -4026,64 +4026,78 @@ const ApplicationForm = () => {
 };
 
 const Footer = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
+  const agenda = [
+    { label: 'The Intelligence Gap', sub: 'Why early entry wins', mode: 'analytics' },
+    { label: 'Living Ecosystems', sub: 'Nature-first design philosophy', mode: 'gallery' },
+    { label: 'Sanctuary Map', sub: 'Environmental heatmap · AQI · Noise', mode: 'map' },
+    { label: 'MODCON Agartha', sub: 'Narsapur Forest · Open access', mode: 'list' },
+    { label: 'SYL Villament', sub: 'Tukkuguda · Newsletter only', mode: 'syl' },
+    { label: 'Concierge Membership', sub: 'Private circle · 30 seats only', mode: 'membership' },
+  ];
+
   return (
-    <footer className="bg-olive-900 text-cream py-32 px-12 md:px-24">
+    <footer className="bg-olive-900 text-cream pt-24 pb-16 px-6 md:px-24">
       <div className="max-w-7xl mx-auto">
-        <div className="grid md:grid-cols-4 gap-12 mb-12">
-          <div className="col-span-2">
-            <div className="flex items-center gap-4 mb-12">
-              <Logo className="w-10 h-10 text-cream" />
-            </div>
-            <p className="text-xl font-light text-cream/30 max-w-md leading-relaxed">
-              Independent collective curating India's most exclusive organic sanctuaries. Featuring MODCON Agartha and SYL at Tukkuguda.
+
+        {/* Top: brand + tagline */}
+        <div className="border-b border-cream/8 pb-16 mb-16 flex flex-col md:flex-row md:items-end justify-between gap-10">
+          <div>
+            <Logo className="w-10 h-10 text-cream mb-6" />
+            <p className="text-2xl md:text-3xl font-light text-cream/30 max-w-xl leading-relaxed">
+              Curating India's most exclusive pre-launch sanctuaries for a private circle of intelligent investors.
             </p>
           </div>
-
-          <div>
-            <p className="text-[10px] uppercase tracking-[0.5em] text-gold mb-12">The Agenda</p>
-            <ul className="space-y-6 text-[10px] uppercase tracking-[0.4em] text-cream/40">
-              <li><button onClick={() => onModeChange('analytics')} className="hover:text-cream transition-all">Advantage</button></li>
-              <li><button onClick={() => onModeChange('gallery')} className="hover:text-cream transition-all">Ecosystems</button></li>
-              <li><button onClick={() => onModeChange('map')} className="hover:text-cream transition-all">Map</button></li>
-              <li><button onClick={() => onModeChange('list')} className="hover:text-cream transition-all">Agartha</button></li>
-              <li><button onClick={() => onModeChange('syl')} className="hover:text-cream transition-all">SYL</button></li>
-              <li><button onClick={() => onModeChange('home')} className="hover:text-cream transition-all">Home</button></li>
-            </ul>
-          </div>
-
-          <div>
-            <p className="text-[10px] uppercase tracking-[0.5em] text-gold mb-12">Collective</p>
-            <div className="flex gap-8">
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-cream/20 hover:text-cream transition-all cursor-pointer">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
-                </svg>
-              </a>
-              <a href="https://linkedin.com/company/the-green-team-india" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="text-cream/20 hover:text-cream transition-all cursor-pointer">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-                  <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
-                  <rect x="2" y="9" width="4" height="12" />
-                  <circle cx="4" cy="4" r="2" />
-                </svg>
-              </a>
-              <a href="mailto:hello@thegreenteam.in" aria-label="Email us" className="text-cream/20 hover:text-cream transition-all cursor-pointer">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                  <polyline points="22,6 12,13 2,6" />
-                </svg>
-              </a>
-            </div>
-          </div>
+          <button
+            onClick={() => onModeChange('membership')}
+            className="flex-shrink-0 flex items-center gap-3 px-8 py-4 border border-cream/20 text-cream text-[9px] uppercase tracking-[0.5em] font-bold hover:bg-cream hover:text-olive-900 transition-all self-start md:self-auto"
+          >
+            Apply for Access <ArrowRight className="w-3.5 h-3.5" />
+          </button>
         </div>
 
-        <div className="pt-12 border-t border-cream/5 flex flex-col md:flex-row justify-between items-center gap-12 text-[9px] uppercase tracking-[0.5em] text-cream/10 font-bold">
-          <p>© {new Date().getFullYear()} The Green Team — Independent Sanctuary Curators. All rights reserved.</p>
-          <div className="flex gap-16">
-            <span className="opacity-40">Privacy</span>
-            <span className="opacity-40">Ethics</span>
-            <span className="opacity-40">Legal</span>
+        {/* Agenda grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-cream/5 mb-16">
+          {agenda.map(item => (
+            <button
+              key={item.mode}
+              onClick={() => onModeChange(item.mode)}
+              className="group text-left p-8 bg-olive-900 hover:bg-olive-800/60 transition-all"
+            >
+              <p className="text-[8px] uppercase tracking-[0.5em] text-cream/25 font-bold mb-2 group-hover:text-primary/60 transition-colors">{item.sub}</p>
+              <p className="text-base font-medium text-cream/70 group-hover:text-cream transition-colors flex items-center gap-2">
+                {item.label}
+                <ArrowRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
+              </p>
+            </button>
+          ))}
+        </div>
+
+        {/* Bottom bar */}
+        <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+          <p className="text-[9px] uppercase tracking-[0.5em] text-cream/15 font-bold">
+            © {new Date().getFullYear()} The Green Team · Independent Sanctuary Curators · Hyderabad
+          </p>
+          <div className="flex items-center gap-8">
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-cream/20 hover:text-cream transition-all">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+              </svg>
+            </a>
+            <a href="https://linkedin.com/company/the-green-team-india" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="text-cream/20 hover:text-cream transition-all">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+                <rect x="2" y="9" width="4" height="12" />
+                <circle cx="4" cy="4" r="2" />
+              </svg>
+            </a>
+            <a href="mailto:hello@thegreenteam.in" aria-label="Email" className="text-cream/20 hover:text-cream transition-all">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                <polyline points="22,6 12,13 2,6" />
+              </svg>
+            </a>
           </div>
         </div>
       </div>
