@@ -207,7 +207,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
     <nav className="relative z-[9990] px-6 md:px-10 flex items-center justify-between h-16 md:h-20 bg-cream border-b border-outline/10">
       {/* Left: Brand + dark mode toggle */}
       <div className="flex items-center gap-3">
-        <button onClick={() => onModeChange('home')} className="flex items-center focus:outline-none" aria-label="Go to home">
+        <button onClick={() => onModeChange('home')} className="flex items-center focus:outline-none hover:opacity-80 transition-opacity" aria-label="Go to home">
           <Logo className="w-7 h-7" textClassName="text-base md:text-lg" />
         </button>
         <button
@@ -4287,9 +4287,9 @@ const ChatBot = ({ data }: { data: any }) => {
 
   return (
     <>
-      <button 
+      <button
         onClick={() => setIsOpen(true)}
-        className="absolute bottom-8 right-8 z-[1000] w-12 h-12 bg-surface text-olive-900 border border-outline/10 rounded-full shadow-lg flex items-center justify-center hover:bg-olive-900 hover:text-cream transition-all duration-300 group"
+        className="fixed bottom-8 right-8 z-[1000] w-12 h-12 bg-surface text-olive-900 border border-outline/10 rounded-full shadow-lg flex items-center justify-center hover:bg-olive-900 hover:text-cream transition-all duration-300 group"
       >
         <MessageSquare className="w-5 h-5 relative z-10" />
       </button>
@@ -4303,13 +4303,13 @@ const ChatBot = ({ data }: { data: any }) => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsOpen(false)}
-              className="absolute inset-0 z-[995] bg-black/10 backdrop-blur-[1px]"
+              className="fixed inset-0 z-[995] bg-black/10 backdrop-blur-[1px]"
             />
             <motion.div
               initial={{ opacity: 0, y: 50, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 50, scale: 0.95 }}
-              className="absolute bottom-24 right-8 z-[1000] w-[340px] max-w-[calc(100vw-3rem)] h-[500px] bg-surface shadow-2xl border border-olive-800/10 flex flex-col overflow-hidden rounded-2xl"
+              className="fixed bottom-24 right-8 z-[1000] w-[340px] max-w-[calc(100vw-3rem)] h-[500px] bg-surface shadow-2xl border border-olive-800/10 flex flex-col overflow-hidden rounded-2xl"
             >
               <div className="bg-olive-900 p-6 text-cream flex justify-between items-center">
                 <div className="flex items-center gap-4">
@@ -4890,12 +4890,14 @@ export default function App() {
       />
 
       <main className="flex-1 flex overflow-hidden relative">
+        {/* Groot — available on every screen */}
+        <ChatBot data={{ sanctuaries: SANCTUARIES }} />
+
         {/* Center - Map or other views */}
         <div className="flex-1 relative overflow-hidden bg-surface">
           {/* Map is always mounted to preserve Leaflet pan/zoom/filter state */}
           <div className={viewMode === 'map' ? 'absolute inset-0 z-10' : 'hidden'}>
             <SanctuaryMapLayout isVisible={viewMode === 'map'} />
-            <ChatBot data={{ sanctuaries: SANCTUARIES }} />
           </div>
           {viewMode !== 'map' && (
             <div ref={scrollRef} className="h-full w-full overflow-y-auto">
