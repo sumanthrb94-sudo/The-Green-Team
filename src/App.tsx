@@ -205,7 +205,9 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
     <nav className="relative z-[9990] px-6 md:px-10 flex items-center justify-between h-16 md:h-20 bg-cream border-b border-outline/10">
       {/* Left: Brand + dark mode toggle */}
       <div className="flex items-center gap-3">
-        <Logo className="w-7 h-7" textClassName="text-base md:text-lg" />
+        <button onClick={() => onModeChange('home')} className="flex items-center focus:outline-none" aria-label="Go to home">
+          <Logo className="w-7 h-7" textClassName="text-base md:text-lg" />
+        </button>
         <button
           onClick={() => setIsDark(!isDark)}
           title={isDark ? 'Light mode' : 'Dark mode'}
@@ -1566,24 +1568,24 @@ const AdminDashboard: FC<{
               <div className="space-y-4">
                 <p className="text-[8px] uppercase tracking-[0.5em] text-secondary/40 font-bold border-b border-outline/10 pb-2">Basic Info</p>
                 <div>
-                  <label className={labelCls}>Property Title *</label>
-                  <input className={inputCls} placeholder="e.g. MODCON Agartha" value={form.title}
+                  <label htmlFor="adm-title" className={labelCls}>Property Title *</label>
+                  <input id="adm-title" name="title" className={inputCls} placeholder="e.g. MODCON Agartha" value={form.title}
                     onChange={e => set('title', e.target.value)} />
                 </div>
                 <div>
-                  <label className={labelCls}>Location *</label>
-                  <input className={inputCls} placeholder="e.g. Narsapur Forest Peripheral, Hyderabad" value={form.location}
+                  <label htmlFor="adm-location" className={labelCls}>Location *</label>
+                  <input id="adm-location" name="location" className={inputCls} placeholder="e.g. Narsapur Forest Peripheral, Hyderabad" value={form.location}
                     onChange={e => set('location', e.target.value)} />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className={labelCls}>Latitude</label>
-                    <input type="number" step="any" className={inputCls} placeholder="17.4700" value={form.lat ?? ''}
+                    <label htmlFor="adm-lat" className={labelCls}>Latitude</label>
+                    <input id="adm-lat" name="lat" type="number" step="any" className={inputCls} placeholder="17.4700" value={form.lat ?? ''}
                       onChange={e => set('lat', e.target.value ? parseFloat(e.target.value) : undefined)} />
                   </div>
                   <div>
-                    <label className={labelCls}>Longitude</label>
-                    <input type="number" step="any" className={inputCls} placeholder="78.2500" value={form.lng ?? ''}
+                    <label htmlFor="adm-lng" className={labelCls}>Longitude</label>
+                    <input id="adm-lng" name="lng" type="number" step="any" className={inputCls} placeholder="78.2500" value={form.lng ?? ''}
                       onChange={e => set('lng', e.target.value ? parseFloat(e.target.value) : undefined)} />
                   </div>
                 </div>
@@ -1594,8 +1596,8 @@ const AdminDashboard: FC<{
               <div className="space-y-4">
                 <p className="text-[8px] uppercase tracking-[0.5em] text-secondary/40 font-bold border-b border-outline/10 pb-2">Media &amp; Links</p>
                 <div>
-                  <label className={labelCls}>Hero Image URL</label>
-                  <input className={inputCls} placeholder="https://..." value={form.image}
+                  <label htmlFor="adm-image" className={labelCls}>Hero Image URL</label>
+                  <input id="adm-image" name="image" className={inputCls} placeholder="https://..." value={form.image}
                     onChange={e => set('image', e.target.value)} />
                   {form.image && (
                     <img src={form.image} alt="preview" referrerPolicy="no-referrer"
@@ -1603,13 +1605,13 @@ const AdminDashboard: FC<{
                   )}
                 </div>
                 <div>
-                  <label className={labelCls}>Site Plan Image URL</label>
-                  <input className={inputCls} placeholder="https://... or /filename.jpg" value={form.sitePlanSrc ?? ''}
+                  <label htmlFor="adm-siteplan" className={labelCls}>Site Plan Image URL</label>
+                  <input id="adm-siteplan" name="sitePlanSrc" className={inputCls} placeholder="https://... or /filename.jpg" value={form.sitePlanSrc ?? ''}
                     onChange={e => set('sitePlanSrc', e.target.value)} />
                 </div>
                 <div>
-                  <label className={labelCls}>Brochure URL</label>
-                  <input className={inputCls} placeholder="https://..." value={form.brochureUrl ?? ''}
+                  <label htmlFor="adm-brochure" className={labelCls}>Brochure URL</label>
+                  <input id="adm-brochure" name="brochureUrl" className={inputCls} placeholder="https://..." value={form.brochureUrl ?? ''}
                     onChange={e => set('brochureUrl', e.target.value)} />
                 </div>
               </div>
@@ -1619,18 +1621,18 @@ const AdminDashboard: FC<{
                 <p className="text-[8px] uppercase tracking-[0.5em] text-secondary/40 font-bold border-b border-outline/10 pb-2">Environment &amp; Commute</p>
                 <div className="grid grid-cols-3 gap-3">
                   <div>
-                    <label className={labelCls}>AQI</label>
-                    <input type="number" className={inputCls} placeholder="12" value={form.aqi}
+                    <label htmlFor="adm-aqi" className={labelCls}>AQI</label>
+                    <input id="adm-aqi" name="aqi" type="number" className={inputCls} placeholder="12" value={form.aqi}
                       onChange={e => set('aqi', parseInt(e.target.value) || 0)} />
                   </div>
                   <div>
-                    <label className={labelCls}>Noise (dB)</label>
-                    <input type="number" className={inputCls} placeholder="18" value={form.noise}
+                    <label htmlFor="adm-noise" className={labelCls}>Noise (dB)</label>
+                    <input id="adm-noise" name="noise" type="number" className={inputCls} placeholder="18" value={form.noise}
                       onChange={e => set('noise', parseInt(e.target.value) || 0)} />
                   </div>
                   <div>
-                    <label className={labelCls}>Commute</label>
-                    <input className={inputCls} placeholder="45 mins to Fin. District" value={form.commute}
+                    <label htmlFor="adm-commute" className={labelCls}>Commute</label>
+                    <input id="adm-commute" name="commute" className={inputCls} placeholder="45 mins to Fin. District" value={form.commute}
                       onChange={e => set('commute', e.target.value)} />
                   </div>
                 </div>
@@ -1641,19 +1643,19 @@ const AdminDashboard: FC<{
                 <p className="text-[8px] uppercase tracking-[0.5em] text-secondary/40 font-bold border-b border-outline/10 pb-2">Pricing</p>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className={labelCls}>Member Price</label>
-                    <input className={inputCls} placeholder="₹1.9 Cr" value={form.memberPrice}
+                    <label htmlFor="adm-memberprice" className={labelCls}>Member Price</label>
+                    <input id="adm-memberprice" name="memberPrice" className={inputCls} placeholder="₹1.9 Cr" value={form.memberPrice}
                       onChange={e => set('memberPrice', e.target.value)} />
                   </div>
                   <div>
-                    <label className={labelCls}>Valuation / Strikethrough</label>
-                    <input className={inputCls} placeholder="₹4.0 Cr" value={form.valuation}
+                    <label htmlFor="adm-valuation" className={labelCls}>Valuation / Strikethrough</label>
+                    <input id="adm-valuation" name="valuation" className={inputCls} placeholder="₹4.0 Cr" value={form.valuation}
                       onChange={e => set('valuation', e.target.value)} />
                   </div>
                 </div>
                 <div>
-                  <label className={labelCls}>Price per Sq Yd (₹) — leave blank if not applicable</label>
-                  <input type="number" className={inputCls} placeholder="7999" value={form.pricePerSqYd ?? ''}
+                  <label htmlFor="adm-pricepersqyd" className={labelCls}>Price per Sq Yd (₹) — leave blank if not applicable</label>
+                  <input id="adm-pricepersqyd" name="pricePerSqYd" type="number" className={inputCls} placeholder="7999" value={form.pricePerSqYd ?? ''}
                     onChange={e => set('pricePerSqYd', e.target.value ? parseInt(e.target.value) : undefined)} />
                 </div>
               </div>
@@ -1662,19 +1664,19 @@ const AdminDashboard: FC<{
               <div className="space-y-4">
                 <p className="text-[8px] uppercase tracking-[0.5em] text-secondary/40 font-bold border-b border-outline/10 pb-2">Content</p>
                 <div>
-                  <label className={labelCls}>Tagline</label>
-                  <input className={inputCls} placeholder="Where the forest becomes home." value={form.tagline ?? ''}
+                  <label htmlFor="adm-tagline" className={labelCls}>Tagline</label>
+                  <input id="adm-tagline" name="tagline" className={inputCls} placeholder="Where the forest becomes home." value={form.tagline ?? ''}
                     onChange={e => set('tagline', e.target.value)} />
                 </div>
                 <div>
-                  <label className={labelCls}>Description</label>
-                  <textarea rows={4} className={cn(inputCls, 'resize-none')}
+                  <label htmlFor="adm-description" className={labelCls}>Description</label>
+                  <textarea id="adm-description" name="description" rows={4} className={cn(inputCls, 'resize-none')}
                     placeholder="Full description of the property…" value={form.description ?? ''}
                     onChange={e => set('description', e.target.value)} />
                 </div>
                 <div>
-                  <label className={labelCls}>Developer / Architect</label>
-                  <input className={inputCls} placeholder="MODCON Builders" value={form.architect ?? ''}
+                  <label htmlFor="adm-architect" className={labelCls}>Developer / Architect</label>
+                  <input id="adm-architect" name="architect" className={inputCls} placeholder="MODCON Builders" value={form.architect ?? ''}
                     onChange={e => set('architect', e.target.value)} />
                 </div>
               </div>
@@ -1684,18 +1686,18 @@ const AdminDashboard: FC<{
                 <p className="text-[8px] uppercase tracking-[0.5em] text-secondary/40 font-bold border-b border-outline/10 pb-2">Plot Community (optional)</p>
                 <div className="grid grid-cols-3 gap-3">
                   <div>
-                    <label className={labelCls}>No. of Plots</label>
-                    <input type="number" className={inputCls} placeholder="53" value={form.plots ?? ''}
+                    <label htmlFor="adm-plots" className={labelCls}>No. of Plots</label>
+                    <input id="adm-plots" name="plots" type="number" className={inputCls} placeholder="53" value={form.plots ?? ''}
                       onChange={e => set('plots', e.target.value ? parseInt(e.target.value) : undefined)} />
                   </div>
                   <div>
-                    <label className={labelCls}>Plot Range</label>
-                    <input className={inputCls} placeholder="808–5,097 sq yds" value={form.plotRange ?? ''}
+                    <label htmlFor="adm-plotrange" className={labelCls}>Plot Range</label>
+                    <input id="adm-plotrange" name="plotRange" className={inputCls} placeholder="808–5,097 sq yds" value={form.plotRange ?? ''}
                       onChange={e => set('plotRange', e.target.value)} />
                   </div>
                   <div>
-                    <label className={labelCls}>Amenity Sq Yds</label>
-                    <input className={inputCls} placeholder="14,548" value={form.amenityAcres ?? ''}
+                    <label htmlFor="adm-amenity" className={labelCls}>Amenity Sq Yds</label>
+                    <input id="adm-amenity" name="amenityAcres" className={inputCls} placeholder="14,548" value={form.amenityAcres ?? ''}
                       onChange={e => set('amenityAcres', e.target.value)} />
                   </div>
                 </div>
@@ -1705,7 +1707,7 @@ const AdminDashboard: FC<{
               <div className="space-y-4">
                 <p className="text-[8px] uppercase tracking-[0.5em] text-secondary/40 font-bold border-b border-outline/10 pb-2">Curated Features</p>
                 <div className="flex gap-2">
-                  <input className={cn(inputCls, 'flex-1')} placeholder="e.g. Vertical Forest" value={featInput}
+                  <input id="adm-feature" name="feature" className={cn(inputCls, 'flex-1')} placeholder="e.g. Vertical Forest" value={featInput}
                     onChange={e => setFeatInput(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addFeature(); } }} />
                   <button type="button" onClick={addFeature}
@@ -4614,8 +4616,8 @@ export default function App() {
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, u => {
       setAuthUser(u);
-      // Auto-redirect admin to dashboard after sign-in
-      if (u?.email === ADMIN_EMAIL) setViewMode('admin');
+      // Auto-open admin panel on sign-in
+      if (u?.email === ADMIN_EMAIL) setShowAdmin(true);
     });
     return unsub;
   }, []);
