@@ -112,7 +112,7 @@ const SANCTUARIES: Sanctuary[] = [
     pricePerSqYd: 7999,
     valuation: '₹1.04 Cr',
     memberPrice: 'From ₹64.6 L',
-    image: 'https://images.unsplash.com/photo-1588880331179-bc9b93a8cb5e?auto=format&fit=crop&q=80&w=1200',
+    image: '/agartha-render.jpg',
     tagline: 'Where the forest becomes home.',
     description: 'MODCON Agartha is a first-of-its-kind biomorphic residential community carved into the Narsapur forest periphery. 53 thoughtfully sized plots surround a 14,548 sq yd organic amenity core — featuring fluid earth architecture, solar-integrated curved roofs, and living canopies that blur the line between structure and forest. No two plots are the same. No straight lines anywhere.',
     plots: 53,
