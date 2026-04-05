@@ -97,6 +97,9 @@ interface Sanctuary {
   architect?: string;
   plotImages?: string[];
   pricePerSqYd?: number;
+  // Site plan + external brochure — populate for any property with a site plan
+  sitePlanSrc?: string;
+  brochureUrl?: string;
 }
 
 // --- Mock Data ---
@@ -119,6 +122,8 @@ const SANCTUARIES: Sanctuary[] = [
     plotRange: '808 – 5,097 sq yds',
     amenityAcres: '14,548 sq yds',
     architect: 'MODCON Builders',
+    sitePlanSrc: '/agartha-layout.jpg',
+    brochureUrl: 'https://www.modconbuilders.com/agartha',
     features: [
       'Biomorphic Architecture',
       'Solar-Curved Rooftops',
@@ -1182,6 +1187,14 @@ const AGARTHA_HOTSPOTS: Hotspot[] = [
   },
 ];
 
+/**
+ * SANCTUARY_HOTSPOTS — maps sanctuary id → its interactive site plan dots.
+ * Add any new property here when it has a site plan.
+ */
+const SANCTUARY_HOTSPOTS: Record<string, Hotspot[]> = {
+  agartha: AGARTHA_HOTSPOTS,
+};
+
 /** Agartha-specific wrapper — delegates to the generic PropertyInteractiveLayout */
 const AagarthaInteractiveLayout: FC<{ onClose: () => void }> = ({ onClose }) => (
   <PropertyInteractiveLayout
@@ -1208,6 +1221,32 @@ const featureIcon = (f: string) => {
 };
 
 const PropertyDetailOverlay = ({ sanctuary, onClose }: { sanctuary: Sanctuary, onClose: () => void }) => {
+  const hotspots = SANCTUARY_HOTSPOTS[sanctuary.id] ?? null;
+  const [activeSpot, setActiveSpot] = useState<Hotspot | null>(hotspots?.[0] ?? null);
+  const [leadName, setLeadName] = useState('');
+  const [leadPhone, setLeadPhone] = useState('');
+  const [leadSubmitted, setLeadSubmitted] = useState(false);
+  const [leadLoading, setLeadLoading] = useState(false);
+
+  // Parse "45 mins to Financial District" → { time: '45m', dest: 'Fin. District' }
+  const commuteTime = sanctuary.commute.match(/\d+/)?.[0] ?? '—';
+  const commuteDest = sanctuary.commute.replace(/^\d+ mins? to /i, '');
+  const commuteShort = commuteDest.length > 16 ? commuteDest.slice(0, 13) + '…' : commuteDest;
+
+  const handleLeadSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!leadName.trim() || !leadPhone.trim()) return;
+    setLeadLoading(true);
+    try {
+      await saveLead({ name: leadName.trim(), email: leadPhone.trim(), intent: `${sanctuary.title} — Site Visit Request` });
+    } catch {/* fire and forget */} finally {
+      setLeadLoading(false);
+      setLeadSubmitted(true);
+    }
+  };
+
+  const badge = sanctuary.id === 'syl' ? 'Upcoming' : 'Open — Expression of Interest';
+
   return (
     <motion.div
       initial={{ x: '100%' }}
@@ -1218,22 +1257,16 @@ const PropertyDetailOverlay = ({ sanctuary, onClose }: { sanctuary: Sanctuary, o
     >
       {/* Hero image */}
       <div className="relative h-64 w-full overflow-hidden flex-shrink-0">
-        <img
-          src={sanctuary.image}
-          alt={sanctuary.title}
-          className="w-full h-full object-cover"
-          referrerPolicy="no-referrer"
-        />
+        <img src={sanctuary.image} alt={sanctuary.title}
+          className="w-full h-full object-cover" referrerPolicy="no-referrer" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-        <button
-          onClick={onClose}
-          className="absolute top-5 right-5 p-2 bg-black/40 backdrop-blur-sm rounded-full hover:bg-black/60 transition-all"
-        >
+        <button onClick={onClose}
+          className="absolute top-5 right-5 p-2 bg-black/40 backdrop-blur-sm rounded-full hover:bg-black/60 transition-all">
           <X className="w-4 h-4 text-white" />
         </button>
         <div className="absolute bottom-5 left-6">
           <span className="px-3 py-1 bg-primary text-on-primary text-[8px] uppercase tracking-widest font-bold rounded-full">
-            {sanctuary.id === 'syl' ? 'Upcoming' : 'Open for Expression of Interest'}
+            {badge}
           </span>
         </div>
       </div>
@@ -1257,7 +1290,10 @@ const PropertyDetailOverlay = ({ sanctuary, onClose }: { sanctuary: Sanctuary, o
               {sanctuary.pricePerSqYd ? (
                 <>
                   <p className="text-[8px] uppercase tracking-widest text-secondary/50 mb-1">Rate</p>
-                  <p className="text-xl font-headline font-bold text-primary">₹{sanctuary.pricePerSqYd.toLocaleString('en-IN')}<span className="text-xs font-normal text-secondary/60">/sq yd</span></p>
+                  <p className="text-xl font-headline font-bold text-primary">
+                    ₹{sanctuary.pricePerSqYd.toLocaleString('en-IN')}
+                    <span className="text-xs font-normal text-secondary/60">/sq yd</span>
+                  </p>
                   <p className="text-[9px] text-secondary/50 mt-0.5">{sanctuary.memberPrice}</p>
                 </>
               ) : (
@@ -1285,17 +1321,15 @@ const PropertyDetailOverlay = ({ sanctuary, onClose }: { sanctuary: Sanctuary, o
           </div>
           <div className="px-4 py-5 text-center">
             <p className="text-[8px] uppercase tracking-widest text-secondary/50 mb-1">Commute</p>
-            <p className="text-lg font-bold text-on-surface">45m</p>
-            <p className="text-[9px] text-secondary/50">to Fin. District</p>
+            <p className="text-lg font-bold text-on-surface">{commuteTime}m</p>
+            <p className="text-[9px] text-secondary/50">{commuteShort}</p>
           </div>
         </div>
 
         <div className="px-8 py-8 space-y-8">
           {/* Description */}
           {sanctuary.description && (
-            <div>
-              <p className="text-sm text-secondary/80 leading-relaxed">{sanctuary.description}</p>
-            </div>
+            <p className="text-sm text-secondary/80 leading-relaxed">{sanctuary.description}</p>
           )}
 
           {/* Plot community stats */}
@@ -1306,12 +1340,76 @@ const PropertyDetailOverlay = ({ sanctuary, onClose }: { sanctuary: Sanctuary, o
                 <p className="text-[8px] uppercase tracking-widest text-secondary/60 mt-1">Private Plots</p>
               </div>
               <div className="p-4 bg-primary/5 rounded-2xl text-center">
-                <p className="text-lg font-headline font-bold text-primary leading-tight">808–5,097</p>
+                <p className="text-base font-headline font-bold text-primary leading-tight">{sanctuary.plotRange ?? '808–5,097'}</p>
                 <p className="text-[8px] uppercase tracking-widest text-secondary/60 mt-1">Sq Yds Range</p>
               </div>
               <div className="p-4 bg-primary/5 rounded-2xl text-center">
-                <p className="text-lg font-headline font-bold text-primary leading-tight">14,548</p>
-                <p className="text-[8px] uppercase tracking-widest text-secondary/60 mt-1">Sq Yds Amenity</p>
+                <p className="text-base font-headline font-bold text-primary leading-tight">{sanctuary.amenityAcres ?? '14,548'}</p>
+                <p className="text-[8px] uppercase tracking-widest text-secondary/60 mt-1">Amenity Sq Yds</p>
+              </div>
+            </div>
+          )}
+
+          {/* ── Interactive Site Plan (shown when property has a site plan) ── */}
+          {sanctuary.sitePlanSrc && hotspots && (
+            <div>
+              <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold mb-4">Interactive Site Plan</p>
+              <div className="rounded-2xl overflow-hidden border border-outline/10 bg-[#0a0f07]">
+                {/* Map image with dots */}
+                <div className="relative">
+                  <img src={sanctuary.sitePlanSrc} alt="Site plan"
+                    className="w-full h-auto object-contain" referrerPolicy="no-referrer" />
+                  {hotspots.map(h => {
+                    const isActive = activeSpot?.id === h.id;
+                    return (
+                      <button key={h.id}
+                        style={{ left: `${h.x}%`, top: `${h.y}%` }}
+                        className="absolute -translate-x-1/2 -translate-y-1/2"
+                        onClick={() => setActiveSpot(h)}>
+                        <span className={cn(
+                          "relative block rounded-full border-2 border-white shadow-lg transition-all duration-200",
+                          isActive ? "w-4 h-4 bg-primary scale-125" : "w-3 h-3 bg-white/60 hover:bg-white hover:scale-125"
+                        )} />
+                        {isActive && <span className="absolute inset-0 rounded-full bg-primary/50 animate-ping pointer-events-none" />}
+                      </button>
+                    );
+                  })}
+                </div>
+                {/* Feature chip row */}
+                <div className="flex gap-2 overflow-x-auto px-4 py-3 border-t border-white/5 no-scrollbar">
+                  {hotspots.map(h => (
+                    <button key={h.id} onClick={() => setActiveSpot(h)}
+                      className={cn(
+                        "flex-shrink-0 text-[8px] uppercase tracking-widest font-bold px-3 py-1.5 rounded-full border transition-all",
+                        activeSpot?.id === h.id
+                          ? "bg-primary border-primary text-on-primary"
+                          : "border-white/15 text-white/40 hover:border-primary/40 hover:text-primary"
+                      )}>
+                      {h.label.split(' ').slice(0, 2).join(' ')}
+                    </button>
+                  ))}
+                </div>
+                {/* Active hotspot info */}
+                {activeSpot && (
+                  <AnimatePresence mode="wait">
+                    <motion.div key={activeSpot.id}
+                      initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                      transition={{ duration: 0.15 }}
+                      className="px-5 py-4 border-t border-white/5 space-y-2">
+                      <p className="text-[8px] uppercase tracking-[0.4em] text-primary/60 font-bold">{activeSpot.tag}</p>
+                      <h4 className="text-sm font-headline font-bold text-white">{activeSpot.label}</h4>
+                      <p className="text-[11px] text-white/50 leading-relaxed">{activeSpot.detail}</p>
+                      <div className="grid grid-cols-3 gap-2 pt-1">
+                        {activeSpot.stats.map(s => (
+                          <div key={s.label} className="bg-white/5 rounded-lg px-2 py-2 text-center">
+                            <p className="text-[7px] uppercase tracking-wider text-white/30 font-bold mb-0.5">{s.label}</p>
+                            <p className="text-[10px] font-bold text-white">{s.value}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  </AnimatePresence>
+                )}
               </div>
             </div>
           )}
@@ -1331,9 +1429,7 @@ const PropertyDetailOverlay = ({ sanctuary, onClose }: { sanctuary: Sanctuary, o
                   { label: 'Plot 15 (Largest)', sqYds: 5097 },
                 ].map((row, i) => {
                   const totalRs = row.sqYds * sanctuary.pricePerSqYd!;
-                  const display = totalRs >= 1e7
-                    ? `₹${(totalRs / 1e7).toFixed(2)} Cr`
-                    : `₹${(totalRs / 1e5).toFixed(1)} L`;
+                  const display = totalRs >= 1e7 ? `₹${(totalRs / 1e7).toFixed(2)} Cr` : `₹${(totalRs / 1e5).toFixed(1)} L`;
                   return (
                     <div key={i} className={cn("grid grid-cols-3 px-4 py-3 text-[10px]", i % 2 === 0 ? "bg-primary/3" : "bg-transparent")}>
                       <span className="text-secondary/60 font-medium">{row.label}</span>
@@ -1343,7 +1439,7 @@ const PropertyDetailOverlay = ({ sanctuary, onClose }: { sanctuary: Sanctuary, o
                   );
                 })}
               </div>
-              <p className="text-[8px] text-secondary/40 mt-2">Rate: ₹7,999/sq yd</p>
+              <p className="text-[8px] text-secondary/40 mt-2">Rate: ₹{sanctuary.pricePerSqYd.toLocaleString('en-IN')}/sq yd</p>
             </div>
           )}
 
@@ -1369,8 +1465,8 @@ const PropertyDetailOverlay = ({ sanctuary, onClose }: { sanctuary: Sanctuary, o
             <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold mb-4">Environmental Integrity</p>
             <div className="space-y-3">
               {[
-                { label: 'Air Quality Index', value: `${sanctuary.aqi} — Pristine`, bar: (50 - sanctuary.aqi) / 50 },
-                { label: 'Ambient Noise', value: `${sanctuary.noise} dB — Near Silent`, bar: (50 - sanctuary.noise) / 50 },
+                { label: 'Air Quality Index', value: `${sanctuary.aqi} — Pristine`, bar: Math.min((50 - sanctuary.aqi) / 50, 1) },
+                { label: 'Ambient Noise', value: `${sanctuary.noise} dB — Near Silent`, bar: Math.min((50 - sanctuary.noise) / 50, 1) },
                 { label: 'Forest Proximity', value: 'Direct Boundary Access', bar: 0.95 },
               ].map(item => (
                 <div key={item.label}>
@@ -1379,19 +1475,16 @@ const PropertyDetailOverlay = ({ sanctuary, onClose }: { sanctuary: Sanctuary, o
                     <span className="font-bold text-on-surface">{item.value}</span>
                   </div>
                   <div className="h-1 bg-outline/10 rounded-full overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${item.bar * 100}%` }}
+                    <motion.div initial={{ width: 0 }} animate={{ width: `${item.bar * 100}%` }}
                       transition={{ delay: 0.3, duration: 0.8, ease: 'easeOut' }}
-                      className="h-full bg-primary rounded-full"
-                    />
+                      className="h-full bg-primary rounded-full" />
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* By MODCON */}
+          {/* Developer credit */}
           {sanctuary.architect && (
             <div className="flex items-center gap-3 p-4 border border-outline/10 rounded-2xl">
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
@@ -1404,21 +1497,41 @@ const PropertyDetailOverlay = ({ sanctuary, onClose }: { sanctuary: Sanctuary, o
             </div>
           )}
 
-          {/* CTAs */}
-          <div className="space-y-3 pb-4">
-            <a
-              href="https://www.modconbuilders.com/agartha"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full py-4 bg-primary text-on-primary text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all flex items-center justify-center gap-3"
-            >
-              <ArrowRight className="w-4 h-4" />
-              View Full Brochure
-            </a>
-            <button className="w-full py-4 border border-outline/20 text-on-surface text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl hover:bg-primary/5 transition-all flex items-center justify-center gap-3">
-              <MessageSquare className="w-4 h-4" />
-              Request Private Briefing
-            </button>
+          {/* ── Lead capture + CTAs ── */}
+          <div className="space-y-4 pb-4">
+            <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold">Reserve Your Interest</p>
+
+            {leadSubmitted ? (
+              <div className="p-6 rounded-2xl bg-primary/5 border border-primary/10 text-center space-y-2">
+                <div className="w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center mx-auto">
+                  <Check className="w-5 h-5 text-primary" />
+                </div>
+                <p className="text-sm font-bold text-on-surface">We'll be in touch soon.</p>
+                <p className="text-[11px] text-secondary/50">Our team will reach out within 24 hours.</p>
+              </div>
+            ) : (
+              <form onSubmit={handleLeadSubmit} className="space-y-3">
+                <input type="text" placeholder="Your Name" value={leadName}
+                  onChange={e => setLeadName(e.target.value)}
+                  className="w-full bg-surface-container-low border border-outline/15 rounded-xl px-4 py-3.5 text-sm text-on-surface placeholder-secondary/30 focus:outline-none focus:border-primary/50 transition-colors" />
+                <input type="tel" placeholder="Phone Number" value={leadPhone}
+                  onChange={e => setLeadPhone(e.target.value)}
+                  className="w-full bg-surface-container-low border border-outline/15 rounded-xl px-4 py-3.5 text-sm text-on-surface placeholder-secondary/30 focus:outline-none focus:border-primary/50 transition-colors" />
+                <button type="submit" disabled={leadLoading || !leadName.trim() || !leadPhone.trim()}
+                  className="w-full py-4 bg-primary text-on-primary text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all flex items-center justify-center gap-3 disabled:opacity-50">
+                  <ArrowRight className="w-4 h-4" />
+                  {leadLoading ? 'Sending…' : 'Request Site Visit'}
+                </button>
+              </form>
+            )}
+
+            {sanctuary.brochureUrl && (
+              <a href={sanctuary.brochureUrl} target="_blank" rel="noopener noreferrer"
+                className="w-full py-3.5 border border-outline/20 text-on-surface text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl hover:bg-primary/5 transition-all flex items-center justify-center gap-3">
+                <ArrowRight className="w-4 h-4" />
+                View Full Brochure
+              </a>
+            )}
           </div>
         </div>
       </div>
@@ -2668,7 +2781,7 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
 
 const Sanctuaries = ({ isSubscribed, onNewsletterClick, isFullPage = false }: { isSubscribed: boolean, onNewsletterClick: () => void, isFullPage?: boolean }) => {
   const [selectedSanctuary, setSelectedSanctuary] = useState<Sanctuary | null>(null);
-  const [showAagarthaLayout, setShowAagarthaLayout] = useState(false);
+
 
   return (
     <section id="agartha" className={cn(
@@ -2693,23 +2806,13 @@ const Sanctuaries = ({ isSubscribed, onNewsletterClick, isFullPage = false }: { 
               sanctuary={s}
               isSubscribed={isSubscribed}
               onNewsletterClick={onNewsletterClick}
-              onOpen={() => {
-                if (s.id === 'agartha') setShowAagarthaLayout(true);
-                else setSelectedSanctuary(s);
-              }}
+              onOpen={() => setSelectedSanctuary(s)}
             />
           ))}
         </div>
       </div>
 
-      {/* Agartha interactive layout */}
-      <AnimatePresence>
-        {showAagarthaLayout && (
-          <AagarthaInteractiveLayout onClose={() => setShowAagarthaLayout(false)} />
-        )}
-      </AnimatePresence>
-
-      {/* Property detail overlay (non-Agartha) */}
+      {/* Property detail overlay */}
       <AnimatePresence>
         {selectedSanctuary && (
           <div className="fixed inset-0 z-[80] overflow-hidden">
