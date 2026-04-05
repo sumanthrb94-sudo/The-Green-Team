@@ -3922,14 +3922,14 @@ const ApplicationForm = () => {
           <div className="lg:col-span-2">
             <span className="text-[9px] uppercase tracking-[0.6em] text-olive-800/40 font-bold block mb-8">Private Membership</span>
             <h2 className="text-5xl md:text-6xl font-medium text-olive-900 leading-tight mb-8">
-              Apply for<br /><span className="italic text-olive-800">Concierge Access.</span>
+              Apply for<br /><span className="italic text-olive-800">Adviser Access.</span>
             </h2>
             <p className="text-base font-light text-olive-900/50 leading-relaxed mb-12">
-              We curate India's most exclusive pre-launch sanctuaries for a reserved investor circle. Our concierge will personally reach out within 24 hours.
+              We curate India's most exclusive pre-launch sanctuaries for a reserved investor circle. Our adviser will personally reach out within 24 hours.
             </p>
             <div className="space-y-6 border-t border-olive-800/10 pt-8">
               {[
-                { label: 'Personal Call', desc: 'Your concierge contacts you within 24hrs' },
+                { label: 'Personal Call', desc: 'Your adviser contacts you within 24hrs' },
                 { label: 'Pre-Launch Pricing', desc: 'Access before public announcement' },
                 { label: 'Monthly Briefings', desc: 'Auto-enrolled in our intelligence network' },
               ].map(i => (
@@ -3960,7 +3960,7 @@ const ApplicationForm = () => {
                 </div>
                 <h3 className="text-3xl font-serif italic mb-4">Application Received.</h3>
                 <p className="text-cream/50 font-light leading-relaxed max-w-sm mx-auto">
-                  Our concierge will contact you within 24 hours for a private briefing. You're also now part of our monthly intelligence network.
+                  Our adviser will contact you within 24 hours for a private briefing. You're also now part of our monthly intelligence network.
                 </p>
               </motion.div>
             ) : (
@@ -3971,7 +3971,7 @@ const ApplicationForm = () => {
                     <input id="m-name" name="name" value={form.name} onChange={e => set('name', e.target.value)} required className={inputCls} placeholder="Your full name" />
                   </div>
                   <div>
-                    <label htmlFor="m-phone" className={labelCls}>Phone for Concierge *</label>
+                    <label htmlFor="m-phone" className={labelCls}>Phone for Adviser *</label>
                     <input id="m-phone" name="phone" type="tel" value={form.phone} onChange={e => set('phone', e.target.value)} required className={inputCls} placeholder="+91 98765 43210" />
                   </div>
                 </div>
@@ -4020,7 +4020,7 @@ const ApplicationForm = () => {
                 <button type="submit" disabled={loading}
                   className="w-full py-5 bg-olive-900 text-cream text-[10px] uppercase tracking-[0.5em] font-bold hover:bg-primary transition-all flex items-center justify-center gap-4 disabled:opacity-60">
                   {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <ArrowRight className="w-4 h-4" />}
-                  {loading ? 'Submitting…' : 'Request Concierge Call'}
+                  {loading ? 'Submitting…' : 'Request Adviser Call'}
                 </button>
 
                 <p className="text-[9px] text-center text-olive-800/25 uppercase tracking-widest">
@@ -4042,7 +4042,7 @@ const Footer = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
     { label: 'Sanctuary Map', sub: 'Environmental heatmap · AQI · Noise', mode: 'map' },
     { label: 'MODCON Agartha', sub: 'Narsapur Forest · Open access', mode: 'list' },
     { label: 'SYL Villament', sub: 'Tukkuguda · Newsletter only', mode: 'syl' },
-    { label: 'Concierge Membership', sub: 'Reserved investor circle · By invitation', mode: 'membership' },
+    { label: 'Adviser Membership', sub: 'Reserved investor circle · By invitation', mode: 'membership' },
   ];
 
   return (
