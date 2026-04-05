@@ -42,6 +42,7 @@ export type PropertyInput = Omit<PropertyDoc, 'id' | 'createdAt'>;
 
 /** Real-time subscription — calls cb on every change */
 export function subscribeProperties(cb: (props: PropertyDoc[]) => void): () => void {
+  if (!db) return () => {};
   const q = query(collection(db, 'properties'), orderBy('createdAt', 'desc'));
   return onSnapshot(q, snap => {
     cb(snap.docs.map(d => ({ id: d.id, ...d.data() } as PropertyDoc)));

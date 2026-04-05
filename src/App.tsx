@@ -55,7 +55,7 @@ import {
   RecaptchaVerifier,
 } from 'firebase/auth';
 import type { User, ConfirmationResult } from 'firebase/auth';
-import { auth, googleProvider } from './lib/firebase';
+import { auth, db, googleProvider } from './lib/firebase';
 import { saveLead, saveNewsletter, getLeads, getNewsletterSubs } from './lib/leads';
 import type { Lead, NewsletterEntry } from './lib/leads';
 import { subscribeProperties, createProperty, updateProperty, deleteProperty } from './lib/properties';
