@@ -3834,19 +3834,20 @@ const ApplicationForm = () => {
             ) : (
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-12">
                 <div className="space-y-2">
-                  <label className="text-[9px] uppercase tracking-[0.5em] text-olive-800/40">Full Name</label>
-                  <input {...register("name", { required: true })} className="input-cashew" placeholder="Your Name" />
-                </div>
-                
-                <div className="space-y-2">
-                  <label className="text-[9px] uppercase tracking-[0.5em] text-olive-800/40">Private Email</label>
-                  <input {...register("email", { required: true })} className="input-cashew" placeholder="email@domain.com" />
+                  <label htmlFor="apply-name" className="text-[9px] uppercase tracking-[0.5em] text-olive-800/40">Full Name</label>
+                  <input id="apply-name" {...register("name", { required: true })} className="input-cashew" placeholder="Your Name" />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[9px] uppercase tracking-[0.5em] text-olive-800/40">Ethical Intent</label>
-                  <textarea 
-                    {...register("intent")} 
+                  <label htmlFor="apply-email" className="text-[9px] uppercase tracking-[0.5em] text-olive-800/40">Private Email</label>
+                  <input id="apply-email" type="email" {...register("email", { required: true })} className="input-cashew" placeholder="email@domain.com" />
+                </div>
+
+                <div className="space-y-2">
+                  <label htmlFor="apply-intent" className="text-[9px] uppercase tracking-[0.5em] text-olive-800/40">Ethical Intent</label>
+                  <textarea
+                    id="apply-intent"
+                    {...register("intent")}
                     className="input-cashew min-h-[120px] resize-none"
                     placeholder="Why does community ethics matter to you?"
                   />
@@ -3869,7 +3870,7 @@ const ApplicationForm = () => {
   );
 };
 
-const Footer = () => {
+const Footer = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
   return (
     <footer className="bg-olive-900 text-cream py-32 px-12 md:px-24">
       <div className="max-w-7xl mx-auto">
@@ -3882,37 +3883,37 @@ const Footer = () => {
               Independent collective curating India's most exclusive organic sanctuaries. Featuring MODCON Agartha and SYL at Tukkuguda.
             </p>
           </div>
-          
+
           <div>
             <p className="text-[10px] uppercase tracking-[0.5em] text-gold mb-12">The Agenda</p>
             <ul className="space-y-6 text-[10px] uppercase tracking-[0.4em] text-cream/40">
-              <li><a href="#the-advantage" className="hover:text-cream transition-all">Advantage</a></li>
-              <li><a href="#ecosystems" className="hover:text-cream transition-all">Ecosystems</a></li>
-              <li><a href="#map" className="hover:text-cream transition-all">Map</a></li>
-              <li><a href="#agartha" className="hover:text-cream transition-all">Agartha</a></li>
-              <li><a href="#syl" className="hover:text-cream transition-all">SYL</a></li>
-              <li><a href="#apply" className="hover:text-cream transition-all">Apply</a></li>
+              <li><button onClick={() => onModeChange('analytics')} className="hover:text-cream transition-all">Advantage</button></li>
+              <li><button onClick={() => onModeChange('gallery')} className="hover:text-cream transition-all">Ecosystems</button></li>
+              <li><button onClick={() => onModeChange('map')} className="hover:text-cream transition-all">Map</button></li>
+              <li><button onClick={() => onModeChange('list')} className="hover:text-cream transition-all">Agartha</button></li>
+              <li><button onClick={() => onModeChange('syl')} className="hover:text-cream transition-all">SYL</button></li>
+              <li><button onClick={() => onModeChange('home')} className="hover:text-cream transition-all">Home</button></li>
             </ul>
           </div>
 
           <div>
             <p className="text-[10px] uppercase tracking-[0.5em] text-gold mb-12">Collective</p>
             <div className="flex gap-8">
-              <a href="#" className="text-cream/20 hover:text-cream transition-all cursor-pointer">
+              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-cream/20 hover:text-cream transition-all cursor-pointer">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
                   <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
                   <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
                   <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
                 </svg>
               </a>
-              <a href="#" className="text-cream/20 hover:text-cream transition-all cursor-pointer">
+              <a href="https://linkedin.com/company/the-green-team-india" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="text-cream/20 hover:text-cream transition-all cursor-pointer">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
                   <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
                   <rect x="2" y="9" width="4" height="12" />
                   <circle cx="4" cy="4" r="2" />
                 </svg>
               </a>
-              <a href="#" className="text-cream/20 hover:text-cream transition-all cursor-pointer">
+              <a href="mailto:hello@thegreenteam.in" aria-label="Email us" className="text-cream/20 hover:text-cream transition-all cursor-pointer">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
                   <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
                   <polyline points="22,6 12,13 2,6" />
@@ -3921,13 +3922,13 @@ const Footer = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="pt-12 border-t border-cream/5 flex flex-col md:flex-row justify-between items-center gap-12 text-[9px] uppercase tracking-[0.5em] text-cream/10 font-bold">
-          <p>© {new Date().getFullYear()} The Green Team - Independent Sanctuary Curators. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} The Green Team — Independent Sanctuary Curators. All rights reserved.</p>
           <div className="flex gap-16">
-            <a href="#" className="hover:text-cream transition-all">Privacy</a>
-            <a href="#" className="hover:text-cream transition-all">Ethics</a>
-            <a href="#" className="hover:text-cream transition-all">Legal</a>
+            <span className="opacity-40">Privacy</span>
+            <span className="opacity-40">Ethics</span>
+            <span className="opacity-40">Legal</span>
           </div>
         </div>
       </div>
@@ -4028,14 +4029,16 @@ const NewsletterHighlight = ({ onSubscribe }: { onSubscribe: () => void }) => {
             ) : (
               <form onSubmit={handleSub} className="space-y-12">
                 <div className="space-y-4">
-                  <label className="text-[9px] uppercase tracking-[0.5em] text-cream/40">Secure Email Address</label>
-                  <input 
-                    type="email" 
+                  <label htmlFor="nl-highlight-email" className="text-[9px] uppercase tracking-[0.5em] text-cream/40">Secure Email Address</label>
+                  <input
+                    id="nl-highlight-email"
+                    name="email"
+                    type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="w-full bg-transparent border-b border-white/20 py-6 outline-none focus:border-gold transition-all font-light text-2xl text-cream placeholder:text-on-surface/10" 
-                    placeholder="email@domain.com" 
+                    className="w-full bg-transparent border-b border-white/20 py-6 outline-none focus:border-gold transition-all font-light text-2xl text-cream placeholder:text-on-surface/10"
+                    placeholder="email@domain.com"
                   />
                 </div>
                 <button 
@@ -4200,7 +4203,7 @@ const ChatBot = ({ data }: { data: any }) => {
   );
 };
 
-const HomeView = ({ isSubscribed, onNewsletterClick, sanctuaries = SANCTUARIES }: { isSubscribed: boolean, onNewsletterClick: () => void, sanctuaries?: Sanctuary[] }) => (
+const HomeView = ({ isSubscribed, onNewsletterClick, sanctuaries = SANCTUARIES, onModeChange }: { isSubscribed: boolean, onNewsletterClick: () => void, sanctuaries?: Sanctuary[], onModeChange: (mode: string) => void }) => (
   <div className="flex flex-col">
     <Hero />
     <Advantage />
@@ -4209,7 +4212,8 @@ const HomeView = ({ isSubscribed, onNewsletterClick, sanctuaries = SANCTUARIES }
     <TheSIL isSubscribed={isSubscribed} onNewsletterClick={onNewsletterClick} />
     <TrustSignals />
     <NewsletterHighlight onSubscribe={onNewsletterClick} />
-    <Footer />
+    <ApplicationForm />
+    <Footer onModeChange={onModeChange} />
   </div>
 );
 
@@ -4451,162 +4455,9 @@ const AuthModal = ({
 };
 
 // ─── App (main) ──────────────────────────────────────────────────────────────
-// (Old AdminDashboard removed — superseded by AdminDashboard component above)
-const _dead = ({ onClose, user }: { onClose: () => void; user: User }) => {
-  const [tab, setTab]           = useState<'leads' | 'newsletter'>('leads');
-  const [leads, setLeads]       = useState<Lead[]>([]);
-  const [subs, setSubs]         = useState<NewsletterEntry[]>([]);
-  const [fetching, setFetching] = useState(false);
-
-  const fetchData = async () => {
-    setFetching(true);
-    try {
-      const [l, s] = await Promise.all([getLeads(), getNewsletterSubs()]);
-      setLeads(l); setSubs(s);
-    } finally {
-      setFetching(false);
-    }
-  };
-
-  useEffect(() => { fetchData(); }, []);
-
-  const fmt = (ts: { seconds: number } | null) => {
-    if (!ts) return '—';
-    return new Date(ts.seconds * 1000).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
-  };
-
-  return (
-    <div className="h-full w-full overflow-y-auto bg-cream">
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-cream border-b border-outline/10 px-6 md:px-12 py-4 flex items-center justify-between shadow-sm">
-        <div className="flex items-center gap-3">
-          <ShieldCheck className="w-5 h-5 text-primary" />
-          <span className="font-bold text-sm uppercase tracking-widest text-olive-900">Admin Console</span>
-        </div>
-        <div className="flex items-center gap-4">
-          <span className="hidden sm:block text-xs text-olive-800/50 truncate max-w-[200px]">{user.email}</span>
-          <button onClick={fetchData} disabled={fetching} className="p-2 rounded-full hover:bg-primary/10 transition-colors" title="Refresh">
-            <RefreshCw className={cn("w-4 h-4 text-olive-800", fetching && "animate-spin")} />
-          </button>
-          <button onClick={onClose} className="p-2 rounded-full hover:bg-primary/10 transition-colors">
-            <X className="w-5 h-5 text-olive-900" />
-          </button>
-        </div>
-      </div>
-
-      {(
-        /* Dashboard */
-        <div className="px-6 md:px-12 py-8 max-w-7xl mx-auto">
-          {/* Summary cards */}
-          <div className="grid grid-cols-2 gap-4 mb-8">
-            <div className="bg-surface border border-outline/10 p-6 flex items-center gap-4">
-              <Users className="w-8 h-8 text-primary opacity-60" />
-              <div>
-                <p className="text-[10px] uppercase tracking-[0.4em] text-olive-800/40 mb-1">Membership Leads</p>
-                <p className="text-3xl font-bold text-olive-900">{leads.length}</p>
-              </div>
-            </div>
-            <div className="bg-surface border border-outline/10 p-6 flex items-center gap-4">
-              <MailIcon className="w-8 h-8 text-primary opacity-60" />
-              <div>
-                <p className="text-[10px] uppercase tracking-[0.4em] text-olive-800/40 mb-1">Newsletter Subs</p>
-                <p className="text-3xl font-bold text-olive-900">{subs.length}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Tabs */}
-          <div className="flex gap-1 mb-6 border-b border-outline/10">
-            {(['leads', 'newsletter'] as const).map(t => (
-              <button
-                key={t}
-                onClick={() => setTab(t)}
-                className={cn(
-                  "px-6 py-3 text-[10px] uppercase tracking-[0.4em] font-bold border-b-2 transition-all",
-                  tab === t ? "border-primary text-olive-900" : "border-transparent text-olive-800/40 hover:text-olive-900"
-                )}
-              >
-                {t === 'leads' ? 'Membership Leads' : 'Newsletter'}
-              </button>
-            ))}
-          </div>
-
-          {/* Leads table */}
-          {tab === 'leads' && (
-            <div className="overflow-x-auto">
-              {leads.length === 0 ? (
-                <p className="text-olive-800/40 text-sm py-12 text-center">No leads yet.</p>
-              ) : (
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="text-[9px] uppercase tracking-[0.4em] text-olive-800/40 border-b border-outline/10">
-                      <th className="text-left py-3 pr-6">Name</th>
-                      <th className="text-left py-3 pr-6">Email</th>
-                      <th className="text-left py-3 pr-6">Intent</th>
-                      <th className="text-left py-3">Submitted</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {leads.map(l => (
-                      <tr key={l.id} className="border-b border-outline/5 hover:bg-primary/5 transition-colors">
-                        <td className="py-4 pr-6 font-medium text-olive-900">{l.name}</td>
-                        <td className="py-4 pr-6 text-olive-800/70">{l.email}</td>
-                        <td className="py-4 pr-6 text-olive-800/50 max-w-xs">
-                          <span className="line-clamp-2">{l.intent || '—'}</span>
-                        </td>
-                        <td className="py-4 text-olive-800/40 whitespace-nowrap text-xs">{fmt(l.createdAt)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
-          )}
-
-          {/* Newsletter table */}
-          {tab === 'newsletter' && (
-            <div className="overflow-x-auto">
-              {subs.length === 0 ? (
-                <p className="text-olive-800/40 text-sm py-12 text-center">No subscribers yet.</p>
-              ) : (
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="text-[9px] uppercase tracking-[0.4em] text-olive-800/40 border-b border-outline/10">
-                      <th className="text-left py-3 pr-6">Email</th>
-                      <th className="text-left py-3 pr-6">Source</th>
-                      <th className="text-left py-3">Signed Up</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {subs.map(s => (
-                      <tr key={s.id} className="border-b border-outline/5 hover:bg-primary/5 transition-colors">
-                        <td className="py-4 pr-6 font-medium text-olive-900">{s.email}</td>
-                        <td className="py-4 pr-6">
-                          <span className={cn(
-                            "text-[9px] uppercase tracking-widest font-bold px-2 py-1",
-                            s.source === 'modal' ? "bg-gold/20 text-gold" : "bg-primary/10 text-primary"
-                          )}>
-                            {s.source === 'modal' ? 'Modal' : 'Inline'}
-                          </span>
-                        </td>
-                        <td className="py-4 text-olive-800/40 whitespace-nowrap text-xs">{fmt(s.createdAt)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-};
-
-// ─── App (main) ──────────────────────────────────────────────────────────────
 
 export default function App() {
-  type ViewMode = 'home' | 'map' | 'list' | 'gallery' | 'analytics' | 'syl' | 'admin';
+  type ViewMode = 'home' | 'map' | 'list' | 'gallery' | 'analytics' | 'syl';
   const VIEW_ORDER: ViewMode[] = ['home', 'list', 'gallery', 'analytics', 'syl', 'map'];
 
   const [authUser, setAuthUser]   = useState<User | null>(null);
@@ -4765,7 +4616,7 @@ export default function App() {
           </div>
           {viewMode !== 'map' && (
             <div ref={scrollRef} className="h-full w-full overflow-y-auto">
-              {viewMode === 'home' && <HomeView isSubscribed={effectivelySubscribed} onNewsletterClick={() => { if (!effectivelySubscribed) setIsNewsletterOpen(true); }} sanctuaries={allSanctuaries} />}
+              {viewMode === 'home' && <HomeView isSubscribed={effectivelySubscribed} onNewsletterClick={() => { if (!effectivelySubscribed) setIsNewsletterOpen(true); }} sanctuaries={allSanctuaries} onModeChange={handleViewChange} />}
               {viewMode === 'list' && <Sanctuaries isSubscribed={effectivelySubscribed} onNewsletterClick={() => { if (!effectivelySubscribed) setIsNewsletterOpen(true); }} isFullPage sanctuaries={allSanctuaries} />}
               {viewMode === 'gallery' && <EcosystemPillars isFullPage />}
               {viewMode === 'analytics' && <Advantage isFullPage />}
