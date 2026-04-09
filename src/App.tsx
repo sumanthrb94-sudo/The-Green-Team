@@ -55,9 +55,11 @@ import {
   RecaptchaVerifier,
 } from 'firebase/auth';
 import type { User, ConfirmationResult } from 'firebase/auth';
-import { auth, googleProvider } from './lib/firebase';
+import { auth, db, googleProvider } from './lib/firebase';
 import { saveLead, saveNewsletter, getLeads, getNewsletterSubs } from './lib/leads';
 import type { Lead, NewsletterEntry } from './lib/leads';
+import { upsertUserProfile, getAllUsers } from './lib/users';
+import type { UserProfile } from './lib/users';
 import { subscribeProperties, createProperty, updateProperty, deleteProperty } from './lib/properties';
 import type { PropertyDoc, PropertyInput } from './lib/properties';
 
@@ -184,23 +186,44 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
   onAdminClick: () => void;
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [sanctuariesOpen, setSanctuariesOpen] = useState(false);
 
   const navItems = [
     { name: 'Home', id: 'home' },
     { name: 'Map', id: 'map' },
     { name: 'Advantage', id: 'analytics' },
     { name: 'Ecosystems', id: 'gallery' },
-    { name: 'Agartha', id: 'list' },
-    { name: 'SYL', id: 'syl' },
     { name: 'Membership', id: 'membership' },
+  ];
+
+  const sanctuaryItems = [
+    { name: 'MODCON Agartha', id: 'list', sub: 'Narsapur Forest · From ₹64.6 L', img: '/agartha-render.jpg' },
+    { name: 'SYL: Vertical Villament', id: 'syl', sub: 'Tukkuguda · From ₹1.9 Cr', img: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=400' },
   ];
 
   const avatarLetter = (authUser?.displayName?.[0] || authUser?.email?.[0] || authUser?.phoneNumber?.[1] || '?').toUpperCase();
 
   return (
     <nav className="relative z-[9990] px-6 md:px-10 flex items-center justify-between h-16 md:h-20 bg-cream border-b border-outline/10">
-      {/* Left: Brand only */}
-      <Logo className="w-7 h-7" textClassName="text-base md:text-lg" />
+      {/* Left: Brand + dark mode toggle */}
+      <div className="flex items-center gap-3">
+        <button onClick={() => onModeChange('home')} className="flex items-center focus:outline-none hover:opacity-80 transition-opacity" aria-label="Go to home">
+          <Logo className="w-7 h-7" textClassName="text-base md:text-lg" />
+        </button>
+        <button
+          onClick={() => setIsDark(!isDark)}
+          title={isDark ? 'Light mode' : 'Dark mode'}
+          className={cn(
+            "flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border text-[8px] uppercase tracking-widest font-bold transition-all",
+            isDark
+              ? "bg-primary/10 border-primary/20 text-primary"
+              : "bg-outline/8 border-outline/20 text-secondary/60 hover:border-primary/30 hover:text-primary"
+          )}
+        >
+          {isDark ? <Sun className="w-3 h-3" /> : <Moon className="w-3 h-3" />}
+          <span className="hidden sm:inline">{isDark ? 'Light' : 'Dark'}</span>
+        </button>
+      </div>
 
       {/* Right: admin badge (admin only) + menu/avatar trigger */}
       <div className="flex items-center gap-2">
@@ -261,36 +284,77 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
               className="fixed top-0 left-0 right-0 bg-surface z-[10000] flex flex-col p-8 md:p-16 shadow-2xl rounded-b-[40px] max-h-[95vh] overflow-y-auto"
             >
               {/* Panel header */}
-              <div className="flex items-center justify-between mb-12">
+              <div className="flex items-center justify-between mb-10">
                 <Logo className="w-8 h-8" textClassName="text-lg" />
-                <button
-                  onClick={() => setIsMenuOpen(false)}
-                  className="p-3 hover:bg-primary/5 rounded-full transition-all"
-                >
+                <button onClick={() => setIsMenuOpen(false)} className="p-3 hover:bg-primary/5 rounded-full transition-all">
                   <X className="w-6 h-6 text-on-surface" />
                 </button>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-12 md:gap-24">
+              <div className="grid md:grid-cols-2 gap-10 md:gap-24">
                 {/* Nav links */}
-                <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-5">
                   <p className="text-[10px] uppercase tracking-[0.6em] text-secondary font-bold opacity-40">Explore</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-6">
+                  <div className="flex flex-col gap-5">
                     {navItems.map((item) => (
-                      <button
-                        key={item.id}
-                        onClick={() => {
-                          if (['home', 'map', 'analytics', 'gallery', 'list', 'syl'].includes(item.id)) {
-                            onModeChange(item.id as any);
-                          }
-                          setIsMenuOpen(false);
-                        }}
-                        className="text-2xl md:text-3xl uppercase tracking-[0.1em] font-headline font-bold text-on-surface hover:text-primary transition-all flex items-center justify-between group text-left"
+                      <button key={item.id}
+                        onClick={() => { onModeChange(item.id as any); setIsMenuOpen(false); }}
+                        className={cn(
+                          "text-2xl md:text-3xl uppercase tracking-[0.1em] font-headline font-bold transition-all flex items-center justify-between group text-left",
+                          item.id === 'membership'
+                            ? "text-primary"
+                            : "text-on-surface hover:text-primary"
+                        )}
                       >
                         <span className="group-hover:translate-x-2 transition-transform duration-500">{item.name}</span>
-                        <ArrowRight className="w-5 h-5 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500" />
+                        <ArrowRight className={cn(
+                          "w-5 h-5 transition-all duration-500",
+                          item.id === 'membership'
+                            ? "opacity-100 translate-x-0"
+                            : "opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0"
+                        )} />
                       </button>
                     ))}
+
+                    {/* Sanctuaries — expandable dropdown */}
+                    <div>
+                      <button
+                        onClick={() => setSanctuariesOpen(v => !v)}
+                        className="text-2xl md:text-3xl uppercase tracking-[0.1em] font-headline font-bold text-on-surface hover:text-primary transition-all flex items-center justify-between w-full group"
+                      >
+                        <span className="group-hover:translate-x-2 transition-transform duration-500">Sanctuaries</span>
+                        <ChevronDown className={cn("w-5 h-5 text-primary transition-transform duration-300", sanctuariesOpen && "rotate-180")} />
+                      </button>
+
+                      <AnimatePresence>
+                        {sanctuariesOpen && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.25 }}
+                            className="overflow-hidden mt-4"
+                          >
+                            <div className="flex flex-col gap-3 pl-2 border-l-2 border-primary/20">
+                              {sanctuaryItems.map(s => (
+                                <button key={s.id}
+                                  onClick={() => { onModeChange(s.id as any); setIsMenuOpen(false); setSanctuariesOpen(false); }}
+                                  className="flex items-center gap-4 group/item text-left hover:translate-x-1 transition-transform duration-200"
+                                >
+                                  <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-outline/10">
+                                    <img src={s.img} alt={s.name} referrerPolicy="no-referrer" className="w-full h-full object-cover grayscale group-hover/item:grayscale-0 transition-all duration-500" />
+                                  </div>
+                                  <div>
+                                    <p className="font-headline font-bold text-sm text-on-surface group-hover/item:text-primary transition-colors">{s.name}</p>
+                                    <p className="text-[9px] uppercase tracking-widest text-secondary/50">{s.sub}</p>
+                                  </div>
+                                </button>
+                              ))}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
                   </div>
                 </div>
 
@@ -365,14 +429,6 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
                     </>
                   )}
 
-                  {/* Dark mode toggle — blended in */}
-                  <button
-                    onClick={() => setIsDark(!isDark)}
-                    className="flex items-center gap-3 text-[10px] uppercase tracking-[0.4em] text-secondary/50 font-bold hover:text-primary transition-colors mt-2 self-start"
-                  >
-                    {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-                    {isDark ? 'Light Mode' : 'Dark Mode'}
-                  </button>
                 </div>
               </div>
 
@@ -440,7 +496,7 @@ const SideNavBar = ({ activeMode, onModeChange }: { activeMode: string, onModeCh
   );
 };
 
-const Hero = () => {
+const Hero = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
   return (
     <section className="relative flex flex-col justify-start px-6 md:px-24 pt-6 pb-12 overflow-hidden cashew-gradient">
       <div className="absolute inset-0 z-0 opacity-10 mix-blend-multiply">
@@ -474,10 +530,10 @@ const Hero = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 md:gap-8 pt-4">
-              <button className="btn-membership btn-olive group w-full sm:w-auto shadow-lg hover:shadow-xl shadow-olive-900/20">
+              <button onClick={() => onModeChange('membership')} className="btn-membership btn-olive group w-full sm:w-auto shadow-lg hover:shadow-xl shadow-olive-900/20">
                 Apply for Membership <ArrowUpRight className="inline-block ml-2 w-4 h-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
               </button>
-              <button className="btn-membership btn-outline-olive w-full sm:w-auto hover:shadow-lg">
+              <button onClick={() => onModeChange('analytics')} className="btn-membership btn-outline-olive w-full sm:w-auto hover:shadow-lg">
                 The Green Team Advantage
               </button>
             </div>
@@ -677,7 +733,7 @@ const TheSIL = ({ isSubscribed, onNewsletterClick, isFullPage = false }: { isSub
               </div>
             </div>
 
-            <button className="btn-membership bg-gold text-olive-900 border-gold hover:bg-cream hover:text-olive-900">
+            <button onClick={onNewsletterClick} className="btn-membership bg-gold text-olive-900 border-gold hover:bg-cream hover:text-olive-900">
               Request Early Access Briefing
             </button>
           </div>
@@ -708,51 +764,62 @@ const TheSIL = ({ isSubscribed, onNewsletterClick, isFullPage = false }: { isSub
 };
 
 const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewsletterClick: () => void, onOpen: () => void }> = ({ sanctuary, isSubscribed, onNewsletterClick, onOpen }) => {
-  const isGated = sanctuary.id === 'syl' && !isSubscribed;
+  const isSyl = sanctuary.id === 'syl';
+  const isGated = isSyl && !isSubscribed;
 
   return (
     <motion.div
       whileHover={{ y: -4 }}
-      className="group relative aspect-square overflow-hidden rounded-3xl cursor-pointer bg-[#0e1409]"
+      className="group relative aspect-square overflow-hidden rounded-3xl cursor-pointer bg-[#1a1f0e]"
       onClick={() => { if (!isGated) onOpen(); }}
     >
-      {/* Full-bleed image */}
+      {/* Full-bleed image — always full color */}
       <img
         src={sanctuary.image}
         alt={sanctuary.title}
         className={cn(
-          "absolute inset-0 w-full h-full object-cover transition-all duration-1000",
-          isGated ? "grayscale brightness-50" : "grayscale brightness-75 group-hover:grayscale-0 group-hover:brightness-90 group-hover:scale-105"
+          "absolute inset-0 w-full h-full object-cover transition-all duration-700",
+          isGated
+            ? "brightness-40 scale-105 blur-sm"
+            : "brightness-80 group-hover:brightness-95 group-hover:scale-105"
         )}
         referrerPolicy="no-referrer"
       />
 
-      {/* Gradient overlay — strong at bottom, light at top */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-black/10 pointer-events-none" />
+      {/* Warm cream-olive gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a0a]/90 via-[#1a1a0a]/20 to-transparent pointer-events-none" />
 
-      {/* Gated overlay */}
+      {/* Gated overlay for SYL */}
       {isGated && (
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center p-8 text-center">
-          <Shield className="w-10 h-10 text-primary mb-4" />
-          <h4 className="text-xl font-headline font-bold text-white mb-2">Locked Landmark.</h4>
-          <p className="text-xs text-white/60 mb-6 max-w-[180px]">Sign up for our newsletter to view SYL details.</p>
+          <div className="w-14 h-14 rounded-2xl bg-[#c8a951]/15 border border-[#c8a951]/30 flex items-center justify-center mb-5">
+            <Shield className="w-6 h-6 text-[#c8a951]" />
+          </div>
+          <h4 className="text-xl font-headline font-bold text-white mb-2">Newsletter Access Required</h4>
+          <p className="text-xs text-white/50 mb-6 max-w-[200px] leading-relaxed">
+            SYL: Vertical Villament is reserved for our intelligence network subscribers.
+          </p>
           <button onClick={e => { e.stopPropagation(); onNewsletterClick(); }}
-            className="px-5 py-2.5 bg-primary text-on-primary text-[9px] uppercase tracking-widest font-bold rounded-xl">
-            Unlock Now
+            className="px-6 py-3 bg-[#c8a951] text-[#1a1a0a] text-[9px] uppercase tracking-widest font-bold rounded-xl hover:bg-white transition-all">
+            Subscribe to Unlock
           </button>
         </div>
       )}
 
       {/* Top badge */}
-      <div className="absolute top-5 left-5">
-        <span className="bg-primary text-on-primary px-3 py-1 text-[8px] uppercase tracking-[0.4em] font-bold rounded-full">
-          {sanctuary.id === 'syl' ? 'Upcoming' : 'Live'}
+      <div className="absolute top-5 left-5 z-20">
+        <span className={cn(
+          "px-3 py-1 text-[8px] uppercase tracking-[0.4em] font-bold rounded-full",
+          isSyl
+            ? "bg-[#c8a951] text-[#1a1a0a]"
+            : "bg-primary/90 text-on-primary backdrop-blur-sm"
+        )}>
+          {isSyl ? 'Newsletter Only' : 'Open Access'}
         </span>
       </div>
 
-      {/* Bottom info overlay */}
-      <div className="absolute bottom-0 left-0 right-0 px-6 pb-6 pt-10">
-        {/* Title + price row */}
+      {/* Bottom info — hide price for gated SYL */}
+      <div className={cn("absolute bottom-0 left-0 right-0 px-6 pb-6 pt-10 z-20", isGated && "opacity-0")}>
         <div className="flex items-end justify-between gap-3 mb-4">
           <div className="min-w-0">
             <p className="text-[8px] uppercase tracking-[0.4em] text-primary/80 font-bold mb-1 truncate">{sanctuary.commute}</p>
@@ -772,8 +839,6 @@ const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewslet
             )}
           </div>
         </div>
-
-        {/* Stats row + CTA */}
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5">
@@ -786,7 +851,7 @@ const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewslet
             </div>
           </div>
           <button
-            onClick={e => { e.stopPropagation(); if (!isGated) onOpen(); }}
+            onClick={e => { e.stopPropagation(); onOpen(); }}
             className="flex-shrink-0 px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white text-[8px] uppercase tracking-widest font-bold rounded-xl hover:bg-primary hover:border-primary transition-all"
           >
             View →
@@ -1348,8 +1413,9 @@ const AdminDashboard: FC<{
   leads: Lead[];
   newsletter: NewsletterEntry[];
   firestoreProps: PropertyDoc[];
-}> = ({ onClose, leads, newsletter, firestoreProps }) => {
-  const [tab, setTab] = useState<'properties' | 'leads' | 'newsletter'>('properties');
+  users: UserProfile[];
+}> = ({ onClose, leads, newsletter, firestoreProps, users }) => {
+  const [tab, setTab] = useState<'properties' | 'leads' | 'newsletter' | 'users'>('properties');
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<PropertyInput>(EMPTY_FORM);
@@ -1427,15 +1493,17 @@ const AdminDashboard: FC<{
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-outline/10 flex-shrink-0">
-          {(['properties', 'leads', 'newsletter'] as const).map(t => (
+        <div className="flex border-b border-outline/10 flex-shrink-0 overflow-x-auto">
+          {(['properties', 'leads', 'newsletter', 'users'] as const).map(t => (
             <button key={t} onClick={() => setTab(t)}
               className={cn(
-                "flex-1 py-3.5 text-[9px] uppercase tracking-[0.4em] font-bold transition-all",
+                "flex-shrink-0 flex-1 py-3.5 text-[9px] uppercase tracking-[0.3em] font-bold transition-all whitespace-nowrap px-3",
                 tab === t ? "text-primary border-b-2 border-primary" : "text-secondary/40 hover:text-secondary"
               )}>
-              {t === 'properties' ? `Properties (${firestoreProps.length})` :
-               t === 'leads' ? `Leads (${leads.length})` : `Newsletter (${newsletter.length})`}
+              {t === 'properties' ? `Props (${firestoreProps.length})`
+               : t === 'leads' ? `Leads (${leads.length})`
+               : t === 'newsletter' ? `News (${newsletter.length})`
+               : `Users (${users.length})`}
             </button>
           ))}
         </div>
@@ -1524,24 +1592,24 @@ const AdminDashboard: FC<{
               <div className="space-y-4">
                 <p className="text-[8px] uppercase tracking-[0.5em] text-secondary/40 font-bold border-b border-outline/10 pb-2">Basic Info</p>
                 <div>
-                  <label className={labelCls}>Property Title *</label>
-                  <input className={inputCls} placeholder="e.g. MODCON Agartha" value={form.title}
+                  <label htmlFor="adm-title" className={labelCls}>Property Title *</label>
+                  <input id="adm-title" name="title" className={inputCls} placeholder="e.g. MODCON Agartha" value={form.title}
                     onChange={e => set('title', e.target.value)} />
                 </div>
                 <div>
-                  <label className={labelCls}>Location *</label>
-                  <input className={inputCls} placeholder="e.g. Narsapur Forest Peripheral, Hyderabad" value={form.location}
+                  <label htmlFor="adm-location" className={labelCls}>Location *</label>
+                  <input id="adm-location" name="location" className={inputCls} placeholder="e.g. Narsapur Forest Peripheral, Hyderabad" value={form.location}
                     onChange={e => set('location', e.target.value)} />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className={labelCls}>Latitude</label>
-                    <input type="number" step="any" className={inputCls} placeholder="17.4700" value={form.lat ?? ''}
+                    <label htmlFor="adm-lat" className={labelCls}>Latitude</label>
+                    <input id="adm-lat" name="lat" type="number" step="any" className={inputCls} placeholder="17.4700" value={form.lat ?? ''}
                       onChange={e => set('lat', e.target.value ? parseFloat(e.target.value) : undefined)} />
                   </div>
                   <div>
-                    <label className={labelCls}>Longitude</label>
-                    <input type="number" step="any" className={inputCls} placeholder="78.2500" value={form.lng ?? ''}
+                    <label htmlFor="adm-lng" className={labelCls}>Longitude</label>
+                    <input id="adm-lng" name="lng" type="number" step="any" className={inputCls} placeholder="78.2500" value={form.lng ?? ''}
                       onChange={e => set('lng', e.target.value ? parseFloat(e.target.value) : undefined)} />
                   </div>
                 </div>
@@ -1552,8 +1620,8 @@ const AdminDashboard: FC<{
               <div className="space-y-4">
                 <p className="text-[8px] uppercase tracking-[0.5em] text-secondary/40 font-bold border-b border-outline/10 pb-2">Media &amp; Links</p>
                 <div>
-                  <label className={labelCls}>Hero Image URL</label>
-                  <input className={inputCls} placeholder="https://..." value={form.image}
+                  <label htmlFor="adm-image" className={labelCls}>Hero Image URL</label>
+                  <input id="adm-image" name="image" className={inputCls} placeholder="https://..." value={form.image}
                     onChange={e => set('image', e.target.value)} />
                   {form.image && (
                     <img src={form.image} alt="preview" referrerPolicy="no-referrer"
@@ -1561,13 +1629,13 @@ const AdminDashboard: FC<{
                   )}
                 </div>
                 <div>
-                  <label className={labelCls}>Site Plan Image URL</label>
-                  <input className={inputCls} placeholder="https://... or /filename.jpg" value={form.sitePlanSrc ?? ''}
+                  <label htmlFor="adm-siteplan" className={labelCls}>Site Plan Image URL</label>
+                  <input id="adm-siteplan" name="sitePlanSrc" className={inputCls} placeholder="https://... or /filename.jpg" value={form.sitePlanSrc ?? ''}
                     onChange={e => set('sitePlanSrc', e.target.value)} />
                 </div>
                 <div>
-                  <label className={labelCls}>Brochure URL</label>
-                  <input className={inputCls} placeholder="https://..." value={form.brochureUrl ?? ''}
+                  <label htmlFor="adm-brochure" className={labelCls}>Brochure URL</label>
+                  <input id="adm-brochure" name="brochureUrl" className={inputCls} placeholder="https://..." value={form.brochureUrl ?? ''}
                     onChange={e => set('brochureUrl', e.target.value)} />
                 </div>
               </div>
@@ -1577,18 +1645,18 @@ const AdminDashboard: FC<{
                 <p className="text-[8px] uppercase tracking-[0.5em] text-secondary/40 font-bold border-b border-outline/10 pb-2">Environment &amp; Commute</p>
                 <div className="grid grid-cols-3 gap-3">
                   <div>
-                    <label className={labelCls}>AQI</label>
-                    <input type="number" className={inputCls} placeholder="12" value={form.aqi}
+                    <label htmlFor="adm-aqi" className={labelCls}>AQI</label>
+                    <input id="adm-aqi" name="aqi" type="number" className={inputCls} placeholder="12" value={form.aqi}
                       onChange={e => set('aqi', parseInt(e.target.value) || 0)} />
                   </div>
                   <div>
-                    <label className={labelCls}>Noise (dB)</label>
-                    <input type="number" className={inputCls} placeholder="18" value={form.noise}
+                    <label htmlFor="adm-noise" className={labelCls}>Noise (dB)</label>
+                    <input id="adm-noise" name="noise" type="number" className={inputCls} placeholder="18" value={form.noise}
                       onChange={e => set('noise', parseInt(e.target.value) || 0)} />
                   </div>
                   <div>
-                    <label className={labelCls}>Commute</label>
-                    <input className={inputCls} placeholder="45 mins to Fin. District" value={form.commute}
+                    <label htmlFor="adm-commute" className={labelCls}>Commute</label>
+                    <input id="adm-commute" name="commute" className={inputCls} placeholder="45 mins to Fin. District" value={form.commute}
                       onChange={e => set('commute', e.target.value)} />
                   </div>
                 </div>
@@ -1599,19 +1667,19 @@ const AdminDashboard: FC<{
                 <p className="text-[8px] uppercase tracking-[0.5em] text-secondary/40 font-bold border-b border-outline/10 pb-2">Pricing</p>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className={labelCls}>Member Price</label>
-                    <input className={inputCls} placeholder="₹1.9 Cr" value={form.memberPrice}
+                    <label htmlFor="adm-memberprice" className={labelCls}>Member Price</label>
+                    <input id="adm-memberprice" name="memberPrice" className={inputCls} placeholder="₹1.9 Cr" value={form.memberPrice}
                       onChange={e => set('memberPrice', e.target.value)} />
                   </div>
                   <div>
-                    <label className={labelCls}>Valuation / Strikethrough</label>
-                    <input className={inputCls} placeholder="₹4.0 Cr" value={form.valuation}
+                    <label htmlFor="adm-valuation" className={labelCls}>Valuation / Strikethrough</label>
+                    <input id="adm-valuation" name="valuation" className={inputCls} placeholder="₹4.0 Cr" value={form.valuation}
                       onChange={e => set('valuation', e.target.value)} />
                   </div>
                 </div>
                 <div>
-                  <label className={labelCls}>Price per Sq Yd (₹) — leave blank if not applicable</label>
-                  <input type="number" className={inputCls} placeholder="7999" value={form.pricePerSqYd ?? ''}
+                  <label htmlFor="adm-pricepersqyd" className={labelCls}>Price per Sq Yd (₹) — leave blank if not applicable</label>
+                  <input id="adm-pricepersqyd" name="pricePerSqYd" type="number" className={inputCls} placeholder="7999" value={form.pricePerSqYd ?? ''}
                     onChange={e => set('pricePerSqYd', e.target.value ? parseInt(e.target.value) : undefined)} />
                 </div>
               </div>
@@ -1620,19 +1688,19 @@ const AdminDashboard: FC<{
               <div className="space-y-4">
                 <p className="text-[8px] uppercase tracking-[0.5em] text-secondary/40 font-bold border-b border-outline/10 pb-2">Content</p>
                 <div>
-                  <label className={labelCls}>Tagline</label>
-                  <input className={inputCls} placeholder="Where the forest becomes home." value={form.tagline ?? ''}
+                  <label htmlFor="adm-tagline" className={labelCls}>Tagline</label>
+                  <input id="adm-tagline" name="tagline" className={inputCls} placeholder="Where the forest becomes home." value={form.tagline ?? ''}
                     onChange={e => set('tagline', e.target.value)} />
                 </div>
                 <div>
-                  <label className={labelCls}>Description</label>
-                  <textarea rows={4} className={cn(inputCls, 'resize-none')}
+                  <label htmlFor="adm-description" className={labelCls}>Description</label>
+                  <textarea id="adm-description" name="description" rows={4} className={cn(inputCls, 'resize-none')}
                     placeholder="Full description of the property…" value={form.description ?? ''}
                     onChange={e => set('description', e.target.value)} />
                 </div>
                 <div>
-                  <label className={labelCls}>Developer / Architect</label>
-                  <input className={inputCls} placeholder="MODCON Builders" value={form.architect ?? ''}
+                  <label htmlFor="adm-architect" className={labelCls}>Developer / Architect</label>
+                  <input id="adm-architect" name="architect" className={inputCls} placeholder="MODCON Builders" value={form.architect ?? ''}
                     onChange={e => set('architect', e.target.value)} />
                 </div>
               </div>
@@ -1642,18 +1710,18 @@ const AdminDashboard: FC<{
                 <p className="text-[8px] uppercase tracking-[0.5em] text-secondary/40 font-bold border-b border-outline/10 pb-2">Plot Community (optional)</p>
                 <div className="grid grid-cols-3 gap-3">
                   <div>
-                    <label className={labelCls}>No. of Plots</label>
-                    <input type="number" className={inputCls} placeholder="53" value={form.plots ?? ''}
+                    <label htmlFor="adm-plots" className={labelCls}>No. of Plots</label>
+                    <input id="adm-plots" name="plots" type="number" className={inputCls} placeholder="53" value={form.plots ?? ''}
                       onChange={e => set('plots', e.target.value ? parseInt(e.target.value) : undefined)} />
                   </div>
                   <div>
-                    <label className={labelCls}>Plot Range</label>
-                    <input className={inputCls} placeholder="808–5,097 sq yds" value={form.plotRange ?? ''}
+                    <label htmlFor="adm-plotrange" className={labelCls}>Plot Range</label>
+                    <input id="adm-plotrange" name="plotRange" className={inputCls} placeholder="808–5,097 sq yds" value={form.plotRange ?? ''}
                       onChange={e => set('plotRange', e.target.value)} />
                   </div>
                   <div>
-                    <label className={labelCls}>Amenity Sq Yds</label>
-                    <input className={inputCls} placeholder="14,548" value={form.amenityAcres ?? ''}
+                    <label htmlFor="adm-amenity" className={labelCls}>Amenity Sq Yds</label>
+                    <input id="adm-amenity" name="amenityAcres" className={inputCls} placeholder="14,548" value={form.amenityAcres ?? ''}
                       onChange={e => set('amenityAcres', e.target.value)} />
                   </div>
                 </div>
@@ -1663,7 +1731,7 @@ const AdminDashboard: FC<{
               <div className="space-y-4">
                 <p className="text-[8px] uppercase tracking-[0.5em] text-secondary/40 font-bold border-b border-outline/10 pb-2">Curated Features</p>
                 <div className="flex gap-2">
-                  <input className={cn(inputCls, 'flex-1')} placeholder="e.g. Vertical Forest" value={featInput}
+                  <input id="adm-feature" name="feature" className={cn(inputCls, 'flex-1')} placeholder="e.g. Vertical Forest" value={featInput}
                     onChange={e => setFeatInput(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addFeature(); } }} />
                   <button type="button" onClick={addFeature}
@@ -1756,6 +1824,52 @@ const AdminDashboard: FC<{
               ))}
             </div>
           )}
+
+          {/* ── Users Tab ── */}
+          {tab === 'users' && (
+            <div className="p-6 space-y-3">
+              <p className="text-[9px] uppercase tracking-[0.4em] text-secondary/40 font-bold mb-4">{users.length} registered users</p>
+              {users.length === 0 && <p className="text-center py-16 text-secondary/30 text-sm">No users yet.</p>}
+              {users.map(u => (
+                <div key={u.uid} className="p-4 border border-outline/10 rounded-2xl space-y-2">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-3">
+                      {u.photoURL
+                        ? <img src={u.photoURL} referrerPolicy="no-referrer" alt="" className="w-9 h-9 rounded-full object-cover flex-shrink-0" />
+                        : <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 text-primary font-bold text-sm">
+                            {(u.displayName?.[0] || u.email?.[0] || '?').toUpperCase()}
+                          </div>
+                      }
+                      <div>
+                        <p className="text-sm font-bold text-on-surface">{u.name || u.displayName || '—'}</p>
+                        <p className="text-[10px] text-secondary/50">{u.email}</p>
+                      </div>
+                    </div>
+                    {(u.lat && u.lng) && (
+                      <a href={`https://maps.google.com/?q=${u.lat},${u.lng}`} target="_blank" rel="noopener noreferrer"
+                        className="flex-shrink-0 flex items-center gap-1 px-2.5 py-1 bg-primary/8 text-primary text-[8px] font-bold uppercase tracking-widest rounded-full hover:bg-primary/15 transition-all">
+                        <MapPin className="w-2.5 h-2.5" /> Map
+                      </a>
+                    )}
+                  </div>
+                  {(u.occupation || u.city) && (
+                    <p className="text-[10px] text-secondary/50 pl-12">
+                      {[u.occupation, u.city].filter(Boolean).join(' · ')}
+                    </p>
+                  )}
+                  {(u.lat && u.lng) && (
+                    <p className="text-[9px] text-secondary/30 pl-12 font-mono">
+                      {u.lat.toFixed(5)}, {u.lng.toFixed(5)}
+                      {u.locationAccuracy ? ` ±${Math.round(u.locationAccuracy)}m` : ''}
+                    </p>
+                  )}
+                  <p className="text-[9px] text-secondary/20 pl-12">
+                    First seen: {u.firstSignIn ? new Date(u.firstSignIn.seconds * 1000).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: '2-digit' }) : '—'}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </motion.div>
     </motion.div>
@@ -1772,7 +1886,12 @@ const featureIcon = (f: string) => {
   return <Zap className="w-4 h-4" />;
 };
 
-const PropertyDetailOverlay = ({ sanctuary, onClose }: { sanctuary: Sanctuary, onClose: () => void }) => {
+const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNewsletterSignup }: {
+  sanctuary: Sanctuary;
+  onClose: () => void;
+  isSubscribed?: boolean;
+  onNewsletterSignup?: () => void;
+}) => {
   const hotspots  = SANCTUARY_HOTSPOTS[sanctuary.id] ?? null;
   const plotDots  = SANCTUARY_PLOTS[sanctuary.id]    ?? null;
   const [activeSpot, setActiveSpot]   = useState<Hotspot | null>(hotspots?.[0] ?? null);
@@ -1782,6 +1901,31 @@ const PropertyDetailOverlay = ({ sanctuary, onClose }: { sanctuary: Sanctuary, o
   const [leadPhone, setLeadPhone]     = useState('');
   const [leadSubmitted, setLeadSubmitted] = useState(false);
   const [leadLoading, setLeadLoading]    = useState(false);
+
+  // Timed newsletter prompt — appears after 25s if not already subscribed
+  const [showNewsletterPrompt, setShowNewsletterPrompt] = useState(false);
+  const [nlEmail, setNlEmail]     = useState('');
+  const [nlDone, setNlDone]       = useState(false);
+  const [nlLoading, setNlLoading] = useState(false);
+  useEffect(() => {
+    if (isSubscribed) return;
+    const t = setTimeout(() => setShowNewsletterPrompt(true), 25000);
+    return () => clearTimeout(t);
+  }, [isSubscribed]);
+
+  const handleNlSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!nlEmail.trim()) return;
+    setNlLoading(true);
+    try {
+      await saveNewsletter(nlEmail.trim(), 'modal');
+      await saveLead({ name: nlEmail.trim(), email: nlEmail.trim(), intent: `${sanctuary.title} — Newsletter Prompt` });
+      onNewsletterSignup?.();
+    } catch {/* ignore */} finally {
+      setNlLoading(false);
+      setNlDone(true);
+    }
+  };
 
   // Parse "45 mins to Financial District" → { time: '45m', dest: 'Fin. District' }
   const commuteTime = sanctuary.commute.match(/\d+/)?.[0] ?? '—';
@@ -2248,6 +2392,53 @@ const PropertyDetailOverlay = ({ sanctuary, onClose }: { sanctuary: Sanctuary, o
           </div>
         </div>
       </div>
+
+      {/* ── Timed newsletter prompt (slides up after 25s) ── */}
+      <AnimatePresence>
+        {showNewsletterPrompt && !nlDone && (
+          <motion.div
+            initial={{ y: '100%', opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: '100%', opacity: 0 }}
+            transition={{ type: 'spring', damping: 28, stiffness: 220 }}
+            className="absolute bottom-0 left-0 right-0 bg-[#0a0f07] border-t border-primary/20 px-6 py-5 z-10"
+          >
+            <button onClick={() => setShowNewsletterPrompt(false)}
+              className="absolute top-3 right-4 p-1 text-white/30 hover:text-white/60 transition-colors">
+              <X className="w-4 h-4" />
+            </button>
+            <p className="text-[8px] uppercase tracking-[0.5em] text-primary/60 font-bold mb-1">Still exploring?</p>
+            <p className="text-sm font-headline font-bold text-white mb-3">
+              Get exclusive {sanctuary.title} updates — pricing alerts, site visit slots &amp; VIP access.
+            </p>
+            <form onSubmit={handleNlSubmit} className="flex gap-2">
+              <input
+                type="email" placeholder="your@email.com" value={nlEmail}
+                onChange={e => setNlEmail(e.target.value)}
+                className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-primary/50 transition-colors"
+              />
+              <button type="submit" disabled={nlLoading || !nlEmail.trim()}
+                className="px-4 py-2.5 bg-primary text-on-primary text-[9px] uppercase tracking-widest font-bold rounded-xl hover:bg-primary/90 transition-all disabled:opacity-50 flex-shrink-0">
+                {nlLoading ? '…' : 'Notify Me'}
+              </button>
+            </form>
+          </motion.div>
+        )}
+        {nlDone && showNewsletterPrompt && (
+          <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
+            transition={{ type: 'spring', damping: 28, stiffness: 220 }}
+            className="absolute bottom-0 left-0 right-0 bg-[#0a0f07] border-t border-primary/20 px-6 py-5 z-10 flex items-center gap-3">
+            <Check className="w-5 h-5 text-primary flex-shrink-0" />
+            <div>
+              <p className="text-sm font-bold text-white">You're on the list.</p>
+              <p className="text-[10px] text-white/40">We'll reach out within 24 hours.</p>
+            </div>
+            <button onClick={() => setShowNewsletterPrompt(false)} className="ml-auto text-white/30 hover:text-white/60">
+              <X className="w-4 h-4" />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };
@@ -3492,7 +3683,7 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
   );
 };
 
-const Sanctuaries = ({ isSubscribed, onNewsletterClick, isFullPage = false }: { isSubscribed: boolean, onNewsletterClick: () => void, isFullPage?: boolean }) => {
+const Sanctuaries = ({ isSubscribed, onNewsletterClick, isFullPage = false, sanctuaries = SANCTUARIES }: { isSubscribed: boolean, onNewsletterClick: () => void, isFullPage?: boolean, sanctuaries?: Sanctuary[] }) => {
   const [selectedSanctuary, setSelectedSanctuary] = useState<Sanctuary | null>(null);
 
 
@@ -3513,7 +3704,7 @@ const Sanctuaries = ({ isSubscribed, onNewsletterClick, isFullPage = false }: { 
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
-          {allSanctuaries.map(s => (
+          {sanctuaries.map(s => (
             <SanctuaryCard
               key={s.id}
               sanctuary={s}
@@ -3536,7 +3727,7 @@ const Sanctuaries = ({ isSubscribed, onNewsletterClick, isFullPage = false }: { 
               onClick={() => setSelectedSanctuary(null)}
               className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             />
-            <PropertyDetailOverlay sanctuary={selectedSanctuary} onClose={() => setSelectedSanctuary(null)} />
+            <PropertyDetailOverlay sanctuary={selectedSanctuary} onClose={() => setSelectedSanctuary(null)} isSubscribed={isSubscribed} onNewsletterSignup={onNewsletterClick} />
           </div>
         )}
       </AnimatePresence>
@@ -3553,7 +3744,7 @@ const Membership = () => {
         </svg>
       ),
       title: "Limited Collective",
-      desc: "We accommodate only 20-30 premium clients total for The Green Team membership. Exclusivity is our core mandate."
+      desc: "A deliberately reserved investor circle — no public roster, no published count. Exclusivity is our core mandate."
     },
     {
       icon: (
@@ -3565,7 +3756,7 @@ const Membership = () => {
         </svg>
       ),
       title: "Project Scarcity",
-      desc: "Maximum of 20 slots per project. Early entry is not just an advantage; it's a requirement for the elite circle."
+      desc: "A finite number of seats per project, never disclosed publicly. Early entry is not just an advantage — it's a prerequisite."
     },
     {
       icon: (
@@ -3592,7 +3783,7 @@ const Membership = () => {
             </p>
             <div className="p-8 border border-gold/20 bg-gold/5 inline-block">
               <p className="text-gold text-[10px] uppercase tracking-[0.4em] font-bold mb-2">Current Capacity</p>
-              <p className="text-3xl font-serif italic">Limited to 30 Premium Clients Total</p>
+              <p className="text-3xl font-serif italic">A Reserved Investor Circle — By Invitation Only</p>
             </div>
           </div>
           
@@ -3677,136 +3868,307 @@ const NewsletterModal = ({ isOpen, onClose, onSubscribe }: { isOpen: boolean, on
   );
 };
 
-const ApplicationForm = () => {
-  const { register, handleSubmit, formState: { isSubmitting } } = useForm();
-  const [submitted, setSubmitted] = useState(false);
+const INVESTMENT_BRACKETS = [
+  '₹50 L – ₹1 Cr',
+  '₹1 Cr – ₹2 Cr',
+  '₹2 Cr – ₹5 Cr',
+  '₹5 Cr+',
+  'Prefer not to say',
+];
 
-  const onSubmit = async (data: any) => {
-    await saveLead({ name: data.name, email: data.email, intent: data.intent });
-    setSubmitted(true);
+const ApplicationForm = () => {
+  const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [form, setForm] = useState({
+    name: '', email: '', phone: '',
+    company: '', designation: '', investmentBracket: '',
+    intent: '',
+  });
+
+  const set = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }));
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.name || !form.email || !form.phone) return;
+    setLoading(true);
+    try {
+      await saveLead({
+        name: form.name,
+        email: form.email,
+        intent: [
+          form.designation && `${form.designation}${form.company ? ' at ' + form.company : ''}`,
+          form.investmentBracket && `Budget: ${form.investmentBracket}`,
+          form.intent,
+        ].filter(Boolean).join(' | '),
+      });
+      await saveNewsletter(form.email, 'modal');
+      setSubmitted(true);
+    } catch {/* silent */} finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <section id="apply" className="py-16 px-12 md:px-24 bg-cream">
-      <div className="max-w-5xl mx-auto">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          <div>
-            <h2 className="text-5xl md:text-7xl font-medium text-olive-900 mb-12">Apply for <br /><span className="italic text-olive-800">Membership.</span></h2>
-            <p className="text-xl md:text-2xl font-light text-olive-900/40 leading-relaxed">
-              We seek intelligent individuals who believe that a community's strength lies in its shared ethics and environmental stewardship.
-            </p>
-          </div>
+    <section id="apply" className="relative bg-olive-900 overflow-hidden">
 
-          <div className="bg-surface p-12 md:p-20 shadow-2xl border border-olive-800/5">
+      {/* Background texture — subtle organic pattern */}
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none">
+        <svg width="100%" height="100%"><defs><pattern id="grain" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r="1" fill="white"/><circle cx="5" cy="5" r="0.5" fill="white"/><circle cx="35" cy="35" r="0.5" fill="white"/><circle cx="5" cy="35" r="0.7" fill="white"/><circle cx="35" cy="5" r="0.7" fill="white"/></pattern></defs><rect width="100%" height="100%" fill="url(#grain)"/></svg>
+      </div>
+
+      {/* Gold accent line top */}
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#c8a951]/60 to-transparent" />
+
+      <div className="relative max-w-7xl mx-auto px-6 md:px-24 py-28 md:py-36">
+        <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-start">
+
+          {/* ── Left — editorial copy ── */}
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.9, ease: 'easeOut' }}
+            className="lg:sticky lg:top-24"
+          >
+            <div className="flex items-center gap-4 mb-10">
+              <div className="w-8 h-px bg-[#c8a951]/60" />
+              <span className="text-[#c8a951] text-[9px] font-bold uppercase tracking-[0.6em]">Reserved Investor Circle</span>
+            </div>
+
+            <h2 className="text-5xl md:text-6xl lg:text-7xl font-medium text-cream leading-[1.05] mb-10">
+              Request Your<br />
+              <span className="italic text-[#c8a951]">Adviser Call.</span>
+            </h2>
+
+            <p className="text-lg font-light text-cream/40 leading-relaxed mb-14 max-w-md">
+              Our adviser reviews every application personally. If your profile aligns with our collective, you'll receive a private call within 24 hours.
+            </p>
+
+            {/* What you get */}
+            <div className="space-y-0 border border-cream/10 divide-y divide-cream/10">
+              {[
+                { num: '01', title: 'Personal Adviser Call', desc: 'Direct conversation — no forms, no bots' },
+                { num: '02', title: 'Pre-Launch Entry Price', desc: 'The only price that compounds before the public knows' },
+                { num: '03', title: 'Intelligence Briefings', desc: 'Monthly sanctuary reports, auto-enrolled' },
+              ].map(item => (
+                <div key={item.num} className="flex gap-6 p-6 group hover:bg-cream/[0.03] transition-colors">
+                  <span className="text-[#c8a951]/40 text-xs font-bold font-mono mt-1 flex-shrink-0">{item.num}</span>
+                  <div>
+                    <p className="text-cream/90 text-sm font-semibold mb-1">{item.title}</p>
+                    <p className="text-cream/30 text-xs font-light leading-relaxed">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <p className="text-[9px] text-cream/15 uppercase tracking-widest mt-8 leading-relaxed">
+              Submission auto-enrolls your email in our monthly intelligence newsletter.
+            </p>
+          </motion.div>
+
+          {/* ── Right — floating form card ── */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.9, ease: 'easeOut', delay: 0.15 }}
+          >
             {submitted ? (
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.9 }}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.96 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="text-center py-12"
+                className="bg-[#c8a951]/10 border border-[#c8a951]/30 p-16 md:p-20 text-center"
               >
-                <Check className="w-16 h-16 text-olive-800 mx-auto mb-8" />
-                <h3 className="text-3xl font-serif italic text-olive-900 mb-6">Application Logged.</h3>
-                <p className="text-olive-800/60 font-light leading-relaxed">
-                  Our membership board will review your profile. A relationship manager will contact you for a private briefing.
+                <div className="w-20 h-20 rounded-full border border-[#c8a951]/40 flex items-center justify-center mx-auto mb-10">
+                  <Check className="w-9 h-9 text-[#c8a951]" />
+                </div>
+                <p className="text-[9px] uppercase tracking-[0.6em] text-[#c8a951]/60 font-bold mb-4">Application Logged</p>
+                <h3 className="text-3xl md:text-4xl font-serif italic text-cream mb-6">We'll be in touch.</h3>
+                <p className="text-cream/40 font-light leading-relaxed max-w-xs mx-auto text-sm">
+                  Your adviser will reach out personally within 24 hours. You're now part of our monthly intelligence network.
                 </p>
               </motion.div>
             ) : (
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-12">
-                <div className="space-y-2">
-                  <label className="text-[9px] uppercase tracking-[0.5em] text-olive-800/40">Full Name</label>
-                  <input {...register("name", { required: true })} className="input-cashew" placeholder="Your Name" />
-                </div>
-                
-                <div className="space-y-2">
-                  <label className="text-[9px] uppercase tracking-[0.5em] text-olive-800/40">Private Email</label>
-                  <input {...register("email", { required: true })} className="input-cashew" placeholder="email@domain.com" />
+              <form onSubmit={handleSubmit} className="bg-[#f5f0e8] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.5)]">
+
+                {/* Form header strip */}
+                <div className="bg-olive-800 px-10 py-7 flex items-center justify-between">
+                  <div>
+                    <p className="text-[8px] uppercase tracking-[0.5em] text-cream/40 font-bold">Private Application</p>
+                    <p className="text-cream text-sm font-semibold mt-0.5">Adviser Membership · The Green Team</p>
+                  </div>
+                  <div className="w-8 h-8 rounded-full bg-[#c8a951]/20 border border-[#c8a951]/30 flex items-center justify-center flex-shrink-0">
+                    <ShieldCheck className="w-4 h-4 text-[#c8a951]" />
+                  </div>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-[9px] uppercase tracking-[0.5em] text-olive-800/40">Ethical Intent</label>
-                  <textarea 
-                    {...register("intent")} 
-                    className="input-cashew min-h-[120px] resize-none"
-                    placeholder="Why does community ethics matter to you?"
-                  />
-                </div>
+                <div className="p-10 md:p-12 space-y-9">
 
-                <button 
-                  type="submit" 
-                  disabled={isSubmitting}
-                  className="w-full btn-membership btn-olive flex items-center justify-center gap-4"
-                >
-                  {isSubmitting ? "Processing..." : "Submit Application"}
-                  <ArrowRight className="w-4 h-4" />
-                </button>
+                  {/* Row 1 */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                    <div className="group">
+                      <label htmlFor="m-name" className="block text-[8px] uppercase tracking-[0.5em] text-olive-800/40 font-bold mb-2">Full Name *</label>
+                      <input id="m-name" name="name" value={form.name} onChange={e => set('name', e.target.value)} required
+                        className="w-full bg-transparent border-b-2 border-olive-800/15 focus:border-olive-900 py-3 text-olive-900 text-sm font-medium placeholder:text-olive-800/20 focus:outline-none transition-colors"
+                        placeholder="Your full name" />
+                    </div>
+                    <div className="group">
+                      <label htmlFor="m-phone" className="block text-[8px] uppercase tracking-[0.5em] text-olive-800/40 font-bold mb-2">Mobile *</label>
+                      <input id="m-phone" name="phone" type="tel" value={form.phone} onChange={e => set('phone', e.target.value)} required
+                        className="w-full bg-transparent border-b-2 border-olive-800/15 focus:border-olive-900 py-3 text-olive-900 text-sm font-medium placeholder:text-olive-800/20 focus:outline-none transition-colors"
+                        placeholder="+91 98765 43210" />
+                    </div>
+                  </div>
+
+                  {/* Row 2 */}
+                  <div>
+                    <label htmlFor="m-email" className="block text-[8px] uppercase tracking-[0.5em] text-olive-800/40 font-bold mb-2">Private Email *</label>
+                    <input id="m-email" name="email" type="email" value={form.email} onChange={e => set('email', e.target.value)} required
+                      className="w-full bg-transparent border-b-2 border-olive-800/15 focus:border-olive-900 py-3 text-olive-900 text-sm font-medium placeholder:text-olive-800/20 focus:outline-none transition-colors"
+                      placeholder="email@company.com" />
+                  </div>
+
+                  {/* Row 3 */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                    <div>
+                      <label htmlFor="m-designation" className="block text-[8px] uppercase tracking-[0.5em] text-olive-800/40 font-bold mb-2">Designation</label>
+                      <input id="m-designation" name="designation" value={form.designation} onChange={e => set('designation', e.target.value)}
+                        className="w-full bg-transparent border-b-2 border-olive-800/15 focus:border-olive-900 py-3 text-olive-900 text-sm font-medium placeholder:text-olive-800/20 focus:outline-none transition-colors"
+                        placeholder="Founder, Director…" />
+                    </div>
+                    <div>
+                      <label htmlFor="m-company" className="block text-[8px] uppercase tracking-[0.5em] text-olive-800/40 font-bold mb-2">Company / Venture</label>
+                      <input id="m-company" name="company" value={form.company} onChange={e => set('company', e.target.value)}
+                        className="w-full bg-transparent border-b-2 border-olive-800/15 focus:border-olive-900 py-3 text-olive-900 text-sm font-medium placeholder:text-olive-800/20 focus:outline-none transition-colors"
+                        placeholder="Your organisation" />
+                    </div>
+                  </div>
+
+                  {/* Investment appetite */}
+                  <div>
+                    <label className="block text-[8px] uppercase tracking-[0.5em] text-olive-800/40 font-bold mb-4">Investment Appetite</label>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {INVESTMENT_BRACKETS.map(b => (
+                        <button key={b} type="button" onClick={() => set('investmentBracket', b)}
+                          className={cn(
+                            "py-3 px-3 text-[9px] uppercase tracking-widest font-bold border-2 transition-all text-center leading-tight",
+                            form.investmentBracket === b
+                              ? "bg-olive-900 text-[#c8a951] border-olive-900 shadow-lg"
+                              : "bg-transparent border-olive-800/15 text-olive-800/40 hover:border-olive-800/40 hover:text-olive-900"
+                          )}>
+                          {b}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Intent */}
+                  <div>
+                    <label htmlFor="m-intent" className="block text-[8px] uppercase tracking-[0.5em] text-olive-800/40 font-bold mb-2">What draws you here? <span className="normal-case tracking-normal font-normal opacity-60">(optional)</span></label>
+                    <textarea id="m-intent" name="intent" value={form.intent} onChange={e => set('intent', e.target.value)} rows={3}
+                      className="w-full bg-olive-800/5 border border-olive-800/10 px-5 py-4 text-olive-900 text-sm font-light placeholder:text-olive-800/20 focus:outline-none focus:border-olive-800/30 transition-colors resize-none"
+                      placeholder="What draws you to pre-launch sanctuary investing?" />
+                  </div>
+
+                  {/* Submit */}
+                  <div className="pt-2">
+                    <button type="submit" disabled={loading}
+                      className="w-full py-5 bg-olive-900 text-cream text-[10px] uppercase tracking-[0.6em] font-bold hover:bg-[#c8a951] hover:text-olive-900 transition-all duration-300 flex items-center justify-center gap-4 disabled:opacity-50 group">
+                      {loading
+                        ? <><RefreshCw className="w-4 h-4 animate-spin" /> Submitting…</>
+                        : <><span>Request Adviser Call</span><ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></>
+                      }
+                    </button>
+                    <p className="text-[8px] text-center text-olive-800/25 uppercase tracking-widest mt-4">
+                      Your details are private · Auto-enrolled in monthly intelligence briefings
+                    </p>
+                  </div>
+                </div>
               </form>
             )}
-          </div>
+          </motion.div>
         </div>
       </div>
+
+      {/* Gold accent line bottom */}
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#c8a951]/40 to-transparent" />
     </section>
   );
 };
 
-const Footer = () => {
+const Footer = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
+  const agenda = [
+    { label: 'The Intelligence Gap', sub: 'Why early entry wins', mode: 'analytics' },
+    { label: 'Living Ecosystems', sub: 'Nature-first design philosophy', mode: 'gallery' },
+    { label: 'Sanctuary Map', sub: 'Environmental heatmap · AQI · Noise', mode: 'map' },
+    { label: 'MODCON Agartha', sub: 'Narsapur Forest · Open access', mode: 'list' },
+    { label: 'SYL Villament', sub: 'Tukkuguda · Newsletter only', mode: 'syl' },
+    { label: 'Adviser Membership', sub: 'Reserved investor circle · By invitation', mode: 'membership' },
+  ];
+
   return (
-    <footer className="bg-olive-900 text-cream py-32 px-12 md:px-24">
+    <footer className="bg-olive-900 text-cream pt-24 pb-16 px-6 md:px-24">
       <div className="max-w-7xl mx-auto">
-        <div className="grid md:grid-cols-4 gap-12 mb-12">
-          <div className="col-span-2">
-            <div className="flex items-center gap-4 mb-12">
-              <Logo className="w-10 h-10 text-cream" />
-            </div>
-            <p className="text-xl font-light text-cream/30 max-w-md leading-relaxed">
-              Independent collective curating India's most exclusive organic sanctuaries. Featuring MODCON Agartha and SYL at Tukkuguda.
+
+        {/* Top: brand + tagline */}
+        <div className="border-b border-cream/8 pb-16 mb-16 flex flex-col md:flex-row md:items-end justify-between gap-10">
+          <div>
+            <Logo className="w-10 h-10 text-cream mb-6" />
+            <p className="text-2xl md:text-3xl font-light text-cream/30 max-w-xl leading-relaxed">
+              Curating India's most exclusive pre-launch sanctuaries for a private circle of intelligent investors.
             </p>
           </div>
-          
-          <div>
-            <p className="text-[10px] uppercase tracking-[0.5em] text-gold mb-12">The Agenda</p>
-            <ul className="space-y-6 text-[10px] uppercase tracking-[0.4em] text-cream/40">
-              <li><a href="#the-advantage" className="hover:text-cream transition-all">Advantage</a></li>
-              <li><a href="#ecosystems" className="hover:text-cream transition-all">Ecosystems</a></li>
-              <li><a href="#map" className="hover:text-cream transition-all">Map</a></li>
-              <li><a href="#agartha" className="hover:text-cream transition-all">Agartha</a></li>
-              <li><a href="#syl" className="hover:text-cream transition-all">SYL</a></li>
-              <li><a href="#apply" className="hover:text-cream transition-all">Apply</a></li>
-            </ul>
-          </div>
-
-          <div>
-            <p className="text-[10px] uppercase tracking-[0.5em] text-gold mb-12">Collective</p>
-            <div className="flex gap-8">
-              <a href="#" className="text-cream/20 hover:text-cream transition-all cursor-pointer">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
-                </svg>
-              </a>
-              <a href="#" className="text-cream/20 hover:text-cream transition-all cursor-pointer">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-                  <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
-                  <rect x="2" y="9" width="4" height="12" />
-                  <circle cx="4" cy="4" r="2" />
-                </svg>
-              </a>
-              <a href="#" className="text-cream/20 hover:text-cream transition-all cursor-pointer">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                  <polyline points="22,6 12,13 2,6" />
-                </svg>
-              </a>
-            </div>
-          </div>
+          <button
+            onClick={() => onModeChange('membership')}
+            className="flex-shrink-0 flex items-center gap-3 px-8 py-4 border border-cream/20 text-cream text-[9px] uppercase tracking-[0.5em] font-bold hover:bg-cream hover:text-olive-900 transition-all self-start md:self-auto"
+          >
+            Apply for Access <ArrowRight className="w-3.5 h-3.5" />
+          </button>
         </div>
-        
-        <div className="pt-12 border-t border-cream/5 flex flex-col md:flex-row justify-between items-center gap-12 text-[9px] uppercase tracking-[0.5em] text-cream/10 font-bold">
-          <p>© {new Date().getFullYear()} The Green Team - Independent Sanctuary Curators. All rights reserved.</p>
-          <div className="flex gap-16">
-            <a href="#" className="hover:text-cream transition-all">Privacy</a>
-            <a href="#" className="hover:text-cream transition-all">Ethics</a>
-            <a href="#" className="hover:text-cream transition-all">Legal</a>
+
+        {/* Agenda grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-cream/5 mb-16">
+          {agenda.map(item => (
+            <button
+              key={item.mode}
+              onClick={() => onModeChange(item.mode)}
+              className="group text-left p-8 bg-olive-900 hover:bg-olive-800/60 transition-all"
+            >
+              <p className="text-[8px] uppercase tracking-[0.5em] text-cream/25 font-bold mb-2 group-hover:text-primary/60 transition-colors">{item.sub}</p>
+              <p className="text-base font-medium text-cream/70 group-hover:text-cream transition-colors flex items-center gap-2">
+                {item.label}
+                <ArrowRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
+              </p>
+            </button>
+          ))}
+        </div>
+
+        {/* Bottom bar */}
+        <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+          <p className="text-[9px] uppercase tracking-[0.5em] text-cream/15 font-bold">
+            © {new Date().getFullYear()} The Green Team · Independent Sanctuary Curators · Hyderabad
+          </p>
+          <div className="flex items-center gap-8">
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-cream/20 hover:text-cream transition-all">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+              </svg>
+            </a>
+            <a href="https://linkedin.com/company/the-green-team-india" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="text-cream/20 hover:text-cream transition-all">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+                <rect x="2" y="9" width="4" height="12" />
+                <circle cx="4" cy="4" r="2" />
+              </svg>
+            </a>
+            <a href="mailto:hello@thegreenteam.in" aria-label="Email" className="text-cream/20 hover:text-cream transition-all">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                <polyline points="22,6 12,13 2,6" />
+              </svg>
+            </a>
           </div>
         </div>
       </div>
@@ -3824,20 +4186,24 @@ const TrustSignals = () => {
         </motion.div>
         
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 opacity-60 grayscale hover:grayscale-0 transition-all duration-700">
-          <div className="flex items-center justify-center h-20">
-            <h3 className="font-headline font-bold text-xl tracking-widest uppercase">Forbes</h3>
+          <div className="flex flex-col items-center justify-center h-20 gap-1">
+            <h3 className="font-headline font-bold text-xl tracking-widest uppercase">MODCON</h3>
+            <p className="text-[8px] uppercase tracking-widest text-olive-800/50">Builders</p>
           </div>
-          <div className="flex items-center justify-center h-20">
-            <h3 className="font-headline font-bold text-xl tracking-widest uppercase">Vogue</h3>
+          <div className="flex flex-col items-center justify-center h-20 gap-1">
+            <h3 className="font-headline font-bold text-xl tracking-widest uppercase">Agartha</h3>
+            <p className="text-[8px] uppercase tracking-widest text-olive-800/50">Forest Community</p>
           </div>
-          <div className="flex items-center justify-center h-20">
-            <h3 className="font-headline font-bold text-xl tracking-widest uppercase">ArchDigest</h3>
+          <div className="flex flex-col items-center justify-center h-20 gap-1">
+            <h3 className="font-headline font-bold text-xl tracking-widest uppercase">Griha</h3>
+            <p className="text-[8px] uppercase tracking-widest text-olive-800/50">Telangana Homes</p>
           </div>
-          <div className="flex items-center justify-center h-20">
-            <h3 className="font-headline font-bold text-xl tracking-widest uppercase">Bloomberg</h3>
+          <div className="flex flex-col items-center justify-center h-20 gap-1">
+            <h3 className="font-headline font-bold text-xl tracking-widest uppercase">Vastu</h3>
+            <p className="text-[8px] uppercase tracking-widest text-olive-800/50">Hyderabad Realty</p>
           </div>
         </div>
-        
+
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }} className="mt-20 p-12 bg-cream/30 rounded-3xl border border-olive-800/5 relative shadow-sm">
           <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-surface w-12 h-12 rounded-full flex items-center justify-center text-gold shadow-sm border border-olive-800/10">
             <span className="text-3xl font-serif leading-none mt-2">"</span>
@@ -3847,11 +4213,11 @@ const TrustSignals = () => {
           </p>
           <div className="flex items-center justify-center gap-4">
             <div className="w-10 h-10 rounded-full overflow-hidden bg-olive-800/20 border-2 border-white">
-              <img src="https://picsum.photos/seed/ark/100/100" alt="Member" className="w-full h-full object-cover" />
+              <img src="https://picsum.photos/seed/kushal/100/100" alt="Member" className="w-full h-full object-cover" />
             </div>
             <div className="text-left">
-              <p className="font-bold text-olive-900 text-sm uppercase tracking-wider">A. R. Krishnan</p>
-              <p className="text-[10px] text-olive-800/60 uppercase tracking-widest font-bold">Early Member, Agartha</p>
+              <p className="font-bold text-olive-900 text-sm uppercase tracking-wider">Kushal</p>
+              <p className="text-[10px] text-olive-800/60 uppercase tracking-widest font-bold">Lead Developer, BHEL · Early Member, Agartha</p>
             </div>
           </div>
         </motion.div>
@@ -3903,14 +4269,16 @@ const NewsletterHighlight = ({ onSubscribe }: { onSubscribe: () => void }) => {
             ) : (
               <form onSubmit={handleSub} className="space-y-12">
                 <div className="space-y-4">
-                  <label className="text-[9px] uppercase tracking-[0.5em] text-cream/40">Secure Email Address</label>
-                  <input 
-                    type="email" 
+                  <label htmlFor="nl-highlight-email" className="text-[9px] uppercase tracking-[0.5em] text-cream/40">Secure Email Address</label>
+                  <input
+                    id="nl-highlight-email"
+                    name="email"
+                    type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="w-full bg-transparent border-b border-white/20 py-6 outline-none focus:border-gold transition-all font-light text-2xl text-cream placeholder:text-on-surface/10" 
-                    placeholder="email@domain.com" 
+                    className="w-full bg-transparent border-b border-white/20 py-6 outline-none focus:border-gold transition-all font-light text-2xl text-cream placeholder:text-on-surface/10"
+                    placeholder="email@domain.com"
                   />
                 </div>
                 <button 
@@ -3980,9 +4348,9 @@ const ChatBot = ({ data }: { data: any }) => {
 
   return (
     <>
-      <button 
+      <button
         onClick={() => setIsOpen(true)}
-        className="absolute bottom-8 right-8 z-[1000] w-12 h-12 bg-surface text-olive-900 border border-outline/10 rounded-full shadow-lg flex items-center justify-center hover:bg-olive-900 hover:text-cream transition-all duration-300 group"
+        className="fixed bottom-8 right-8 z-[1000] w-12 h-12 bg-surface text-olive-900 border border-outline/10 rounded-full shadow-lg flex items-center justify-center hover:bg-olive-900 hover:text-cream transition-all duration-300 group"
       >
         <MessageSquare className="w-5 h-5 relative z-10" />
       </button>
@@ -3996,13 +4364,13 @@ const ChatBot = ({ data }: { data: any }) => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsOpen(false)}
-              className="absolute inset-0 z-[995] bg-black/10 backdrop-blur-[1px]"
+              className="fixed inset-0 z-[995] bg-black/10 backdrop-blur-[1px]"
             />
             <motion.div
               initial={{ opacity: 0, y: 50, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 50, scale: 0.95 }}
-              className="absolute bottom-24 right-8 z-[1000] w-[340px] max-w-[calc(100vw-3rem)] h-[500px] bg-surface shadow-2xl border border-olive-800/10 flex flex-col overflow-hidden rounded-2xl"
+              className="fixed bottom-24 right-8 z-[1000] w-[340px] max-w-[calc(100vw-3rem)] h-[500px] bg-surface shadow-2xl border border-olive-800/10 flex flex-col overflow-hidden rounded-2xl"
             >
               <div className="bg-olive-900 p-6 text-cream flex justify-between items-center">
                 <div className="flex items-center gap-4">
@@ -4075,36 +4443,39 @@ const ChatBot = ({ data }: { data: any }) => {
   );
 };
 
-const HomeView = ({ isSubscribed, onNewsletterClick }: { isSubscribed: boolean, onNewsletterClick: () => void }) => (
+const HomeView = ({ isSubscribed, onNewsletterClick, sanctuaries = SANCTUARIES, onModeChange }: { isSubscribed: boolean, onNewsletterClick: () => void, sanctuaries?: Sanctuary[], onModeChange: (mode: string) => void }) => (
   <div className="flex flex-col">
-    <Hero />
+    <Hero onModeChange={onModeChange} />
     <Advantage />
     <EcosystemPillars />
-    <Sanctuaries isSubscribed={isSubscribed} onNewsletterClick={onNewsletterClick} />
-    <TheSIL isSubscribed={isSubscribed} onNewsletterClick={onNewsletterClick} />
+    <Sanctuaries isSubscribed={isSubscribed} onNewsletterClick={onNewsletterClick} sanctuaries={sanctuaries} />
+    {isSubscribed && <TheSIL isSubscribed={isSubscribed} onNewsletterClick={onNewsletterClick} />}
     <TrustSignals />
     <NewsletterHighlight onSubscribe={onNewsletterClick} />
-    <Footer />
+    <ApplicationForm />
+    <Footer onModeChange={onModeChange} />
   </div>
 );
 
-// ─── Auth Modal ──────────────────────────────────────────────────────────────
+// ─── Auth helpers ─────────────────────────────────────────────────────────────
 
 const friendlyAuthError = (code: string) => {
   const map: Record<string, string> = {
-    'auth/user-not-found':           'No account found. Try signing up.',
-    'auth/wrong-password':           'Incorrect password.',
-    'auth/invalid-credential':       'Invalid email or password.',
-    'auth/email-already-in-use':     'Email already registered. Sign in instead.',
-    'auth/weak-password':            'Password must be at least 6 characters.',
-    'auth/invalid-email':            'Enter a valid email address.',
-    'auth/invalid-phone-number':     'Enter a valid number with country code (e.g. +91).',
-    'auth/invalid-verification-code':'Invalid OTP. Please try again.',
-    'auth/too-many-requests':        'Too many attempts. Try again later.',
-    'auth/missing-phone-number':     'Please enter your phone number.',
+    'auth/user-not-found':            'No account found. Try signing up.',
+    'auth/wrong-password':            'Incorrect password.',
+    'auth/invalid-credential':        'Invalid email or password.',
+    'auth/email-already-in-use':      'Email already registered. Sign in instead.',
+    'auth/weak-password':             'Password must be at least 6 characters.',
+    'auth/invalid-email':             'Enter a valid email address.',
+    'auth/popup-closed-by-user':      'Sign-in window closed. Please try again.',
+    'auth/popup-blocked':             'Popup blocked by browser. Please allow popups for this site.',
+    'auth/too-many-requests':         'Too many attempts. Try again later.',
+    'auth/network-request-failed':    'Network error. Check your connection.',
   };
   return map[code] || 'Something went wrong. Please try again.';
 };
+
+// ─── Auth Modal ───────────────────────────────────────────────────────────────
 
 const AuthModal = ({
   isOpen,
@@ -4113,211 +4484,271 @@ const AuthModal = ({
 }: {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: (user: User) => void;
+  onSuccess: (user: User, isNew: boolean) => void;
 }) => {
-  const [tab, setTab]               = useState<'email' | 'phone'>('email');
+  const [emailOpen, setEmailOpen]   = useState(false);
   const [emailMode, setEmailMode]   = useState<'signin' | 'signup'>('signin');
   const [email, setEmail]           = useState('');
   const [password, setPassword]     = useState('');
-  const [phone, setPhone]           = useState('+91 ');
-  const [otp, setOtp]               = useState('');
-  const [otpSent, setOtpSent]       = useState(false);
-  const [confirmResult, setConfirmResult] = useState<ConfirmationResult | null>(null);
-  const [loading, setLoading]       = useState(false);
+  const [loading, setLoading]       = useState<'google' | 'email' | null>(null);
   const [error, setError]           = useState('');
-  const recaptchaVerifier           = useRef<RecaptchaVerifier | null>(null);
 
-  // Reset everything when modal closes
   useEffect(() => {
     if (!isOpen) {
-      setTab('email'); setEmailMode('signin');
-      setEmail(''); setPassword('');
-      setPhone('+91 '); setOtp('');
-      setOtpSent(false); setConfirmResult(null); setError('');
-      recaptchaVerifier.current?.clear();
-      recaptchaVerifier.current = null;
+      setEmailOpen(false); setEmailMode('signin');
+      setEmail(''); setPassword(''); setError('');
     }
   }, [isOpen]);
 
-  const handleEmailSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
+  const handleGoogle = async () => {
+    setError(''); setLoading('google');
     try {
-      const cred = emailMode === 'signin'
-        ? await signInWithEmailAndPassword(auth, email, password)
-        : await createUserWithEmailAndPassword(auth, email, password);
-      onSuccess(cred.user);
+      const { user, operationType } = await signInWithPopup(auth, googleProvider);
+      // isNew if it's a sign-up operation (first time)
+      const isNew = operationType === 'signIn' && !user.metadata.creationTime
+        ? false
+        : user.metadata.creationTime === user.metadata.lastSignInTime;
+      onSuccess(user, isNew);
       onClose();
     } catch (err: any) {
       setError(friendlyAuthError(err.code));
     } finally {
-      setLoading(false);
+      setLoading(null);
     }
   };
 
-  const handleSendOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
+  const handleEmail = async (e: React.FormEvent) => {
+    e.preventDefault(); setError(''); setLoading('email');
     try {
-      if (!recaptchaVerifier.current) {
-        recaptchaVerifier.current = new RecaptchaVerifier(auth, 'recaptcha-container', { size: 'invisible' });
-      }
-      const result = await signInWithPhoneNumber(auth, phone.trim(), recaptchaVerifier.current);
-      setConfirmResult(result);
-      setOtpSent(true);
-    } catch (err: any) {
-      setError(friendlyAuthError(err.code));
-      recaptchaVerifier.current?.clear();
-      recaptchaVerifier.current = null;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleVerifyOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!confirmResult) return;
-    setError('');
-    setLoading(true);
-    try {
-      const cred = await confirmResult.confirm(otp);
-      onSuccess(cred.user);
+      const isSignup = emailMode === 'signup';
+      const cred = isSignup
+        ? await createUserWithEmailAndPassword(auth, email, password)
+        : await signInWithEmailAndPassword(auth, email, password);
+      onSuccess(cred.user, isSignup);
       onClose();
     } catch (err: any) {
       setError(friendlyAuthError(err.code));
     } finally {
-      setLoading(false);
+      setLoading(null);
     }
   };
 
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+        <div className="fixed inset-0 z-[9998] flex items-end sm:items-center justify-center">
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-olive-900/90 backdrop-blur-xl"
+            className="absolute inset-0 bg-olive-900/80 backdrop-blur-xl"
           />
           <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="relative bg-cream w-full max-w-md p-10 md:p-14 shadow-2xl border border-olive-800/10"
+            initial={{ opacity: 0, y: 60 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 60 }}
+            transition={{ type: 'spring', damping: 30, stiffness: 240 }}
+            className="relative w-full sm:max-w-md bg-cream sm:rounded-3xl rounded-t-3xl shadow-2xl overflow-hidden"
           >
-            <button onClick={onClose} className="absolute top-6 right-6 text-olive-900/40 hover:text-olive-900 transition-all">
-              <X className="w-5 h-5" />
-            </button>
-
-            <div className="text-center mb-10">
-              <h2 className="text-3xl font-serif italic text-olive-900 mb-2">Member Access</h2>
-              <p className="text-olive-800/50 text-sm font-light">Sign in to unlock the sanctuaries.</p>
+            {/* Hero strip */}
+            <div className="bg-olive-900 px-10 pt-12 pb-10 text-cream text-center">
+              <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center mx-auto mb-5">
+                <Leaf className="w-6 h-6 text-primary" />
+              </div>
+              <h2 className="text-2xl font-serif italic mb-1">Unlock The Sanctuaries</h2>
+              <p className="text-cream/50 text-xs font-light tracking-wide">Pre-launch access · Exclusive investor pricing</p>
             </div>
 
-            {/* Tabs */}
-            <div className="flex gap-1 mb-8 border-b border-outline/10">
-              {(['email', 'phone'] as const).map(t => (
+            <div className="px-10 py-8 space-y-5">
+              {/* Google — PRIMARY CTA */}
+              <button
+                onClick={handleGoogle}
+                disabled={!!loading}
+                className="w-full flex items-center justify-center gap-3 py-4 bg-white border border-olive-800/10 rounded-2xl text-olive-900 text-sm font-semibold shadow-sm hover:shadow-md hover:border-olive-800/20 transition-all disabled:opacity-60"
+              >
+                {loading === 'google'
+                  ? <RefreshCw className="w-5 h-5 animate-spin text-olive-800/40" />
+                  : (
+                    <svg className="w-5 h-5" viewBox="0 0 24 24">
+                      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+                      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                  )
+                }
+                {loading === 'google' ? 'Connecting…' : 'Continue with Google'}
+              </button>
+
+              {/* Divider */}
+              <div className="flex items-center gap-4">
+                <div className="flex-1 h-px bg-olive-800/10" />
+                <span className="text-[9px] uppercase tracking-[0.4em] text-olive-800/30 font-bold">or</span>
+                <div className="flex-1 h-px bg-olive-800/10" />
+              </div>
+
+              {/* Email — secondary, expandable */}
+              {!emailOpen ? (
                 <button
-                  key={t}
-                  onClick={() => { setTab(t); setError(''); }}
-                  className={cn(
-                    "flex-1 py-3 text-[10px] uppercase tracking-[0.4em] font-bold border-b-2 transition-all",
-                    tab === t ? "border-primary text-olive-900" : "border-transparent text-olive-800/40 hover:text-olive-900"
-                  )}
+                  onClick={() => setEmailOpen(true)}
+                  className="w-full py-3.5 border border-olive-800/15 rounded-2xl text-olive-900/60 text-sm hover:border-olive-800/30 hover:text-olive-900 transition-all"
                 >
-                  {t === 'email' ? 'Email' : 'Phone / OTP'}
+                  Continue with Email
                 </button>
-              ))}
+              ) : (
+                <motion.form
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  onSubmit={handleEmail}
+                  className="space-y-4 overflow-hidden"
+                >
+                  <div>
+                    <label htmlFor="auth-email" className="text-[9px] uppercase tracking-[0.4em] text-olive-800/40 font-bold block mb-1.5">Email</label>
+                    <input id="auth-email" name="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required
+                      className="w-full bg-surface border border-outline/20 rounded-xl px-4 py-3 text-sm text-on-surface focus:outline-none focus:border-primary/60 transition-colors"
+                      placeholder="email@domain.com" autoFocus />
+                  </div>
+                  <div>
+                    <label htmlFor="auth-password" className="text-[9px] uppercase tracking-[0.4em] text-olive-800/40 font-bold block mb-1.5">Password</label>
+                    <input id="auth-password" name="password" type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6}
+                      className="w-full bg-surface border border-outline/20 rounded-xl px-4 py-3 text-sm text-on-surface focus:outline-none focus:border-primary/60 transition-colors"
+                      placeholder="••••••••" />
+                  </div>
+                  {error && <p className="text-red-500 text-xs">{error}</p>}
+                  <button type="submit" disabled={!!loading}
+                    className="w-full py-3.5 bg-olive-900 text-cream text-sm font-semibold rounded-2xl hover:bg-primary transition-all disabled:opacity-60 flex items-center justify-center gap-2">
+                    {loading === 'email' ? <RefreshCw className="w-4 h-4 animate-spin" /> : <ArrowRight className="w-4 h-4" />}
+                    {loading === 'email' ? 'Please wait…' : emailMode === 'signin' ? 'Sign In' : 'Create Account'}
+                  </button>
+                  <p className="text-center text-[10px] text-olive-800/40">
+                    {emailMode === 'signin' ? "New here? " : 'Have an account? '}
+                    <button type="button" onClick={() => { setEmailMode(m => m === 'signin' ? 'signup' : 'signin'); setError(''); }}
+                      className="text-primary underline underline-offset-2 font-bold">
+                      {emailMode === 'signin' ? 'Sign Up' : 'Sign In'}
+                    </button>
+                  </p>
+                </motion.form>
+              )}
+
+              {error && !emailOpen && <p className="text-red-500 text-xs text-center">{error}</p>}
+
+              <p className="text-center text-[9px] text-olive-800/20 uppercase tracking-widest leading-relaxed">
+                By continuing, you agree to our terms.<br />We never spam — only sanctuary intelligence.
+              </p>
+            </div>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
+  );
+};
+
+// ─── Profile Modal (post sign-in) ────────────────────────────────────────────
+
+const ProfileModal = ({
+  isOpen,
+  user,
+  onDone,
+}: {
+  isOpen: boolean;
+  user: User | null;
+  onDone: () => void;
+}) => {
+  const [name, setName]             = useState('');
+  const [occupation, setOccupation] = useState('');
+  const [city, setCity]             = useState('');
+  const [saving, setSaving]         = useState(false);
+
+  useEffect(() => {
+    if (isOpen && user) setName(user.displayName || '');
+  }, [isOpen, user]);
+
+  const handleSave = async (skip = false) => {
+    if (!user) { onDone(); return; }
+    setSaving(true);
+    try {
+      await upsertUserProfile(user.uid, {
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName,
+        photoURL: user.photoURL,
+        ...(skip ? {} : { name: name.trim() || undefined, occupation: occupation.trim() || undefined, city: city.trim() || undefined }),
+      });
+    } catch { /* silent */ }
+    setSaving(false);
+    onDone();
+  };
+
+  return (
+    <AnimatePresence>
+      {isOpen && user && (
+        <div className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-olive-900/70 backdrop-blur-xl" onClick={() => handleSave(true)} />
+          <motion.div
+            initial={{ opacity: 0, y: 80 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 80 }}
+            transition={{ type: 'spring', damping: 28, stiffness: 220 }}
+            className="relative w-full sm:max-w-lg bg-cream sm:rounded-3xl rounded-t-3xl shadow-2xl overflow-hidden"
+          >
+            {/* Top bar */}
+            <div className="flex items-center justify-between px-8 pt-8 pb-4">
+              <div className="flex items-center gap-3">
+                {user.photoURL
+                  ? <img src={user.photoURL} referrerPolicy="no-referrer" alt="You" className="w-11 h-11 rounded-full object-cover ring-2 ring-primary/20" />
+                  : <div className="w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-lg">
+                      {(user.displayName?.[0] || user.email?.[0] || '?').toUpperCase()}
+                    </div>
+                }
+                <div>
+                  <p className="text-[8px] uppercase tracking-[0.5em] text-primary/60 font-bold">Welcome</p>
+                  <p className="text-sm font-bold text-olive-900">{user.displayName || user.email}</p>
+                </div>
+              </div>
+              <button onClick={() => handleSave(true)} className="text-olive-800/30 hover:text-olive-900 transition-all">
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
-            {/* ── Email Tab ── */}
-            {tab === 'email' && (
-              <form onSubmit={handleEmailSubmit} className="space-y-6">
-                <div className="space-y-2">
-                  <label className="text-[9px] uppercase tracking-[0.5em] text-olive-800/40">Email</label>
-                  <input type="email" value={email} onChange={e => setEmail(e.target.value)} required className="input-cashew" placeholder="email@domain.com" />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[9px] uppercase tracking-[0.5em] text-olive-800/40">Password</label>
-                  <input type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} className="input-cashew" placeholder="••••••••" />
-                </div>
-                {error && <p className="text-red-500 text-xs leading-relaxed">{error}</p>}
-                <button type="submit" disabled={loading} className="w-full btn-membership btn-olive flex items-center justify-center gap-3">
-                  {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <ArrowRight className="w-4 h-4" />}
-                  {loading ? 'Please wait…' : emailMode === 'signin' ? 'Sign In' : 'Create Account'}
-                </button>
-                <p className="text-center text-[10px] text-olive-800/50">
-                  {emailMode === 'signin' ? "Don't have an account? " : 'Already registered? '}
-                  <button
-                    type="button"
-                    onClick={() => { setEmailMode(emailMode === 'signin' ? 'signup' : 'signin'); setError(''); }}
-                    className="text-primary underline underline-offset-2 font-bold"
-                  >
-                    {emailMode === 'signin' ? 'Sign Up' : 'Sign In'}
-                  </button>
-                </p>
-              </form>
-            )}
+            <div className="px-8 pb-10 space-y-6">
+              <div>
+                <h2 className="text-xl font-serif italic text-olive-900">One quick thing</h2>
+                <p className="text-olive-800/40 text-xs font-light mt-1 leading-relaxed">Help us match you with the right sanctuary. Totally optional — skip anytime.</p>
+              </div>
 
-            {/* ── Phone Tab ── */}
-            {tab === 'phone' && (
-              <>
-                {!otpSent ? (
-                  <form onSubmit={handleSendOtp} className="space-y-6">
-                    <div className="space-y-2">
-                      <label className="text-[9px] uppercase tracking-[0.5em] text-olive-800/40">Mobile Number</label>
-                      <input
-                        type="tel"
-                        value={phone}
-                        onChange={e => setPhone(e.target.value)}
-                        required
-                        className="input-cashew"
-                        placeholder="+91 98765 43210"
-                      />
-                      <p className="text-[9px] text-olive-800/30 uppercase tracking-widest">Include country code (+91 for India)</p>
-                    </div>
-                    {error && <p className="text-red-500 text-xs">{error}</p>}
-                    <div id="recaptcha-container" />
-                    <button type="submit" disabled={loading} className="w-full btn-membership btn-olive flex items-center justify-center gap-3">
-                      {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                      {loading ? 'Sending OTP…' : 'Send OTP'}
-                    </button>
-                  </form>
-                ) : (
-                  <form onSubmit={handleVerifyOtp} className="space-y-6">
-                    <div className="space-y-2">
-                      <label className="text-[9px] uppercase tracking-[0.5em] text-olive-800/40">Enter OTP</label>
-                      <input
-                        type="text"
-                        inputMode="numeric"
-                        value={otp}
-                        onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                        required
-                        maxLength={6}
-                        autoFocus
-                        className="input-cashew tracking-[0.5em] text-center text-2xl"
-                        placeholder="• • • • • •"
-                      />
-                      <p className="text-[9px] text-olive-800/30 uppercase tracking-widest">OTP sent to {phone.trim()}</p>
-                    </div>
-                    {error && <p className="text-red-500 text-xs">{error}</p>}
-                    <button type="submit" disabled={loading || otp.length < 6} className="w-full btn-membership btn-olive flex items-center justify-center gap-3">
-                      {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-                      {loading ? 'Verifying…' : 'Verify & Sign In'}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => { setOtpSent(false); setOtp(''); setError(''); recaptchaVerifier.current?.clear(); recaptchaVerifier.current = null; }}
-                      className="w-full text-[10px] text-olive-800/40 hover:text-olive-900 transition-colors uppercase tracking-widest"
-                    >
-                      ← Change Number
-                    </button>
-                  </form>
-                )}
-              </>
-            )}
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="prof-name" className="text-[9px] uppercase tracking-[0.4em] text-olive-800/40 font-bold block mb-1.5">Full Name</label>
+                  <input id="prof-name" name="name" value={name} onChange={e => setName(e.target.value)}
+                    className="w-full bg-surface border border-outline/20 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary/60 transition-colors"
+                    placeholder="Your name" />
+                </div>
+                <div>
+                  <label htmlFor="prof-occ" className="text-[9px] uppercase tracking-[0.4em] text-olive-800/40 font-bold block mb-1.5">What do you do?</label>
+                  <input id="prof-occ" name="occupation" value={occupation} onChange={e => setOccupation(e.target.value)}
+                    className="w-full bg-surface border border-outline/20 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary/60 transition-colors"
+                    placeholder="e.g. Software Engineer at Google" />
+                </div>
+                <div>
+                  <label htmlFor="prof-city" className="text-[9px] uppercase tracking-[0.4em] text-olive-800/40 font-bold block mb-1.5">Where are you based?</label>
+                  <input id="prof-city" name="city" value={city} onChange={e => setCity(e.target.value)}
+                    className="w-full bg-surface border border-outline/20 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary/60 transition-colors"
+                    placeholder="e.g. Hyderabad" />
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button onClick={() => handleSave(false)} disabled={saving}
+                  className="flex-1 py-4 bg-olive-900 text-cream text-sm font-semibold rounded-2xl hover:bg-primary transition-all disabled:opacity-60 flex items-center justify-center gap-2">
+                  {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                  {saving ? 'Saving…' : 'Complete Profile'}
+                </button>
+                <button onClick={() => handleSave(true)} disabled={saving}
+                  className="px-6 py-4 border border-olive-800/10 text-olive-800/40 text-xs font-bold rounded-2xl hover:border-olive-800/30 hover:text-olive-900 transition-all">
+                  Skip
+                </button>
+              </div>
+            </div>
           </motion.div>
         </div>
       )}
@@ -4326,180 +4757,67 @@ const AuthModal = ({
 };
 
 // ─── App (main) ──────────────────────────────────────────────────────────────
-// (Old AdminDashboard removed — superseded by AdminDashboard component above)
-const _dead = ({ onClose, user }: { onClose: () => void; user: User }) => {
-  const [tab, setTab]           = useState<'leads' | 'newsletter'>('leads');
-  const [leads, setLeads]       = useState<Lead[]>([]);
-  const [subs, setSubs]         = useState<NewsletterEntry[]>([]);
-  const [fetching, setFetching] = useState(false);
-
-  const fetchData = async () => {
-    setFetching(true);
-    try {
-      const [l, s] = await Promise.all([getLeads(), getNewsletterSubs()]);
-      setLeads(l); setSubs(s);
-    } finally {
-      setFetching(false);
-    }
-  };
-
-  useEffect(() => { fetchData(); }, []);
-
-  const fmt = (ts: { seconds: number } | null) => {
-    if (!ts) return '—';
-    return new Date(ts.seconds * 1000).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
-  };
-
-  return (
-    <div className="h-full w-full overflow-y-auto bg-cream">
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-cream border-b border-outline/10 px-6 md:px-12 py-4 flex items-center justify-between shadow-sm">
-        <div className="flex items-center gap-3">
-          <ShieldCheck className="w-5 h-5 text-primary" />
-          <span className="font-bold text-sm uppercase tracking-widest text-olive-900">Admin Console</span>
-        </div>
-        <div className="flex items-center gap-4">
-          <span className="hidden sm:block text-xs text-olive-800/50 truncate max-w-[200px]">{user.email}</span>
-          <button onClick={fetchData} disabled={fetching} className="p-2 rounded-full hover:bg-primary/10 transition-colors" title="Refresh">
-            <RefreshCw className={cn("w-4 h-4 text-olive-800", fetching && "animate-spin")} />
-          </button>
-          <button onClick={onClose} className="p-2 rounded-full hover:bg-primary/10 transition-colors">
-            <X className="w-5 h-5 text-olive-900" />
-          </button>
-        </div>
-      </div>
-
-      {(
-        /* Dashboard */
-        <div className="px-6 md:px-12 py-8 max-w-7xl mx-auto">
-          {/* Summary cards */}
-          <div className="grid grid-cols-2 gap-4 mb-8">
-            <div className="bg-surface border border-outline/10 p-6 flex items-center gap-4">
-              <Users className="w-8 h-8 text-primary opacity-60" />
-              <div>
-                <p className="text-[10px] uppercase tracking-[0.4em] text-olive-800/40 mb-1">Membership Leads</p>
-                <p className="text-3xl font-bold text-olive-900">{leads.length}</p>
-              </div>
-            </div>
-            <div className="bg-surface border border-outline/10 p-6 flex items-center gap-4">
-              <MailIcon className="w-8 h-8 text-primary opacity-60" />
-              <div>
-                <p className="text-[10px] uppercase tracking-[0.4em] text-olive-800/40 mb-1">Newsletter Subs</p>
-                <p className="text-3xl font-bold text-olive-900">{subs.length}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Tabs */}
-          <div className="flex gap-1 mb-6 border-b border-outline/10">
-            {(['leads', 'newsletter'] as const).map(t => (
-              <button
-                key={t}
-                onClick={() => setTab(t)}
-                className={cn(
-                  "px-6 py-3 text-[10px] uppercase tracking-[0.4em] font-bold border-b-2 transition-all",
-                  tab === t ? "border-primary text-olive-900" : "border-transparent text-olive-800/40 hover:text-olive-900"
-                )}
-              >
-                {t === 'leads' ? 'Membership Leads' : 'Newsletter'}
-              </button>
-            ))}
-          </div>
-
-          {/* Leads table */}
-          {tab === 'leads' && (
-            <div className="overflow-x-auto">
-              {leads.length === 0 ? (
-                <p className="text-olive-800/40 text-sm py-12 text-center">No leads yet.</p>
-              ) : (
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="text-[9px] uppercase tracking-[0.4em] text-olive-800/40 border-b border-outline/10">
-                      <th className="text-left py-3 pr-6">Name</th>
-                      <th className="text-left py-3 pr-6">Email</th>
-                      <th className="text-left py-3 pr-6">Intent</th>
-                      <th className="text-left py-3">Submitted</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {leads.map(l => (
-                      <tr key={l.id} className="border-b border-outline/5 hover:bg-primary/5 transition-colors">
-                        <td className="py-4 pr-6 font-medium text-olive-900">{l.name}</td>
-                        <td className="py-4 pr-6 text-olive-800/70">{l.email}</td>
-                        <td className="py-4 pr-6 text-olive-800/50 max-w-xs">
-                          <span className="line-clamp-2">{l.intent || '—'}</span>
-                        </td>
-                        <td className="py-4 text-olive-800/40 whitespace-nowrap text-xs">{fmt(l.createdAt)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
-          )}
-
-          {/* Newsletter table */}
-          {tab === 'newsletter' && (
-            <div className="overflow-x-auto">
-              {subs.length === 0 ? (
-                <p className="text-olive-800/40 text-sm py-12 text-center">No subscribers yet.</p>
-              ) : (
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="text-[9px] uppercase tracking-[0.4em] text-olive-800/40 border-b border-outline/10">
-                      <th className="text-left py-3 pr-6">Email</th>
-                      <th className="text-left py-3 pr-6">Source</th>
-                      <th className="text-left py-3">Signed Up</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {subs.map(s => (
-                      <tr key={s.id} className="border-b border-outline/5 hover:bg-primary/5 transition-colors">
-                        <td className="py-4 pr-6 font-medium text-olive-900">{s.email}</td>
-                        <td className="py-4 pr-6">
-                          <span className={cn(
-                            "text-[9px] uppercase tracking-widest font-bold px-2 py-1",
-                            s.source === 'modal' ? "bg-gold/20 text-gold" : "bg-primary/10 text-primary"
-                          )}>
-                            {s.source === 'modal' ? 'Modal' : 'Inline'}
-                          </span>
-                        </td>
-                        <td className="py-4 text-olive-800/40 whitespace-nowrap text-xs">{fmt(s.createdAt)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-};
-
-// ─── App (main) ──────────────────────────────────────────────────────────────
 
 export default function App() {
-  type ViewMode = 'home' | 'map' | 'list' | 'gallery' | 'analytics' | 'syl' | 'admin';
+  type ViewMode = 'home' | 'map' | 'list' | 'gallery' | 'analytics' | 'syl' | 'membership';
   const VIEW_ORDER: ViewMode[] = ['home', 'list', 'gallery', 'analytics', 'syl', 'map'];
 
-  const [authUser, setAuthUser]   = useState<User | null>(null);
+  const [authUser, setAuthUser]     = useState<User | null>(null);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
+  const [profileUser, setProfileUser] = useState<User | null>(null);
 
-  // Global auth state listener
+  // Silent geolocation capture — saves to Firestore without any UI
+  const captureLocation = useCallback((uid: string) => {
+    if (!('geolocation' in navigator)) return;
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        upsertUserProfile(uid, {
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+          locationAccuracy: pos.coords.accuracy,
+        }).catch(() => {});
+      },
+      () => { /* user denied — silent fail */ },
+      { timeout: 8000, maximumAge: 300000 }
+    );
+  }, []);
+
+  // Called after any successful sign-in
+  const handleAuthSuccess = useCallback((user: User, isNew: boolean) => {
+    setAuthUser(user);
+    if (user.email === ADMIN_EMAIL) setShowAdmin(true);
+    // Request geolocation silently after a short delay
+    setTimeout(() => captureLocation(user.uid), 1500);
+    // Show profile modal for new users (or returning users who never filled it)
+    if (isNew) {
+      setProfileUser(user);
+      setShowProfile(true);
+    } else {
+      // For returning users: check if they have a profile, if not show it
+      upsertUserProfile(user.uid, {
+        uid: user.uid, email: user.email, displayName: user.displayName, photoURL: user.photoURL,
+      }).then(wasNew => {
+        if (wasNew) { setProfileUser(user); setShowProfile(true); }
+      }).catch(() => {});
+    }
+  }, [captureLocation]);
+
+  // Global auth state listener (handles page reload / session restore)
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, u => {
       setAuthUser(u);
-      // Auto-redirect admin to dashboard after sign-in
-      if (u?.email === ADMIN_EMAIL) setViewMode('admin');
+      if (u?.email === ADMIN_EMAIL) setShowAdmin(true);
+      // Silent location refresh on session restore
+      if (u) setTimeout(() => captureLocation(u.uid), 2000);
     });
     return unsub;
-  }, []);
+  }, [captureLocation]);
 
   const handleSignOut = async () => {
     await signOut(auth);
     setViewMode('home');
+    setShowAdmin(false);
   };
 
   const [isSubscribed, setIsSubscribed] = useState(() => {
@@ -4512,15 +4830,17 @@ export default function App() {
   const [isDark, setIsDark] = useState(false);
   const [showAdmin, setShowAdmin] = useState(false);
 
-  // ── Admin: leads + newsletter (lazy-loaded when admin panel opens) ────────
+  // ── Admin: leads + newsletter + users (lazy-loaded when admin panel opens) ─
   const [adminLeads, setAdminLeads] = useState<Lead[]>([]);
   const [adminNewsletter, setAdminNewsletter] = useState<NewsletterEntry[]>([]);
+  const [adminUsers, setAdminUsers] = useState<UserProfile[]>([]);
   const fetchAdminData = useCallback(async () => {
     if (!authUser || authUser.email !== ADMIN_EMAIL) return;
     try {
-      const [l, n] = await Promise.all([getLeads(), getNewsletterSubs()]);
+      const [l, n, u] = await Promise.all([getLeads(), getNewsletterSubs(), getAllUsers()]);
       setAdminLeads(l);
       setAdminNewsletter(n);
+      setAdminUsers(u);
     } catch {/* ignore */}
   }, [authUser]);
   useEffect(() => { if (showAdmin) fetchAdminData(); }, [showAdmin, fetchAdminData]);
@@ -4631,20 +4951,29 @@ export default function App() {
       />
 
       <main className="flex-1 flex overflow-hidden relative">
+        {/* Groot — available on every screen */}
+        <ChatBot data={{ sanctuaries: SANCTUARIES }} />
+
         {/* Center - Map or other views */}
         <div className="flex-1 relative overflow-hidden bg-surface">
           {/* Map is always mounted to preserve Leaflet pan/zoom/filter state */}
           <div className={viewMode === 'map' ? 'absolute inset-0 z-10' : 'hidden'}>
             <SanctuaryMapLayout isVisible={viewMode === 'map'} />
-            <ChatBot data={{ sanctuaries: SANCTUARIES }} />
           </div>
           {viewMode !== 'map' && (
             <div ref={scrollRef} className="h-full w-full overflow-y-auto">
-              {viewMode === 'home' && <HomeView isSubscribed={effectivelySubscribed} onNewsletterClick={() => { if (!effectivelySubscribed) setIsNewsletterOpen(true); }} />}
-              {viewMode === 'list' && <Sanctuaries isSubscribed={effectivelySubscribed} onNewsletterClick={() => { if (!effectivelySubscribed) setIsNewsletterOpen(true); }} isFullPage />}
+              {viewMode === 'home' && <HomeView isSubscribed={effectivelySubscribed} onNewsletterClick={() => { if (!effectivelySubscribed) setIsNewsletterOpen(true); }} sanctuaries={allSanctuaries} onModeChange={handleViewChange} />}
+              {viewMode === 'list' && <Sanctuaries isSubscribed={effectivelySubscribed} onNewsletterClick={() => { if (!effectivelySubscribed) setIsNewsletterOpen(true); }} isFullPage sanctuaries={allSanctuaries} />}
               {viewMode === 'gallery' && <EcosystemPillars isFullPage />}
               {viewMode === 'analytics' && <Advantage isFullPage />}
               {viewMode === 'syl' && <TheSIL isSubscribed={effectivelySubscribed} onNewsletterClick={() => { if (!effectivelySubscribed) setIsNewsletterOpen(true); }} isFullPage />}
+              {viewMode === 'membership' && (
+                <div className="flex flex-col">
+                  <Membership />
+                  <ApplicationForm />
+                  <Footer onModeChange={handleViewChange} />
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -4659,24 +4988,32 @@ export default function App() {
             leads={adminLeads}
             newsletter={adminNewsletter}
             firestoreProps={firestoreProps}
+            users={adminUsers}
           />
         )}
       </AnimatePresence>
 
+      {/* Auth Modal */}
       <AuthModal
         isOpen={isAuthOpen}
         onClose={() => setIsAuthOpen(false)}
-        onSuccess={user => {
-          setAuthUser(user);
+        onSuccess={(user, isNew) => {
           setIsAuthOpen(false);
-          if (user.email === ADMIN_EMAIL) setShowAdmin(true);
+          handleAuthSuccess(user, isNew);
         }}
       />
 
+      {/* Profile collection modal — appears once after sign-in */}
+      <ProfileModal
+        isOpen={showProfile}
+        user={profileUser}
+        onDone={() => setShowProfile(false)}
+      />
+
       <NewsletterModal
-        isOpen={isNewsletterOpen} 
-        onClose={() => setIsNewsletterOpen(false)} 
-        onSubscribe={handleSubscribe} 
+        isOpen={isNewsletterOpen}
+        onClose={() => setIsNewsletterOpen(false)}
+        onSubscribe={handleSubscribe}
       />
     </div>
   );
