@@ -119,15 +119,39 @@ const SANCTUARIES: Sanctuary[] = [
     pricePerSqYd: 7999,
     valuation: '₹1.04 Cr',
     memberPrice: 'From ₹64.6 L',
-    image: '/agartha-render.jpg',
+    image: 'https://static.wixstatic.com/media/142b26_5a1d622ef5d5437aa5da964188a3266e~mv2.png',
     tagline: 'Where the forest becomes home.',
     description: 'MODCON Agartha is a first-of-its-kind biomorphic residential community carved into the Narsapur forest periphery. 53 thoughtfully sized plots surround a 14,548 sq yd organic amenity core — featuring fluid earth architecture, solar-integrated curved roofs, and living canopies that blur the line between structure and forest. No two plots are the same. No straight lines anywhere.',
     plots: 53,
     plotRange: '808 – 5,097 sq yds',
     amenityAcres: '14,548 sq yds',
     architect: 'MODCON Builders',
-    sitePlanSrc: '/agartha-layout.jpg',
+    sitePlanSrc: 'https://static.wixstatic.com/media/142b26_8ddd02a733d04a139fdd19e058e72d94~mv2.jpg',
     brochureUrl: 'https://www.modconbuilders.com/agartha',
+    plotImages: [
+      'https://static.wixstatic.com/media/142b26_cb62ea3cf3a1420399ec2e43c1dee85f~mv2.png',
+      'https://static.wixstatic.com/media/142b26_3a60dc75703c4cc2a29c6d44f41b8e21~mv2.png',
+      'https://static.wixstatic.com/media/142b26_a329de8538c44092bb941ee925dbcd7c~mv2.png',
+      'https://static.wixstatic.com/media/142b26_b52923b4599745df825e9d06157b43d3~mv2.jpg',
+      'https://static.wixstatic.com/media/142b26_5f7c47258d394edcbf818b25e3b12965~mv2.jpg',
+      'https://static.wixstatic.com/media/142b26_e9917bb73fc94531948ef638eba5a051~mv2.jpg',
+      'https://static.wixstatic.com/media/142b26_86e04d7ce83d497997bdac2c29efe900~mv2.jpg',
+      'https://static.wixstatic.com/media/142b26_d9f37ad4d1d74e65a62892327167ed6b~mv2.jpg',
+      'https://static.wixstatic.com/media/142b26_acda3bc9aaa84bfc976803cdcbdce73f~mv2.jpg',
+      'https://static.wixstatic.com/media/142b26_0fee06470ac2445c9ff7742be6377273~mv2.jpg',
+      'https://static.wixstatic.com/media/142b26_567e195b978947c9b29be195842095af~mv2.jpg',
+      'https://static.wixstatic.com/media/142b26_07ba6ec4ef4e49d680a53ab9a3362f25~mv2.jpg',
+      'https://static.wixstatic.com/media/142b26_a8649ae42bca482cbbafe84794fe8a6e~mv2.jpg',
+      'https://static.wixstatic.com/media/142b26_13ce857bed164143a7d79ce6cef3668e~mv2.jpg',
+      'https://static.wixstatic.com/media/142b26_87ac7f7d92a145b9aa2740c4a6898410~mv2.jpg',
+      'https://static.wixstatic.com/media/142b26_e952e8d04d6546b5866e374206744e87~mv2.jpg',
+      'https://static.wixstatic.com/media/142b26_bdabb7cd17f741ee815019462732e449~mv2.jpg',
+      'https://static.wixstatic.com/media/142b26_5a78474b934e4251b54ce25e16770c68~mv2.jpg',
+      'https://static.wixstatic.com/media/142b26_a79caac8357141ef89993d2115817696~mv2.jpg',
+      'https://static.wixstatic.com/media/142b26_04f61d366de9472cb87db76b28b272fc~mv2.jpg',
+      'https://static.wixstatic.com/media/142b26_34c58cd885c64ddebbae12791465bbe3~mv2.jpg',
+      'https://static.wixstatic.com/media/142b26_89a3906d085c4518a1ce49864ebda77a~mv2.jpg',
+    ],
     features: [
       'Biomorphic Architecture',
       'Solar-Curved Rooftops',
@@ -197,7 +221,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
   ];
 
   const sanctuaryItems = [
-    { name: 'MODCON Agartha', id: 'list', sub: 'Narsapur Forest · From ₹64.6 L', img: '/agartha-render.jpg' },
+    { name: 'MODCON Agartha', id: 'list', sub: 'Narsapur Forest · From ₹64.6 L', img: 'https://static.wixstatic.com/media/142b26_5a1d622ef5d5437aa5da964188a3266e~mv2.png' },
     { name: 'SYL: Vertical Villament', id: 'syl', sub: 'Tukkuguda · From ₹1.9 Cr', img: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=400' },
   ];
 
@@ -1381,7 +1405,7 @@ const SANCTUARY_HOTSPOTS: Record<string, Hotspot[]> = {
 /** Agartha-specific wrapper — delegates to the generic PropertyInteractiveLayout */
 const AagarthaInteractiveLayout: FC<{ onClose: () => void }> = ({ onClose }) => (
   <PropertyInteractiveLayout
-    sitePlanSrc="/agartha-layout.jpg"
+    sitePlanSrc="https://static.wixstatic.com/media/142b26_8ddd02a733d04a139fdd19e058e72d94~mv2.jpg"
     hotspots={AGARTHA_HOTSPOTS}
     projectName="Agartha"
     developerTag="MODCON Builders · Narsapur"
@@ -2045,6 +2069,25 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
               <div className="p-4 bg-primary/5 rounded-2xl text-center">
                 <p className="text-base font-headline font-bold text-primary leading-tight">{sanctuary.amenityAcres ?? '14,548'}</p>
                 <p className="text-[8px] uppercase tracking-widest text-secondary/60 mt-1">Amenity Sq Yds</p>
+              </div>
+            </div>
+          )}
+
+          {/* ── Photo Gallery ── */}
+          {sanctuary.plotImages && sanctuary.plotImages.length > 0 && (
+            <div>
+              <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold mb-3">Gallery</p>
+              <div className="flex gap-2 overflow-x-auto pb-2 -mx-8 px-8 scrollbar-hide snap-x snap-mandatory">
+                {sanctuary.plotImages.map((src, i) => (
+                  <img
+                    key={i}
+                    src={src}
+                    alt={`${sanctuary.title} — photo ${i + 1}`}
+                    className="h-52 w-auto flex-shrink-0 rounded-xl object-cover snap-start"
+                    referrerPolicy="no-referrer"
+                    loading="lazy"
+                  />
+                ))}
               </div>
             </div>
           )}
