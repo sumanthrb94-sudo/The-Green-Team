@@ -25,6 +25,7 @@ export interface NewsletterEntry {
 }
 
 export async function saveLead(data: { name: string; email: string; intent?: string }) {
+  if (!db) return new Promise(r => setTimeout(r, 600));
   return addDoc(collection(db, 'leads'), {
     ...data,
     source: 'membership',
@@ -33,6 +34,7 @@ export async function saveLead(data: { name: string; email: string; intent?: str
 }
 
 export async function saveNewsletter(email: string, source: 'modal' | 'inline') {
+  if (!db) return new Promise(r => setTimeout(r, 600));
   return addDoc(collection(db, 'newsletter'), {
     email,
     source,
@@ -41,12 +43,14 @@ export async function saveNewsletter(email: string, source: 'modal' | 'inline') 
 }
 
 export async function getLeads(): Promise<Lead[]> {
+  if (!db) return [];
   const q = query(collection(db, 'leads'), orderBy('createdAt', 'desc'));
   const snap = await getDocs(q);
   return snap.docs.map(d => ({ id: d.id, ...d.data() } as Lead));
 }
 
 export async function getNewsletterSubs(): Promise<NewsletterEntry[]> {
+  if (!db) return [];
   const q = query(collection(db, 'newsletter'), orderBy('createdAt', 'desc'));
   const snap = await getDocs(q);
   return snap.docs.map(d => ({ id: d.id, ...d.data() } as NewsletterEntry));

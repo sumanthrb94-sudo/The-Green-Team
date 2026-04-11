@@ -102,7 +102,7 @@ interface Sanctuary {
   architect?: string;
   plotImages?: string[];
   pricePerSqYd?: number;
-  // Site plan + external brochure — populate for any property with a site plan
+  // Site plan + external brochure - populate for any property with a site plan
   sitePlanSrc?: string;
   brochureUrl?: string;
   gallery?: string[];
@@ -123,9 +123,9 @@ const SANCTUARIES: Sanctuary[] = [
     memberPrice: 'From ₹64.6 L',
     image: '/agartha-official-render.png',
     tagline: 'Where the forest becomes home.',
-    description: 'MODCON Agartha is a first-of-its-kind biomorphic residential community carved into the Narsapur forest periphery. 53 thoughtfully sized plots surround a 14,548 sq yd organic amenity core — featuring fluid earth architecture, solar-integrated curved roofs, and living canopies that blur the line between structure and forest. No two plots are the same. No straight lines anywhere.',
+    description: 'MODCON Agartha is a first-of-its-kind biomorphic residential community carved into the Narsapur forest periphery. 53 thoughtfully sized plots surround a 14,548 sq yd organic amenity core - featuring fluid earth architecture, solar-integrated curved roofs, and living canopies that blur the line between structure and forest. No two plots are the same. No straight lines anywhere.',
     plots: 53,
-    plotRange: '808 – 5,097 sq yds',
+    plotRange: '808 ? 5,097 sq yds',
     amenityAcres: '14,548 sq yds',
     architect: 'MODCON Builders',
     sitePlanSrc: '/FINAL-LAYOUT.jpeg',
@@ -198,7 +198,7 @@ const Logo = ({ className = "w-10 h-10", textClassName = "text-xl md:text-2xl", 
   </div>
 );
 
-const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDark, onSignInClick, authUser, onSignOut, isAdmin, onAdminClick }: {
+const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDark, onSignInClick, authUser, onSignOut, isAdmin, onAdminClick, onPropertySelect }: {
   isSubscribed: boolean;
   onNewsletterClick: () => void;
   onModeChange: (mode: any) => void;
@@ -209,6 +209,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
   onSignOut: () => void;
   isAdmin: boolean;
   onAdminClick: () => void;
+  onPropertySelect: (id: string) => void;
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [sanctuariesOpen, setSanctuariesOpen] = useState(false);
@@ -222,8 +223,8 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
   ];
 
   const sanctuaryItems = [
-    { name: 'MODCON Agartha', id: 'list', sub: 'Narsapur Forest · From ₹64.6 L', img: '/agartha-render.jpg' },
-    { name: 'SYL: Vertical Villament', id: 'syl', sub: 'Tukkuguda · From ₹1.9 Cr', img: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=400' },
+    { name: 'MODCON Agartha', id: 'list', sub: 'Narsapur Forest  From ₹64.6 L', img: '/agartha-render.jpg' },
+    { name: 'SYL: Vertical Villament', id: 'syl', sub: 'Tukkuguda  From ₹1.9 Cr', img: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=400' },
   ];
 
   const avatarLetter = (authUser?.displayName?.[0] || authUser?.email?.[0] || authUser?.phoneNumber?.[1] || '?').toUpperCase();
@@ -241,7 +242,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
           className={cn(
             "flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border text-[8px] uppercase tracking-widest font-bold transition-all",
             isDark
-              ? "bg-primary/10 border-primary/20 text-primary"
+             ? "bg-primary/10 border-primary/20 text-primary"
               : "bg-outline/8 border-outline/20 text-secondary/60 hover:border-primary/30 hover:text-primary"
           )}
         >
@@ -327,7 +328,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
                         className={cn(
                           "text-2xl md:text-3xl uppercase tracking-[0.1em] font-headline font-bold transition-all flex items-center justify-between group text-left",
                           item.id === 'membership'
-                            ? "text-primary"
+             ? "text-primary"
                             : "text-on-surface hover:text-primary"
                         )}
                       >
@@ -335,13 +336,13 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
                         <ArrowRight className={cn(
                           "w-5 h-5 transition-all duration-500",
                           item.id === 'membership'
-                            ? "opacity-100 translate-x-0"
+             ? "opacity-100 translate-x-0"
                             : "opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0"
                         )} />
                       </button>
                     ))}
 
-                    {/* Sanctuaries — expandable dropdown */}
+                    {/* Sanctuaries - expandable dropdown */}
                     <div>
                       <button
                         onClick={() => setSanctuariesOpen(v => !v)}
@@ -363,7 +364,12 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
                             <div className="flex flex-col gap-3 pl-2 border-l-2 border-primary/20">
                               {sanctuaryItems.map(s => (
                                 <button key={s.id}
-                                  onClick={() => { onModeChange(s.id as any); setIsMenuOpen(false); setSanctuariesOpen(false); }}
+                                  onClick={() => { 
+                                    // Map 'list' back to 'agartha' for direct opening
+                                    onPropertySelect(s.id === 'list' ? 'agartha' : s.id); 
+                                    setIsMenuOpen(false); 
+                                    setSanctuariesOpen(false); 
+                                  }}
                                   className="flex items-center gap-4 group/item text-left hover:translate-x-1 transition-transform duration-200"
                                 >
                                   <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-outline/10">
@@ -430,7 +436,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
                       </button>
                     </>
                   ) : (
-                    /* Logged-out state — conversion CTA */
+                    /* Logged-out state - conversion CTA */
                     <>
                       <p className="text-[10px] uppercase tracking-[0.4em] text-secondary/50 font-bold mb-2">Join The Collective</p>
                       <button
@@ -744,7 +750,7 @@ const TheSIL = ({ isSubscribed, onNewsletterClick, isFullPage = false }: { isSub
             </div>
             <h2 className="text-5xl md:text-7xl font-medium mb-6">SYL<br />Villament.</h2>
             <p className="text-lg md:text-xl font-light text-cream/60 leading-relaxed mb-6">
-              Imagine an 18-floor masterpiece where **two floors equal one villa**. Amidst a landscape of traditional villas, SYL stands as the only tower—a soaring statement of exclusivity in Tukkuguda.
+              Imagine an 18-floor masterpiece where **two floors equal one villa**. Amidst a landscape of traditional villas, SYL stands as the only tower — a soaring statement of exclusivity in Tukkuguda.
             </p>
             
             <div className="grid grid-cols-2 gap-6 mb-8">
@@ -798,14 +804,14 @@ const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewslet
       className="group relative aspect-square overflow-hidden rounded-3xl cursor-pointer bg-[#1a1f0e]"
       onClick={() => { if (!isGated) onOpen(); }}
     >
-      {/* Full-bleed image — always full color */}
+      {/* Full-bleed image - always full color */}
       <img
         src={sanctuary.image}
         alt={sanctuary.title}
         className={cn(
           "absolute inset-0 w-full h-full object-cover transition-all duration-700",
           isGated
-            ? "brightness-40 scale-105 blur-sm"
+             ? "brightness-40 scale-105 blur-sm"
             : "brightness-80 group-hover:brightness-95 group-hover:scale-105"
         )}
         referrerPolicy="no-referrer"
@@ -820,8 +826,8 @@ const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewslet
           <div className="w-14 h-14 rounded-2xl bg-[#c8a951]/15 border border-[#c8a951]/30 flex items-center justify-center mb-5">
             <Shield className="w-6 h-6 text-[#c8a951]" />
           </div>
-          <h4 className="text-xl font-headline font-bold text-white mb-2">Newsletter Access Required</h4>
-          <p className="text-xs text-white/50 mb-6 max-w-[200px] leading-relaxed">
+          <h4 className="text-xl font-headline font-bold text-white mb-2 leading-tight">Newsletter Access Required</h4>
+          <p className="text-[10px] text-white/50 mb-6 max-w-[200px] mx-auto leading-relaxed">
             SYL: Vertical Villament is reserved for our intelligence network subscribers.
           </p>
           <button onClick={e => { e.stopPropagation(); onNewsletterClick(); }}
@@ -836,14 +842,14 @@ const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewslet
         <span className={cn(
           "px-3 py-1 text-[8px] uppercase tracking-[0.4em] font-bold rounded-full",
           isSyl
-            ? "bg-[#c8a951] text-[#1a1a0a]"
+             ? "bg-[#c8a951] text-[#1a1a0a]"
             : "bg-primary/90 text-on-primary backdrop-blur-sm"
         )}>
           {isSyl ? 'Newsletter Only' : 'Open Access'}
         </span>
       </div>
 
-      {/* Bottom info — hide price for gated SYL */}
+      {/* Bottom info - hide price for gated SYL */}
       <div className={cn("absolute bottom-0 left-0 right-0 px-6 pb-6 pt-10 z-20", isGated && "opacity-0")}>
         <div className="flex items-end justify-between gap-3 mb-4">
           <div className="min-w-0">
@@ -879,7 +885,7 @@ const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewslet
             onClick={e => { e.stopPropagation(); onOpen(); }}
             className="flex-shrink-0 px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white text-[8px] uppercase tracking-widest font-bold rounded-xl hover:bg-primary hover:border-primary transition-all"
           >
-            View →
+            View Details
           </button>
         </div>
       </div>
@@ -961,10 +967,9 @@ const SanctuaryPopupContent = ({ loc }: { loc: any }) => (
     )}
 
     <p className="text-xs text-on-surface-variant leading-relaxed mb-4 font-light">
-      {loc.type === 'traffic-zone' 
-        ? `Disadvantage: ${loc.description}`
+      {loc.type === 'traffic-zone' ? `Disadvantage: ${loc.description}`
         : loc.type === 'exit'
-          ? "Strategic access point via Outer Ring Road. High-speed connectivity to the sanctuary corridor, but subject to immediate urban pollution."
+             ? "Strategic access point via Outer Ring Road. High-speed connectivity to the sanctuary corridor, but subject to immediate urban pollution."
           : loc.description}
     </p>
     
@@ -1020,7 +1025,7 @@ const MapVisibilityTracker = ({ isVisible, onReady }: { isVisible?: boolean; onR
   return null;
 };
 
-// ─── Generic Property Interactive Layout ─────────────────────────────────────
+// ──  Generic Property Interactive Layout ────────────────────────────────────" 
 
 interface Hotspot {
   id: string;
@@ -1038,16 +1043,16 @@ interface PropertyLayoutConfig {
   sitePlanFallback?: string;
   hotspots: Hotspot[];
   projectName: string;
-  developerTag: string;   // e.g. "MODCON Builders · Narsapur"
-  tagline: string;        // e.g. "53 plots · Forest community · From ₹64.6 L"
+  developerTag: string;   // e.g. MODCON Builders  Narsapur
+  tagline: string;        // e.g. 53 plots  Forest community  From ₹64.6 L
   brochureUrl?: string;
-  intentPrefix: string;   // used in lead: "Agartha — Organic Amenity Core"
+  intentPrefix: string;   // used in lead: Agartha - Organic Amenity Core
 }
 
 /**
  * PropertyInteractiveLayout
  * Reusable full-screen overlay: site plan left, feature info + lead form right.
- * This is the template for ALL property cards — Agartha and future listings.
+ * This is the template for ALL property cards - Agartha and future listings.
  */
 const PropertyInteractiveLayout: FC<PropertyLayoutConfig & { onClose: () => void }> = ({
   sitePlanSrc, sitePlanFallback, hotspots, projectName, developerTag, tagline,
@@ -1064,7 +1069,7 @@ const PropertyInteractiveLayout: FC<PropertyLayoutConfig & { onClose: () => void
     if (!leadName.trim() || !leadPhone.trim()) return;
     setLeadLoading(true);
     try {
-      await saveLead({ name: leadName.trim(), email: leadPhone.trim(), intent: `${intentPrefix} — ${active.label}` });
+      await saveLead({ name: leadName.trim(), email: leadPhone.trim(), intent: `${intentPrefix} - ${active.label}` });
     } catch {/* fire and forget */} finally {
       setLeadLoading(false);
       setLeadSubmitted(true);
@@ -1096,12 +1101,12 @@ const PropertyInteractiveLayout: FC<PropertyLayoutConfig & { onClose: () => void
       <button type="submit" disabled={leadLoading || !leadName.trim() || !leadPhone.trim()}
         className="w-full py-3.5 bg-primary text-on-primary text-[9px] uppercase tracking-[0.4em] font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-primary/90 transition-all disabled:opacity-50">
         <ArrowRight className="w-3.5 h-3.5" />
-        {leadLoading ? 'Sending…' : 'Request Site Visit'}
+        {leadLoading ? 'Sending ' : 'Request Site Visit'}
       </button>
       {brochureUrl && (
         <a href={brochureUrl} target="_blank" rel="noopener noreferrer"
           className="block text-center text-[9px] uppercase tracking-widest font-bold text-white/25 hover:text-white/50 transition-colors pt-1">
-          View Brochure Instead →
+          View Brochure Instead  '
         </a>
       )}
     </form>
@@ -1114,7 +1119,7 @@ const PropertyInteractiveLayout: FC<PropertyLayoutConfig & { onClose: () => void
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-[90] bg-[#0a0f07] flex flex-col md:flex-row overflow-hidden"
     >
-      {/* ── LEFT: Full Site Plan — scrollable on mobile, fills screen on desktop ── */}
+      {/* ── LEFT: Full Site Plan - scrollable on mobile, fills screen on desktop ── */}
       <div className="relative w-full md:flex-1 md:h-full overflow-y-auto md:overflow-hidden flex flex-col">
 
         {/* Sticky header over the plan */}
@@ -1128,7 +1133,7 @@ const PropertyInteractiveLayout: FC<PropertyLayoutConfig & { onClose: () => void
           </button>
         </div>
 
-        {/* Site plan image — full portrait, no cropping */}
+        {/* Site plan image - full portrait, no cropping */}
         <div className="relative flex-1 md:absolute md:inset-0 md:flex md:items-center md:justify-center">
           <img
             src={sitePlanSrc}
@@ -1164,7 +1169,7 @@ const PropertyInteractiveLayout: FC<PropertyLayoutConfig & { onClose: () => void
                 className={cn(
                   "flex-shrink-0 text-[8px] uppercase tracking-widest font-bold px-3 py-2 rounded-full border transition-all",
                   active.id === h.id
-                    ? "bg-primary border-primary text-on-primary"
+             ? "bg-primary border-primary text-on-primary"
                     : "border-white/15 text-white/50 hover:border-primary/40 hover:text-primary"
                 )}>
                 {h.label.split(' ').slice(0, 2).join(' ')}
@@ -1217,7 +1222,7 @@ const PropertyInteractiveLayout: FC<PropertyLayoutConfig & { onClose: () => void
                   className={cn(
                     "text-[8px] uppercase tracking-widest font-bold px-3 py-1.5 rounded-full border transition-all",
                     active.id === h.id
-                      ? "bg-primary border-primary text-on-primary"
+             ? "bg-primary border-primary text-on-primary"
                       : "border-white/10 text-white/40 hover:border-primary/40 hover:text-primary"
                   )}>
                   {h.label.split(' ').slice(0, 2).join(' ')}
@@ -1270,27 +1275,27 @@ const AGARTHA_HOTSPOTS: Hotspot[] = [
     id: 'amenity-core', num: 1, x: 44, y: 50,
     label: 'Organic Amenity Core',
     tag: '14,548 Sq Yds',
-    detail: 'The biomorphic heart of Agartha. Zero right angles — every curve echoes the surrounding forest. Infinity lap pool, social pavilions, canopy walkways, all in earth and bamboo.',
+    detail: 'The biomorphic heart of Agartha. Zero right angles - every curve echoes the surrounding forest. Infinity lap pool, social pavilions, canopy walkways, all in earth and bamboo.',
     stats: [{ label: 'Size', value: '14,548 sq yds' }, { label: 'Style', value: 'Biomorphic' }, { label: 'Material', value: 'Earth + Bamboo' }],
   },
   {
     id: 'forest-buffer', num: 2, x: 8, y: 40,
     label: 'Narsapur Forest Buffer',
     tag: 'AQI 12',
-    detail: 'Direct boundary with the Narsapur forest reserve. AQI 12 — one of the cleanest micro-climates in the Hyderabad metro. Native bird corridors, natural white noise.',
-    stats: [{ label: 'AQI', value: '12 — Pristine' }, { label: 'Noise', value: '18 dB' }, { label: 'Forest', value: 'Native Dry Deciduous' }],
+    detail: 'Direct boundary with the Narsapur forest reserve. AQI 12 - one of the cleanest micro-climates in the Hyderabad metro. Native bird corridors, natural white noise.',
+    stats: [{ label: 'AQI', value: '12 - Pristine' }, { label: 'Noise', value: '18 dB' }, { label: 'Forest', value: 'Native Dry Deciduous' }],
   },
   {
     id: 'grand-entry', num: 3, x: 48, y: 8,
     label: 'Grand Entry Boulevard',
     tag: 'Gated Access',
-    detail: 'A winding, landscaped approach lined with native canopy trees. No straight lines — the boulevard curves through the forest edge before revealing the community.',
+    detail: 'A winding, landscaped approach lined with native canopy trees. No straight lines - the boulevard curves through the forest edge before revealing the community.',
     stats: [{ label: 'Access', value: 'Single gated entry' }, { label: 'Landscape', value: 'Native canopy' }, { label: 'Design', value: 'No straight lines' }],
   },
   {
     id: 'premium-corner', num: 4, x: 14, y: 72,
-    label: 'Premium Corner — Plot 15',
-    tag: '5,097 Sq Yds · ₹4.08 Cr',
+    label: 'Premium Corner - Plot 15',
+    tag: '5,097 Sq Yds  ₹4.08 Cr',
     detail: 'The largest plot in Agartha. Corner positioning gives dual forest frontage and the greatest separation from neighbours. At ₹7,999/sq yd: ₹4.08 Cr.',
     stats: [{ label: 'Size', value: '5,097 sq yds' }, { label: 'Price', value: '₹4.08 Cr' }, { label: 'Frontage', value: 'Dual forest-facing' }],
   },
@@ -1298,14 +1303,14 @@ const AGARTHA_HOTSPOTS: Hotspot[] = [
     id: 'plot-community', num: 5, x: 62, y: 60,
     label: '53-Plot Private Community',
     tag: 'From ₹64.6 L',
-    detail: '53 plots, each unique — no two the same. Sizes from 808 to 5,097 sq yds at ₹7,999/sq yd. A true private forest community, not a subdivision.',
+    detail: '53 plots, each unique - no two the same. Sizes from 808 to 5,097 sq yds at ₹7,999/sq yd. A true private forest community, not a subdivision.',
     stats: [{ label: 'Total Plots', value: '53' }, { label: 'Starting', value: '₹64.6 L (808 sq yds)' }, { label: 'Rate', value: '₹7,999/sq yd' }],
   },
 ];
 
-// ─── Agartha: 53 individual plot dots ────────────────────────────────────────
+// ──"  Agartha: 53 individual plot dots ────────────────────────────────────────
 // Positions (x%, y%) map onto the portrait site plan image.
-// Sizes reflect the actual MODCON plot range (808–5,097 sq yds).
+// Sizes reflect the actual MODCON plot range (808 ? 5,097 sq yds).
 // Plot 15 = landmark premium corner (dual forest frontage, 5,097 sq yds).
 
 interface PlotDot { id: number; sqYds: number; x: number; y: number }
@@ -1320,8 +1325,8 @@ const AGARTHA_PLOTS: PlotDot[] = [
   { id: 15, sqYds: 5097, x: 50, y: 75 }, // Largest landmark plot
 ];
 
-const AGARTHA_OLD_RATE = 6199;   // ₹/sq yd — VIP pre-launch rate (2 yrs ago)
-const AGARTHA_NOW_RATE = 7999;   // ₹/sq yd — current rate
+const AGARTHA_OLD_RATE = 6199;   // ₹/sq yd - VIP pre-launch rate (2 yrs ago)
+const AGARTHA_NOW_RATE = 7999;   // ₹/sq yd - current rate
 
 /** dot diameter: scales linearly from 7px (808 sq yd) to 18px (5097 sq yd) */
 const plotDotSize = (sqYds: number) =>
@@ -1330,36 +1335,36 @@ const plotDotSize = (sqYds: number) =>
 const formatRs = (rs: number) =>
   rs >= 1e7 ? `₹${(rs / 1e7).toFixed(2)} Cr` : `₹${(rs / 1e5).toFixed(1)} L`;
 
-/** lookup: sanctuary id → its 53 plot dots */
+/** lookup: sanctuary id - its 53 plot dots */
 const SANCTUARY_PLOTS: Record<string, PlotDot[]> = {
   agartha: AGARTHA_PLOTS,
 };
 
 /**
- * SANCTUARY_HOTSPOTS — maps sanctuary id → its interactive site plan dots.
+ * SANCTUARY_HOTSPOTS - maps sanctuary id - its interactive site plan dots.
  * Add any new property here when it has a site plan.
  */
 const SANCTUARY_HOTSPOTS: Record<string, Hotspot[]> = {
   agartha: AGARTHA_HOTSPOTS,
 };
 
-/** Agartha-specific wrapper — delegates to the generic PropertyInteractiveLayout */
+/** Agartha-specific wrapper - delegates to the generic PropertyInteractiveLayout */
 const AagarthaInteractiveLayout: FC<{ onClose: () => void }> = ({ onClose }) => (
   <PropertyInteractiveLayout
     sitePlanSrc="/agartha-layout.jpg"
     hotspots={AGARTHA_HOTSPOTS}
     projectName="Agartha"
-    developerTag="MODCON Builders · Narsapur"
-    tagline="53 plots · Forest community · From ₹64.6 L"
+    developerTag="MODCON Builders - Narsapur"
+    tagline="53 plots - Forest community - From ₹64.6 L"
     brochureUrl="https://www.modconbuilders.com/agartha"
     intentPrefix="Agartha"
     onClose={onClose}
   />
 );
 
-// ─────────────────────────────────────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────────────────────── 
 
-// ─── Admin ────────────────────────────────────────────────────────────────────
+// ──"  Admin ────────────────────────────────────────────────────────────────────
 const ADMIN_EMAIL = 'sumanthbolla97@gmail.com';
 
 const EMPTY_FORM: PropertyInput = {
@@ -1516,10 +1521,10 @@ const AdminDashboard: FC<{
                         className={cn(
                           "flex-shrink-0 px-3 py-1 rounded-full text-[8px] uppercase tracking-widest font-bold transition-all",
                           p.status === 'live'
-                            ? "bg-primary/10 text-primary"
+             ? "bg-primary/10 text-primary"
                             : "bg-outline/10 text-secondary/40"
                         )}>
-                        {p.status === 'live' ? '● Live' : '○ Draft'}
+                        {p.status === 'live' ? '— Live' : '—  Draft'}
                       </button>
                     </div>
                     <div className="flex gap-2 mt-3">
@@ -1529,7 +1534,7 @@ const AdminDashboard: FC<{
                       </button>
                       <button onClick={() => handleDelete(p.id)} disabled={deleting === p.id}
                         className="text-[9px] uppercase tracking-widest font-bold text-error/60 hover:text-error transition-colors px-3 py-1.5 border border-error/10 rounded-lg hover:border-error/30 disabled:opacity-40">
-                        {deleting === p.id ? 'Deleting…' : 'Delete'}
+                        {deleting === p.id ? 'Deleting ' : 'Delete'}
                       </button>
                     </div>
                   </div>
@@ -1578,7 +1583,7 @@ const AdminDashboard: FC<{
                       onChange={e => set('lng', e.target.value ? parseFloat(e.target.value) : undefined)} />
                   </div>
                 </div>
-                <p className="text-[9px] text-secondary/30 -mt-2">Get from Google Maps → right-click → copy coordinates</p>
+                <p className="text-[9px] text-secondary/30 -mt-2">Get from Google Maps - right-click - copy coordinates</p>
               </div>
 
               {/* Section: Media */}
@@ -1643,7 +1648,7 @@ const AdminDashboard: FC<{
                   </div>
                 </div>
                 <div>
-                  <label htmlFor="adm-pricepersqyd" className={labelCls}>Price per Sq Yd (₹) — leave blank if not applicable</label>
+                  <label htmlFor="adm-pricepersqyd" className={labelCls}>Price per Sq Yd (₹) - leave blank if not applicable</label>
                   <input id="adm-pricepersqyd" name="pricePerSqYd" type="number" className={inputCls} placeholder="7999" value={form.pricePerSqYd ?? ''}
                     onChange={e => set('pricePerSqYd', e.target.value ? parseInt(e.target.value) : undefined)} />
                 </div>
@@ -1660,7 +1665,7 @@ const AdminDashboard: FC<{
                 <div>
                   <label htmlFor="adm-description" className={labelCls}>Description</label>
                   <textarea id="adm-description" name="description" rows={4} className={cn(inputCls, 'resize-none')}
-                    placeholder="Full description of the property…" value={form.description ?? ''}
+                    placeholder="Full description of the property " value={form.description ?? ''}
                     onChange={e => set('description', e.target.value)} />
                 </div>
                 <div>
@@ -1681,7 +1686,7 @@ const AdminDashboard: FC<{
                   </div>
                   <div>
                     <label htmlFor="adm-plotrange" className={labelCls}>Plot Range</label>
-                    <input id="adm-plotrange" name="plotRange" className={inputCls} placeholder="808–5,097 sq yds" value={form.plotRange ?? ''}
+                    <input id="adm-plotrange" name="plotRange" className={inputCls} placeholder="808 ? 5,097 sq yds" value={form.plotRange ?? ''}
                       onChange={e => set('plotRange', e.target.value)} />
                   </div>
                   <div>
@@ -1730,13 +1735,13 @@ const AdminDashboard: FC<{
                     )} />
                   </button>
                   <span className="text-xs font-bold text-on-surface">
-                    {form.status === 'live' ? 'Live — visible on site' : 'Draft — hidden'}
+                    {form.status === 'live' ? 'Live - visible on site' : 'Draft - hidden'}
                   </span>
                 </div>
                 <button onClick={handleSave} disabled={saving}
                   className="px-6 py-3 bg-primary text-on-primary text-[9px] uppercase tracking-[0.4em] font-bold rounded-xl hover:bg-primary/90 transition-all disabled:opacity-50 flex items-center gap-2">
                   <Check className="w-3.5 h-3.5" />
-                  {saving ? 'Saving…' : editingId ? 'Update' : 'Publish'}
+                  {saving ? 'Saving ' : editingId ? 'Update' : 'Publish'}
                 </button>
               </div>
             </div>
@@ -1799,8 +1804,7 @@ const AdminDashboard: FC<{
                 <div key={u.uid} className="p-4 border border-outline/10 rounded-2xl space-y-2">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-3">
-                      {u.photoURL
-                        ? <img src={u.photoURL} referrerPolicy="no-referrer" alt="" className="w-9 h-9 rounded-full object-cover flex-shrink-0" />
+                      {u.photoURL ? <img src={u.photoURL} referrerPolicy="no-referrer" alt="" className="w-9 h-9 rounded-full object-cover flex-shrink-0" />
                         : <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 text-primary font-bold text-sm">
                             {(u.displayName?.[0] || u.email?.[0] || '?').toUpperCase()}
                           </div>
@@ -1819,13 +1823,13 @@ const AdminDashboard: FC<{
                   </div>
                   {(u.occupation || u.city) && (
                     <p className="text-[10px] text-secondary/50 pl-12">
-                      {[u.occupation, u.city].filter(Boolean).join(' · ')}
+                      {[u.occupation, u.city].filter(Boolean).join('  ')}
                     </p>
                   )}
                   {(u.lat && u.lng) && (
                     <p className="text-[9px] text-secondary/30 pl-12 font-mono">
                       {u.lat.toFixed(5)}, {u.lng.toFixed(5)}
-                      {u.locationAccuracy ? ` ±${Math.round(u.locationAccuracy)}m` : ''}
+                      {u.locationAccuracy ? `  ${Math.round(u.locationAccuracy)}m` : ''}
                     </p>
                   )}
                   <p className="text-[9px] text-secondary/20 pl-12">
@@ -1841,7 +1845,7 @@ const AdminDashboard: FC<{
   );
 };
 
-// ─── Feature icon helper ───────────────────────────────────────────────────────
+// ──  Feature icon helper ──────────────────────────────────────────────────────" 
 const featureIcon = (f: string) => {
   if (f.includes('Solar') || f.includes('Energy')) return <Sun className="w-4 h-4" />;
   if (f.includes('Forest') || f.includes('Earth') || f.includes('Bamboo') || f.includes('Organic')) return <Leaf className="w-4 h-4" />;
@@ -1857,23 +1861,19 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
   isSubscribed?: boolean;
   onNewsletterSignup?: () => void;
 }) => {
-  const hotspots  = SANCTUARY_HOTSPOTS[sanctuary.id] ?? null;
-  const plotDots  = SANCTUARY_PLOTS[sanctuary.id]    ?? null;
-  const [activeSpot, setActiveSpot]   = useState<Hotspot | null>(hotspots?.[0] ?? null);
-  const [activePlot, setActivePlot]   = useState<PlotDot | null>(null);
-  const [mapMode, setMapMode]         = useState<'plots' | 'features'>(plotDots ? 'plots' : 'features');
-  const [leadName, setLeadName]       = useState('');
-  const [leadPhone, setLeadPhone]     = useState('');
+  type Tab = 'gallery' | 'layout' | 'details' | 'investment';
+  const [activeTab, setActiveTab] = useState<Tab>('gallery');
+  const [activeImg, setActiveImg] = useState(0);
+  const [leadName, setLeadName] = useState('');
+  const [leadPhone, setLeadPhone] = useState('');
   const [leadSubmitted, setLeadSubmitted] = useState(false);
-  const [leadLoading, setLeadLoading]    = useState(false);
+  const [leadLoading, setLeadLoading] = useState(false);
 
-  // Timed newsletter prompt — appears after 25s if not already subscribed
-  const [showNewsletterPrompt, setShowNewsletterPrompt] = useState(false);
-  const [nlEmail, setNlEmail]     = useState('');
-  const [nlDone, setNlDone]       = useState(false);
-  const [nlLoading, setNlLoading] = useState(false);
-
-  // --- DEV TOOL: VISUAL PLOT MAPPER ---
+  const hotspots = SANCTUARY_HOTSPOTS[sanctuary.id] ?? null;
+  const plotDots  = SANCTUARY_PLOTS[sanctuary.id]    ?? null;
+  const [activeSpot, setActiveSpot] = useState<Hotspot | null>(hotspots?.[0] ?? null);
+  const [activePlot, setActivePlot] = useState<PlotDot | null>(null);
+  const [mapMode, setMapMode] = useState<'plots' | 'features'>(plotDots ? 'plots' : 'features');
   const [mapperActive, setMapperActive] = useState(false);
   const [mappedPlots, setMappedPlots] = useState<{id:number, x:number, y:number, sqYds:number}[]>([]);
 
@@ -1885,569 +1885,575 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
     setMappedPlots(prev => [...prev, { id: prev.length + 1, x, y, sqYds: 1000 }]);
   };
 
-  useEffect(() => {
-    if (isSubscribed) return;
-    const t = setTimeout(() => setShowNewsletterPrompt(true), 25000);
-    return () => clearTimeout(t);
-  }, [isSubscribed]);
+  const gallery = sanctuary.gallery && sanctuary.gallery.length > 0 ? sanctuary.gallery : [sanctuary.image];
 
-  const handleNlSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!nlEmail.trim()) return;
-    setNlLoading(true);
-    try {
-      await saveNewsletter(nlEmail.trim(), 'modal');
-      await saveLead({ name: nlEmail.trim(), email: nlEmail.trim(), intent: `${sanctuary.title} — Newsletter Prompt` });
-      onNewsletterSignup?.();
-    } catch {/* ignore */} finally {
-      setNlLoading(false);
-      setNlDone(true);
-    }
-  };
-
-  // Parse "45 mins to Financial District" → { time: '45m', dest: 'Fin. District' }
   const commuteTime = sanctuary.commute.match(/\d+/)?.[0] ?? '—';
   const commuteDest = sanctuary.commute.replace(/^\d+ mins? to /i, '');
-  const commuteShort = commuteDest.length > 16 ? commuteDest.slice(0, 13) + '…' : commuteDest;
 
   const handleLeadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!leadName.trim() || !leadPhone.trim()) return;
     setLeadLoading(true);
     try {
-      await saveLead({ name: leadName.trim(), email: leadPhone.trim(), intent: `${sanctuary.title} — Site Visit Request` });
+      await saveLead({ name: leadName.trim(), email: leadPhone.trim(), intent: `${sanctuary.title} - Site Visit Request` });
     } catch {/* fire and forget */} finally {
       setLeadLoading(false);
       setLeadSubmitted(true);
     }
   };
 
-  const badge = sanctuary.id === 'syl' ? 'Upcoming' : 'Open — Expression of Interest';
+  const badge = sanctuary.id === 'syl' ? 'Upcoming' : 'Open - Expression of Interest';
+
+  const TABS: { id: Tab; label: string }[] = [
+    { id: 'gallery', label: 'Gallery' },
+    { id: 'layout', label: 'Layout Plan' },
+    { id: 'details', label: 'Details' },
+    { id: 'investment', label: 'Investment' },
+  ];
 
   return (
     <motion.div
-      initial={{ x: '100%' }}
-      animate={{ x: 0 }}
-      exit={{ x: '100%' }}
-      transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-      className="fixed inset-0 w-full z-[10000] bg-surface shadow-[-10px_0_40px_rgba(0,0,0,0.15)] flex flex-col overflow-hidden"
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 40 }}
+      transition={{ type: 'spring', damping: 28, stiffness: 220 }}
+      className="fixed inset-0 z-[10000] flex flex-col bg-surface overflow-hidden"
     >
-      {/* Hero image or Gallery */}
-      <div className="relative h-64 w-full flex-shrink-0 bg-black group">
-        {sanctuary.gallery && sanctuary.gallery.length > 0 ? (
-          <div className="w-full h-full flex overflow-x-auto snap-x snap-mandatory no-scrollbar scroll-smooth">
-            {sanctuary.gallery.map((img, idx) => (
-              <div key={idx} className="w-full h-full flex-shrink-0 snap-center relative">
-                <img src={img} alt={`${sanctuary.title} gallery ${idx + 1}`} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="w-full h-full relative">
-            <img src={sanctuary.image} alt={sanctuary.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
-          </div>
-        )}
-        <button onClick={onClose}
-          className="absolute top-5 right-5 p-2 bg-black/40 backdrop-blur-sm rounded-full hover:bg-black/60 transition-all z-10">
-          <X className="w-4 h-4 text-white" />
-        </button>
-        <div className="absolute bottom-5 left-6 z-10 pointer-events-none flex flex-col gap-1.5">
-          <span className="px-3 py-1 bg-primary text-on-primary text-[8px] uppercase tracking-widest font-bold rounded-full shadow-lg w-fit">
-            {badge}
-          </span>
-          {sanctuary.gallery && sanctuary.gallery.length > 0 && (
-            <span className="text-[9px] text-white/70 uppercase tracking-widest font-bold font-headline select-none w-fit px-1">
-              Swipe to explore gallery ({sanctuary.gallery.length}) ➔
-            </span>
+      {/* ── TOP BAR ──────────────────────────────────────────────────── */}
+      <div className="relative flex-shrink-0 flex items-center justify-between px-6 pt-5 pb-3 z-20">
+        <div>
+          {sanctuary.tagline && (
+            <p className="text-[9px] uppercase tracking-[0.55em] text-primary/70 font-bold mb-1">{sanctuary.tagline}</p>
           )}
+          <h2 className="text-xl font-headline font-bold text-on-surface leading-tight">{sanctuary.title}</h2>
+          <div className="flex items-center gap-1.5 text-secondary text-xs mt-0.5">
+            <MapPin className="w-3 h-3 flex-shrink-0" />
+            {sanctuary.location}
+          </div>
         </div>
+        <button
+          onClick={onClose}
+          className="w-9 h-9 rounded-full bg-on-surface/10 hover:bg-on-surface/20 flex items-center justify-center transition-all flex-shrink-0 ml-4"
+        >
+          <X className="w-4 h-4 text-on-surface" />
+        </button>
       </div>
 
-      {/* Scrollable body */}
+      {/* ── TAB BAR ──────────────────────────────────────────────────── */}
+      <div className="flex-shrink-0 flex items-center gap-1 px-6 pb-3 z-20">
+        {TABS.map(t => (
+          <button
+            key={t.id}
+            onClick={() => setActiveTab(t.id)}
+            className={cn(
+              "px-4 py-1.5 rounded-full text-[10px] uppercase tracking-[0.4em] font-bold transition-all",
+              activeTab === t.id
+             ? "bg-primary text-on-primary"
+                : "text-secondary/60 hover:text-on-surface"
+            )}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {/* ── CONTENT AREA ── */}
       <div className="flex-1 overflow-y-auto">
-        {/* Title + price */}
-        <div className="px-8 pt-8 pb-6 border-b border-outline/10">
-          <div className="flex justify-between items-start gap-4">
-            <div>
-              {sanctuary.tagline && (
-                <p className="text-[9px] uppercase tracking-[0.5em] text-primary font-bold mb-2">{sanctuary.tagline}</p>
-              )}
-              <h2 className="text-2xl font-headline font-bold text-on-surface leading-tight">{sanctuary.title}</h2>
-              <div className="flex items-center gap-2 text-secondary text-xs mt-2">
-                <MapPin className="w-3 h-3 flex-shrink-0" />
-                {sanctuary.location}
-              </div>
-            </div>
-            <div className="text-right flex-shrink-0">
-              {sanctuary.pricePerSqYd ? (
-                <>
-                  <p className="text-[8px] uppercase tracking-widest text-secondary/50 mb-1">Rate</p>
-                  <p className="text-xl font-headline font-bold text-primary">
-                    ₹{sanctuary.pricePerSqYd.toLocaleString('en-IN')}
-                    <span className="text-xs font-normal text-secondary/60">/sq yd</span>
-                  </p>
-                  <p className="text-[9px] text-secondary/50 mt-0.5">{sanctuary.memberPrice}</p>
-                </>
-              ) : (
-                <>
-                  <p className="text-[8px] uppercase tracking-widest text-secondary/50 mb-1">Member Price</p>
-                  <p className="text-xl font-headline font-bold text-primary">{sanctuary.memberPrice}</p>
-                  <p className="text-xs text-secondary/40 line-through">{sanctuary.valuation}</p>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
+        <AnimatePresence mode="wait">
 
-        {/* Key stats */}
-        <div className="grid grid-cols-3 divide-x divide-outline/10 border-b border-outline/10">
-          <div className="px-4 py-5 text-center">
-            <p className="text-[8px] uppercase tracking-widest text-secondary/50 mb-1">AQI</p>
-            <p className="text-lg font-bold text-primary">{sanctuary.aqi}</p>
-            <p className="text-[9px] text-secondary/50">Pure Air</p>
-          </div>
-          <div className="px-4 py-5 text-center">
-            <p className="text-[8px] uppercase tracking-widest text-secondary/50 mb-1">Noise</p>
-            <p className="text-lg font-bold text-on-surface">{sanctuary.noise} dB</p>
-            <p className="text-[9px] text-secondary/50">Near Silent</p>
-          </div>
-          <div className="px-4 py-5 text-center">
-            <p className="text-[8px] uppercase tracking-widest text-secondary/50 mb-1">Commute</p>
-            <p className="text-lg font-bold text-on-surface">{commuteTime}m</p>
-            <p className="text-[9px] text-secondary/50">{commuteShort}</p>
-          </div>
-        </div>
+          {/* ══ GALLERY TAB ══════════════════════════════════════════════ */}
+          {activeTab === 'gallery' && (
+            <motion.div key="gallery" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col h-full">
+              {/* Hero image */}
+              <div className="relative w-full bg-black" style={{ height: '52vw', maxHeight: 380, minHeight: 200 }}>
+                <AnimatePresence mode="wait">
+                  <motion.img
+                    key={activeImg}
+                    src={gallery[activeImg]}
+                    alt={`${sanctuary.title} - ${activeImg + 1}`}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    referrerPolicy="no-referrer"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.35 }}
+                  />
+                </AnimatePresence>
+                {/* Gradient overlays */}
+                <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-black/30 pointer-events-none" />
 
-        <div className="px-8 py-8 space-y-8">
-          {/* Description */}
-          {sanctuary.description && (
-            <p className="text-sm text-secondary/80 leading-relaxed">{sanctuary.description}</p>
-          )}
+                {/* Badge + counter */}
+                <div className="absolute top-4 left-4 flex items-center gap-2">
+                  <span className="px-3 py-1 bg-primary text-on-primary text-[8px] uppercase tracking-widest font-bold rounded-full shadow-lg">
+                    {badge}
+                  </span>
+                </div>
+                <span className="absolute top-4 right-4 px-2.5 py-1 bg-black/50 backdrop-blur-sm text-white/70 text-[9px] rounded-full font-bold">
+                  {activeImg + 1} / {gallery.length}
+                </span>
 
-          {/* Plot community stats */}
-          {sanctuary.plots && (
-            <div className="grid grid-cols-3 gap-4">
-              <div className="p-4 bg-primary/5 rounded-2xl text-center">
-                <p className="text-2xl font-headline font-bold text-primary">{sanctuary.plots}</p>
-                <p className="text-[8px] uppercase tracking-widest text-secondary/60 mt-1">Private Plots</p>
-              </div>
-              <div className="p-4 bg-primary/5 rounded-2xl text-center">
-                <p className="text-base font-headline font-bold text-primary leading-tight">{sanctuary.plotRange ?? '808–5,097'}</p>
-                <p className="text-[8px] uppercase tracking-widest text-secondary/60 mt-1">Sq Yds Range</p>
-              </div>
-              <div className="p-4 bg-primary/5 rounded-2xl text-center">
-                <p className="text-base font-headline font-bold text-primary leading-tight">{sanctuary.amenityAcres ?? '14,548'}</p>
-                <p className="text-[8px] uppercase tracking-widest text-secondary/60 mt-1">Amenity Sq Yds</p>
-              </div>
-            </div>
-          )}
-
-          {/* ── Interactive Site Plan ── */}
-          {sanctuary.sitePlanSrc && (plotDots || hotspots) && (
-            <div>
-              {/* Section header + mode toggle */}
-              <div className="flex items-center justify-between mb-4">
-                <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold">
-                  {mapMode === 'plots' ? `Site Plan — ${plotDots?.length ?? 0} Plots` : 'Site Plan — Features'}
-                </p>
-                {plotDots && hotspots && (
-                  <div className="flex rounded-full border border-outline/15 overflow-hidden text-[8px] uppercase tracking-widest font-bold">
-                    <button onClick={() => setMapMode('plots')}
-                      className={cn("px-3 py-1.5 transition-all",
-                        mapMode === 'plots' ? "bg-primary text-on-primary" : "text-secondary/50 hover:text-secondary")}>
-                      Plots
+                {/* Left / Right arrows */}
+                {gallery.length > 1 && (
+                  <>
+                    <button
+                      onClick={() => setActiveImg(i => (i - 1 + gallery.length) % gallery.length)}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center text-white/80 hover:bg-black/80 transition-all"
+                    >
+                      <ArrowRight className="w-4 h-4 rotate-180" />
                     </button>
-                    <button onClick={() => setMapMode('features')}
-                      className={cn("px-3 py-1.5 transition-all",
-                        mapMode === 'features' ? "bg-primary text-on-primary" : "text-secondary/50 hover:text-secondary")}>
-                      Features
+                    <button
+                      onClick={() => setActiveImg(i => (i + 1) % gallery.length)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center text-white/80 hover:bg-black/80 transition-all"
+                    >
+                      <ArrowRight className="w-4 h-4" />
                     </button>
-                  </div>
+                  </>
                 )}
               </div>
 
-              <div className="rounded-2xl overflow-hidden border border-outline/10 bg-[#0a0f07]">
-
-                {/* ── PLOTS MODE ── */}
-                {mapMode === 'plots' && plotDots && (
-                  <>
-                    {/* Map with 53 sized dots */}
-                    <div className="relative">
-                      {/* DEV TOOL MAPPER TOGGLE */}
-                      <button 
-                        onClick={() => setMapperActive(!mapperActive)} 
-                        className="absolute top-2 left-2 z-50 px-3 py-1 bg-black/80 text-white text-[8px] uppercase tracking-widest font-bold border border-white/10 rounded-full"
-                      >
-                        {mapperActive ? `Mapper Active (${mappedPlots.length}) - Tap to Disable` : `Enable Visual Mapper`}
-                      </button>
-
-                      {mapperActive && mappedPlots.length > 0 && (
-                        <div className="absolute top-12 left-2 right-2 z-50 flex gap-2">
-                          <button onClick={() => setMappedPlots(prev => prev.slice(0, -1))} className="px-3 py-1 bg-red-500/80 text-white text-[8px] uppercase font-bold rounded-full">Undo</button>
-                          <button onClick={() => {
-                            navigator.clipboard.writeText(JSON.stringify(mappedPlots, null, 2));
-                            alert('Copied absolute array to clipboard! Paste it to the AI.');
-                          }} className="px-3 py-1 bg-primary text-on-primary text-[8px] uppercase font-bold rounded-full">Copy Coordinates</button>
-                        </div>
+              {/* Thumbnail strip */}
+              {gallery.length > 1 && (
+                <div className="flex gap-2 overflow-x-auto px-6 py-3 no-scrollbar flex-shrink-0">
+                  {gallery.map((img, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setActiveImg(i)}
+                      className={cn(
+                        "flex-shrink-0 w-16 h-12 rounded-xl overflow-hidden border-2 transition-all",
+                        i === activeImg ? "border-primary scale-105" : "border-transparent opacity-50 hover:opacity-80"
                       )}
+                    >
+                      <img src={img} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                    </button>
+                  ))}
+                </div>
+              )}
 
-                      <img src={sanctuary.sitePlanSrc} alt="Site plan"
-                        className={cn("w-full h-auto object-contain", mapperActive && "cursor-crosshair")} 
-                        referrerPolicy="no-referrer" 
-                        onClick={handleMapClick} 
-                      />
-
-                      {/* Render Newly Mapped Dots OR Existing plotDots */}
-                      {(mapperActive ? mappedPlots : plotDots).map(p => {
-                        const sz     = mapperActive ? 12 : plotDotSize(p.sqYds);
-                        const isActive = activePlot?.id === p.id;
-                        return (
-                          <button
-                            key={p.id}
-                            style={{
-                              left: `${p.x}%`, top: `${p.y}%`,
-                              width: sz, height: sz,
-                            }}
-                            className={cn(
-                              "absolute -translate-x-1/2 -translate-y-1/2 rounded-full border transition-all duration-150 shadow-md",
-                              mapperActive ? "bg-red-500 border-red-300" :
-                              isActive
-                                ? "border-primary bg-primary scale-125"
-                                : "border-primary/80 bg-primary/60 hover:bg-primary hover:scale-110"
-                            )}
-                            onClick={() => !mapperActive && setActivePlot(isActive ? null : p as any)}
-                          >
-                            {mapperActive && <span className="absolute -top-4 -left-2 text-[8px] text-red-400 font-bold bg-black/60 px-1 rounded">{p.id}</span>}
-                            {isActive && !mapperActive && (
-                              <span className="absolute inset-0 rounded-full bg-primary/40 animate-ping pointer-events-none" />
-                            )}
-                          </button>
-                        );
-                      })}
-                    </div>
-
-                    {/* Legend */}
-                    <div className="flex items-center gap-4 px-4 py-2.5 border-t border-white/5">
-                      <div className="flex items-center gap-1.5">
-                        <span className="w-2.5 h-2.5 rounded-full bg-primary/70 border border-primary/80" />
-                        <span className="text-[8px] text-white/40 uppercase tracking-wider font-bold">Standard</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <span className="w-3.5 h-3.5 rounded-full bg-amber-500/70 border border-amber-500/80" />
-                        <span className="text-[8px] text-white/40 uppercase tracking-wider font-bold">Premium (3,000+ sq yds)</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <span className="w-4 h-4 rounded-full bg-amber-400/90 border border-amber-400" />
-                        <span className="text-[8px] text-amber-400/80 uppercase tracking-wider font-bold">Plot 15</span>
-                      </div>
-                    </div>
-
-                    {/* Investment snapshot — shown when plot is tapped */}
-                    <AnimatePresence mode="wait">
-                      {activePlot && (() => {
-                        const oldVal  = activePlot.sqYds * AGARTHA_OLD_RATE;
-                        const nowVal  = activePlot.sqYds * AGARTHA_NOW_RATE;
-                        const gain    = nowVal - oldVal;
-                        const pct     = ((gain / oldVal) * 100).toFixed(1);
-                        const annPct  = (parseFloat(pct) / 2).toFixed(1);
-                        return (
-                          <motion.div
-                            key={activePlot.id}
-                            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 4 }}
-                            transition={{ duration: 0.18 }}
-                            className="border-t border-white/8 bg-[#0d1409]"
-                          >
-                            {/* Plot header */}
-                            <div className="flex items-start justify-between px-5 pt-4 pb-3">
-                              <div>
-                                <p className="text-[8px] uppercase tracking-[0.5em] text-primary/50 font-bold">
-                                  Plot {activePlot.id} · {activePlot.sqYds.toLocaleString('en-IN')} sq yds
-                                  {activePlot.id === 15 && <span className="ml-2 text-amber-400">★ Premium Corner</span>}
-                                </p>
-                                <p className="text-xl font-headline font-bold text-white mt-0.5">{formatRs(nowVal)}</p>
-                                <p className="text-[10px] text-white/40">at ₹{AGARTHA_NOW_RATE.toLocaleString('en-IN')}/sq yd</p>
-                              </div>
-                              <button onClick={() => setActivePlot(null)} className="p-1.5 rounded-full bg-white/5 hover:bg-white/10 transition-all mt-0.5">
-                                <X className="w-3 h-3 text-white/40" />
-                              </button>
-                            </div>
-
-                            {/* Price comparison bar */}
-                            <div className="px-5 pb-3">
-                              <div className="rounded-xl bg-white/4 border border-white/5 overflow-hidden">
-                                {/* Two-year-ago row */}
-                                <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
-                                  <div>
-                                    <p className="text-[8px] uppercase tracking-widest text-white/30 font-bold">VIP Pre-Launch · 2022</p>
-                                    <p className="text-base font-headline font-bold text-white/60 mt-0.5">{formatRs(oldVal)}</p>
-                                  </div>
-                                  <p className="text-[9px] text-white/30">₹{AGARTHA_OLD_RATE.toLocaleString('en-IN')}/sq yd</p>
-                                </div>
-                                {/* Current row */}
-                                <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
-                                  <div>
-                                    <p className="text-[8px] uppercase tracking-widest text-primary/60 font-bold">Today · 2024</p>
-                                    <p className="text-base font-headline font-bold text-white mt-0.5">{formatRs(nowVal)}</p>
-                                  </div>
-                                  <p className="text-[9px] text-primary/60">₹{AGARTHA_NOW_RATE.toLocaleString('en-IN')}/sq yd</p>
-                                </div>
-                                {/* Gain row */}
-                                <div className="px-4 py-3 bg-primary/8 flex items-center justify-between">
-                                  <div className="flex items-center gap-2">
-                                    <TrendingDown className="w-4 h-4 text-primary rotate-180" />
-                                    <div>
-                                      <p className="text-[8px] uppercase tracking-widest text-primary/70 font-bold">Early Investor Gain</p>
-                                      <p className="text-lg font-headline font-bold text-primary">{formatRs(gain)}</p>
-                                    </div>
-                                  </div>
-                                  <div className="text-right">
-                                    <p className="text-xl font-headline font-bold text-primary">+{pct}%</p>
-                                    <p className="text-[9px] text-primary/50">in 2 years</p>
-                                    <p className="text-[9px] text-primary/40">({annPct}% p.a.)</p>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Context copy */}
-                            <div className="px-5 pb-4">
-                              <p className="text-[10px] text-white/35 leading-relaxed">
-                                An investor who booked this exact plot at pre-launch in 2022 has seen a paper gain of <span className="text-primary/70 font-bold">{formatRs(gain)}</span> without doing anything — simply because Agartha's land value grew <span className="text-primary/70 font-bold">+{pct}% in 2 years</span>. Today's buyers get the same compounding advantage for the next cycle.
-                              </p>
-                            </div>
-                          </motion.div>
-                        );
-                      })()}
-                    </AnimatePresence>
-                  </>
-                )}
-
-                {/* ── FEATURES MODE ── */}
-                {mapMode === 'features' && hotspots && (
-                  <>
-                    <div className="relative">
-                      <img src={sanctuary.sitePlanSrc} alt="Site plan"
-                        className="w-full h-auto object-contain" referrerPolicy="no-referrer" />
-                      {hotspots.map(h => {
-                        const isActive = activeSpot?.id === h.id;
-                        return (
-                          <button key={h.id} style={{ left: `${h.x}%`, top: `${h.y}%` }}
-                            className="absolute -translate-x-1/2 -translate-y-1/2" onClick={() => setActiveSpot(h)}>
-                            <span className={cn(
-                              "relative block rounded-full border-2 border-white shadow-lg transition-all duration-200",
-                              isActive ? "w-4 h-4 bg-primary scale-125" : "w-3 h-3 bg-white/60 hover:bg-white hover:scale-125"
-                            )} />
-                            {isActive && <span className="absolute inset-0 rounded-full bg-primary/50 animate-ping pointer-events-none" />}
-                          </button>
-                        );
-                      })}
-                    </div>
-                    <div className="flex gap-2 overflow-x-auto px-4 py-3 border-t border-white/5 no-scrollbar">
-                      {hotspots.map(h => (
-                        <button key={h.id} onClick={() => setActiveSpot(h)}
-                          className={cn("flex-shrink-0 text-[8px] uppercase tracking-widest font-bold px-3 py-1.5 rounded-full border transition-all",
-                            activeSpot?.id === h.id ? "bg-primary border-primary text-on-primary" : "border-white/15 text-white/40 hover:border-primary/40 hover:text-primary")}>
-                          {h.label.split(' ').slice(0, 2).join(' ')}
-                        </button>
-                      ))}
-                    </div>
-                    {activeSpot && (
-                      <AnimatePresence mode="wait">
-                        <motion.div key={activeSpot.id} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-                          transition={{ duration: 0.15 }} className="px-5 py-4 border-t border-white/5 space-y-2">
-                          <p className="text-[8px] uppercase tracking-[0.4em] text-primary/60 font-bold">{activeSpot.tag}</p>
-                          <h4 className="text-sm font-headline font-bold text-white">{activeSpot.label}</h4>
-                          <p className="text-[11px] text-white/50 leading-relaxed">{activeSpot.detail}</p>
-                          <div className="grid grid-cols-3 gap-2 pt-1">
-                            {activeSpot.stats.map(s => (
-                              <div key={s.label} className="bg-white/5 rounded-lg px-2 py-2 text-center">
-                                <p className="text-[7px] uppercase tracking-wider text-white/30 font-bold mb-0.5">{s.label}</p>
-                                <p className="text-[10px] font-bold text-white">{s.value}</p>
-                              </div>
-                            ))}
-                          </div>
-                        </motion.div>
-                      </AnimatePresence>
-                    )}
-                  </>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Price breakdown table */}
-          {sanctuary.pricePerSqYd && (
-            <div>
-              <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold mb-4">
-                Price Calculator — ₹{sanctuary.pricePerSqYd.toLocaleString('en-IN')}/sq yd
-              </p>
-              <div className="rounded-2xl overflow-hidden border border-outline/10">
+              {/* Key stat pills */}
+              <div className="grid grid-cols-3 gap-3 px-6 py-4">
                 {[
-                  { label: 'Plot 01 (Smallest)', sqYds: 808 },
-                  { label: 'Typical Plot', sqYds: 1300 },
-                  { label: 'Large Plot', sqYds: 2000 },
-                  { label: 'Premium Plot', sqYds: 3000 },
-                  { label: 'Plot 15 (Largest)', sqYds: 5097 },
-                ].map((row, i) => {
-                  const totalRs = row.sqYds * sanctuary.pricePerSqYd!;
-                  const display = totalRs >= 1e7 ? `₹${(totalRs / 1e7).toFixed(2)} Cr` : `₹${(totalRs / 1e5).toFixed(1)} L`;
-                  return (
-                    <div key={i} className={cn("grid grid-cols-3 px-4 py-3 text-[10px]", i % 2 === 0 ? "bg-primary/3" : "bg-transparent")}>
-                      <span className="text-secondary/60 font-medium">{row.label}</span>
-                      <span className="text-center font-bold text-on-surface">{row.sqYds.toLocaleString('en-IN')} sq yds</span>
-                      <span className="text-right font-bold text-primary">{display}</span>
-                    </div>
-                  );
-                })}
-              </div>
-              <p className="text-[8px] text-secondary/40 mt-2">Rate: ₹{sanctuary.pricePerSqYd.toLocaleString('en-IN')}/sq yd</p>
-            </div>
-          )}
-
-          {/* Features */}
-          {sanctuary.features && sanctuary.features.length > 0 && (
-            <div>
-              <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold mb-4">Curated Features</p>
-              <div className="grid grid-cols-2 gap-3">
-                {sanctuary.features.map((feature, i) => (
-                  <div key={i} className="flex items-center gap-3 p-3 rounded-xl border border-outline/10 bg-surface-container-low/50">
-                    <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
-                      {featureIcon(feature)}
-                    </div>
-                    <span className="text-[10px] font-medium text-on-surface leading-tight">{feature}</span>
+                  { label: 'AQI', value: sanctuary.aqi, sub: 'Pure Air', color: 'text-emerald-400' },
+                  { label: 'Noise', value: `${sanctuary.noise} dB`, sub: 'Near Silent', color: 'text-sky-400' },
+                  { label: 'Commute', value: `${commuteTime}m`, sub: commuteDest.slice(0, 14), color: 'text-amber-400' },
+                ].map(s => (
+                  <div key={s.label} className="bg-on-surface/5 rounded-2xl p-4 text-center border border-outline/10">
+                    <p className="text-[8px] uppercase tracking-widest text-secondary/50 font-bold mb-1">{s.label}</p>
+                    <p className={cn("text-xl font-headline font-bold", s.color)}>{s.value}</p>
+                    <p className="text-[8px] text-secondary/50 mt-0.5">{s.sub}</p>
                   </div>
                 ))}
               </div>
-            </div>
-          )}
 
-          {/* Environmental integrity */}
-          <div>
-            <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold mb-4">Environmental Integrity</p>
-            <div className="space-y-3">
-              {[
-                { label: 'Air Quality Index', value: `${sanctuary.aqi} — Pristine`, bar: Math.min((50 - sanctuary.aqi) / 50, 1) },
-                { label: 'Ambient Noise', value: `${sanctuary.noise} dB — Near Silent`, bar: Math.min((50 - sanctuary.noise) / 50, 1) },
-                { label: 'Forest Proximity', value: 'Direct Boundary Access', bar: 0.95 },
-              ].map(item => (
-                <div key={item.label}>
-                  <div className="flex justify-between text-[9px] mb-1">
-                    <span className="uppercase tracking-widest text-secondary/60">{item.label}</span>
-                    <span className="font-bold text-on-surface">{item.value}</span>
-                  </div>
-                  <div className="h-1 bg-outline/10 rounded-full overflow-hidden">
-                    <motion.div initial={{ width: 0 }} animate={{ width: `${item.bar * 100}%` }}
-                      transition={{ delay: 0.3, duration: 0.8, ease: 'easeOut' }}
-                      className="h-full bg-primary rounded-full" />
+              {/* Description */}
+              {sanctuary.description && (
+                <div className="px-6 pb-4">
+                  <p className="text-sm text-secondary leading-relaxed">{sanctuary.description}</p>
+                </div>
+              )}
+
+              {/* Features grid */}
+              {sanctuary.features && sanctuary.features.length > 0 && (
+                <div className="px-6 pb-6">
+                  <p className="text-[9px] uppercase tracking-[0.5em] text-secondary/60 font-bold mb-3">Curated Features</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {sanctuary.features.map((f, i) => (
+                      <div key={i} className="flex items-center gap-2.5 p-3 rounded-xl bg-on-surface/4 border border-outline/10">
+                        <div className="w-6 h-6 rounded-lg bg-primary/15 flex items-center justify-center text-primary flex-shrink-0">
+                          {featureIcon(f)}
+                        </div>
+                        <span className="text-[10px] font-medium text-on-surface/70 leading-tight">{f}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
+              )}
+            </motion.div>
+          )}
 
-          {/* Developer credit */}
-          {sanctuary.architect && (
-            <div className="flex items-center gap-3 p-4 border border-outline/10 rounded-2xl">
-              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                <Award className="w-5 h-5 text-primary" />
-              </div>
+          {/* ══ LAYOUT PLAN TAB ══════════════════════════════════════════ */}
+          {activeTab === 'layout' && (
+            <motion.div key="layout" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="px-4 py-4 space-y-4">
+              {sanctuary.sitePlanSrc ? (
+                <>
+                  {/* Mode toggle */}
+                  {plotDots && hotspots && (
+                    <div className="flex rounded-full border border-outline/20 overflow-hidden w-fit text-[9px] uppercase tracking-widest font-bold">
+                      {(['plots', 'features'] as const).map(m => (
+                        <button
+                          key={m}
+                          onClick={() => setMapMode(m)}
+                          className={cn("px-4 py-2 transition-all", mapMode === m ? "bg-primary text-on-primary" : "text-secondary/60 hover:text-on-surface")}
+                        >
+                          {m}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="rounded-2xl overflow-hidden border border-outline/10 bg-surface-container-low">
+                    {/* PLOTS MODE */}
+                    {(mapMode === 'plots' || !hotspots) && plotDots && (
+                      <>
+                        <div className="relative">
+                          <button
+                            onClick={() => setMapperActive(!mapperActive)}
+                            className="absolute top-2 left-2 z-50 px-3 py-1 bg-black/80 text-white text-[8px] uppercase tracking-widest font-bold border border-white/10 rounded-full"
+                          >
+                            {mapperActive ? `Mapper Active (${mappedPlots.length}) - Disable` : 'Enable Visual Mapper'}
+                          </button>
+                          {mapperActive && mappedPlots.length > 0 && (
+                            <div className="absolute top-12 left-2 right-2 z-50 flex gap-2">
+                              <button onClick={() => setMappedPlots(prev => prev.slice(0, -1))} className="px-3 py-1 bg-red-500/80 text-white text-[8px] uppercase font-bold rounded-full">Undo</button>
+                              <button onClick={() => { navigator.clipboard.writeText(JSON.stringify(mappedPlots, null, 2)); alert('Copied!'); }} className="px-3 py-1 bg-primary text-on-primary text-[8px] uppercase font-bold rounded-full">Copy</button>
+                            </div>
+                          )}
+                          <img
+                            src={sanctuary.sitePlanSrc}
+                            alt="Site plan"
+                            className={cn("w-full h-auto object-contain", mapperActive && "cursor-crosshair")}
+                            referrerPolicy="no-referrer"
+                            onClick={handleMapClick}
+                          />
+                          {(mapperActive ? mappedPlots : plotDots).map(p => {
+                            const sz = mapperActive ? 12 : plotDotSize(p.sqYds);
+                            const isActive = activePlot?.id === p.id;
+                            return (
+                              <button
+                                key={p.id}
+                                style={{ left: `${p.x}%`, top: `${p.y}%`, width: sz, height: sz }}
+                                className={cn(
+                                  "absolute -translate-x-1/2 -translate-y-1/2 rounded-full border transition-all duration-150 shadow-md",
+                                  mapperActive ? "bg-red-500 border-red-300" :
+                                  isActive ? "border-primary bg-primary scale-125" : "border-primary/80 bg-primary/60 hover:bg-primary hover:scale-110"
+                                )}
+                                onClick={() => !mapperActive && setActivePlot(isActive ? null : p as any)}
+                              >
+                                {mapperActive && <span className="absolute -top-4 -left-2 text-[8px] text-red-400 font-bold bg-black/60 px-1 rounded">{p.id}</span>}
+                                {isActive && !mapperActive && <span className="absolute inset-0 rounded-full bg-primary/40 animate-ping pointer-events-none" />}
+                              </button>
+                            );
+                          })}
+                        </div>
+
+                        {/* Legend */}
+                        <div className="flex items-center gap-4 px-4 py-2.5 border-t border-outline/10">
+                          {[
+                            { cls: 'bg-primary/70 border-primary/80', label: 'Standard' },
+                            { cls: 'bg-amber-500/70 border-amber-500/80 w-3.5 h-3.5', label: 'Premium 3000+ sq yds' },
+                          ].map(l => (
+                            <div key={l.label} className="flex items-center gap-1.5">
+                              <span className={cn("w-2.5 h-2.5 rounded-full border", l.cls)} />
+                              <span className="text-[8px] text-secondary/60 uppercase tracking-wider font-bold">{l.label}</span>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Plot investment card */}
+                        <AnimatePresence mode="wait">
+                          {activePlot && (() => {
+                            const oldVal = activePlot.sqYds * AGARTHA_OLD_RATE;
+                            const nowVal = activePlot.sqYds * AGARTHA_NOW_RATE;
+                            const gain   = nowVal - oldVal;
+                            const pct    = ((gain / oldVal) * 100).toFixed(1);
+                            const annPct = (parseFloat(pct) / 2).toFixed(1);
+                            return (
+                              <motion.div
+                                key={activePlot.id}
+                                initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 4 }}
+                                className="border-t border-outline/10 bg-surface-container px-5 py-4 space-y-3"
+                              >
+                                <div className="flex items-start justify-between">
+                                  <div>
+                                    <p className="text-[8px] uppercase tracking-[0.5em] text-primary/50 font-bold">
+                                      Plot {activePlot.id}  {activePlot.sqYds.toLocaleString('en-IN')} sq yds
+                                      {activePlot.id === 15 && <span className="ml-2 text-amber-400"> … Premium</span>}
+                                    </p>
+                                    <p className="text-xl font-headline font-bold text-on-surface mt-0.5">{formatRs(nowVal)}</p>
+                                  </div>
+                                  <button onClick={() => setActivePlot(null)} className="p-1.5 rounded-full bg-on-surface/5 hover:bg-on-surface/10">
+                                    <X className="w-3 h-3 text-secondary/60" />
+                                  </button>
+                                </div>
+                                <div className="grid grid-cols-3 gap-2 text-center">
+                                  {[
+                                    { label: 'Pre-Launch 2022', val: formatRs(oldVal), sub: `₹${AGARTHA_OLD_RATE.toLocaleString('en-IN')}/yd`, color: 'text-white/50' },
+                                    { label: 'Today 2024', val: formatRs(nowVal), sub: `₹${AGARTHA_NOW_RATE.toLocaleString('en-IN')}/yd`, color: 'text-white' },
+                                    { label: 'Gain', val: `+${pct}%`, sub: `${annPct}% p.a.`, color: 'text-primary' },
+                                  ].map(r => (
+                                    <div key={r.label} className="bg-white/4 rounded-xl p-3 border border-white/5">
+                                      <p className="text-[7px] uppercase tracking-wider text-white/30 font-bold mb-1">{r.label}</p>
+                                      <p className={cn("text-sm font-headline font-bold", r.color)}>{r.val}</p>
+                                      <p className="text-[8px] text-white/30 mt-0.5">{r.sub}</p>
+                                    </div>
+                                  ))}
+                                </div>
+                              </motion.div>
+                            );
+                          })()}
+                        </AnimatePresence>
+                      </>
+                    )}
+
+                    {/* FEATURES MODE */}
+                    {(mapMode === 'features' || !plotDots) && hotspots && (
+                      <>
+                        <div className="relative">
+                          <img src={sanctuary.sitePlanSrc} alt="Site plan" className="w-full h-auto object-contain" referrerPolicy="no-referrer" />
+                          {hotspots.map(h => {
+                            const isActive = activeSpot?.id === h.id;
+                            return (
+                              <button key={h.id} style={{ left: `${h.x}%`, top: `${h.y}%` }}
+                                className="absolute -translate-x-1/2 -translate-y-1/2" onClick={() => setActiveSpot(h)}>
+                                <span className={cn("relative block rounded-full border-2 border-white shadow-lg transition-all duration-200",
+                                  isActive ? "w-4 h-4 bg-primary scale-125" : "w-3 h-3 bg-white/60 hover:bg-white hover:scale-125")} />
+                                {isActive && <span className="absolute inset-0 rounded-full bg-primary/50 animate-ping pointer-events-none" />}
+                              </button>
+                            );
+                          })}
+                        </div>
+                        <div className="flex gap-2 overflow-x-auto px-4 py-3 border-t border-outline/10 no-scrollbar">
+                          {hotspots.map(h => (
+                            <button key={h.id} onClick={() => setActiveSpot(h)}
+                              className={cn("flex-shrink-0 text-[8px] uppercase tracking-widest font-bold px-3 py-1.5 rounded-full border transition-all",
+                                activeSpot?.id === h.id ? "bg-primary border-primary text-on-primary" : "border-outline/20 text-secondary/60 hover:border-primary/40 hover:text-primary")}>
+                              {h.label.split(' ').slice(0, 2).join(' ')}
+                            </button>
+                          ))}
+                        </div>
+                        {activeSpot && (
+                          <AnimatePresence mode="wait">
+                            <motion.div key={activeSpot.id} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                              className="px-5 py-4 border-t border-outline/10 space-y-2">
+                              <p className="text-[8px] uppercase tracking-[0.4em] text-primary/60 font-bold">{activeSpot.tag}</p>
+                              <h4 className="text-sm font-headline font-bold text-on-surface">{activeSpot.label}</h4>
+                              <p className="text-[11px] text-secondary leading-relaxed">{activeSpot.detail}</p>
+                              <div className="grid grid-cols-3 gap-2 pt-1">
+                                {activeSpot.stats.map(s => (
+                                  <div key={s.label} className="bg-on-surface/5 rounded-lg px-2 py-2 text-center">
+                                    <p className="text-[7px] uppercase tracking-wider text-secondary/50 font-bold mb-0.5">{s.label}</p>
+                                    <p className="text-[10px] font-bold text-on-surface">{s.value}</p>
+                                  </div>
+                                ))}
+                              </div>
+                            </motion.div>
+                          </AnimatePresence>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-24 text-center">
+                  <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mb-4">
+                    <MapPin className="w-8 h-8 text-white/20" />
+                  </div>
+                  <p className="text-white/30 text-sm">Layout plan coming soon.</p>
+                </div>
+              )}
+            </motion.div>
+          )}
+
+          {/* ══ DETAILS TAB ══════════════════════════════════════════════ */}
+          {activeTab === 'details' && (
+            <motion.div key="details" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="px-6 py-4 space-y-6 pb-28">
+
+              {/* Plot community stats */}
+              {sanctuary.plots && (
+                <div>
+                  <p className="text-[9px] uppercase tracking-[0.5em] text-secondary/60 font-bold mb-3">Community Scale</p>
+                  <div className="grid grid-cols-3 gap-3">
+                    {[
+                      { val: sanctuary.plots, label: 'Private Plots' },
+                      { val: sanctuary.plotRange ?? '808 ? 5,097', label: 'Sq Yds Range' },
+                      { val: sanctuary.amenityAcres ?? '14,548', label: 'Amenity Sq Yds' },
+                    ].map(s => (
+                      <div key={s.label} className="bg-on-surface/5 rounded-2xl p-4 text-center border border-outline/10">
+                        <p className="text-lg font-headline font-bold text-primary leading-tight">{s.val}</p>
+                        <p className="text-[8px] uppercase tracking-widest text-secondary/50 mt-1">{s.label}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Environmental integrity */}
               <div>
-                <p className="text-[8px] uppercase tracking-widest text-secondary/50">Developed by</p>
-                <p className="text-sm font-bold text-on-surface">{sanctuary.architect}</p>
+                <p className="text-[9px] uppercase tracking-[0.5em] text-secondary/60 font-bold mb-3">Environmental Integrity</p>
+                <div className="space-y-4 bg-on-surface/3 rounded-2xl border border-outline/10 p-5">
+                  {[
+                    { label: 'Air Quality Index', value: `${sanctuary.aqi} - Pristine`, bar: Math.min((50 - sanctuary.aqi) / 50, 1), color: 'bg-emerald-500' },
+                    { label: 'Ambient Noise', value: `${sanctuary.noise} dB - Near Silent`, bar: Math.min((50 - sanctuary.noise) / 50, 1), color: 'bg-sky-500' },
+                    { label: 'Forest Proximity', value: 'Direct Boundary Access', bar: 0.95, color: 'bg-primary' },
+                  ].map(item => (
+                    <div key={item.label}>
+                      <div className="flex justify-between text-[9px] mb-1.5">
+                        <span className="uppercase tracking-widest text-secondary/60">{item.label}</span>
+                        <span className="font-bold text-on-surface/80">{item.value}</span>
+                      </div>
+                      <div className="h-1.5 bg-on-surface/10 rounded-full overflow-hidden">
+                        <motion.div initial={{ width: 0 }} animate={{ width: `${item.bar * 100}%` }}
+                          transition={{ delay: 0.3, duration: 0.8, ease: 'easeOut' }}
+                          className={cn("h-full rounded-full", item.color)} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+
+              {/* Developer credit */}
+              {sanctuary.architect && (
+                <div className="flex items-center gap-3 p-4 border border-outline/10 rounded-2xl bg-on-surface/3">
+                  <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center">
+                    <Award className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-[8px] uppercase tracking-widest text-secondary/50">Developed by</p>
+                    <p className="text-sm font-bold text-on-surface">{sanctuary.architect}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Brochure link */}
+              {sanctuary.brochureUrl && (
+                <a href={sanctuary.brochureUrl} target="_blank" rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-3 w-full py-3.5 border border-outline/20 text-secondary text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl hover:bg-on-surface/5 transition-all">
+                  <ArrowUpRight className="w-4 h-4" />
+                  View Full Brochure
+                </a>
+              )}
+            </motion.div>
           )}
 
-          {/* ── Lead capture + CTAs ── */}
-          <div className="space-y-4 pb-4">
-            <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold">Reserve Your Interest</p>
+          {/* ══ INVESTMENT TAB ════════════════════════════════════════════ */}
+          {activeTab === 'investment' && (
+            <motion.div key="investment" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="px-6 py-4 space-y-6 pb-28">
 
-            {leadSubmitted ? (
-              <div className="p-6 rounded-2xl bg-primary/5 border border-primary/10 text-center space-y-2">
-                <div className="w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center mx-auto">
-                  <Check className="w-5 h-5 text-primary" />
-                </div>
-                <p className="text-sm font-bold text-on-surface">We'll be in touch soon.</p>
-                <p className="text-[11px] text-secondary/50">Our team will reach out within 24 hours.</p>
+              {/* Pricing hero */}
+              <div className="rounded-3xl bg-gradient-to-br from-primary/10 to-surface-container border border-primary/20 p-6">
+                <p className="text-[9px] uppercase tracking-[0.5em] text-primary/70 font-bold mb-1">Exclusive Member Price</p>
+                <p className="text-4xl font-headline font-bold text-on-surface">{sanctuary.memberPrice}</p>
+                {sanctuary.pricePerSqYd && (
+                  <p className="text-sm text-primary/60 mt-1">@ ₹{sanctuary.pricePerSqYd.toLocaleString('en-IN')} / sq yd</p>
+                )}
+                {sanctuary.valuation && sanctuary.valuation !== sanctuary.memberPrice && (
+                  <p className="text-xs text-secondary/40 line-through mt-0.5">Market: {sanctuary.valuation}</p>
+                )}
               </div>
-            ) : (
-              <form onSubmit={handleLeadSubmit} className="space-y-3">
-                <input type="text" placeholder="Your Name" value={leadName}
-                  onChange={e => setLeadName(e.target.value)}
-                  className="w-full bg-surface-container-low border border-outline/15 rounded-xl px-4 py-3.5 text-sm text-on-surface placeholder-secondary/30 focus:outline-none focus:border-primary/50 transition-colors" />
-                <input type="tel" placeholder="Phone Number" value={leadPhone}
-                  onChange={e => setLeadPhone(e.target.value)}
-                  className="w-full bg-surface-container-low border border-outline/15 rounded-xl px-4 py-3.5 text-sm text-on-surface placeholder-secondary/30 focus:outline-none focus:border-primary/50 transition-colors" />
-                <button type="submit" disabled={leadLoading || !leadName.trim() || !leadPhone.trim()}
-                  className="w-full py-4 bg-primary text-on-primary text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all flex items-center justify-center gap-3 disabled:opacity-50">
-                  <ArrowRight className="w-4 h-4" />
-                  {leadLoading ? 'Sending…' : 'Request Site Visit'}
-                </button>
-              </form>
-            )}
 
-            {sanctuary.brochureUrl && (
-              <a href={sanctuary.brochureUrl} target="_blank" rel="noopener noreferrer"
-                className="w-full py-3.5 border border-outline/20 text-on-surface text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl hover:bg-primary/5 transition-all flex items-center justify-center gap-3">
-                <ArrowRight className="w-4 h-4" />
-                View Full Brochure
-              </a>
-            )}
-          </div>
-        </div>
+              {/* Price calculator */}
+              {sanctuary.pricePerSqYd && (
+                <div>
+                  <p className="text-[9px] uppercase tracking-[0.5em] text-secondary/60 font-bold mb-3">Price Calculator</p>
+                  <div className="rounded-2xl overflow-hidden border border-outline/10">
+                    {[
+                      { label: 'Smallest Plot', sqYds: 808 },
+                      { label: 'Typical Plot', sqYds: 1300 },
+                      { label: 'Large Plot', sqYds: 2000 },
+                      { label: 'Premium Plot', sqYds: 3000 },
+                      { label: 'Largest Plot', sqYds: 5097 },
+                    ].map((row, i) => {
+                      const totalRs = row.sqYds * sanctuary.pricePerSqYd!;
+                      const display = totalRs >= 1e7 ? `₹${(totalRs / 1e7).toFixed(2)} Cr` : `₹${(totalRs / 1e5).toFixed(1)} L`;
+                      return (
+                        <div key={i} className={cn("grid grid-cols-3 px-4 py-3.5 text-[10px]", i % 2 === 0 ? "bg-on-surface/3" : "bg-transparent")}>
+                          <span className="text-secondary font-medium">{row.label}</span>
+                          <span className="text-center font-bold text-on-surface/70">{row.sqYds.toLocaleString('en-IN')} sq yds</span>
+                          <span className="text-right font-bold text-primary">{display}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Early investor ROI */}
+              {sanctuary.id === 'agartha' && (
+                <div>
+                  <p className="text-[9px] uppercase tracking-[0.5em] text-secondary/60 font-bold mb-3">Early Investor Returns</p>
+                  <div className="rounded-2xl border border-outline/10 bg-on-surface/3 p-5 space-y-4">
+                    <div className="grid grid-cols-2 gap-3">
+                      {[
+                        { label: 'Pre-Launch Rate (2022)', val: `₹${AGARTHA_OLD_RATE.toLocaleString('en-IN')}/sq yd`, color: 'text-white/60' },
+                        { label: 'Current Rate (2024)', val: `₹${AGARTHA_NOW_RATE.toLocaleString('en-IN')}/sq yd`, color: 'text-primary' },
+                      ].map(r => (
+                        <div key={r.label} className="bg-white/4 rounded-xl p-3 text-center border border-white/5">
+                          <p className="text-[7px] uppercase tracking-wider text-white/30 font-bold mb-1">{r.label}</p>
+                          <p className={cn("text-sm font-bold", r.color)}>{r.val}</p>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="bg-primary/10 rounded-xl p-4 flex items-center justify-between border border-primary/20">
+                      <div>
+                        <p className="text-[8px] uppercase tracking-widest text-primary/60 font-bold">Appreciation (2 years)</p>
+                        <p className="text-2xl font-headline font-bold text-primary mt-0.5">
+                          +{(((AGARTHA_NOW_RATE - AGARTHA_OLD_RATE) / AGARTHA_OLD_RATE) * 100).toFixed(1)}%
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-[8px] uppercase tracking-widest text-primary/40 font-bold">Per Annum</p>
+                        <p className="text-lg font-headline font-bold text-primary/80">
+                          +{((((AGARTHA_NOW_RATE - AGARTHA_OLD_RATE) / AGARTHA_OLD_RATE) * 100) / 2).toFixed(1)}% p.a.
+                        </p>
+                      </div>
+                    </div>
+                    <p className="text-[10px] text-white/30 leading-relaxed">
+                      An investor who booked at pre-launch in 2022 has seen paper gains purely through land value appreciation - without any development or rental income. Today's buyers sit at the same inflection point for the next cycle.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Site visit form */}
+              <div>
+                <p className="text-[9px] uppercase tracking-[0.5em] text-secondary/60 font-bold mb-3">Reserve Your Interest</p>
+                {leadSubmitted ? (
+                  <div className="p-6 rounded-2xl bg-primary/8 border border-primary/15 text-center space-y-2">
+                    <div className="w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center mx-auto">
+                      <Check className="w-5 h-5 text-primary" />
+                    </div>
+                    <p className="text-sm font-bold text-on-surface">We'll be in touch soon.</p>
+                    <p className="text-[11px] text-secondary/60">Our team will reach out within 24 hours.</p>
+                  </div>
+                ) : (
+                  <form onSubmit={handleLeadSubmit} className="space-y-3">
+                    <input type="text" placeholder="Your Name" value={leadName} onChange={e => setLeadName(e.target.value)}
+                      className="w-full bg-on-surface/5 border border-outline/20 rounded-xl px-4 py-3.5 text-sm text-on-surface placeholder:text-secondary/40 focus:outline-none focus:border-primary/50 transition-colors" />
+                    <input type="tel" placeholder="Phone Number" value={leadPhone} onChange={e => setLeadPhone(e.target.value)}
+                      className="w-full bg-on-surface/5 border border-outline/20 rounded-xl px-4 py-3.5 text-sm text-on-surface placeholder:text-secondary/40 focus:outline-none focus:border-primary/50 transition-colors" />
+                    <button type="submit" disabled={leadLoading || !leadName.trim() || !leadPhone.trim()}
+                      className="w-full py-4 bg-primary text-on-primary text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl hover:bg-primary/90 transition-all flex items-center justify-center gap-3 disabled:opacity-50">
+                      <ArrowRight className="w-4 h-4" />
+                      {leadLoading ? 'Sending ' : 'Request Site Visit'}
+                    </button>
+                  </form>
+                )}
+              </div>
+            </motion.div>
+          )}
+
+        </AnimatePresence>
       </div>
 
-      {/* ── Timed newsletter prompt (slides up after 25s) ── */}
-      <AnimatePresence>
-        {showNewsletterPrompt && !nlDone && (
-          <motion.div
-            initial={{ y: '100%', opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: '100%', opacity: 0 }}
-            transition={{ type: 'spring', damping: 28, stiffness: 220 }}
-            className="absolute bottom-0 left-0 right-0 bg-[#0a0f07] border-t border-primary/20 px-6 py-5 z-10"
-          >
-            <button onClick={() => setShowNewsletterPrompt(false)}
-              className="absolute top-3 right-4 p-1 text-white/30 hover:text-white/60 transition-colors">
-              <X className="w-4 h-4" />
-            </button>
-            <p className="text-[8px] uppercase tracking-[0.5em] text-primary/60 font-bold mb-1">Still exploring?</p>
-            <p className="text-sm font-headline font-bold text-white mb-3">
-              Get exclusive {sanctuary.title} updates — pricing alerts, site visit slots &amp; VIP access.
-            </p>
-            <form onSubmit={handleNlSubmit} className="flex gap-2">
-              <input
-                type="email" placeholder="your@email.com" value={nlEmail}
-                onChange={e => setNlEmail(e.target.value)}
-                className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-primary/50 transition-colors"
-              />
-              <button type="submit" disabled={nlLoading || !nlEmail.trim()}
-                className="px-4 py-2.5 bg-primary text-on-primary text-[9px] uppercase tracking-widest font-bold rounded-xl hover:bg-primary/90 transition-all disabled:opacity-50 flex-shrink-0">
-                {nlLoading ? '…' : 'Notify Me'}
-              </button>
-            </form>
-          </motion.div>
+      {/* ── STICKY BOTTOM CTA ────────────────────────────────────────── */}
+      <div className="flex-shrink-0 px-6 py-4 bg-surface border-t border-outline/10 flex gap-3">
+        <button
+          onClick={() => setActiveTab('investment')}
+          className="flex-1 py-3.5 bg-primary text-on-primary text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl hover:bg-primary/90 transition-all flex items-center justify-center gap-2"
+        >
+          <ArrowRight className="w-4 h-4" />
+          Express Interest
+        </button>
+        {sanctuary.brochureUrl && (
+          <a href={sanctuary.brochureUrl} target="_blank" rel="noopener noreferrer"
+            className="py-3.5 px-5 border border-outline/20 text-secondary text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl hover:bg-on-surface/5 transition-all flex items-center gap-2">
+            <ArrowUpRight className="w-4 h-4" />
+          </a>
         )}
-        {nlDone && showNewsletterPrompt && (
-          <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
-            transition={{ type: 'spring', damping: 28, stiffness: 220 }}
-            className="absolute bottom-0 left-0 right-0 bg-[#0a0f07] border-t border-primary/20 px-6 py-5 z-10 flex items-center gap-3">
-            <Check className="w-5 h-5 text-primary flex-shrink-0" />
-            <div>
-              <p className="text-sm font-bold text-white">You're on the list.</p>
-              <p className="text-[10px] text-white/40">We'll reach out within 24 hours.</p>
-            </div>
-            <button onClick={() => setShowNewsletterPrompt(false)} className="ml-auto text-white/30 hover:text-white/60">
-              <X className="w-4 h-4" />
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      </div>
     </motion.div>
   );
 };
+
 
 /**
  * Renders a CSS backdrop-filter blur + dark veil that covers everything
@@ -2568,17 +2574,17 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
 
   // ── Clean-air sources near forests & water bodies (negative = blue) ──────
   const CLEAN_AIR_ZONES = [
-    { lat: 17.74, lng: 78.28, strength: 0.90 }, // Narsapur Forest Reserve   ← Agartha
-    { lat: 17.37, lng: 78.29, strength: 0.80 }, // Osman Sagar / Gandipet    ← Neo-Vertex corridor
+    { lat: 17.74, lng: 78.28, strength: 0.90 }, // Narsapur Forest Reserve     Agartha
+    { lat: 17.37, lng: 78.29, strength: 0.80 }, // Osman Sagar / Gandipet      Neo-Vertex corridor
     { lat: 17.31, lng: 78.31, strength: 0.75 }, // Himayat Sagar reservoir
     { lat: 17.35, lng: 78.34, strength: 0.70 }, // Mrugavani National Park
     { lat: 17.33, lng: 78.58, strength: 0.60 }, // Mahavir Harina Vanasthali
     { lat: 17.52, lng: 78.33, strength: 0.65 }, // Ameenpur Lake biodiversity site
     { lat: 17.31, lng: 77.85, strength: 0.65 }, // Ananthagiri Hills
-    { lat: 17.24, lng: 78.48, strength: 0.55 }, // Tukkuguda green belt        ← SYL
+    { lat: 17.24, lng: 78.48, strength: 0.55 }, // Tukkuguda green belt          SYL
   ];
 
-  // ── Net AQI intensity: range -0.5 (very clean/blue) → +1.0 (polluted/red)
+  // ── Net AQI intensity: range -0.5 (very clean/blue) - +1.0 (polluted/red)
   const getIntensity = (
     point: { lat: number; lng: number },
     hotspots: { lat: number; lng: number; intensity: number }[],
@@ -2638,8 +2644,8 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
     return () => clearInterval(interval);
   }, []);
 
-  // Generate a grid of points for the "Real-time Mesh"
-  // Each point pre-computes a boundaryFade (0–1) so the AQI heatmap blends
+  // Generate a grid of points for the Real-time Mesh"
+  // Each point pre-computes a boundaryFade (0 "1) so the AQI heatmap blends
   // smoothly into the RRR boundary rather than cutting off abruptly.
   const gridPoints = useMemo(() => {
     const points: { lat: number; lng: number; boundaryFade: number }[] = [];
@@ -2675,7 +2681,7 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
     return points;
   }, [isTelanganaView, currentZoom]);
 
-  // Hyderabad Outer Ring Road (ORR) — refined 158 km trace aligned to satellite road
+  // Hyderabad Outer Ring Road (ORR) - refined 158 km trace aligned to satellite road
   const ORR_PATH: [number, number][] = [
     [17.4218, 78.3412], // E1  Gachibowli SW
     [17.4150, 78.3250], // Narsingi W
@@ -2736,7 +2742,7 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
     [17.4218, 78.3412], // Close at Gachibowli
   ];
 
-  // Hyderabad Regional Ring Road (RRR) — GPS-accurate outer trace
+  // Hyderabad Regional Ring Road (RRR) - GPS-accurate outer trace
   const RRR_PATH: [number, number][] = [
     // Starting from north-west, going clockwise
     [17.5800, 78.0500], // Sangareddy west
@@ -2792,13 +2798,13 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
     [17.5800, 78.0500], // Close at Sangareddy west
   ];
 
-  // Radial National Highways & expressways — ORR junctions → RRR junctions
+  // Radial National Highways & expressways - ORR junctions - RRR junctions
   // All share the same amber highway colour as ORR/RRR
   const HIGHWAYS: { id: string; name: string; path: [number, number][] }[] = [
     {
       id: 'nh-65',
       name: 'NH 65',
-      // Mumbai / Pune (NW): city → ORR Patancheru (E3) → RRR Sangareddy
+      // Mumbai / Pune (NW): city - ORR Patancheru (E3) - RRR Sangareddy
       path: [
         [17.430, 78.430],
         [17.456, 78.384],
@@ -2814,7 +2820,7 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
     {
       id: 'nh-44-s',
       name: 'NH 44',
-      // Bangalore / Chennai (S): city → ORR Shamshabad (E15) → RRR south
+      // Bangalore / Chennai (S): city - ORR Shamshabad (E15) - RRR south
       path: [
         [17.415, 78.468],
         [17.375, 78.470],
@@ -2828,7 +2834,7 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
     {
       id: 'nh-163',
       name: 'NH 163',
-      // Vijayawada (E): city → ORR Ghatkesar (E9) → RRR Bhongir
+      // Vijayawada (E): city - ORR Ghatkesar (E9) - RRR Bhongir
       path: [
         [17.440, 78.502],
         [17.455, 78.555],
@@ -2843,7 +2849,7 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
     {
       id: 'nh-44-n',
       name: 'NH 44',
-      // Nagpur (N): city → ORR Medchal (E6) → RRR Toopran
+      // Nagpur (N): city - ORR Medchal (E6) - RRR Toopran
       path: [
         [17.460, 78.462],
         [17.508, 78.460],
@@ -2870,7 +2876,7 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
     {
       id: 'sagar-hwy',
       name: 'Sagar Highway',
-      // SE corridor: city → ORR → RRR Ibrahimpatnam
+      // SE corridor: city - ORR - RRR Ibrahimpatnam
       path: [
         [17.418, 78.492],
         [17.398, 78.510],
@@ -2885,13 +2891,13 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
   ];
 
   // Research-verified Government Reserve Forests, National Parks & Protected Water Bodies
-  // Polygons shaped to satellite imagery — all within or adjacent to RRR corridor
+  // Polygons shaped to satellite imagery - all within or adjacent to RRR corridor
   const NATURAL_FEATURES = [
 
-    // ── RESERVE FORESTS (NORTH) ─────────────────────────────────────────────
+    // ── RESERVE FORESTS (NORTH) ──────────────────────────────────────────── 
 
     // 1. Narsapur-Toopran Reserved Forest Complex (~30 sq km, Medak Division)
-    // Directly adjacent to MODCON Agartha — the primary ecological asset
+    // Directly adjacent to MODCON Agartha - the primary ecological asset
     {
       id: "narsapur-rf",
       type: 'forest',
@@ -2922,7 +2928,7 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
       area: "680 ha"
     },
 
-    // 3. Mulugu Reserved Forest (Siddipet — RRR northern transit)
+    // 3. Mulugu Reserved Forest (Siddipet - RRR northern transit)
     {
       id: "mulugu-rf",
       type: 'forest',
@@ -2933,13 +2939,13 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
         [17.810, 78.590], [17.790, 78.580], [17.780, 78.558], [17.788, 78.530],
         [17.805, 78.515]
       ] as [number, number][],
-      description: "Designated RF along Siddipet range — key forest diversion zone identified in RRR northern corridor EIA.",
+      description: "Designated RF along Siddipet range - key forest diversion zone identified in RRR northern corridor EIA.",
       area: "520 ha"
     },
 
     // ── NATIONAL PARKS & WILDLIFE SANCTUARIES ──────────────────────────────
 
-    // 4. KBR National Park (Inside ORR — Jubilee Hills)
+    // 4. KBR National Park (Inside ORR - Jubilee Hills)
     {
       id: "kbr-national-park",
       type: 'forest',
@@ -2984,10 +2990,10 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
       area: "1,400 ha"
     },
 
-    // ── RESERVE FORESTS (SOUTH & WEST) ─────────────────────────────────────
+    // ── RESERVE FORESTS (SOUTH & WEST) ──────────────────────────────────── 
 
-    // 7. Ananthagiri Hills Reserved Forest Complex (Vikarabad — 6,124 ha)
-    // Largest forest block in Hyderabad metro — origin of Musi river
+    // 7. Ananthagiri Hills Reserved Forest Complex (Vikarabad ? 6,124 ha)
+    // Largest forest block in Hyderabad metro - origin of Musi river
     {
       id: "ananthagiri-rf",
       type: 'forest',
@@ -3047,7 +3053,7 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
       area: "290 ha"
     },
 
-    // 11. Dalmia RF — Maheswaram/Kandukur (South RRR corridor)
+    // 11. Dalmia RF - Maheswaram/Kandukur (South RRR corridor)
     {
       id: "dalmia-rf",
       type: 'forest',
@@ -3061,7 +3067,7 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
       area: "385 ha"
     },
 
-    // 12. Kothiyal-Kappa Pahad RF (NE — Siddipet/Yadadri corridor)
+    // 12. Kothiyal-Kappa Pahad RF (NE - Siddipet/Yadadri corridor)
     {
       id: "kothiyal-rf",
       type: 'forest',
@@ -3076,7 +3082,7 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
       area: "610 ha"
     },
 
-    // 13. Yadadri Green Hills (Eastern RRR — pilgrim forest buffer)
+    // 13. Yadadri Green Hills (Eastern RRR - pilgrim forest buffer)
     {
       id: "yadadri-hills",
       type: 'forest',
@@ -3093,7 +3099,7 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
 
     // ── GOVERNMENT-DESIGNATED LAKES & WATER BODIES ────────────────────────
 
-    // 14. Osman Sagar (Gandipet) — Protected reservoir + catchment forest
+    // 14. Osman Sagar (Gandipet) - Protected reservoir + catchment forest
     {
       id: "osman-sagar",
       type: 'lake',
@@ -3108,7 +3114,7 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
       area: "3,048 ha (reservoir)"
     },
 
-    // 15. Himayat Sagar — Protected reservoir
+    // 15. Himayat Sagar - Protected reservoir
     {
       id: "himayat-sagar",
       type: 'lake',
@@ -3123,7 +3129,7 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
       area: "2,748 ha (reservoir)"
     },
 
-    // 16. Hussain Sagar — Central government lake
+    // 16. Hussain Sagar - Central government lake
     {
       id: "hussain-sagar",
       type: 'lake',
@@ -3137,7 +3143,7 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
       area: "1,600 ha"
     },
 
-    // 17. Ameenpur Lake — India's first biodiversity heritage lake
+    // 17. Ameenpur Lake - India's first biodiversity heritage lake
     {
       id: "ameenpur-lake",
       type: 'lake',
@@ -3254,7 +3260,7 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
     // Always show sanctuaries, show others based on filter
     return locations.filter(loc => {
       if (loc.type === 'sanctuary') return activeFilters.has('sanctuaries');
-      return false; // ORR/RRR exits hidden — not in active filter set
+      return false; // ORR/RRR exits hidden - not in active filter set
     });
   }, [activeFilters]); // locations is stable per render
 
@@ -3314,7 +3320,7 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
         )}
 
 
-        {/* Live AQI badge — visible when AQI Live filter is active */}
+        {/* Live AQI badge - visible when AQI Live filter is active */}
         <AnimatePresence>
           {showAqi && (
             <motion.div
@@ -3354,7 +3360,7 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
                   className={cn(
                     "flex-shrink-0 flex items-center gap-1.5 h-9 px-3.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-colors duration-200 whitespace-nowrap border cursor-pointer select-none",
                     isActive
-                      ? "bg-primary text-on-primary border-transparent shadow-lg shadow-primary/30"
+             ? "bg-primary text-on-primary border-transparent shadow-lg shadow-primary/30"
                       : "bg-surface/90 backdrop-blur-md text-secondary border-outline/20 shadow-md hover:border-primary/50 hover:text-primary hover:bg-surface"
                   )}
                 >
@@ -3392,7 +3398,7 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
                 positions={feature.boundary}
                 interactive={false}
                 pathOptions={isForest ? {
-                  // Olive-mint — matches site palette (olive-900 / primary green)
+                  // Olive-mint - matches site palette (olive-900 / primary green)
                   fillColor: '#3d5c35',
                   fillOpacity: 0.12,
                   color: '#4a6741',
@@ -3402,7 +3408,7 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
                   lineCap: 'round',
                   lineJoin: 'round',
                 } : {
-                  // Slate-blue — muted water tone
+                  // Slate-blue - muted water tone
                   fillColor: '#334e68',
                   fillOpacity: 0.14,
                   color: '#4a6fa5',
@@ -3417,13 +3423,13 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
           <MapController targetView={targetView} />
           <ZoomTracker onZoom={setCurrentZoom} />
           {isSatellite ? (
-            /* Pure satellite — no Google labels/POIs/restaurant names */
+            /* Pure satellite - no Google labels/POIs/restaurant names */
             <TileLayer
               attribution="&copy; Google Maps"
               url="https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}"
             />
           ) : (
-            /* Google Maps road layer — real NH numbers, highways at every zoom */
+            /* Google Maps road layer - real NH numbers, highways at every zoom */
             <TileLayer
               attribution="&copy; Google Maps"
               url="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"
@@ -3433,16 +3439,19 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
 
 
 
-          {/* Real-time Environmental Mesh — blue near forests, red near industry */}
+          {/* Real-time Environmental Mesh - blue near forests, red near industry */}
           {gridPoints.map((point, idx) => {
             const net = getIntensity(point, AQI_HOTSPOTS, CLEAN_AIR_ZONES);
             const pulseFactor = Math.sin((idx + livePulse) * 0.1) * 0.03;
-            // 5-band colour scale: red → orange → yellow → green → blue
-            const fillColor = net > 0.55  ? '#ef4444'  // red   — very polluted
-                            : net > 0.28  ? '#f97316'  // orange — polluted
-                            : net > 0.08  ? '#eab308'  // yellow — moderate
-                            : net > -0.12 ? '#4ade80'  // green  — good
-                            :               '#3b82f6'; // blue   — very clean / forest zone
+            // 5-band colour scale: red - orange - yellow - green - blue
+            const fillColor = net > 0.55
+             ? '#ef4444'  // red   - very polluted
+                            : net > 0.28
+             ? '#f97316'  // orange - polluted
+                            : net > 0.08
+             ? '#eab308'  // yellow - moderate
+                            : net > -0.12 ? '#4ade80'  // green  - good
+                            :               '#3b82f6'; // blue   - very clean / forest zone
             // Opacity scales with absolute deviation from 0; always slightly visible
             const fillOpacity = (Math.abs(net) * 0.22 + 0.04 + pulseFactor) * point.boundaryFade;
 
@@ -3475,7 +3484,7 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
             </React.Fragment>
           ))}
 
-          {/* ── ORR — solid amber line, matches satellite road ─────────────────── */}
+          {/* ── ORR - solid amber line, matches satellite road ── */}
           {/* glow */}
           <Polyline positions={ORR_PATH} pathOptions={{ color: '#d97706', weight: 16, opacity: 0.10, lineCap: 'round' }} />
           {/* casing */}
@@ -3483,7 +3492,7 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
           {/* centre stripe */}
           <Polyline positions={ORR_PATH} pathOptions={{ color: '#fcd34d', weight: 2,  opacity: 0.85, lineCap: 'round' }} />
 
-          {/* ── RRR — same amber family, longer dash = proposed alignment ─────── */}
+          {/* ── RRR - same amber family, longer dash = proposed alignment ── */}
           {/* glow */}
           <Polyline positions={RRR_PATH} pathOptions={{ color: '#d97706', weight: 12, opacity: 0.08, lineCap: 'round' }} />
           {/* casing */}
@@ -3491,96 +3500,68 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
           {/* centre stripe */}
           <Polyline positions={RRR_PATH} pathOptions={{ color: '#fcd34d', weight: 1.5, opacity: 0.65, dashArray: '14, 10', lineCap: 'round' }} />
 
-          {/* Outside-RRR blur overlay — backdrop-filter blur + dark veil,
+          {/* Outside-RRR blur overlay - backdrop-filter blur + dark veil,
               clipped to the exterior via clip-path:path(evenodd) */}
           <RRRBlurOverlay rrrPath={RRR_PATH} />
 
 
 
-          {/* ── ORR exits — always visible, zoom-responsive labels ─────────── */}
+          {/* ── ORR exits - always visible, zoom-responsive labels ── */}
           {locations.filter(l => l.type === 'exit').map(loc => (
             <Marker
               key={loc.id}
               position={loc.coords}
               icon={L.divIcon({
                 className: '',
-                html: currentZoom >= 11
-                  ? `<div style="
-                      display:flex;align-items:center;gap:5px;
-                      background:#faf9f6;border:1.5px solid #2d3a1d;
-                      border-radius:20px;padding:3px 8px;
-                      box-shadow:0 2px 8px rgba(0,0,0,0.18);
-                      font-size:9px;font-weight:800;color:#1a2410;
-                      text-transform:uppercase;letter-spacing:0.05em;
-                      white-space:nowrap;
-                    ">
-                      <div style="width:6px;height:6px;border-radius:50%;background:#d97706;flex-shrink:0;"></div>
+                html: currentZoom >= 11 ? `<div style="font-size:11px; font-weight:600; color:white; background:#d97706; padding:2px 8px; border-radius:10px;"></div>
                       ${loc.title.replace('ORR ', 'ORR ')}
                     </div>`
-                  : `<div style="
-                      width:10px;height:10px;border-radius:50%;
-                      background:#d97706;border:1.5px solid #faf9f6;
-                      box-shadow:0 1px 4px rgba(0,0,0,0.3);
-                    "></div>`,
+                  : `<div style={{ fontSize: "11px", lineHeight: "1.2", fontWeight: 600, color: "white", textShadow: "0 1px 3px rgba(0,0,0,0.4)", letterSpacing: "0.05em" }}></div>`,
                 iconSize: currentZoom >= 11 ? [90, 22] : [10, 10],
                 iconAnchor: currentZoom >= 11 ? [45, 11] : [5, 5],
                 popupAnchor: [0, -14],
               })}
             >
               <Popup className="custom-popup">
-                <div style="padding:12px 14px;min-width:160px;">
-                  <div style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:#1a2410;margin-bottom:4px;">{loc.title}</div>
-                  <div style="font-size:9px;color:#586062;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;">{loc.location}</div>
-                  <div style="display:flex;align-items:center;gap:6px;">
-                    <div style="width:8px;height:8px;border-radius:50%;background:${(loc.aqi ?? 0) <= 50 ? '#4ade80' : (loc.aqi ?? 0) <= 100 ? '#86efac' : (loc.aqi ?? 0) <= 150 ? '#fbbf24' : '#ef4444'};flex-shrink:0;"></div>
-                    <span style="font-size:9px;font-weight:700;text-transform:uppercase;color:#1a2410;">AQI ${loc.aqi ?? 'N/A'}</span>
+                <div style={{ fontSize: "11px", lineHeight: "1.2", fontWeight: 600, color: "white", textShadow: "0 1px 3px rgba(0,0,0,0.4)", letterSpacing: "0.05em" }}>
+                  <div style={{ fontSize: "11px", lineHeight: "1.2", fontWeight: 600, color: "white", textShadow: "0 1px 3px rgba(0,0,0,0.4)", letterSpacing: "0.05em" }}>{loc.title}</div>
+                  <div style={{ fontSize: "11px", lineHeight: "1.2", fontWeight: 600, color: "white", textShadow: "0 1px 3px rgba(0,0,0,0.4)", letterSpacing: "0.05em" }}>{loc.location}</div>
+                  <div style={{ fontSize: "11px", lineHeight: "1.2", fontWeight: 600, color: "white", textShadow: "0 1px 3px rgba(0,0,0,0.4)", letterSpacing: "0.05em" }}>
+                    <div style={{ fontSize: "11px", lineHeight: "1.2", fontWeight: 600, color: "white", textShadow: "0 1px 3px rgba(0,0,0,0.4)", letterSpacing: "0.05em" }}></div>
+                    <span style={{ fontSize: "11px", lineHeight: "1.2", fontWeight: 600, color: "white", textShadow: "0 1px 3px rgba(0,0,0,0.4)", letterSpacing: "0.05em" }}>AQI ${loc.aqi ?? 'N/A'}</span>
                   </div>
                 </div>
               </Popup>
             </Marker>
           ))}
 
-          {/* ── RRR exits — always visible ─────────────────────────────────── */}
+          {/* ── RRR exits - always visible ── */}
           {locations.filter(l => l.type === 'rrr-exit').map(loc => (
             <Marker
               key={loc.id}
               position={loc.coords}
               icon={L.divIcon({
                 className: '',
-                html: currentZoom >= 9
-                  ? `<div style="
-                      display:flex;align-items:center;gap:5px;
-                      background:#1a2410;border:1.5px solid #fcd34d;
-                      border-radius:20px;padding:3px 9px;
-                      box-shadow:0 2px 10px rgba(0,0,0,0.3);
-                      font-size:8px;font-weight:900;color:#faf9f6;
-                      text-transform:uppercase;letter-spacing:0.06em;
-                      white-space:nowrap;
-                    ">
-                      <div style="width:5px;height:5px;border-radius:50%;background:#fcd34d;flex-shrink:0;"></div>
-                      RRR · ${loc.location}
+                html: currentZoom >= 9 ? `<div style="font-size:11px;font-weight:600;color:white;text-shadow:0 1px 3px rgba(0,0,0,0.4);letter-spacing:0.05em;"><div style="width:5px;height:5px;border-radius:50%;background:#fcd34d;flex-shrink:0;"></div></div>
+                      RRR  ${loc.location}
                     </div>`
-                  : `<div style="
-                      width:8px;height:8px;border-radius:50%;
-                      background:#fcd34d;border:1.5px solid #1a2410;
-                      box-shadow:0 1px 4px rgba(0,0,0,0.3);
-                    "></div>`,
+                  : `<div style={{ fontSize: "11px", lineHeight: "1.2", fontWeight: 600, color: "white", textShadow: "0 1px 3px rgba(0,0,0,0.4)", letterSpacing: "0.05em" }}></div>`,
                 iconSize: currentZoom >= 9 ? [110, 20] : [8, 8],
                 iconAnchor: currentZoom >= 9 ? [55, 10] : [4, 4],
                 popupAnchor: [0, -12],
               })}
             >
               <Popup className="custom-popup">
-                <div style="padding:12px 14px;min-width:160px;">
-                  <div style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:#1a2410;margin-bottom:4px;">RRR Proposed Exit</div>
-                  <div style="font-size:9px;color:#586062;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;">{loc.location}</div>
-                  <div style="font-size:8px;color:#2d3a1d;font-weight:700;">Proposed alignment. Under construction.</div>
+                <div style={{ fontSize: "11px", lineHeight: "1.2", fontWeight: 600, color: "white", textShadow: "0 1px 3px rgba(0,0,0,0.4)", letterSpacing: "0.05em" }}>
+                  <div style={{ fontSize: "11px", lineHeight: "1.2", fontWeight: 600, color: "white", textShadow: "0 1px 3px rgba(0,0,0,0.4)", letterSpacing: "0.05em" }}>RRR Proposed Exit</div>
+                  <div style={{ fontSize: "11px", lineHeight: "1.2", fontWeight: 600, color: "white", textShadow: "0 1px 3px rgba(0,0,0,0.4)", letterSpacing: "0.05em" }}>{loc.location}</div>
+                  <div style={{ fontSize: "11px", lineHeight: "1.2", fontWeight: 600, color: "white", textShadow: "0 1px 3px rgba(0,0,0,0.4)", letterSpacing: "0.05em" }}>Proposed alignment. Under construction.</div>
                 </div>
               </Popup>
             </Marker>
           ))}
 
-          {/* ── Sanctuary markers (filter-gated) ─────────────────────────── */}
+          {/* ── Sanctuary markers (filter-gated) ── */}
           {filteredLocations.map((loc) => {
             const isPremium = loc.type === 'sanctuary';
             if (!isPremium) return null;
@@ -3639,47 +3620,34 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
                 position={zone.coords as [number, number]}
                 icon={L.divIcon({
                   className: '',
-                  html: `<div style="position:relative;display:flex;align-items:center;justify-content:center;width:40px;height:40px;">
-                    ${isCritical ? `<div style="position:absolute;inset:0;border-radius:50%;background:${ringColor};opacity:0.25;animation:ping 1.5s cubic-bezier(0,0,0.2,1) infinite;"></div>` : ''}
-                    <div style="
-                      width:${isCritical ? 32 : isHigh ? 28 : 24}px;
-                      height:${isCritical ? 32 : isHigh ? 28 : 24}px;
-                      background:${bgColor};
-                      border: 2px solid ${ringColor};
-                      border-radius:50%;
-                      display:flex;align-items:center;justify-content:center;
-                      box-shadow: 0 0 12px ${ringColor}88, 0 2px 8px rgba(0,0,0,0.4);
-                      position:relative;z-index:1;
-                    ">
-                      <span style="font-size:9px;font-weight:900;color:${textColor};letter-spacing:0;">${zone.aqi}</span>
-                    </div>
-                  </div>`,
-                  iconSize: [40, 40],
-                  iconAnchor: [20, 20],
-                  popupAnchor: [0, -22],
+                  html: `<div style="background-color: ${bgColor}; width: 32px; height: 32px; border-radius: 50%; border: 3px solid ${ringColor}; display: flex; items-center: center; justify-content: center; box-shadow: 0 0 20px ${ringColor}44;">
+                          <div style="font-size: 10px; font-weight: 900; color: ${textColor};">${zone.aqi}</div>
+                         </div>`,
+                  iconSize: [32, 32],
+                  iconAnchor: [16, 16],
+                  popupAnchor: [0, -16],
                 })}
               >
                 <Popup className="custom-popup">
-                  <div style="padding:14px 16px;min-width:200px;font-family:inherit;">
-                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-                      <div style="width:10px;height:10px;border-radius:50%;background:${ringColor};flex-shrink:0;"></div>
-                      <span style="font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:#1a1a1a;">${zone.name}</span>
+                  <div className="p-4 bg-surface text-on-surface">
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="font-headline font-bold text-base">${zone.name}</h4>
+                      <span className="px-2 py-0.5 bg-error/10 text-error text-[8px] uppercase font-bold rounded-full">${zone.tag}</span>
                     </div>
-                    <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.1em;color:#999;margin-bottom:12px;">${zone.tag}</div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
-                      <div style="background:${bgColor}22;border-radius:8px;padding:8px;text-align:center;">
-                        <div style="font-size:18px;font-weight:900;color:${ringColor};">${zone.aqi}</div>
-                        <div style="font-size:8px;text-transform:uppercase;letter-spacing:0.08em;color:#666;">AQI</div>
-                        <div style="font-size:7px;color:${ringColor};font-weight:700;margin-top:2px;">${aqiBand}</div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-[8px] uppercase tracking-widest text-secondary opacity-50 mb-1">AQI Status</p>
+                        <p className="text-xl font-headline font-bold">${zone.aqi}</p>
+                        <p className="text-[10px] text-error font-medium">${aqiBand}</p>
                       </div>
-                      <div style="background:#33333322;border-radius:8px;padding:8px;text-align:center;">
-                        <div style="font-size:18px;font-weight:900;color:#555;">${zone.noise}<span style="font-size:10px;">dB</span></div>
-                        <div style="font-size:8px;text-transform:uppercase;letter-spacing:0.08em;color:#666;">Noise</div>
-                        <div style="font-size:7px;color:#888;font-weight:700;margin-top:2px;">${zone.noise >= 85 ? 'Damaging' : zone.noise >= 75 ? 'Harmful' : 'Elevated'}</div>
+                      <div>
+                        <p className="text-[8px] uppercase tracking-widest text-secondary opacity-50 mb-1">Noise Level</p>
+                        <p className="text-xl font-headline font-bold">${zone.noise} dB</p>
                       </div>
                     </div>
-                    <div style="background:${ringColor}18;border:1px solid ${ringColor}44;border-radius:6px;padding:7px 10px;font-size:8px;color:#333;line-height:1.5;">
-                      ⚠ Health Risk: <strong style="color:${ringColor};text-transform:uppercase;">${zone.hazard}</strong> — prolonged exposure linked to respiratory illness, cardiovascular stress.
+                    <div className="mt-4 pt-4 border-t border-outline/10 text-[10px] leading-relaxed">
+                      <span className="text-error font-bold uppercase tracking-wider">Health Risk: </span>
+                      ${zone.hazard} - Significant cardiovascular and respiratory risk.
                     </div>
                   </div>
                 </Popup>
@@ -3692,7 +3660,7 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
   );
 };
 
-const Sanctuaries = ({ isSubscribed, onNewsletterClick, isFullPage = false, sanctuaries = SANCTUARIES }: { isSubscribed: boolean, onNewsletterClick: () => void, isFullPage?: boolean, sanctuaries?: Sanctuary[] }) => {
+const Sanctuaries = ({ isSubscribed, onNewsletterClick, isFullPage = false, sanctuaries = SANCTUARIES, onOpen }: { isSubscribed: boolean, onNewsletterClick: () => void, isFullPage?: boolean, sanctuaries?: Sanctuary[], onOpen?: (s: Sanctuary) => void }) => {
   const [selectedSanctuary, setSelectedSanctuary] = useState<Sanctuary | null>(null);
 
 
@@ -3719,7 +3687,7 @@ const Sanctuaries = ({ isSubscribed, onNewsletterClick, isFullPage = false, sanc
               sanctuary={s}
               isSubscribed={isSubscribed}
               onNewsletterClick={onNewsletterClick}
-              onOpen={() => setSelectedSanctuary(s)}
+              onOpen={() => { if (onOpen) onOpen(s); else setSelectedSanctuary(s); }}
             />
           ))}
         </div>
@@ -3756,7 +3724,7 @@ const Membership = () => {
         </svg>
       ),
       title: "Limited Collective",
-      desc: "A deliberately reserved investor circle — no public roster, no published count. Exclusivity is our core mandate."
+      desc: "A deliberately reserved investor circle - no public roster, no published count. Exclusivity is our core mandate."
     },
     {
       icon: (
@@ -3768,7 +3736,7 @@ const Membership = () => {
         </svg>
       ),
       title: "Project Scarcity",
-      desc: "A finite number of seats per project, never disclosed publicly. Early entry is not just an advantage — it's a prerequisite."
+      desc: "A finite number of seats per project, never disclosed publicly. Early entry is not just an advantage - it's a prerequisite."
     },
     {
       icon: (
@@ -3795,7 +3763,7 @@ const Membership = () => {
             </p>
             <div className="p-8 border border-gold/20 bg-gold/5 inline-block">
               <p className="text-gold text-[10px] uppercase tracking-[0.4em] font-bold mb-2">Current Capacity</p>
-              <p className="text-3xl font-serif italic">A Reserved Investor Circle — By Invitation Only</p>
+              <p className="text-3xl font-serif italic">A Reserved Investor Circle - By Invitation Only</p>
             </div>
           </div>
           
@@ -3881,9 +3849,9 @@ const NewsletterModal = ({ isOpen, onClose, onSubscribe }: { isOpen: boolean, on
 };
 
 const INVESTMENT_BRACKETS = [
-  '₹50 L – ₹1 Cr',
-  '₹1 Cr – ₹2 Cr',
-  '₹2 Cr – ₹5 Cr',
+  '₹50 L - ₹1 Cr',
+  '₹1 Cr - ₹2 Cr',
+  '₹2 Cr - ₹5 Cr',
   '₹5 Cr+',
   'Prefer not to say',
 ];
@@ -3914,7 +3882,7 @@ const ApplicationForm = () => {
           form.intent,
         ].filter(Boolean).join(' | '),
       });
-      // Auto-subscribe to newsletter — membership includes intelligence briefings
+      // Auto-subscribe to newsletter - membership includes intelligence briefings
       await saveNewsletter(form.email, 'modal');
       setSubmitted(true);
     } catch {/* silent */} finally {
@@ -3930,7 +3898,7 @@ const ApplicationForm = () => {
       <div className="max-w-6xl mx-auto">
         <div className="grid lg:grid-cols-5 gap-16 items-start">
 
-          {/* Left — copy */}
+          {/* Left - copy */}
           <div className="lg:col-span-2">
             <span className="text-[9px] uppercase tracking-[0.6em] text-olive-800/40 font-bold block mb-8">Private Membership</span>
             <h2 className="text-5xl md:text-6xl font-medium text-olive-900 leading-tight mb-8">
@@ -3959,7 +3927,7 @@ const ApplicationForm = () => {
             </p>
           </div>
 
-          {/* Right — form */}
+          {/* Right - form */}
           <div className="lg:col-span-3">
             {submitted ? (
               <motion.div
@@ -4014,7 +3982,7 @@ const ApplicationForm = () => {
                         className={cn(
                           "px-3 py-1.5 text-[9px] uppercase tracking-widest font-bold border transition-all rounded-lg",
                           form.investmentBracket === b
-                            ? "bg-olive-900 text-cream border-olive-900"
+             ? "bg-olive-900 text-cream border-olive-900"
                             : "border-olive-800/20 text-olive-800/50 hover:border-olive-800/50"
                         )}
                       >{b}</button>
@@ -4026,13 +3994,13 @@ const ApplicationForm = () => {
                   <label htmlFor="m-intent" className={labelCls}>Why do you seek this?</label>
                   <textarea id="m-intent" name="intent" value={form.intent} onChange={e => set('intent', e.target.value)} rows={3}
                     className={cn(inputCls, "resize-none border-b-0 border border-olive-800/20 px-4 py-3 rounded-lg mt-1")}
-                    placeholder="Optional — what draws you to pre-launch sanctuary investing?" />
+                    placeholder="Optional - what draws you to pre-launch sanctuary investing?" />
                 </div>
 
                 <button type="submit" disabled={loading}
                   className="w-full py-5 bg-olive-900 text-cream text-[10px] uppercase tracking-[0.5em] font-bold hover:bg-primary transition-all flex items-center justify-center gap-4 disabled:opacity-60">
                   {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <ArrowRight className="w-4 h-4" />}
-                  {loading ? 'Submitting…' : 'Request Adviser Call'}
+                  {loading ? 'Submitting ' : 'Request Adviser Call'}
                 </button>
 
                 <p className="text-[9px] text-center text-olive-800/25 uppercase tracking-widest">
@@ -4051,10 +4019,10 @@ const Footer = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
   const agenda = [
     { label: 'The Intelligence Gap', sub: 'Why early entry wins', mode: 'analytics' },
     { label: 'Living Ecosystems', sub: 'Nature-first design philosophy', mode: 'gallery' },
-    { label: 'Sanctuary Map', sub: 'Environmental heatmap · AQI · Noise', mode: 'map' },
-    { label: 'MODCON Agartha', sub: 'Narsapur Forest · Open access', mode: 'list' },
-    { label: 'SYL Villament', sub: 'Tukkuguda · Newsletter only', mode: 'syl' },
-    { label: 'Adviser Membership', sub: 'Reserved investor circle · By invitation', mode: 'membership' },
+    { label: 'Sanctuary Map', sub: 'Environmental heatmap  AQI  Noise', mode: 'map' },
+    { label: 'MODCON Agartha', sub: 'Narsapur Forest  Open access', mode: 'list' },
+    { label: 'SYL Villament', sub: 'Tukkuguda  Newsletter only', mode: 'syl' },
+    { label: 'Adviser Membership', sub: 'Reserved investor circle  By invitation', mode: 'membership' },
   ];
 
   return (
@@ -4097,7 +4065,7 @@ const Footer = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
         {/* Bottom bar */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           <p className="text-[9px] uppercase tracking-[0.5em] text-cream/15 font-bold">
-            © {new Date().getFullYear()} The Green Team · Independent Sanctuary Curators · Hyderabad
+            © {new Date().getFullYear()} The Green Team  Independent Sanctuary Curators  Hyderabad
           </p>
           <div className="flex items-center gap-8">
             <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-cream/20 hover:text-cream transition-all">
@@ -4168,7 +4136,7 @@ const TrustSignals = () => {
             </div>
             <div className="text-left">
               <p className="font-bold text-olive-900 text-sm uppercase tracking-wider">Kushal</p>
-              <p className="text-[10px] text-olive-800/60 uppercase tracking-widest font-bold">Lead Developer, BHEL · Early Member, Agartha</p>
+              <p className="text-[10px] text-olive-800/60 uppercase tracking-widest font-bold">Lead Developer, BHEL  Early Member, Agartha</p>
             </div>
           </div>
         </motion.div>
@@ -4229,7 +4197,7 @@ const NewsletterHighlight = ({ onSubscribe }: { onSubscribe: () => void }) => {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     className="w-full bg-transparent border-b border-white/20 py-6 outline-none focus:border-gold transition-all font-light text-2xl text-cream placeholder:text-on-surface/10"
-                    placeholder="email@domain.com"
+                    placeholder="email@domain.com" 
                   />
                 </div>
                 <button 
@@ -4343,8 +4311,8 @@ const ChatBot = ({ data }: { data: any }) => {
                   <div key={i} className={cn("flex flex-col", m.role === 'user' ? "items-end" : "items-start")}>
                     <div className={cn(
                       "max-w-[85%] p-4 text-sm leading-relaxed rounded-2xl shadow-sm",
-                      m.role === 'user' 
-                        ? "bg-olive-900 text-cream rounded-tr-none" 
+                      m.role === 'user'
+             ? "bg-olive-900 text-cream rounded-tr-none" 
                         : "bg-surface text-olive-900 border border-outline/10 rounded-tl-none"
                     )}>
                       {m.text}
@@ -4374,7 +4342,7 @@ const ChatBot = ({ data }: { data: any }) => {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                    placeholder="Ask Groot about sanctuaries..."
+                    placeholder="Ask Groot about sanctuaries..." 
                     className="w-full bg-cream/20 border border-outline/20 rounded-2xl py-4 pl-6 pr-16 text-sm focus:outline-none focus:border-primary/50 transition-all"
                   />
                   <button 
@@ -4394,12 +4362,12 @@ const ChatBot = ({ data }: { data: any }) => {
   );
 };
 
-const HomeView = ({ isSubscribed, onNewsletterClick, sanctuaries = SANCTUARIES, onModeChange }: { isSubscribed: boolean, onNewsletterClick: () => void, sanctuaries?: Sanctuary[], onModeChange: (mode: string) => void }) => (
+const HomeView = ({ isSubscribed, onNewsletterClick, sanctuaries = SANCTUARIES, onModeChange, onPropertyClick }: { isSubscribed: boolean, onNewsletterClick: () => void, sanctuaries?: Sanctuary[], onModeChange: (mode: string) => void, onPropertyClick: (s: Sanctuary) => void }) => (
   <div className="flex flex-col">
     <Hero onModeChange={onModeChange} />
     <Advantage />
     <EcosystemPillars />
-    <Sanctuaries isSubscribed={isSubscribed} onNewsletterClick={onNewsletterClick} sanctuaries={sanctuaries} />
+    <Sanctuaries isSubscribed={isSubscribed} onNewsletterClick={onNewsletterClick} sanctuaries={sanctuaries} onOpen={onPropertyClick} />
     {isSubscribed && <TheSIL isSubscribed={isSubscribed} onNewsletterClick={onNewsletterClick} />}
     <TrustSignals />
     <NewsletterHighlight onSubscribe={onNewsletterClick} />
@@ -4408,7 +4376,7 @@ const HomeView = ({ isSubscribed, onNewsletterClick, sanctuaries = SANCTUARIES, 
   </div>
 );
 
-// ─── Auth helpers ─────────────────────────────────────────────────────────────
+// ──  Auth helpers ────────────────────────────────────────────────────────────" 
 
 const friendlyAuthError = (code: string) => {
   const map: Record<string, string> = {
@@ -4426,7 +4394,7 @@ const friendlyAuthError = (code: string) => {
   return map[code] || 'Something went wrong. Please try again.';
 };
 
-// ─── Auth Modal ───────────────────────────────────────────────────────────────
+// ──  Auth Modal ──────────────────────────────────────────────────────────────" 
 
 const AuthModal = ({
   isOpen,
@@ -4453,11 +4421,18 @@ const AuthModal = ({
 
   const handleGoogle = async () => {
     setError(''); setLoading('google');
+    if (!auth) {
+      setTimeout(() => {
+        onSuccess({ uid: 'guest', email: 'guest@sanctuary.local', displayName: 'Guest Investor', metadata: {} } as any, true);
+        onClose();
+        setLoading(null);
+      }, 800);
+      return;
+    }
     try {
       const { user, operationType } = await signInWithPopup(auth, googleProvider);
       // isNew if it's a sign-up operation (first time)
-      const isNew = operationType === 'signIn' && !user.metadata.creationTime
-        ? false
+      const isNew = operationType === 'signIn' && !user.metadata.creationTime ? false
         : user.metadata.creationTime === user.metadata.lastSignInTime;
       onSuccess(user, isNew);
       onClose();
@@ -4470,10 +4445,17 @@ const AuthModal = ({
 
   const handleEmail = async (e: React.FormEvent) => {
     e.preventDefault(); setError(''); setLoading('email');
+    if (!auth) {
+      setTimeout(() => {
+        onSuccess({ uid: 'guest_email', email, displayName: email.split('@')[0], metadata: {} } as any, emailMode === 'signup');
+        onClose();
+        setLoading(null);
+      }, 800);
+      return;
+    }
     try {
       const isSignup = emailMode === 'signup';
-      const cred = isSignup
-        ? await createUserWithEmailAndPassword(auth, email, password)
+      const cred = isSignup ? await createUserWithEmailAndPassword(auth, email, password)
         : await signInWithEmailAndPassword(auth, email, password);
       onSuccess(cred.user, isSignup);
       onClose();
@@ -4506,18 +4488,17 @@ const AuthModal = ({
                 <Leaf className="w-6 h-6 text-primary" />
               </div>
               <h2 className="text-2xl font-serif italic mb-1">Unlock The Sanctuaries</h2>
-              <p className="text-cream/50 text-xs font-light tracking-wide">Pre-launch access · Exclusive investor pricing</p>
+              <p className="text-cream/50 text-xs font-light tracking-wide">Pre-launch access  Exclusive investor pricing</p>
             </div>
 
             <div className="px-10 py-8 space-y-5">
-              {/* Google — PRIMARY CTA */}
+              {/* Google - PRIMARY CTA */}
               <button
                 onClick={handleGoogle}
                 disabled={!!loading}
                 className="w-full flex items-center justify-center gap-3 py-4 bg-white border border-olive-800/10 rounded-2xl text-olive-900 text-sm font-semibold shadow-sm hover:shadow-md hover:border-olive-800/20 transition-all disabled:opacity-60"
               >
-                {loading === 'google'
-                  ? <RefreshCw className="w-5 h-5 animate-spin text-olive-800/40" />
+                {loading === 'google' ? <RefreshCw className="w-5 h-5 animate-spin text-olive-800/40" />
                   : (
                     <svg className="w-5 h-5" viewBox="0 0 24 24">
                       <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -4527,7 +4508,7 @@ const AuthModal = ({
                     </svg>
                   )
                 }
-                {loading === 'google' ? 'Connecting…' : 'Continue with Google'}
+                {loading === 'google' ? 'Connecting ' : 'Continue with Google'}
               </button>
 
               {/* Divider */}
@@ -4537,7 +4518,7 @@ const AuthModal = ({
                 <div className="flex-1 h-px bg-olive-800/10" />
               </div>
 
-              {/* Email — secondary, expandable */}
+              {/* Email - secondary, expandable */}
               {!emailOpen ? (
                 <button
                   onClick={() => setEmailOpen(true)}
@@ -4562,13 +4543,13 @@ const AuthModal = ({
                     <label htmlFor="auth-password" className="text-[9px] uppercase tracking-[0.4em] text-olive-800/40 font-bold block mb-1.5">Password</label>
                     <input id="auth-password" name="password" type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6}
                       className="w-full bg-surface border border-outline/20 rounded-xl px-4 py-3 text-sm text-on-surface focus:outline-none focus:border-primary/60 transition-colors"
-                      placeholder="••••••••" />
+                      placeholder="       " />
                   </div>
                   {error && <p className="text-red-500 text-xs">{error}</p>}
                   <button type="submit" disabled={!!loading}
                     className="w-full py-3.5 bg-olive-900 text-cream text-sm font-semibold rounded-2xl hover:bg-primary transition-all disabled:opacity-60 flex items-center justify-center gap-2">
                     {loading === 'email' ? <RefreshCw className="w-4 h-4 animate-spin" /> : <ArrowRight className="w-4 h-4" />}
-                    {loading === 'email' ? 'Please wait…' : emailMode === 'signin' ? 'Sign In' : 'Create Account'}
+                    {loading === 'email' ? 'Please wait ' : emailMode === 'signin' ? 'Sign In' : 'Create Account'}
                   </button>
                   <p className="text-center text-[10px] text-olive-800/40">
                     {emailMode === 'signin' ? "New here? " : 'Have an account? '}
@@ -4583,7 +4564,7 @@ const AuthModal = ({
               {error && !emailOpen && <p className="text-red-500 text-xs text-center">{error}</p>}
 
               <p className="text-center text-[9px] text-olive-800/20 uppercase tracking-widest leading-relaxed">
-                By continuing, you agree to our terms.<br />We never spam — only sanctuary intelligence.
+                By continuing, you agree to our terms.<br />We never spam - only sanctuary intelligence.
               </p>
             </div>
           </motion.div>
@@ -4593,7 +4574,7 @@ const AuthModal = ({
   );
 };
 
-// ─── Profile Modal (post sign-in) ────────────────────────────────────────────
+// ──"  Profile Modal (post sign-in) ────────────────────────────────────────────
 
 const ProfileModal = ({
   isOpen,
@@ -4645,8 +4626,7 @@ const ProfileModal = ({
             {/* Top bar */}
             <div className="flex items-center justify-between px-8 pt-8 pb-4">
               <div className="flex items-center gap-3">
-                {user.photoURL
-                  ? <img src={user.photoURL} referrerPolicy="no-referrer" alt="You" className="w-11 h-11 rounded-full object-cover ring-2 ring-primary/20" />
+                {user.photoURL ? <img src={user.photoURL} referrerPolicy="no-referrer" alt="You" className="w-11 h-11 rounded-full object-cover ring-2 ring-primary/20" />
                   : <div className="w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-lg">
                       {(user.displayName?.[0] || user.email?.[0] || '?').toUpperCase()}
                     </div>
@@ -4664,7 +4644,7 @@ const ProfileModal = ({
             <div className="px-8 pb-10 space-y-6">
               <div>
                 <h2 className="text-xl font-serif italic text-olive-900">One quick thing</h2>
-                <p className="text-olive-800/40 text-xs font-light mt-1 leading-relaxed">Help us match you with the right sanctuary. Totally optional — skip anytime.</p>
+                <p className="text-olive-800/40 text-xs font-light mt-1 leading-relaxed">Help us match you with the right sanctuary. Totally optional - skip anytime.</p>
               </div>
 
               <div className="space-y-4">
@@ -4692,7 +4672,7 @@ const ProfileModal = ({
                 <button onClick={() => handleSave(false)} disabled={saving}
                   className="flex-1 py-4 bg-olive-900 text-cream text-sm font-semibold rounded-2xl hover:bg-primary transition-all disabled:opacity-60 flex items-center justify-center gap-2">
                   {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-                  {saving ? 'Saving…' : 'Complete Profile'}
+                  {saving ? 'Saving ' : 'Complete Profile'}
                 </button>
                 <button onClick={() => handleSave(true)} disabled={saving}
                   className="px-6 py-4 border border-olive-800/10 text-olive-800/40 text-xs font-bold rounded-2xl hover:border-olive-800/30 hover:text-olive-900 transition-all">
@@ -4707,7 +4687,7 @@ const ProfileModal = ({
   );
 };
 
-// ─── App (main) ──────────────────────────────────────────────────────────────
+// ──"  App (main) ──────────────────────────────────────────────────────────────
 
 export default function App() {
   type ViewMode = 'home' | 'map' | 'list' | 'gallery' | 'analytics' | 'syl' | 'membership';
@@ -4718,7 +4698,7 @@ export default function App() {
   const [showProfile, setShowProfile] = useState(false);
   const [profileUser, setProfileUser] = useState<User | null>(null);
 
-  // Silent geolocation capture — saves to Firestore without any UI
+  // Silent geolocation capture - saves to Firestore without any UI
   const captureLocation = useCallback((uid: string) => {
     if (!('geolocation' in navigator)) return;
     navigator.geolocation.getCurrentPosition(
@@ -4729,7 +4709,7 @@ export default function App() {
           locationAccuracy: pos.coords.accuracy,
         }).catch(() => {});
       },
-      () => { /* user denied — silent fail */ },
+      () => { /* user denied - silent fail */ },
       { timeout: 8000, maximumAge: 300000 }
     );
   }, []);
@@ -4756,6 +4736,7 @@ export default function App() {
 
   // Global auth state listener (handles page reload / session restore)
   useEffect(() => {
+    if (!auth) return;
     const unsub = onAuthStateChanged(auth, u => {
       setAuthUser(u);
       if (u?.email === ADMIN_EMAIL) setShowAdmin(true);
@@ -4774,14 +4755,14 @@ export default function App() {
   const [isSubscribed, setIsSubscribed] = useState(() => {
     return localStorage.getItem('gt_subscribed') === 'true';
   });
-  // A logged-in user is always treated as a subscriber — no gates shown
+  // A logged-in user is always treated as a subscriber - no gates shown
   const effectivelySubscribed = isSubscribed || !!authUser;
   const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('home');
   const [isDark, setIsDark] = useState(false);
   const [showAdmin, setShowAdmin] = useState(false);
-
-  // ── Admin: leads + newsletter + users (lazy-loaded when admin panel opens) ─
+  const [selectedProperty, setSelectedProperty] = useState<Sanctuary | null>(null);
+  // ── Admin: leads + newsletter + users (lazy-loaded when admin panel opens)  
   const [adminLeads, setAdminLeads] = useState<Lead[]>([]);
   const [adminNewsletter, setAdminNewsletter] = useState<NewsletterEntry[]>([]);
   const [adminUsers, setAdminUsers] = useState<UserProfile[]>([]);
@@ -4794,9 +4775,10 @@ export default function App() {
       setAdminUsers(u);
     } catch {/* ignore */}
   }, [authUser]);
+
   useEffect(() => { if (showAdmin) fetchAdminData(); }, [showAdmin, fetchAdminData]);
 
-  // ── Firestore properties (real-time) ─────────────────────────────────────
+  // ── Firestore properties (real-time) ──────────────────────────────────── 
   const [firestoreProps, setFirestoreProps] = useState<PropertyDoc[]>([]);
   useEffect(() => {
     if (!db) return;
@@ -4837,134 +4819,162 @@ export default function App() {
   const scrollRef       = useRef<HTMLDivElement>(null);
 
   const handleViewChange = useCallback((next: ViewMode) => {
-    // Save current scroll before leaving
-    if (scrollRef.current) scrollPositions.current[viewMode] = scrollRef.current.scrollTop;
+    if (scrollRef.current) {
+      scrollPositions.current[viewMode] = scrollRef.current.scrollTop;
+    }
     setViewMode(next);
+    // Restore or reset scroll position for the next view
+    setTimeout(() => {
+      if (scrollRef.current) {
+        scrollRef.current.scrollTop = scrollPositions.current[next] || 0;
+      }
+    }, 0);
   }, [viewMode]);
-
-  // Restore scroll after the new view renders
-  useEffect(() => {
-    if (scrollRef.current) scrollRef.current.scrollTop = scrollPositions.current[viewMode] ?? 0;
-  }, [viewMode]);
-
-  // ── Edge-only swipe navigation (Android-style) ───────────────────────────
-  // Only triggers when the touch STARTS within EDGE_ZONE px of the left or right
-  // screen edge — mid-screen swipes are ignored entirely.
-  const EDGE_ZONE = 24; // px from either edge that counts as an edge swipe
-  const touchStart = useRef<{ x: number; y: number; fromEdge: boolean } | null>(null);
-
-  const onTouchStart = useCallback((e: React.TouchEvent) => {
-    const x = e.touches[0].clientX;
-    const fromEdge = x <= EDGE_ZONE || x >= window.innerWidth - EDGE_ZONE;
-    touchStart.current = { x, y: e.touches[0].clientY, fromEdge };
-  }, []);
-
-  const onTouchEnd = useCallback((e: React.TouchEvent) => {
-    if (!touchStart.current) return;
-    const { fromEdge, x: startX, y: startY } = touchStart.current;
-    touchStart.current = null;
-    if (!fromEdge) return; // mid-screen swipe — do nothing
-    const dx = e.changedTouches[0].clientX - startX;
-    const dy = Math.abs(e.changedTouches[0].clientY - startY);
-    if (Math.abs(dx) < 40 || Math.abs(dx) < dy * 1.2) return; // too short or mostly vertical
-    const idx = VIEW_ORDER.indexOf(viewMode);
-    if (dx < 0 && idx < VIEW_ORDER.length - 1) handleViewChange(VIEW_ORDER[idx + 1]); // swipe left → next
-    if (dx > 0 && idx > 0)                     handleViewChange(VIEW_ORDER[idx - 1]); // swipe right → prev
-  }, [viewMode, handleViewChange]);
-
-  useEffect(() => {
-    if (isDark) document.documentElement.classList.add('dark');
-    else document.documentElement.classList.remove('dark');
-  }, [isDark]);
-
-  const handleSubscribe = () => {
-    setIsSubscribed(true);
-    localStorage.setItem('gt_subscribed', 'true');
-  };
 
   return (
-    <div
-      className="h-screen w-screen bg-cream text-olive-900 overflow-hidden flex flex-col transition-colors duration-700"
-      onTouchStart={onTouchStart}
-      onTouchEnd={onTouchEnd}
-    >
-      <Navbar
-        isSubscribed={effectivelySubscribed}
-        onNewsletterClick={() => { if (!effectivelySubscribed) setIsNewsletterOpen(true); }}
-        onModeChange={handleViewChange}
-        isDark={isDark}
-        setIsDark={setIsDark}
-        onSignInClick={() => setIsAuthOpen(true)}
-        authUser={authUser}
-        onSignOut={handleSignOut}
-        isAdmin={authUser?.email === ADMIN_EMAIL}
-        onAdminClick={() => setShowAdmin(true)}
-      />
+    <div className={cn("min-h-screen font-sans transition-colors duration-700", isDark ? "dark" : "")}>
+      <div className="bg-surface text-on-surface flex h-screen overflow-hidden">
+        
+        {/* Navigation Sidebar (Desktop) */}
+         { /* SideNavBar removed */ }
 
-      <main className="flex-1 flex overflow-hidden relative">
-        {/* Groot — available on every screen */}
-        <ChatBot data={{ sanctuaries: SANCTUARIES }} />
+        {/* Main Content Area */}
+        <main ref={scrollRef} className="flex-1 overflow-y-auto overflow-x-hidden relative scroll-smooth scrollbar-thin scrollbar-thumb-primary/10">
+          
+          <Navbar 
+            isSubscribed={effectivelySubscribed}
+            onNewsletterClick={() => setIsNewsletterOpen(true)}
+            onModeChange={handleViewChange}
+            isDark={isDark}
+            setIsDark={setIsDark}
+            onSignInClick={() => setIsAuthOpen(true)}
+            authUser={authUser}
+            onSignOut={handleSignOut}
+            isAdmin={showAdmin}
+            onAdminClick={() => setViewMode('list')} // Admin goes to property dashboard
+            onPropertySelect={(id) => {
+              const sanctuary = allSanctuaries.find(s => s.id === id);
+              if (sanctuary) setSelectedProperty(sanctuary);
+            }}
+          />
 
-        {/* Center - Map or other views */}
-        <div className="flex-1 relative overflow-hidden bg-surface">
-          {/* Map is always mounted to preserve Leaflet pan/zoom/filter state */}
-          <div className={viewMode === 'map' ? 'absolute inset-0 z-10' : 'hidden'}>
-            <SanctuaryMapLayout isVisible={viewMode === 'map'} />
-          </div>
-          {viewMode !== 'map' && (
-            <div ref={scrollRef} className="h-full w-full overflow-y-auto">
-              {viewMode === 'home' && <HomeView isSubscribed={effectivelySubscribed} onNewsletterClick={() => { if (!effectivelySubscribed) setIsNewsletterOpen(true); }} sanctuaries={allSanctuaries} onModeChange={handleViewChange} />}
-              {viewMode === 'list' && <Sanctuaries isSubscribed={effectivelySubscribed} onNewsletterClick={() => { if (!effectivelySubscribed) setIsNewsletterOpen(true); }} isFullPage sanctuaries={allSanctuaries} />}
-              {viewMode === 'gallery' && <EcosystemPillars isFullPage />}
-              {viewMode === 'analytics' && <Advantage isFullPage />}
-              {viewMode === 'syl' && <TheSIL isSubscribed={effectivelySubscribed} onNewsletterClick={() => { if (!effectivelySubscribed) setIsNewsletterOpen(true); }} isFullPage />}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={viewMode}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.4, ease: "circOut" }}
+            >
+              {viewMode === 'home' && (
+                <HomeView 
+                  isSubscribed={effectivelySubscribed} 
+                  onNewsletterClick={() => setIsNewsletterOpen(true)} 
+                  sanctuaries={allSanctuaries}
+                  onModeChange={handleViewChange}
+                  onPropertyClick={setSelectedProperty}
+                />
+              )}
+
+              {viewMode === 'map' && (
+                <div className="h-[calc(100vh-80px)] w-full">
+                  <SanctuaryMapLayout isVisible={true} />
+                </div>
+              )}
+
+              {viewMode === 'analytics' && <Advantage isFullPage={true} />}
+              
+              {viewMode === 'gallery' && <EcosystemPillars isFullPage={true} />}
+
+              {viewMode === 'syl' && (
+                <TheSIL 
+                  isSubscribed={effectivelySubscribed} 
+                  onNewsletterClick={() => setIsNewsletterOpen(true)} 
+                  isFullPage={true} 
+                />
+              )}
+
+              {viewMode === 'list' && (
+                <div className="px-6 md:px-24 py-16">
+                  <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
+                    <div>
+                      <span className="text-primary text-xs font-bold uppercase tracking-[0.6em] mb-4 block">Independent Sanctuaries</span>
+                      <h2 className="text-5xl md:text-7xl font-medium text-olive-900 italic">Curated Portfolio.</h2>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {allSanctuaries.map(s => (
+                      <SanctuaryCard 
+                        key={s.id} 
+                        sanctuary={s} 
+                        isSubscribed={effectivelySubscribed} 
+                        onNewsletterClick={() => setIsNewsletterOpen(true)}
+                        onOpen={() => {/* PropertyDetailOverlay handles this via URL/State */}}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {viewMode === 'membership' && (
                 <div className="flex flex-col">
-                  <Membership />
                   <ApplicationForm />
                   <Footer onModeChange={handleViewChange} />
                 </div>
               )}
-            </div>
-          )}
-        </div>
-      </main>
+            </motion.div>
+          </AnimatePresence>
 
-      {/* Admin Dashboard overlay — only for sumanthbolla97@gmail.com */}
+          {/* ChatBot access for all views */}
+          <ChatBot data={{ sanctuaries: allSanctuaries, user: authUser }} />
+        </main>
+      </div>
+
+      {/* Global Modals */}
+      <AuthModal 
+        isOpen={isAuthOpen} 
+        onClose={() => setIsAuthOpen(false)} 
+        onSuccess={handleAuthSuccess} 
+      />
+      
+      <ProfileModal 
+        isOpen={showProfile} 
+        user={profileUser} 
+        onDone={() => setShowProfile(false)} 
+      />
+
+      
+      {/* Property Detail Portal */}
       <AnimatePresence>
-        {showAdmin && authUser?.email === ADMIN_EMAIL && (
-          <AdminDashboard
-            onClose={() => setShowAdmin(false)}
-            authUser={authUser}
-            leads={adminLeads}
-            newsletter={adminNewsletter}
-            firestoreProps={firestoreProps}
-            users={adminUsers}
-          />
+        {selectedProperty && (
+          <div className="fixed inset-0 z-[10000] overflow-hidden flex items-center justify-center">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedProperty(null)}
+              className="absolute inset-0 bg-black/80 backdrop-blur-md"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full h-full md:h-[90vh] md:max-w-6xl md:rounded-3xl overflow-hidden shadow-2xl"
+            >
+              <PropertyDetailOverlay 
+                sanctuary={selectedProperty} 
+                onClose={() => setSelectedProperty(null)} 
+                isSubscribed={effectivelySubscribed} 
+                onNewsletterSignup={() => setIsNewsletterOpen(true)} 
+              />
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
-
-      {/* Auth Modal */}
-      <AuthModal
-        isOpen={isAuthOpen}
-        onClose={() => setIsAuthOpen(false)}
-        onSuccess={(user, isNew) => {
-          setIsAuthOpen(false);
-          handleAuthSuccess(user, isNew);
-        }}
-      />
-
-      {/* Profile collection modal — appears once after sign-in */}
-      <ProfileModal
-        isOpen={showProfile}
-        user={profileUser}
-        onDone={() => setShowProfile(false)}
-      />
-
-      <NewsletterModal
-        isOpen={isNewsletterOpen}
+      <NewsletterModal 
+        isOpen={isNewsletterOpen} 
         onClose={() => setIsNewsletterOpen(false)}
-        onSubscribe={handleSubscribe}
+        onSubscribe={() => setIsSubscribed(true)}
       />
     </div>
   );
