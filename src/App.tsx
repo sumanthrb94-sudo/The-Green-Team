@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef, FC } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Wind, 
@@ -104,6 +105,7 @@ interface Sanctuary {
   // Site plan + external brochure — populate for any property with a site plan
   sitePlanSrc?: string;
   brochureUrl?: string;
+  gallery?: string[];
 }
 
 // --- Mock Data ---
@@ -119,15 +121,38 @@ const SANCTUARIES: Sanctuary[] = [
     pricePerSqYd: 7999,
     valuation: '₹1.04 Cr',
     memberPrice: 'From ₹64.6 L',
-    image: '/agartha-render.jpg',
+    image: '/agartha-official-render.png',
     tagline: 'Where the forest becomes home.',
     description: 'MODCON Agartha is a first-of-its-kind biomorphic residential community carved into the Narsapur forest periphery. 53 thoughtfully sized plots surround a 14,548 sq yd organic amenity core — featuring fluid earth architecture, solar-integrated curved roofs, and living canopies that blur the line between structure and forest. No two plots are the same. No straight lines anywhere.',
     plots: 53,
     plotRange: '808 – 5,097 sq yds',
     amenityAcres: '14,548 sq yds',
     architect: 'MODCON Builders',
-    sitePlanSrc: '/agartha-layout.jpg',
-    brochureUrl: 'https://www.modconbuilders.com/agartha',
+    sitePlanSrc: '/FINAL-LAYOUT.jpeg',
+    brochureUrl: 'https://www.agartha.in/',
+    gallery: [
+      '/gallery/agartha/1.jpg',
+      '/gallery/agartha/142b26_07ba6ec4ef4e49d680a53ab9a3362f25~mv2.jpg.jpeg',
+      '/gallery/agartha/142b26_0fee06470ac2445c9ff7742be6377273~mv2.jpg.jpeg',
+      '/gallery/agartha/142b26_13ce857bed164143a7d79ce6cef3668e~mv2.jpg.jpeg',
+      '/gallery/agartha/142b26_34c58cd885c64ddebbae12791465bbe3~mv2.jpg.jpeg',
+      '/gallery/agartha/142b26_567e195b978947c9b29be195842095af~mv2.jpg.jpeg',
+      '/gallery/agartha/142b26_5a78474b934e4251b54ce25e16770c68~mv2.jpg.jpeg',
+      '/gallery/agartha/142b26_5f7c47258d394edcbf818b25e3b12965~mv2.jpg.jpeg',
+      '/gallery/agartha/142b26_86e04d7ce83d497997bdac2c29efe900~mv2.jpg.jpeg',
+      '/gallery/agartha/142b26_87ac7f7d92a145b9aa2740c4a6898410~mv2.jpg.jpeg',
+      '/gallery/agartha/142b26_89a3906d085c4518a1ce49864ebda77a~mv2.jpg.jpeg',
+      '/gallery/agartha/142b26_a79caac8357141ef89993d2115817696~mv2.jpg.jpeg',
+      '/gallery/agartha/142b26_a8649ae42bca482cbbafe84794fe8a6e~mv2.jpg.jpeg',
+      '/gallery/agartha/142b26_acda3bc9aaa84bfc976803cdcbdce73f~mv2.jpg.jpeg',
+      '/gallery/agartha/142b26_b52923b4599745df825e9d06157b43d3~mv2.jpg.jpeg',
+      '/gallery/agartha/142b26_bdabb7cd17f741ee815019462732e449~mv2.jpg.jpeg',
+      '/gallery/agartha/142b26_cb62ea3cf3a1420399ec2e43c1dee85f~mv2.png_1.jpeg',
+      '/gallery/agartha/142b26_d9c0a047f545422a8b53ee00aed7b1e0~mv2.png.jpeg',
+      '/gallery/agartha/142b26_d9f37ad4d1d74e65a62892327167ed6b~mv2.jpg.jpeg',
+      '/gallery/agartha/142b26_e952e8d04d6546b5866e374206744e87~mv2.jpg.jpeg',
+      '/gallery/agartha/142b26_e9917bb73fc94531948ef638eba5a051~mv2.jpg.jpeg'
+    ],
     features: [
       'Biomorphic Architecture',
       'Solar-Curved Rooftops',
@@ -1286,73 +1311,13 @@ const AGARTHA_HOTSPOTS: Hotspot[] = [
 interface PlotDot { id: number; sqYds: number; x: number; y: number }
 
 const AGARTHA_PLOTS: PlotDot[] = [
-  // ── North outer arc (near Grand Entry boulevard) ──
-  { id:1,  sqYds:1050, x:22, y:22 },
-  { id:2,  sqYds:980,  x:30, y:18 },
-  { id:3,  sqYds:920,  x:38, y:16 },
-  { id:4,  sqYds:900,  x:46, y:17 },
-  { id:5,  sqYds:950,  x:54, y:19 },
-  { id:6,  sqYds:1100, x:62, y:22 },
-  // ── North-East outer ──
-  { id:7,  sqYds:1300, x:70, y:26 },
-  { id:8,  sqYds:1400, x:76, y:32 },
-  { id:9,  sqYds:1500, x:79, y:38 },
-  { id:10, sqYds:1550, x:80, y:44 },
-  { id:11, sqYds:1600, x:79, y:50 },
-  { id:12, sqYds:1500, x:77, y:56 },
-  // ── South-East outer ──
-  { id:13, sqYds:1800, x:73, y:62 },
-  { id:14, sqYds:2000, x:68, y:68 },
-  // ── PLOT 15 — Premium Corner (largest, dual forest frontage) ──
-  { id:15, sqYds:5097, x:14, y:72 },
-  // ── South arc ──
-  { id:16, sqYds:2200, x:62, y:75 },
-  { id:17, sqYds:1900, x:54, y:79 },
-  { id:18, sqYds:1700, x:46, y:81 },
-  { id:19, sqYds:1500, x:38, y:80 },
-  { id:20, sqYds:1350, x:30, y:77 },
-  // ── South-West outer (forest edge) ──
-  { id:21, sqYds:1800, x:24, y:73 },
-  { id:22, sqYds:2400, x:18, y:67 },
-  { id:23, sqYds:2800, x:13, y:61 },
-  // ── West outer (Narsapur forest buffer boundary) ──
-  { id:24, sqYds:3200, x:11, y:54 },
-  { id:25, sqYds:2900, x:9,  y:47 },
-  { id:26, sqYds:2600, x:11, y:40 },
-  // ── North-West outer ──
-  { id:27, sqYds:1700, x:15, y:33 },
-  { id:28, sqYds:1400, x:19, y:26 },
-  { id:29, sqYds:1200, x:15, y:19 },
-  // ── North inner ring ──
-  { id:30, sqYds:870,  x:29, y:30 },
-  { id:31, sqYds:850,  x:36, y:27 },
-  { id:32, sqYds:840,  x:43, y:26 },
-  { id:33, sqYds:855,  x:50, y:28 },
-  { id:34, sqYds:900,  x:57, y:31 },
-  { id:35, sqYds:940,  x:63, y:35 },
-  // ── East inner ring ──
-  { id:36, sqYds:960,  x:66, y:40 },
-  { id:37, sqYds:970,  x:67, y:46 },
-  { id:38, sqYds:980,  x:66, y:52 },
-  { id:39, sqYds:1000, x:63, y:57 },
-  // ── South-East inner ──
-  { id:40, sqYds:1050, x:58, y:62 },
-  { id:41, sqYds:1100, x:52, y:65 },
-  { id:42, sqYds:1150, x:45, y:66 },
-  { id:43, sqYds:1120, x:38, y:64 },
-  // ── South-West inner ──
-  { id:44, sqYds:1080, x:32, y:61 },
-  { id:45, sqYds:1020, x:27, y:57 },
-  { id:46, sqYds:990,  x:25, y:51 },
-  { id:47, sqYds:960,  x:26, y:45 },
-  // ── West inner ──
-  { id:48, sqYds:940,  x:27, y:38 },
-  { id:49, sqYds:920,  x:21, y:40 },
-  { id:50, sqYds:908,  x:21, y:47 },
-  { id:51, sqYds:915,  x:22, y:54 },
-  // ── NW inner + smallest plots ──
-  { id:52, sqYds:880,  x:25, y:34 },
-  { id:53, sqYds:808,  x:33, y:36 },
+  // ── Representative Size Samples ──
+  { id: 1,  sqYds: 808,  x: 20, y: 65 }, // Smallest typical
+  { id: 2,  sqYds: 1050, x: 35, y: 55 }, // Standard
+  { id: 3,  sqYds: 1400, x: 50, y: 45 }, // Large
+  { id: 4,  sqYds: 2200, x: 65, y: 35 }, // Estate size
+  { id: 5,  sqYds: 3200, x: 80, y: 50 }, // Premium
+  { id: 15, sqYds: 5097, x: 50, y: 75 }, // Largest landmark plot
 ];
 
 const AGARTHA_OLD_RATE = 6199;   // ₹/sq yd — VIP pre-launch rate (2 yrs ago)
@@ -1907,6 +1872,19 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
   const [nlEmail, setNlEmail]     = useState('');
   const [nlDone, setNlDone]       = useState(false);
   const [nlLoading, setNlLoading] = useState(false);
+
+  // --- DEV TOOL: VISUAL PLOT MAPPER ---
+  const [mapperActive, setMapperActive] = useState(false);
+  const [mappedPlots, setMappedPlots] = useState<{id:number, x:number, y:number, sqYds:number}[]>([]);
+
+  const handleMapClick = (e: React.MouseEvent<HTMLImageElement>) => {
+    if (!mapperActive) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = Number(((e.clientX - rect.left) / rect.width * 100).toFixed(2));
+    const y = Number(((e.clientY - rect.top) / rect.height * 100).toFixed(2));
+    setMappedPlots(prev => [...prev, { id: prev.length + 1, x, y, sqYds: 1000 }]);
+  };
+
   useEffect(() => {
     if (isSubscribed) return;
     const t = setTimeout(() => setShowNewsletterPrompt(true), 25000);
@@ -1952,21 +1930,38 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
       animate={{ x: 0 }}
       exit={{ x: '100%' }}
       transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-      className="fixed top-0 right-0 bottom-0 w-full md:w-[480px] z-[1001] bg-surface shadow-[-10px_0_40px_rgba(0,0,0,0.15)] flex flex-col overflow-hidden"
+      className="fixed inset-0 w-full z-[10000] bg-surface shadow-[-10px_0_40px_rgba(0,0,0,0.15)] flex flex-col overflow-hidden"
     >
-      {/* Hero image */}
-      <div className="relative h-64 w-full overflow-hidden flex-shrink-0">
-        <img src={sanctuary.image} alt={sanctuary.title}
-          className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+      {/* Hero image or Gallery */}
+      <div className="relative h-64 w-full flex-shrink-0 bg-black group">
+        {sanctuary.gallery && sanctuary.gallery.length > 0 ? (
+          <div className="w-full h-full flex overflow-x-auto snap-x snap-mandatory no-scrollbar scroll-smooth">
+            {sanctuary.gallery.map((img, idx) => (
+              <div key={idx} className="w-full h-full flex-shrink-0 snap-center relative">
+                <img src={img} alt={`${sanctuary.title} gallery ${idx + 1}`} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="w-full h-full relative">
+            <img src={sanctuary.image} alt={sanctuary.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+          </div>
+        )}
         <button onClick={onClose}
-          className="absolute top-5 right-5 p-2 bg-black/40 backdrop-blur-sm rounded-full hover:bg-black/60 transition-all">
+          className="absolute top-5 right-5 p-2 bg-black/40 backdrop-blur-sm rounded-full hover:bg-black/60 transition-all z-10">
           <X className="w-4 h-4 text-white" />
         </button>
-        <div className="absolute bottom-5 left-6">
-          <span className="px-3 py-1 bg-primary text-on-primary text-[8px] uppercase tracking-widest font-bold rounded-full">
+        <div className="absolute bottom-5 left-6 z-10 pointer-events-none flex flex-col gap-1.5">
+          <span className="px-3 py-1 bg-primary text-on-primary text-[8px] uppercase tracking-widest font-bold rounded-full shadow-lg w-fit">
             {badge}
           </span>
+          {sanctuary.gallery && sanctuary.gallery.length > 0 && (
+            <span className="text-[9px] text-white/70 uppercase tracking-widest font-bold font-headline select-none w-fit px-1">
+              Swipe to explore gallery ({sanctuary.gallery.length}) ➔
+            </span>
+          )}
         </div>
       </div>
 
@@ -2080,21 +2075,34 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
                   <>
                     {/* Map with 53 sized dots */}
                     <div className="relative">
+                      {/* DEV TOOL MAPPER TOGGLE */}
+                      <button 
+                        onClick={() => setMapperActive(!mapperActive)} 
+                        className="absolute top-2 left-2 z-50 px-3 py-1 bg-black/80 text-white text-[8px] uppercase tracking-widest font-bold border border-white/10 rounded-full"
+                      >
+                        {mapperActive ? `Mapper Active (${mappedPlots.length}) - Tap to Disable` : `Enable Visual Mapper`}
+                      </button>
+
+                      {mapperActive && mappedPlots.length > 0 && (
+                        <div className="absolute top-12 left-2 right-2 z-50 flex gap-2">
+                          <button onClick={() => setMappedPlots(prev => prev.slice(0, -1))} className="px-3 py-1 bg-red-500/80 text-white text-[8px] uppercase font-bold rounded-full">Undo</button>
+                          <button onClick={() => {
+                            navigator.clipboard.writeText(JSON.stringify(mappedPlots, null, 2));
+                            alert('Copied absolute array to clipboard! Paste it to the AI.');
+                          }} className="px-3 py-1 bg-primary text-on-primary text-[8px] uppercase font-bold rounded-full">Copy Coordinates</button>
+                        </div>
+                      )}
+
                       <img src={sanctuary.sitePlanSrc} alt="Site plan"
-                        className="w-full h-auto object-contain" referrerPolicy="no-referrer" />
+                        className={cn("w-full h-auto object-contain", mapperActive && "cursor-crosshair")} 
+                        referrerPolicy="no-referrer" 
+                        onClick={handleMapClick} 
+                      />
 
-                      {/* Investor legend strip at top of image */}
-                      <div className="absolute top-2 left-2 right-2 flex items-center gap-2 flex-wrap">
-                        <span className="bg-black/60 backdrop-blur-sm text-[7px] uppercase tracking-widest font-bold text-white/70 px-2 py-1 rounded-full">
-                          Tap a plot to see its investment snapshot
-                        </span>
-                      </div>
-
-                      {plotDots.map(p => {
-                        const sz     = plotDotSize(p.sqYds);
+                      {/* Render Newly Mapped Dots OR Existing plotDots */}
+                      {(mapperActive ? mappedPlots : plotDots).map(p => {
+                        const sz     = mapperActive ? 12 : plotDotSize(p.sqYds);
                         const isActive = activePlot?.id === p.id;
-                        const isPremium = p.sqYds >= 3000;
-                        const isLandmark = p.id === 15;
                         return (
                           <button
                             key={p.id}
@@ -2104,17 +2112,15 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
                             }}
                             className={cn(
                               "absolute -translate-x-1/2 -translate-y-1/2 rounded-full border transition-all duration-150 shadow-md",
-                              isLandmark
-                                ? "border-amber-400 bg-amber-400/90 scale-110"
-                                : isPremium
-                                ? "border-amber-500/80 bg-amber-500/70"
-                                : isActive
+                              mapperActive ? "bg-red-500 border-red-300" :
+                              isActive
                                 ? "border-primary bg-primary scale-125"
                                 : "border-primary/80 bg-primary/60 hover:bg-primary hover:scale-110"
                             )}
-                            onClick={() => setActivePlot(isActive ? null : p)}
+                            onClick={() => !mapperActive && setActivePlot(isActive ? null : p as any)}
                           >
-                            {isActive && (
+                            {mapperActive && <span className="absolute -top-4 -left-2 text-[8px] text-red-400 font-bold bg-black/60 px-1 rounded">{p.id}</span>}
+                            {isActive && !mapperActive && (
                               <span className="absolute inset-0 rounded-full bg-primary/40 animate-ping pointer-events-none" />
                             )}
                           </button>
@@ -3286,23 +3292,26 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
       </AnimatePresence>
 
       <div className="flex-1 relative">
-        <AnimatePresence>
-          {selectedSanctuary && (
-            <>
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setSelectedId(null)}
-                className="absolute inset-0 bg-black/20 backdrop-blur-[2px] z-[1000]"
-              />
-              <PropertyDetailOverlay 
-                sanctuary={selectedSanctuary} 
-                onClose={() => setSelectedId(null)} 
-              />
-            </>
-          )}
-        </AnimatePresence>
+        {createPortal(
+          <AnimatePresence>
+            {selectedSanctuary && (
+              <div key="property-overlay" className="fixed inset-0 z-[10000] overflow-hidden">
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onClick={() => setSelectedId(null)}
+                  className="absolute inset-0 bg-black/20 backdrop-blur-[2px]"
+                />
+                <PropertyDetailOverlay 
+                  sanctuary={selectedSanctuary} 
+                  onClose={() => setSelectedId(null)} 
+                />
+              </div>
+            )}
+          </AnimatePresence>,
+          document.body
+        )}
 
 
         {/* Live AQI badge — visible when AQI Live filter is active */}
@@ -3717,20 +3726,23 @@ const Sanctuaries = ({ isSubscribed, onNewsletterClick, isFullPage = false, sanc
       </div>
 
       {/* Property detail overlay */}
-      <AnimatePresence>
-        {selectedSanctuary && (
-          <div className="fixed inset-0 z-[80] overflow-hidden">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setSelectedSanctuary(null)}
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-            />
-            <PropertyDetailOverlay sanctuary={selectedSanctuary} onClose={() => setSelectedSanctuary(null)} isSubscribed={isSubscribed} onNewsletterSignup={onNewsletterClick} />
-          </div>
-        )}
-      </AnimatePresence>
+      {createPortal(
+        <AnimatePresence>
+          {selectedSanctuary && (
+            <div key="property-overlay" className="fixed inset-0 z-[10000] overflow-hidden">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setSelectedSanctuary(null)}
+                className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              />
+              <PropertyDetailOverlay sanctuary={selectedSanctuary} onClose={() => setSelectedSanctuary(null)} isSubscribed={isSubscribed} onNewsletterSignup={onNewsletterClick} />
+            </div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </section>
   );
 };
