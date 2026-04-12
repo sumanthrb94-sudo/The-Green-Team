@@ -1905,6 +1905,7 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
   const [leadPhone, setLeadPhone]     = useState('');
   const [leadSubmitted, setLeadSubmitted] = useState(false);
   const [leadLoading, setLeadLoading]    = useState(false);
+  const [leadError, setLeadError]        = useState<string | null>(null);
 
   // Timed newsletter prompt — appears after 25s if not already subscribed
   const [showNewsletterPrompt, setShowNewsletterPrompt] = useState(false);
@@ -1940,11 +1941,15 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
     e.preventDefault();
     if (!leadName.trim() || !leadPhone.trim()) return;
     setLeadLoading(true);
+    setLeadError(null);
     try {
       await saveLead({ name: leadName.trim(), email: leadPhone.trim(), intent: `${sanctuary.title} — Site Visit Request` });
-    } catch {/* fire and forget */} finally {
-      setLeadLoading(false);
       setLeadSubmitted(true);
+    } catch (err) {
+      console.error('[Lead] Save failed:', err);
+      setLeadError('Could not save your details. Please try again or WhatsApp us directly.');
+    } finally {
+      setLeadLoading(false);
     }
   };
 
@@ -2408,6 +2413,9 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
                     <ArrowRight className="w-4 h-4" />
                     {leadLoading ? 'Sending…' : 'Request Site Visit'}
                   </button>
+                  {leadError && (
+                    <p className="text-[10px] text-red-500 text-center pt-1">{leadError}</p>
+                  )}
                 </form>
               )}
               {sanctuary.brochureUrl && (
@@ -3909,6 +3917,7 @@ const INVESTMENT_BRACKETS = [
 const ApplicationForm = () => {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [form, setForm] = useState({
     name: '', email: '', phone: '',
     company: '', designation: '', investmentBracket: '',
@@ -3933,7 +3942,10 @@ const ApplicationForm = () => {
       });
       await saveNewsletter(form.email, 'modal');
       setSubmitted(true);
-    } catch {/* silent */} finally {
+    } catch (err) {
+      console.error('[ApplicationForm] Lead save failed:', err);
+      setSubmitError('Submission failed — please check your connection and try again.');
+    } finally {
       setLoading(false);
     }
   };
@@ -4109,6 +4121,9 @@ const ApplicationForm = () => {
                         : <><span>Request Adviser Call</span><ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></>
                       }
                     </button>
+                    {submitError && (
+                      <p className="text-[10px] text-red-500 text-center mt-3">{submitError}</p>
+                    )}
                     <p className="text-[8px] text-center text-olive-800/25 uppercase tracking-widest mt-4">
                       Your details are private · Auto-enrolled in monthly intelligence briefings
                     </p>

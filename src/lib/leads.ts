@@ -25,6 +25,7 @@ export interface NewsletterEntry {
 }
 
 export async function saveLead(data: { name: string; email: string; intent?: string }) {
+  if (!db) throw new Error('[Lead] Firestore not initialized — check VITE_FIREBASE_* env vars');
   return addDoc(collection(db, 'leads'), {
     ...data,
     source: 'membership',
@@ -33,6 +34,7 @@ export async function saveLead(data: { name: string; email: string; intent?: str
 }
 
 export async function saveNewsletter(email: string, source: 'modal' | 'inline') {
+  if (!db) throw new Error('[Newsletter] Firestore not initialized — check VITE_FIREBASE_* env vars');
   return addDoc(collection(db, 'newsletter'), {
     email,
     source,
