@@ -11,10 +11,10 @@ import { db } from './firebase';
 export interface Lead {
   id: string;
   name: string;
-  email: string;
+  email?: string;
   phone?: string;
   intent?: string;
-  source: 'membership';
+  source: string;
   createdAt: { seconds: number } | null;
 }
 
@@ -25,11 +25,11 @@ export interface NewsletterEntry {
   createdAt: { seconds: number } | null;
 }
 
-export async function saveLead(data: { name: string; email: string; phone?: string; intent?: string }) {
+export async function saveLead(data: { name: string; email?: string; phone?: string; intent?: string; source?: string }) {
   if (!db) return new Promise(r => setTimeout(r, 600));
   return addDoc(collection(db, 'leads'), {
     ...data,
-    source: 'membership',
+    source: data.source || 'unspecified',
     createdAt: serverTimestamp(),
   });
 }

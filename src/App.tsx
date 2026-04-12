@@ -1011,7 +1011,12 @@ const PropertyInteractiveLayout: FC<PropertyLayoutConfig & { onClose: () => void
     if (!leadName.trim() || !leadPhone.trim()) return;
     setLeadLoading(true);
     try {
-      await saveLead({ name: leadName.trim(), email: leadPhone.trim(), intent: `${intentPrefix} - ${active.label}` });
+      await saveLead({ 
+        name: leadName.trim(), 
+        phone: leadPhone.trim(), 
+        intent: `${intentPrefix} - ${active.label}`,
+        source: 'site_visit'
+      });
     } catch {/* fire and forget */} finally {
       setLeadLoading(false);
       setLeadSubmitted(true);
@@ -1137,10 +1142,7 @@ const PropertyInteractiveLayout: FC<PropertyLayoutConfig & { onClose: () => void
             </motion.div>
           </AnimatePresence>
 
-          <div className="mt-6 border-t border-white/10 pt-5">
-            <p className="text-[9px] uppercase tracking-[0.4em] text-white/40 font-bold mb-3">Express Interest</p>
-            <LeadForm />
-          </div>
+
         </div>
       </div>
 
@@ -1191,13 +1193,11 @@ const PropertyInteractiveLayout: FC<PropertyLayoutConfig & { onClose: () => void
             </AnimatePresence>
           </div>
 
-          {/* Lead capture */}
           <div className="border-t border-white/5 pt-6">
-            <p className="text-[8px] uppercase tracking-[0.4em] text-white/30 font-bold mb-1">Reserve Your Plot</p>
-            <p className="text-xs text-white/40 mb-4 leading-relaxed">
-              Express interest and our team will reach out within 24 hours.
+            <p className="text-[8px] uppercase tracking-[0.4em] text-white/30 font-bold mb-1">Status</p>
+            <p className="text-xs text-white/40 leading-relaxed italic">
+              Available for private reservation. Contact your advisor for details.
             </p>
-            <LeadForm />
           </div>
         </div>
 
@@ -1843,14 +1843,19 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
     if (!leadName.trim() || !leadPhone.trim()) return;
     setLeadLoading(true);
     try {
-      await saveLead({ name: leadName.trim(), email: leadPhone.trim(), intent: `${sanctuary.title} - Site Visit Request` });
+      await saveLead({ 
+        name: leadName.trim(), 
+        phone: leadPhone.trim(), 
+        intent: `${sanctuary.title} - Site Visit Request`,
+        source: 'site_visit'
+      });
     } catch {/* fire and forget */} finally {
       setLeadLoading(false);
       setLeadSubmitted(true);
     }
   };
 
-  const badge = sanctuary.id === 'syl' ? 'Upcoming' : 'Open - Expression of Interest';
+  const badge = sanctuary.id === 'syl' ? 'Upcoming' : 'Open for Reservation';
 
   const TABS: { id: Tab; label: string }[] = [
     { id: 'gallery', label: 'Gallery' },
@@ -2445,31 +2450,7 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
                 </div>
               )}
 
-              {/* Site visit form */}
-              <div>
-                <p className="text-[9px] uppercase tracking-[0.5em] text-secondary/60 font-bold mb-3">Reserve Your Interest</p>
-                {leadSubmitted ? (
-                  <div className="p-6 rounded-2xl bg-primary/8 border border-primary/15 text-center space-y-2">
-                    <div className="w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center mx-auto">
-                      <Check className="w-5 h-5 text-primary" />
-                    </div>
-                    <p className="text-sm font-bold text-on-surface">We'll be in touch soon.</p>
-                    <p className="text-[11px] text-secondary/60">Our team will reach out within 24 hours.</p>
-                  </div>
-                ) : (
-                  <form onSubmit={handleLeadSubmit} className="space-y-3">
-                    <input type="text" placeholder="Your Name" value={leadName} onChange={e => setLeadName(e.target.value)}
-                      className="w-full bg-on-surface/5 border border-outline/20 rounded-xl px-4 py-3.5 text-sm text-on-surface placeholder:text-secondary/40 focus:outline-none focus:border-primary/50 transition-colors" />
-                    <input type="tel" placeholder="Phone Number" value={leadPhone} onChange={e => setLeadPhone(e.target.value)}
-                      className="w-full bg-on-surface/5 border border-outline/20 rounded-xl px-4 py-3.5 text-sm text-on-surface placeholder:text-secondary/40 focus:outline-none focus:border-primary/50 transition-colors" />
-                    <button type="submit" disabled={leadLoading || !leadName.trim() || !leadPhone.trim()}
-                      className="w-full py-4 bg-primary text-on-primary text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl hover:bg-primary/90 transition-all flex items-center justify-center gap-3 disabled:opacity-50">
-                      <ArrowRight className="w-4 h-4" />
-                      {leadLoading ? 'Sending ' : 'Request Site Visit'}
-                    </button>
-                  </form>
-                )}
-              </div>
+
             </motion.div>
           )}
 
@@ -2478,13 +2459,7 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
 
       {/* ── STICKY BOTTOM CTA ────────────────────────────────────────── */}
       <div className="flex-shrink-0 px-6 py-4 bg-surface border-t border-outline/10 flex gap-3">
-        <button
-          onClick={() => setActiveTab('investment')}
-          className="flex-1 py-3.5 bg-primary text-on-primary text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl hover:bg-primary/90 transition-all flex items-center justify-center gap-2"
-        >
-          <ArrowRight className="w-4 h-4" />
-          Express Interest
-        </button>
+
         {(sanctuary.mapUrl || sanctuary.brochureUrl) && (
           <a
             href={sanctuary.mapUrl || sanctuary.brochureUrl}
@@ -3929,6 +3904,7 @@ const ApplicationForm = ({ isLoggedIn = false, onNewsletterClick }: { isLoggedIn
           form.investmentBracket && `Budget: ${form.investmentBracket}`,
           form.intent,
         ].filter(Boolean).join(' | '),
+        source: 'adviser_call'
       });
       // Auto-subscribe to newsletter - membership includes intelligence briefings
       await saveNewsletter(form.email, 'modal');
@@ -4911,6 +4887,13 @@ export default function App() {
     if (isNew) {
       setProfileUser(user);
       setShowProfile(true);
+      // Ensure all signups are captured as leads immediately
+      saveLead({
+        name: user.displayName || 'New User',
+        email: user.email || undefined,
+        intent: 'New Sign-up',
+        source: 'signup'
+      }).catch(() => {}); 
     } else {
       // For returning users: check if they have a profile, if not show it
       upsertUserProfile(user.uid, {
