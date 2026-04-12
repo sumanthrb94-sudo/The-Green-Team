@@ -4705,9 +4705,14 @@ const AuthModal = ({
       initializeRecaptcha();
       
       // Format phone number with country code if not present
-      let formattedPhone = phone.trim();
+      let formattedPhone = phone.trim().replace(/\s/g, '');
       if (!formattedPhone.startsWith('+')) {
-        formattedPhone = '+91' + formattedPhone.replace(/\D/g, '');
+        // If it starts with 91 but no +, add +
+        if (formattedPhone.startsWith('91') && formattedPhone.length > 10) {
+          formattedPhone = '+' + formattedPhone;
+        } else {
+          formattedPhone = '+91' + formattedPhone.replace(/\D/g, '');
+        }
       }
       
       if (recaptchaVerifierRef.current) {
@@ -4800,24 +4805,24 @@ const AuthModal = ({
         transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
         className="relative"
       >
-        <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center relative">
+        <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-[#3a5630]/20 to-[#3a5630]/5 flex items-center justify-center relative">
           {/* Glow effect */}
           <motion.div
             animate={{ opacity: [0.2, 0.5, 0.2], scale: [1, 1.1, 1] }}
             transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute inset-0 bg-primary/20 blur-2xl rounded-full"
+            className="absolute inset-0 bg-[#3a5630]/20 blur-2xl rounded-full"
           />
-          <svg viewBox="0 0 100 100" className="w-12 h-12 text-primary fill-current">
-            <path d="M50 95C50 95 48 80 40 70C30 60 10 55 5 40C0 25 15 5 40 10C55 13 65 25 70 40C75 55 65 75 50 95Z" className="opacity-30" />
-            <path d="M50 90C50 90 52 75 60 65C70 55 90 50 95 35C100 20 85 0 60 5C45 8 35 20 30 35C25 50 35 70 50 90Z" />
-            <path d="M50 90L50 40M50 90C50 90 45 70 35 60M50 90C50 90 55 70 65 60" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" className="opacity-50" />
+          <svg viewBox="0 0 100 100" className="w-12 h-12 fill-current">
+            <path d="M50 95C50 95 48 80 40 70C30 60 10 55 5 40C0 25 15 5 40 10C55 13 65 25 70 40C75 55 65 75 50 95Z" className="text-[#3a5630] opacity-30" />
+            <path d="M50 90C50 90 52 75 60 65C70 55 90 50 95 35C100 20 85 0 60 5C45 8 35 20 30 35C25 50 35 70 50 90Z" className="text-[#3a5630]" />
+            <path d="M50 90L50 40M50 90C50 90 45 70 35 60M50 90C50 90 55 70 65 60" fill="none" stroke="#3a5630" strokeWidth="1" strokeLinecap="round" className="opacity-50" />
           </svg>
         </div>
         {/* Animated rings around logo */}
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
-          className="absolute inset-0 rounded-3xl border-2 border-transparent border-t-primary/40 border-r-primary/20"
+          className="absolute inset-0 rounded-3xl border-2 border-transparent border-t-[#3a5630]/40 border-r-[#3a5630]/20"
         />
       </motion.div>
     </motion.div>
