@@ -5236,6 +5236,20 @@ export default function App() {
         onClose={() => setIsNewsletterOpen(false)}
         onSubscribe={handleSubscribe}
       />
+
+      {/* Auth Modal — Sign In / Sign Up */}
+      <AuthModal
+        isOpen={isAuthOpen}
+        onClose={() => setIsAuthOpen(false)}
+        onSuccess={handleAuthSuccess}
+      />
+
+      {/* Profile Modal — Post Sign-In Profile Setup */}
+      <ProfileModal
+        isOpen={showProfile}
+        user={profileUser}
+        onDone={() => setShowProfile(false)}
+      />
     </div>
   );
 }
