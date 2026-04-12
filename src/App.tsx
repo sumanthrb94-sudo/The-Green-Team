@@ -1909,54 +1909,42 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
       transition={{ type: 'spring', damping: 28, stiffness: 220 }}
       className="fixed inset-0 z-[10000] flex flex-col bg-surface overflow-hidden"
     >
-      {/* ── TOP BAR ──────────────────────────────────────────────────── */}
-      <div className="relative flex-shrink-0 flex items-center justify-between px-6 pt-5 pb-3 z-20">
-        <div>
-          {sanctuary.tagline && (
-            <p className="text-[9px] uppercase tracking-[0.55em] text-primary/70 font-bold mb-1">{sanctuary.tagline}</p>
-          )}
-          <h2 className="text-xl font-headline font-bold text-on-surface leading-tight">{sanctuary.title}</h2>
-          <div className="flex items-center gap-1.5 text-secondary text-xs mt-0.5">
-            <MapPin className="w-3 h-3 flex-shrink-0" />
-            {sanctuary.location}
-          </div>
-        </div>
-        <button
-          onClick={onClose}
-          className="w-9 h-9 rounded-full bg-on-surface/10 hover:bg-on-surface/20 flex items-center justify-center transition-all flex-shrink-0 ml-4"
-        >
-          <X className="w-4 h-4 text-on-surface" />
-        </button>
-      </div>
-
-      {/* Non-scrollable header — title + price */}
-      <div className="px-6 pt-5 pb-4 border-b border-outline/10 flex-shrink-0">
-        <div className="flex justify-between items-start gap-3">
-          <div>
+      {/* ── Header — title + price + close ── */}
+      <div className="px-5 pt-4 pb-4 border-b border-outline/10 flex-shrink-0">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
             {sanctuary.tagline && (
-              <p className="text-[9px] uppercase tracking-[0.5em] text-primary font-bold mb-1">{sanctuary.tagline}</p>
+              <p className="text-[8px] uppercase tracking-[0.5em] text-primary font-bold mb-0.5 truncate">{sanctuary.tagline}</p>
             )}
-            <h2 className="text-xl font-headline font-bold text-on-surface leading-tight">{sanctuary.title}</h2>
-            <div className="flex items-center gap-1.5 text-secondary text-xs mt-1.5">
+            <h2 className="text-lg font-headline font-bold text-on-surface leading-tight">{sanctuary.title}</h2>
+            <div className="flex items-center gap-1.5 text-secondary text-[11px] mt-1">
               <MapPin className="w-3 h-3 flex-shrink-0" />
-              {sanctuary.location}
+              <span className="truncate">{sanctuary.location}</span>
             </div>
           </div>
-          <div className="text-right flex-shrink-0">
-            {sanctuary.pricePerSqYd ? (
-              <>
-                <p className="text-xl font-headline font-bold text-primary">
-                  ₹{sanctuary.pricePerSqYd.toLocaleString('en-IN')}
-                  <span className="text-xs font-normal text-secondary/60">/sq yd</span>
-                </p>
-                <p className="text-[9px] text-secondary/50">{sanctuary.memberPrice}</p>
-              </>
-            ) : (
-              <>
-                <p className="text-xl font-headline font-bold text-primary">{sanctuary.memberPrice}</p>
-                <p className="text-xs text-secondary/40 line-through">{sanctuary.valuation}</p>
-              </>
-            )}
+          <div className="flex items-start gap-2 flex-shrink-0">
+            <div className="text-right">
+              {sanctuary.pricePerSqYd ? (
+                <>
+                  <p className="text-lg font-headline font-bold text-primary leading-tight">
+                    ₹{sanctuary.pricePerSqYd.toLocaleString('en-IN')}
+                    <span className="text-[10px] font-normal text-secondary/60">/sq yd</span>
+                  </p>
+                  <p className="text-[9px] text-secondary/50">{sanctuary.memberPrice}</p>
+                </>
+              ) : (
+                <>
+                  <p className="text-lg font-headline font-bold text-primary">{sanctuary.memberPrice}</p>
+                  <p className="text-[10px] text-secondary/40 line-through">{sanctuary.valuation}</p>
+                </>
+              )}
+            </div>
+            <button
+              onClick={onClose}
+              className="w-8 h-8 rounded-full bg-on-surface/10 hover:bg-on-surface/20 flex items-center justify-center transition-all"
+            >
+              <X className="w-4 h-4 text-on-surface" />
+            </button>
           </div>
         </div>
       </div>
@@ -2092,7 +2080,7 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
                         const nowVal  = activePlot.sqYds * AGARTHA_NOW_RATE;
                         const gain    = nowVal - oldVal;
                         const pct     = ((gain / oldVal) * 100).toFixed(1);
-                        const annPct  = (parseFloat(pct) / 2).toFixed(1);
+                        const annPct  = (parseFloat(pct) / 1.5).toFixed(1);
                         return (
                           <motion.div key={activePlot.id}
                             initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 4 }}
@@ -2114,14 +2102,14 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
                               <div className="rounded-xl bg-white/4 border border-white/5 overflow-hidden">
                                 <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
                                   <div>
-                                    <p className="text-[8px] uppercase tracking-widest text-white/30 font-bold">VIP Pre-Launch · 2022</p>
+                                    <p className="text-[8px] uppercase tracking-widest text-white/30 font-bold">VIP Pre-Launch · Aug 2024</p>
                                     <p className="text-base font-headline font-bold text-white/60 mt-0.5">{formatRs(oldVal)}</p>
                                   </div>
                                   <p className="text-[9px] text-white/30">₹{AGARTHA_OLD_RATE.toLocaleString('en-IN')}/sq yd</p>
                                 </div>
                                 <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
                                   <div>
-                                    <p className="text-[8px] uppercase tracking-widest text-primary/60 font-bold">Today · 2024</p>
+                                    <p className="text-[8px] uppercase tracking-widest text-primary/60 font-bold">Today · 2026</p>
                                     <p className="text-base font-headline font-bold text-white mt-0.5">{formatRs(nowVal)}</p>
                                   </div>
                                   <p className="text-[9px] text-primary/60">₹{AGARTHA_NOW_RATE.toLocaleString('en-IN')}/sq yd</p>
@@ -2136,7 +2124,7 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
                                   </div>
                                   <div className="text-right">
                                     <p className="text-xl font-headline font-bold text-primary">+{pct}%</p>
-                                    <p className="text-[9px] text-primary/50">in 2 years</p>
+                                    <p className="text-[9px] text-primary/50">in ~18 months</p>
                                     <p className="text-[9px] text-primary/40">({annPct}% p.a.)</p>
                                   </div>
                                 </div>
@@ -2144,7 +2132,7 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
                             </div>
                             <div className="px-5 pb-4">
                               <p className="text-[10px] text-white/35 leading-relaxed">
-                                An investor who booked this exact plot at pre-launch in 2022 has seen a paper gain of <span className="text-primary/70 font-bold">{formatRs(gain)}</span> without doing anything — simply because Agartha's land value grew <span className="text-primary/70 font-bold">+{pct}% in 2 years</span>. Today's buyers get the same compounding advantage for the next cycle.
+                                An investor who booked this exact plot at VIP pre-launch in Aug 2024 has seen a paper gain of <span className="text-primary/70 font-bold">{formatRs(gain)}</span> without doing anything — simply because Agartha's land value grew <span className="text-primary/70 font-bold">+{pct}% in ~18 months</span>. Today's buyers get the same compounding advantage for the next cycle.
                               </p>
                             </div>
                           </motion.div>
