@@ -1918,6 +1918,7 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
 }) => {
   const hotspots  = SANCTUARY_HOTSPOTS[sanctuary.id] ?? null;
   const plotDots  = SANCTUARY_PLOTS[sanctuary.id]    ?? null;
+  const [pdTab, setPdTab]             = useState<'gallery' | 'plan' | 'invest'>('gallery');
   const [activeSpot, setActiveSpot]   = useState<Hotspot | null>(hotspots?.[0] ?? null);
   const [activePlot, setActivePlot]   = useState<PlotDot | null>(null);
   const [mapMode, setMapMode]         = useState<'plots' | 'features'>(plotDots ? 'plots' : 'features');
@@ -1994,103 +1995,105 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
         </div>
       </div>
 
-      {/* Scrollable body */}
+      {/* Non-scrollable header — title + price */}
+      <div className="px-6 pt-5 pb-4 border-b border-outline/10 flex-shrink-0">
+        <div className="flex justify-between items-start gap-3">
+          <div>
+            {sanctuary.tagline && (
+              <p className="text-[9px] uppercase tracking-[0.5em] text-primary font-bold mb-1">{sanctuary.tagline}</p>
+            )}
+            <h2 className="text-xl font-headline font-bold text-on-surface leading-tight">{sanctuary.title}</h2>
+            <div className="flex items-center gap-1.5 text-secondary text-xs mt-1.5">
+              <MapPin className="w-3 h-3 flex-shrink-0" />
+              {sanctuary.location}
+            </div>
+          </div>
+          <div className="text-right flex-shrink-0">
+            {sanctuary.pricePerSqYd ? (
+              <>
+                <p className="text-xl font-headline font-bold text-primary">
+                  ₹{sanctuary.pricePerSqYd.toLocaleString('en-IN')}
+                  <span className="text-xs font-normal text-secondary/60">/sq yd</span>
+                </p>
+                <p className="text-[9px] text-secondary/50">{sanctuary.memberPrice}</p>
+              </>
+            ) : (
+              <>
+                <p className="text-xl font-headline font-bold text-primary">{sanctuary.memberPrice}</p>
+                <p className="text-xs text-secondary/40 line-through">{sanctuary.valuation}</p>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Tab nav ── */}
+      <div className="flex border-b border-outline/10 flex-shrink-0">
+        {(['gallery', 'plan', 'invest'] as const).map(t => (
+          <button key={t} onClick={() => setPdTab(t)}
+            className={cn(
+              "flex-1 py-3 text-[9px] uppercase tracking-[0.25em] font-bold transition-all border-b-2",
+              pdTab === t ? "text-primary border-primary" : "text-secondary/40 border-transparent hover:text-secondary/70"
+            )}>
+            {t === 'gallery' ? 'Gallery' : t === 'plan' ? 'Plan & Details' : 'Invest'}
+          </button>
+        ))}
+      </div>
+
+      {/* ── Tab content — scrollable ── */}
       <div className="flex-1 overflow-y-auto">
-        {/* Title + price */}
-        <div className="px-8 pt-8 pb-6 border-b border-outline/10">
-          <div className="flex justify-between items-start gap-4">
-            <div>
-              {sanctuary.tagline && (
-                <p className="text-[9px] uppercase tracking-[0.5em] text-primary font-bold mb-2">{sanctuary.tagline}</p>
-              )}
-              <h2 className="text-2xl font-headline font-bold text-on-surface leading-tight">{sanctuary.title}</h2>
-              <div className="flex items-center gap-2 text-secondary text-xs mt-2">
-                <MapPin className="w-3 h-3 flex-shrink-0" />
-                {sanctuary.location}
-              </div>
-            </div>
-            <div className="text-right flex-shrink-0">
-              {sanctuary.pricePerSqYd ? (
-                <>
-                  <p className="text-[8px] uppercase tracking-widest text-secondary/50 mb-1">Rate</p>
-                  <p className="text-xl font-headline font-bold text-primary">
-                    ₹{sanctuary.pricePerSqYd.toLocaleString('en-IN')}
-                    <span className="text-xs font-normal text-secondary/60">/sq yd</span>
-                  </p>
-                  <p className="text-[9px] text-secondary/50 mt-0.5">{sanctuary.memberPrice}</p>
-                </>
-              ) : (
-                <>
-                  <p className="text-[8px] uppercase tracking-widest text-secondary/50 mb-1">Member Price</p>
-                  <p className="text-xl font-headline font-bold text-primary">{sanctuary.memberPrice}</p>
-                  <p className="text-xs text-secondary/40 line-through">{sanctuary.valuation}</p>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
 
-        {/* Key stats */}
-        <div className="grid grid-cols-3 divide-x divide-outline/10 border-b border-outline/10">
-          <div className="px-4 py-5 text-center">
-            <p className="text-[8px] uppercase tracking-widest text-secondary/50 mb-1">AQI</p>
-            <p className="text-lg font-bold text-primary">{sanctuary.aqi}</p>
-            <p className="text-[9px] text-secondary/50">Pure Air</p>
-          </div>
-          <div className="px-4 py-5 text-center">
-            <p className="text-[8px] uppercase tracking-widest text-secondary/50 mb-1">Noise</p>
-            <p className="text-lg font-bold text-on-surface">{sanctuary.noise} dB</p>
-            <p className="text-[9px] text-secondary/50">Near Silent</p>
-          </div>
-          <div className="px-4 py-5 text-center">
-            <p className="text-[8px] uppercase tracking-widest text-secondary/50 mb-1">Commute</p>
-            <p className="text-lg font-bold text-on-surface">{commuteTime}m</p>
-            <p className="text-[9px] text-secondary/50">{commuteShort}</p>
-          </div>
-        </div>
-
-        <div className="px-8 py-8 space-y-8">
-          {/* Description */}
-          {sanctuary.description && (
-            <p className="text-sm text-secondary/80 leading-relaxed">{sanctuary.description}</p>
-          )}
-
-          {/* Plot community stats */}
-          {sanctuary.plots && (
-            <div className="grid grid-cols-3 gap-4">
-              <div className="p-4 bg-primary/5 rounded-2xl text-center">
-                <p className="text-2xl font-headline font-bold text-primary">{sanctuary.plots}</p>
-                <p className="text-[8px] uppercase tracking-widest text-secondary/60 mt-1">Private Plots</p>
-              </div>
-              <div className="p-4 bg-primary/5 rounded-2xl text-center">
-                <p className="text-base font-headline font-bold text-primary leading-tight">{sanctuary.plotRange ?? '808–5,097'}</p>
-                <p className="text-[8px] uppercase tracking-widest text-secondary/60 mt-1">Sq Yds Range</p>
-              </div>
-              <div className="p-4 bg-primary/5 rounded-2xl text-center">
-                <p className="text-base font-headline font-bold text-primary leading-tight">{sanctuary.amenityAcres ?? '14,548'}</p>
-                <p className="text-[8px] uppercase tracking-widest text-secondary/60 mt-1">Amenity Sq Yds</p>
-              </div>
-            </div>
-          )}
-
-          {/* ── Photo Gallery ── */}
-          {sanctuary.plotImages && sanctuary.plotImages.length > 0 && (
-            <div>
-              <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold mb-3">Gallery</p>
-              <div className="flex gap-2 overflow-x-auto pb-2 -mx-8 px-8 scrollbar-hide snap-x snap-mandatory">
+        {/* ── GALLERY TAB ── */}
+        {pdTab === 'gallery' && (
+          <div className="py-4">
+            {sanctuary.plotImages && sanctuary.plotImages.length > 0 ? (
+              <div className="grid grid-cols-2 gap-0.5">
                 {sanctuary.plotImages.map((src, i) => (
                   <img
                     key={i}
                     src={src}
                     alt={`${sanctuary.title} — photo ${i + 1}`}
-                    className="h-52 w-auto flex-shrink-0 rounded-xl object-cover snap-start"
+                    className={cn(
+                      "w-full object-cover",
+                      i === 0 ? "col-span-2 h-56" : "h-40"
+                    )}
                     referrerPolicy="no-referrer"
                     loading="lazy"
                   />
                 ))}
               </div>
-            </div>
-          )}
+            ) : (
+              <img src={sanctuary.image} alt={sanctuary.title}
+                className="w-full h-72 object-cover" referrerPolicy="no-referrer" />
+            )}
+          </div>
+        )}
+
+        {/* ── PLAN & DETAILS TAB ── */}
+        {pdTab === 'plan' && (
+          <div className="px-6 py-6 space-y-8">
+            {/* Description */}
+            {sanctuary.description && (
+              <p className="text-sm text-secondary/80 leading-relaxed">{sanctuary.description}</p>
+            )}
+
+            {/* Plot community stats */}
+            {sanctuary.plots && (
+              <div className="grid grid-cols-3 gap-3">
+                <div className="p-4 bg-primary/5 rounded-2xl text-center">
+                  <p className="text-2xl font-headline font-bold text-primary">{sanctuary.plots}</p>
+                  <p className="text-[8px] uppercase tracking-widest text-secondary/60 mt-1">Private Plots</p>
+                </div>
+                <div className="p-4 bg-primary/5 rounded-2xl text-center">
+                  <p className="text-sm font-headline font-bold text-primary leading-tight">{sanctuary.plotRange ?? '808–5,097'}</p>
+                  <p className="text-[8px] uppercase tracking-widest text-secondary/60 mt-1">Sq Yds Range</p>
+                </div>
+                <div className="p-4 bg-primary/5 rounded-2xl text-center">
+                  <p className="text-sm font-headline font-bold text-primary leading-tight">{sanctuary.amenityAcres ?? '14,548'}</p>
+                  <p className="text-[8px] uppercase tracking-widest text-secondary/60 mt-1">Amenity Sq Yds</p>
+                </div>
+              </div>
+            )}
 
           {/* ── Interactive Site Plan ── */}
           {sanctuary.sitePlanSrc && (plotDots || hotspots) && (
@@ -2314,126 +2317,152 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
             </div>
           )}
 
-          {/* Price breakdown table */}
-          {sanctuary.pricePerSqYd && (
-            <div>
-              <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold mb-4">
-                Price Calculator — ₹{sanctuary.pricePerSqYd.toLocaleString('en-IN')}/sq yd
-              </p>
-              <div className="rounded-2xl overflow-hidden border border-outline/10">
-                {[
-                  { label: 'Plot 01 (Smallest)', sqYds: 808 },
-                  { label: 'Typical Plot', sqYds: 1300 },
-                  { label: 'Large Plot', sqYds: 2000 },
-                  { label: 'Premium Plot', sqYds: 3000 },
-                  { label: 'Plot 15 (Largest)', sqYds: 5097 },
-                ].map((row, i) => {
-                  const totalRs = row.sqYds * sanctuary.pricePerSqYd!;
-                  const display = totalRs >= 1e7 ? `₹${(totalRs / 1e7).toFixed(2)} Cr` : `₹${(totalRs / 1e5).toFixed(1)} L`;
-                  return (
-                    <div key={i} className={cn("grid grid-cols-3 px-4 py-3 text-[10px]", i % 2 === 0 ? "bg-primary/3" : "bg-transparent")}>
-                      <span className="text-secondary/60 font-medium">{row.label}</span>
-                      <span className="text-center font-bold text-on-surface">{row.sqYds.toLocaleString('en-IN')} sq yds</span>
-                      <span className="text-right font-bold text-primary">{display}</span>
-                    </div>
-                  );
-                })}
-              </div>
-              <p className="text-[8px] text-secondary/40 mt-2">Rate: ₹{sanctuary.pricePerSqYd.toLocaleString('en-IN')}/sq yd</p>
-            </div>
-          )}
 
-          {/* Features */}
-          {sanctuary.features && sanctuary.features.length > 0 && (
-            <div>
-              <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold mb-4">Curated Features</p>
-              <div className="grid grid-cols-2 gap-3">
-                {sanctuary.features.map((feature, i) => (
-                  <div key={i} className="flex items-center gap-3 p-3 rounded-xl border border-outline/10 bg-surface-container-low/50">
-                    <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
-                      {featureIcon(feature)}
+            {/* Features */}
+            {sanctuary.features && sanctuary.features.length > 0 && (
+              <div>
+                <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold mb-4">Curated Features</p>
+                <div className="grid grid-cols-2 gap-3">
+                  {sanctuary.features.map((feature, i) => (
+                    <div key={i} className="flex items-center gap-3 p-3 rounded-xl border border-outline/10 bg-surface-container-low/50">
+                      <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
+                        {featureIcon(feature)}
+                      </div>
+                      <span className="text-[10px] font-medium text-on-surface leading-tight">{feature}</span>
                     </div>
-                    <span className="text-[10px] font-medium text-on-surface leading-tight">{feature}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Environmental integrity */}
+            <div>
+              <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold mb-4">Environmental Integrity</p>
+              <div className="space-y-3">
+                {[
+                  { label: 'Air Quality Index', value: `${sanctuary.aqi} — Pristine`, bar: Math.min((50 - sanctuary.aqi) / 50, 1) },
+                  { label: 'Ambient Noise', value: `${sanctuary.noise} dB — Near Silent`, bar: Math.min((50 - sanctuary.noise) / 50, 1) },
+                  { label: 'Forest Proximity', value: 'Direct Boundary Access', bar: 0.95 },
+                ].map(item => (
+                  <div key={item.label}>
+                    <div className="flex justify-between text-[9px] mb-1">
+                      <span className="uppercase tracking-widest text-secondary/60">{item.label}</span>
+                      <span className="font-bold text-on-surface">{item.value}</span>
+                    </div>
+                    <div className="h-1 bg-outline/10 rounded-full overflow-hidden">
+                      <motion.div initial={{ width: 0 }} animate={{ width: `${item.bar * 100}%` }}
+                        transition={{ delay: 0.3, duration: 0.8, ease: 'easeOut' }}
+                        className="h-full bg-primary rounded-full" />
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
-          )}
 
-          {/* Environmental integrity */}
-          <div>
-            <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold mb-4">Environmental Integrity</p>
-            <div className="space-y-3">
-              {[
-                { label: 'Air Quality Index', value: `${sanctuary.aqi} — Pristine`, bar: Math.min((50 - sanctuary.aqi) / 50, 1) },
-                { label: 'Ambient Noise', value: `${sanctuary.noise} dB — Near Silent`, bar: Math.min((50 - sanctuary.noise) / 50, 1) },
-                { label: 'Forest Proximity', value: 'Direct Boundary Access', bar: 0.95 },
-              ].map(item => (
-                <div key={item.label}>
-                  <div className="flex justify-between text-[9px] mb-1">
-                    <span className="uppercase tracking-widest text-secondary/60">{item.label}</span>
-                    <span className="font-bold text-on-surface">{item.value}</span>
-                  </div>
-                  <div className="h-1 bg-outline/10 rounded-full overflow-hidden">
-                    <motion.div initial={{ width: 0 }} animate={{ width: `${item.bar * 100}%` }}
-                      transition={{ delay: 0.3, duration: 0.8, ease: 'easeOut' }}
-                      className="h-full bg-primary rounded-full" />
-                  </div>
+            {/* Developer credit */}
+            {sanctuary.architect && (
+              <div className="flex items-center gap-3 p-4 border border-outline/10 rounded-2xl">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <Award className="w-5 h-5 text-primary" />
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Developer credit */}
-          {sanctuary.architect && (
-            <div className="flex items-center gap-3 p-4 border border-outline/10 rounded-2xl">
-              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                <Award className="w-5 h-5 text-primary" />
+                <div>
+                  <p className="text-[8px] uppercase tracking-widest text-secondary/50">Developed by</p>
+                  <p className="text-sm font-bold text-on-surface">{sanctuary.architect}</p>
+                </div>
               </div>
+            )}
+          </div>
+        )}
+
+        {/* ── INVEST TAB ── */}
+        {pdTab === 'invest' && (
+          <div className="px-6 py-6 space-y-6">
+
+            {/* Key stats row */}
+            <div className="grid grid-cols-3 divide-x divide-outline/10 rounded-2xl border border-outline/10 overflow-hidden">
+              <div className="px-3 py-4 text-center">
+                <p className="text-[8px] uppercase tracking-widest text-secondary/50 mb-1">AQI</p>
+                <p className="text-lg font-bold text-primary">{sanctuary.aqi}</p>
+                <p className="text-[9px] text-secondary/50">Pure Air</p>
+              </div>
+              <div className="px-3 py-4 text-center">
+                <p className="text-[8px] uppercase tracking-widest text-secondary/50 mb-1">Noise</p>
+                <p className="text-lg font-bold text-on-surface">{sanctuary.noise} dB</p>
+                <p className="text-[9px] text-secondary/50">Near Silent</p>
+              </div>
+              <div className="px-3 py-4 text-center">
+                <p className="text-[8px] uppercase tracking-widest text-secondary/50 mb-1">Commute</p>
+                <p className="text-lg font-bold text-on-surface">{commuteTime}m</p>
+                <p className="text-[9px] text-secondary/50">{commuteShort}</p>
+              </div>
+            </div>
+
+            {/* Price breakdown table */}
+            {sanctuary.pricePerSqYd && (
               <div>
-                <p className="text-[8px] uppercase tracking-widest text-secondary/50">Developed by</p>
-                <p className="text-sm font-bold text-on-surface">{sanctuary.architect}</p>
-              </div>
-            </div>
-          )}
-
-          {/* ── Lead capture + CTAs ── */}
-          <div className="space-y-4 pb-4">
-            <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold">Reserve Your Interest</p>
-
-            {leadSubmitted ? (
-              <div className="p-6 rounded-2xl bg-primary/5 border border-primary/10 text-center space-y-2">
-                <div className="w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center mx-auto">
-                  <Check className="w-5 h-5 text-primary" />
+                <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold mb-4">
+                  Price Calculator — ₹{sanctuary.pricePerSqYd.toLocaleString('en-IN')}/sq yd
+                </p>
+                <div className="rounded-2xl overflow-hidden border border-outline/10">
+                  {[
+                    { label: 'Plot 01 (Smallest)', sqYds: 808 },
+                    { label: 'Typical Plot', sqYds: 1300 },
+                    { label: 'Large Plot', sqYds: 2000 },
+                    { label: 'Premium Plot', sqYds: 3000 },
+                    { label: 'Plot 15 (Largest)', sqYds: 5097 },
+                  ].map((row, i) => {
+                    const totalRs = row.sqYds * sanctuary.pricePerSqYd!;
+                    const display = totalRs >= 1e7 ? `₹${(totalRs / 1e7).toFixed(2)} Cr` : `₹${(totalRs / 1e5).toFixed(1)} L`;
+                    return (
+                      <div key={i} className={cn("grid grid-cols-3 px-4 py-3 text-[10px]", i % 2 === 0 ? "bg-primary/3" : "bg-transparent")}>
+                        <span className="text-secondary/60 font-medium">{row.label}</span>
+                        <span className="text-center font-bold text-on-surface">{row.sqYds.toLocaleString('en-IN')} sq yds</span>
+                        <span className="text-right font-bold text-primary">{display}</span>
+                      </div>
+                    );
+                  })}
                 </div>
-                <p className="text-sm font-bold text-on-surface">We'll be in touch soon.</p>
-                <p className="text-[11px] text-secondary/50">Our team will reach out within 24 hours.</p>
+                <p className="text-[8px] text-secondary/40 mt-2">Rate: ₹{sanctuary.pricePerSqYd.toLocaleString('en-IN')}/sq yd</p>
               </div>
-            ) : (
-              <form onSubmit={handleLeadSubmit} className="space-y-3">
-                <input type="text" placeholder="Your Name" value={leadName}
-                  onChange={e => setLeadName(e.target.value)}
-                  className="w-full bg-surface-container-low border border-outline/15 rounded-xl px-4 py-3.5 text-sm text-on-surface placeholder-secondary/30 focus:outline-none focus:border-primary/50 transition-colors" />
-                <input type="tel" placeholder="Phone Number" value={leadPhone}
-                  onChange={e => setLeadPhone(e.target.value)}
-                  className="w-full bg-surface-container-low border border-outline/15 rounded-xl px-4 py-3.5 text-sm text-on-surface placeholder-secondary/30 focus:outline-none focus:border-primary/50 transition-colors" />
-                <button type="submit" disabled={leadLoading || !leadName.trim() || !leadPhone.trim()}
-                  className="w-full py-4 bg-primary text-on-primary text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all flex items-center justify-center gap-3 disabled:opacity-50">
-                  <ArrowRight className="w-4 h-4" />
-                  {leadLoading ? 'Sending…' : 'Request Site Visit'}
-                </button>
-              </form>
             )}
 
-            {sanctuary.brochureUrl && (
-              <a href={sanctuary.brochureUrl} target="_blank" rel="noopener noreferrer"
-                className="w-full py-3.5 border border-outline/20 text-on-surface text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl hover:bg-primary/5 transition-all flex items-center justify-center gap-3">
-                <ArrowRight className="w-4 h-4" />
-                View Full Brochure
-              </a>
-            )}
+            {/* Lead capture */}
+            <div className="space-y-4 pb-4">
+              <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold">Reserve Your Interest</p>
+              {leadSubmitted ? (
+                <div className="p-6 rounded-2xl bg-primary/5 border border-primary/10 text-center space-y-2">
+                  <div className="w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center mx-auto">
+                    <Check className="w-5 h-5 text-primary" />
+                  </div>
+                  <p className="text-sm font-bold text-on-surface">We'll be in touch soon.</p>
+                  <p className="text-[11px] text-secondary/50">Our team will reach out within 24 hours.</p>
+                </div>
+              ) : (
+                <form onSubmit={handleLeadSubmit} className="space-y-3">
+                  <input type="text" placeholder="Your Name" value={leadName}
+                    onChange={e => setLeadName(e.target.value)}
+                    className="w-full bg-surface-container-low border border-outline/15 rounded-xl px-4 py-3.5 text-sm text-on-surface placeholder-secondary/30 focus:outline-none focus:border-primary/50 transition-colors" />
+                  <input type="tel" placeholder="Phone Number" value={leadPhone}
+                    onChange={e => setLeadPhone(e.target.value)}
+                    className="w-full bg-surface-container-low border border-outline/15 rounded-xl px-4 py-3.5 text-sm text-on-surface placeholder-secondary/30 focus:outline-none focus:border-primary/50 transition-colors" />
+                  <button type="submit" disabled={leadLoading || !leadName.trim() || !leadPhone.trim()}
+                    className="w-full py-4 bg-primary text-on-primary text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all flex items-center justify-center gap-3 disabled:opacity-50">
+                    <ArrowRight className="w-4 h-4" />
+                    {leadLoading ? 'Sending…' : 'Request Site Visit'}
+                  </button>
+                </form>
+              )}
+              {sanctuary.brochureUrl && (
+                <a href={sanctuary.brochureUrl} target="_blank" rel="noopener noreferrer"
+                  className="w-full py-3.5 border border-outline/20 text-on-surface text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl hover:bg-primary/5 transition-all flex items-center justify-center gap-3">
+                  <ArrowRight className="w-4 h-4" />
+                  View Full Brochure
+                </a>
+              )}
+            </div>
           </div>
-        </div>
+        )}
+
       </div>
 
       {/* ── Timed newsletter prompt (slides up after 25s) ── */}
