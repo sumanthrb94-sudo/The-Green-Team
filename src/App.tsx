@@ -4643,7 +4643,7 @@ const friendlyAuthError = (code: string) => {
   return map[code] || 'Something went wrong. Please try again.';
 };
 
-// ─── Auth Modal ───────────────────────────────────────────────────────────────
+// ─── Auth Modal (Premium Animated) ────────────────────────────────────────────
 
 const AuthModal = ({
   isOpen,
@@ -4701,40 +4701,112 @@ const AuthModal = ({
     }
   };
 
+  // Animated logo component
+  const AnimatedLogo = () => (
+    <motion.div
+      initial={{ scale: 0, opacity: 0, rotate: -180 }}
+      animate={{ scale: 1, opacity: 1, rotate: 0 }}
+      transition={{ type: 'spring', damping: 20, stiffness: 150, delay: 0.2 }}
+      className="flex justify-center mb-8"
+    >
+      <motion.div
+        animate={{ y: [0, -8, 0] }}
+        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+        className="relative"
+      >
+        <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+          <svg viewBox="0 0 100 100" className="w-12 h-12 text-primary fill-current">
+            <path d="M50 95C50 95 48 80 40 70C30 60 10 55 5 40C0 25 15 5 40 10C55 13 65 25 70 40C75 55 65 75 50 95Z" className="opacity-30" />
+            <path d="M50 90C50 90 52 75 60 65C70 55 90 50 95 35C100 20 85 0 60 5C45 8 35 20 30 35C25 50 35 70 50 90Z" />
+            <path d="M50 90L50 40M50 90C50 90 45 70 35 60M50 90C50 90 55 70 65 60" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" className="opacity-50" />
+          </svg>
+        </div>
+        {/* Animated rings around logo */}
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
+          className="absolute inset-0 rounded-3xl border-2 border-transparent border-t-primary/40 border-r-primary/20"
+        />
+      </motion.div>
+    </motion.div>
+  );
+
   return (
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-[9998] flex items-end sm:items-center justify-center">
+          {/* Animated backdrop with gradient */}
           <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-olive-900/80 backdrop-blur-xl"
+            className="absolute inset-0 bg-gradient-to-b from-olive-900/60 to-olive-900/90 backdrop-blur-xl"
           />
+          
+          {/* Main modal container */}
           <motion.div
-            initial={{ opacity: 0, y: 60 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 60 }}
-            transition={{ type: 'spring', damping: 30, stiffness: 240 }}
+            initial={{ opacity: 0, y: 100, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 100, scale: 0.9 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
             className="relative w-full sm:max-w-md bg-cream sm:rounded-3xl rounded-t-3xl shadow-2xl overflow-hidden"
           >
-            {/* Hero strip */}
-            <div className="bg-olive-900 px-10 pt-12 pb-10 text-cream text-center">
-              <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center mx-auto mb-5">
-                <Leaf className="w-6 h-6 text-primary" />
+            {/* Animated gradient header */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.1 }}
+              className="relative bg-gradient-to-br from-olive-900 via-olive-800 to-primary/20 px-10 pt-8 pb-12 text-cream text-center overflow-hidden"
+            >
+              {/* Animated background elements */}
+              <motion.div
+                animate={{ opacity: [0.1, 0.3, 0.1] }}
+                transition={{ duration: 4, repeat: Infinity }}
+                className="absolute inset-0 bg-gradient-to-t from-primary/10 to-transparent"
+              />
+              
+              {/* Logo */}
+              <div className="relative z-10">
+                <AnimatedLogo />
+                <motion.h2
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="text-3xl font-serif italic mb-2 font-bold tracking-tight"
+                >
+                  Unlock The Sanctuaries
+                </motion.h2>
+                <motion.p
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="text-cream/60 text-xs font-light tracking-wide"
+                >
+                  Pre-launch access · Exclusive investor pricing
+                </motion.p>
               </div>
-              <h2 className="text-2xl font-serif italic mb-1">Unlock The Sanctuaries</h2>
-              <p className="text-cream/50 text-xs font-light tracking-wide">Pre-launch access · Exclusive investor pricing</p>
-            </div>
+            </motion.div>
 
-            <div className="px-10 py-8 space-y-5">
+            {/* Form content */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="px-10 py-8 space-y-5"
+            >
               {/* Google — PRIMARY CTA */}
-              <button
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={handleGoogle}
                 disabled={!!loading}
-                className="w-full flex items-center justify-center gap-3 py-4 bg-white border border-olive-800/10 rounded-2xl text-olive-900 text-sm font-semibold shadow-sm hover:shadow-md hover:border-olive-800/20 transition-all disabled:opacity-60"
+                className="w-full flex items-center justify-center gap-3 py-4 bg-white border border-olive-800/10 rounded-2xl text-olive-900 text-sm font-semibold shadow-sm hover:shadow-lg hover:border-olive-800/20 transition-all disabled:opacity-60"
               >
                 {loading === 'google'
-                  ? <RefreshCw className="w-5 h-5 animate-spin text-olive-800/40" />
+                  ? <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity }}>
+                      <RefreshCw className="w-5 h-5 text-olive-800/40" />
+                    </motion.div>
                   : (
                     <svg className="w-5 h-5" viewBox="0 0 24 24">
                       <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -4744,24 +4816,31 @@ const AuthModal = ({
                     </svg>
                   )
                 }
-                {loading === 'google' ? 'Connecting…' : 'Continue with Google'}
-              </button>
+                <span>{loading === 'google' ? 'Connecting…' : 'Continue with Google'}</span>
+              </motion.button>
 
               {/* Divider */}
-              <div className="flex items-center gap-4">
-                <div className="flex-1 h-px bg-olive-800/10" />
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className="flex items-center gap-4"
+              >
+                <motion.div className="flex-1 h-px bg-gradient-to-r from-transparent via-olive-800/20 to-transparent" />
                 <span className="text-[9px] uppercase tracking-[0.4em] text-olive-800/30 font-bold">or</span>
-                <div className="flex-1 h-px bg-olive-800/10" />
-              </div>
+                <motion.div className="flex-1 h-px bg-gradient-to-r from-transparent via-olive-800/20 to-transparent" />
+              </motion.div>
 
               {/* Email — secondary, expandable */}
               {!emailOpen ? (
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={() => setEmailOpen(true)}
                   className="w-full py-3.5 border border-olive-800/15 rounded-2xl text-olive-900/60 text-sm hover:border-olive-800/30 hover:text-olive-900 transition-all"
                 >
                   Continue with Email
-                </button>
+                </motion.button>
               ) : (
                 <motion.form
                   initial={{ opacity: 0, height: 0 }}
@@ -4769,40 +4848,52 @@ const AuthModal = ({
                   onSubmit={handleEmail}
                   className="space-y-4 overflow-hidden"
                 >
-                  <div>
+                  <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.1 }}>
                     <label htmlFor="auth-email" className="text-[9px] uppercase tracking-[0.4em] text-olive-800/40 font-bold block mb-1.5">Email</label>
                     <input id="auth-email" name="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required
                       className="w-full bg-surface border border-outline/20 rounded-xl px-4 py-3 text-sm text-on-surface focus:outline-none focus:border-primary/60 transition-colors"
                       placeholder="email@domain.com" autoFocus />
-                  </div>
-                  <div>
+                  </motion.div>
+                  <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.15 }}>
                     <label htmlFor="auth-password" className="text-[9px] uppercase tracking-[0.4em] text-olive-800/40 font-bold block mb-1.5">Password</label>
                     <input id="auth-password" name="password" type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6}
                       className="w-full bg-surface border border-outline/20 rounded-xl px-4 py-3 text-sm text-on-surface focus:outline-none focus:border-primary/60 transition-colors"
                       placeholder="••••••••" />
-                  </div>
-                  {error && <p className="text-red-500 text-xs">{error}</p>}
-                  <button type="submit" disabled={!!loading}
-                    className="w-full py-3.5 bg-olive-900 text-cream text-sm font-semibold rounded-2xl hover:bg-primary transition-all disabled:opacity-60 flex items-center justify-center gap-2">
-                    {loading === 'email' ? <RefreshCw className="w-4 h-4 animate-spin" /> : <ArrowRight className="w-4 h-4" />}
+                  </motion.div>
+                  {error && <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-red-500 text-xs">{error}</motion.p>}
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    type="submit"
+                    disabled={!!loading}
+                    className="w-full py-3.5 bg-gradient-to-r from-olive-900 to-primary text-cream text-sm font-semibold rounded-2xl hover:shadow-lg transition-all disabled:opacity-60 flex items-center justify-center gap-2"
+                  >
+                    {loading === 'email' ? <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity }}>
+                      <RefreshCw className="w-4 h-4" />
+                    </motion.div> : <ArrowRight className="w-4 h-4" />}
                     {loading === 'email' ? 'Please wait…' : emailMode === 'signin' ? 'Sign In' : 'Create Account'}
-                  </button>
-                  <p className="text-center text-[10px] text-olive-800/40">
+                  </motion.button>
+                  <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center text-[10px] text-olive-800/40">
                     {emailMode === 'signin' ? "New here? " : 'Have an account? '}
                     <button type="button" onClick={() => { setEmailMode(m => m === 'signin' ? 'signup' : 'signin'); setError(''); }}
-                      className="text-primary underline underline-offset-2 font-bold">
+                      className="text-primary underline underline-offset-2 font-bold hover:text-primary/80 transition-colors">
                       {emailMode === 'signin' ? 'Sign Up' : 'Sign In'}
                     </button>
-                  </p>
+                  </motion.p>
                 </motion.form>
               )}
 
-              {error && !emailOpen && <p className="text-red-500 text-xs text-center">{error}</p>}
+              {error && !emailOpen && <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-red-500 text-xs text-center">{error}</motion.p>}
 
-              <p className="text-center text-[9px] text-olive-800/20 uppercase tracking-widest leading-relaxed">
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4 }}
+                className="text-center text-[9px] text-olive-800/20 uppercase tracking-widest leading-relaxed"
+              >
                 By continuing, you agree to our terms.<br />We never spam — only sanctuary intelligence.
-              </p>
-            </div>
+              </motion.p>
+            </motion.div>
           </motion.div>
         </div>
       )}
