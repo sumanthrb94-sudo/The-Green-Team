@@ -57,7 +57,7 @@ import {
 } from 'firebase/auth';
 import type { User, ConfirmationResult } from 'firebase/auth';
 import { auth, db, googleProvider } from './lib/firebase';
-import { saveLead, saveNewsletter, getLeads, getNewsletterSubs } from './lib/leads';
+import { saveLead, saveNewsletter, getLeads, getNewsletterSubs, subscribeLeads, subscribeNewsletter } from './lib/leads';
 import type { Lead, NewsletterEntry } from './lib/leads';
 import { upsertUserProfile, getAllUsers } from './lib/users';
 import type { UserProfile } from './lib/users';
@@ -4868,22 +4868,22 @@ export default function App() {
     setIsNewsletterOpen(false);
   }, []);
 
-  // ── Admin: leads + newsletter + users (lazy-loaded when admin panel opens) ─
+  // ── Admin: leads + newsletter + users (real-time when panel is open) ─────
   const [adminLeads, setAdminLeads] = useState<Lead[]>([]);
   const [adminNewsletter, setAdminNewsletter] = useState<NewsletterEntry[]>([]);
   const [adminUsers, setAdminUsers] = useState<UserProfile[]>([]);
-  const fetchAdminData = useCallback(async () => {
-    if (!authUser || authUser.email !== ADMIN_EMAIL) return;
-    try {
-      const [l, n, u] = await Promise.all([getLeads(), getNewsletterSubs(), getAllUsers()]);
-      setAdminLeads(l);
-      setAdminNewsletter(n);
-      setAdminUsers(u);
-    } catch {/* ignore */}
-  }, [authUser]);
 
-  useEffect(() => { if (showAdmin) fetchAdminData(); }, [showAdmin, fetchAdminData]);
-  useEffect(() => { if (showAdminPanel && showAdmin) fetchAdminData(); }, [showAdminPanel, showAdmin, fetchAdminData]);
+  // Real-time listeners — only active while admin panel is open
+  useEffect(() => {
+    if (!showAdminPanel || !showAdmin) return;
+    const unsubLeads = subscribeLeads(setAdminLeads);
+    const unsubNL    = subscribeNewsletter(setAdminNewsletter);
+    // Users are not real-time — one-time fetch is fine
+    if (authUser?.email === ADMIN_EMAIL) {
+      getAllUsers().then(setAdminUsers).catch(() => {});
+    }
+    return () => { unsubLeads(); unsubNL(); };
+  }, [showAdminPanel, showAdmin, authUser]);
 
   // ── Firestore properties (real-time) ──────────────────────────────────── 
   const [firestoreProps, setFirestoreProps] = useState<PropertyDoc[]>([]);
@@ -4958,7 +4958,7 @@ export default function App() {
             authUser={authUser}
             onSignOut={handleSignOut}
             isAdmin={showAdmin}
-            onAdminClick={() => { if (showAdmin) { fetchAdminData(); setShowAdminPanel(true); } }}
+            onAdminClick={() => { if (showAdmin) setShowAdminPanel(true); }}
             onPropertySelect={(id) => {
               const sanctuary = allSanctuaries.find(s => s.id === id);
               if (sanctuary) setSelectedProperty(sanctuary);
