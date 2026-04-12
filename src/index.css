@@ -33,47 +33,53 @@
 
 @layer base {
   :root {
-    --primary: #2d3a1d;       /* Deep Olive */
+    --primary: #3a5630;
     --on-primary: #ffffff;
-    --background: #faf9f6;    /* Warm Ivory */
-    --surface: #faf9f6;
-    --on-surface: #1a1c1a;    /* Charcoal Forest */
-    --secondary: #586062;
-    --tertiary: #984138;
-    --surface-container: #f2f4f2; /* Soft Bone */
-    --surface-container-low: #f8faf8;
-    --surface-container-highest: #e0e4e0;
-    --outline: #8c9c8c;
+    --background: #f1ebe2;
+    --surface: #f1ebe2;
+    --on-surface: #1c1f18;
+    --secondary: #5a6355;
+    --tertiary: #8a3d36;
+    --surface-container: #e5dfd6;
+    --surface-container-low: #f6f1e8;
+    --surface-container-highest: #dbd5cc;
+    --outline: #889480;
 
-    --olive-900: #1a2410;     /* Deep Shadow */
-    --olive-800: #2d3a1d;     /* Main Olive */
-    --olive-700: #4a5c3d;     /* Mid Olive */
-    --cashew: #f2f4f2;        /* Soft Sage */
-    --cream: #faf9f6;         /* Ivory */
-    --gold: #b8860b;          /* Muted Gold */
-    --charcoal: #1a1a1a;
+    --olive-900: #1c2b14;
+    --olive-800: #2d4020;
+    --olive-700: #4a5c3d;
+    --cashew: #e5dfd6;
+    --cream: #f1ebe2;
+    --gold: #a87c0a;
+    --charcoal: #1c1c18;
+
+    /* Section-level dark bg: used in Hero, EcosystemPillars, Footer, credential strip */
+    --forest-section: #1c2b14;
   }
 
   .dark {
-    --primary: #a3b18a;       /* Sage Accent */
-    --on-primary: #1a1c1a;
-    --background: #151b15;    /* Deep Forest */
-    --surface: #151b15;
-    --on-surface: #eae6da;    /* Warm Bone */
-    --secondary: #98a698;
-    --tertiary: #fecaca;
-    --surface-container: #222b22;
-    --surface-container-low: #1a221a;
-    --surface-container-highest: #2b362b;
-    --outline: #6d7a73;
+    --primary: #8aab78;
+    --on-primary: #0c1809;
+    --background: #0e1b0b;
+    --surface: #0e1b0b;
+    --on-surface: #e0dace;
+    --secondary: #8da284;
+    --tertiary: #f5b8b0;
+    --surface-container: #162614;
+    --surface-container-low: #112010;
+    --surface-container-highest: #20381c;
+    --outline: #5a6c54;
 
-    --olive-900: #faf9f6;     /* Contrast Ivory */
-    --olive-800: #eae6da;     /* Warm Bone */
-    --olive-700: #daddd8;
-    --cashew: #1a221a;
-    --cream: #151b15;
-    --gold: #edd282;          /* Pale Gold */
-    --charcoal: #f9fafb;
+    --olive-900: #e0dace;
+    --olive-800: #cec8be;
+    --olive-700: #b4b0a8;
+    --cashew: #162614;
+    --cream: #0e1b0b;
+    --gold: #ccac58;
+    --charcoal: #e8e4de;
+
+    /* Section-level dark bg in dark mode */
+    --forest-section: #0a1408;
   }
 
   /* Prevent layout shift from scrollbar appearing/disappearing */
@@ -224,4 +230,9 @@
   .preserve-3d {
     transform-style: preserve-3d;
   }
+}
+
+/* ── Section-level forest background — responds to both modes ────────────── */
+.bg-forest-section {
+  background-color: var(--forest-section);
 }

@@ -532,65 +532,61 @@ const Hero = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
   ];
 
   return (
-    <section className="min-h-screen bg-[#080d06] flex flex-col overflow-hidden">
-      {/* Main grid */}
+    <section className="min-h-screen bg-surface flex flex-col overflow-hidden">
       <div className="flex-1 grid lg:grid-cols-[1fr_480px] xl:grid-cols-[1fr_560px]">
 
         {/* Left — editorial copy */}
-        <div className="flex flex-col justify-between px-8 md:px-16 xl:px-20 pt-16 pb-10 lg:py-20 relative z-10 border-r border-cream/5">
-          {/* Top label */}
+        <div className="flex flex-col justify-between px-8 md:px-16 xl:px-20 pt-16 pb-10 lg:py-20 border-r border-outline/10">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 0.1 }}
-            className="flex items-center gap-3 mb-0"
+            transition={{ duration: 0.8 }}
+            className="flex items-center gap-3"
           >
-            <div className="w-1.5 h-1.5 rounded-full bg-[#a3b18a] animate-pulse" />
-            <span className="text-[8px] font-bold uppercase tracking-[0.6em] text-cream/30">
+            <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+            <span className="text-[8px] font-bold uppercase tracking-[0.6em] text-secondary/60">
               Independent Curators · Hyderabad, India
             </span>
           </motion.div>
 
-          {/* Big headline */}
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
             className="flex-1 flex flex-col justify-center py-12 lg:py-16"
           >
-            <h1 className="text-[3.2rem] sm:text-[4rem] md:text-[5rem] lg:text-[4.2rem] xl:text-[5.2rem] 2xl:text-[6rem] font-light text-cream leading-[1.0] tracking-tight mb-8">
+            <h1 className="text-[3.2rem] sm:text-[4rem] md:text-[5rem] lg:text-[4.2rem] xl:text-[5.2rem] font-light text-on-surface leading-[1.0] tracking-tight mb-8">
               The most<br />
-              <span className="italic font-medium text-[#a3b18a]">valuable forests</span><br />
+              <span className="italic font-medium text-primary">valuable forests</span><br />
               in India.<br />
-              <span className="text-cream/40">We found them</span><br />
-              <span className="italic font-medium text-cream/70">first.</span>
+              <span className="text-on-surface/35">We found them</span><br />
+              <span className="italic font-medium text-on-surface/55">first.</span>
             </h1>
-            <p className="text-base md:text-lg font-light text-cream/45 leading-relaxed max-w-md mb-12">
-              The Green Team is India's independent curation house — we identify, verify, and represent forest-adjacent communities for a private circle of investors, before the market discovers them.
+            <p className="text-base md:text-lg font-light text-secondary leading-relaxed max-w-md mb-12">
+              The Green Team is India's independent curation house — identifying, verifying, and representing forest-adjacent communities for a private circle of investors before the market discovers them.
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={() => onModeChange('membership')}
-                className="group px-7 py-4 bg-[#a3b18a] text-[#080d06] text-[9px] uppercase tracking-[0.45em] font-bold hover:bg-cream transition-all duration-300 flex items-center justify-center gap-2"
+                className="group px-7 py-4 bg-primary text-on-primary text-[9px] uppercase tracking-[0.45em] font-bold hover:opacity-90 transition-all duration-300 flex items-center justify-center gap-2"
               >
                 Apply for Adviser Access
                 <ArrowUpRight className="w-3 h-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
               </button>
               <button
                 onClick={() => onModeChange('list')}
-                className="px-7 py-4 border border-cream/15 text-cream/55 text-[9px] uppercase tracking-[0.45em] font-bold hover:border-cream/35 hover:text-cream transition-all duration-300"
+                className="px-7 py-4 border border-outline/30 text-on-surface/55 text-[9px] uppercase tracking-[0.45em] font-bold hover:border-primary/50 hover:text-primary transition-all duration-300"
               >
                 Current Listing
               </button>
             </div>
           </motion.div>
 
-          {/* Bottom KPIs */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1, duration: 0.8 }}
-            className="flex flex-wrap gap-8 md:gap-12 pt-8 border-t border-cream/6"
+            transition={{ delay: 0.9, duration: 0.8 }}
+            className="flex flex-wrap gap-8 md:gap-12 pt-8 border-t border-outline/15"
           >
             {[
               { label: 'Current Listing', value: 'MODCON Agartha' },
@@ -599,8 +595,8 @@ const Hero = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
               { label: 'Appreciation', value: '+29% / 18 Mo' },
             ].map(s => (
               <div key={s.label}>
-                <p className="text-[7px] uppercase tracking-[0.45em] text-cream/20 font-bold">{s.label}</p>
-                <p className="text-xs font-headline font-bold text-cream/65 mt-0.5">{s.value}</p>
+                <p className="text-[7px] uppercase tracking-[0.45em] text-secondary/40 font-bold">{s.label}</p>
+                <p className="text-xs font-headline font-bold text-on-surface/70 mt-0.5">{s.value}</p>
               </div>
             ))}
           </motion.div>
@@ -611,31 +607,26 @@ const Hero = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
           initial={{ opacity: 0, x: 30 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.3, duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
-          className="hidden lg:flex flex-col gap-0.5 relative"
+          className="hidden lg:flex flex-col gap-0.5 relative overflow-hidden"
         >
           {heroImages.map((src, i) => (
             <div key={i} className="flex-1 relative overflow-hidden">
-              <img
-                src={src}
-                alt=""
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-[#080d06]/25" />
+              <img src={src} alt="" className="w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-surface/5 dark:bg-[#0a1408]/45" />
             </div>
           ))}
-          {/* Floating label */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.4, duration: 0.6 }}
             className="absolute bottom-6 left-6 right-6 flex items-center justify-between"
           >
-            <div className="flex items-center gap-2 bg-[#080d06]/70 backdrop-blur-md px-3 py-2 rounded-lg border border-cream/10">
-              <div className="w-1.5 h-1.5 rounded-full bg-[#a3b18a] animate-pulse" />
-              <span className="text-[8px] uppercase tracking-[0.4em] font-bold text-cream/50">Featuring · MODCON Agartha</span>
+            <div className="flex items-center gap-2 bg-surface/85 dark:bg-[#0e1b0b]/85 backdrop-blur-md px-3 py-2 rounded-lg border border-outline/15">
+              <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+              <span className="text-[8px] uppercase tracking-[0.4em] font-bold text-secondary/70">Featuring · MODCON Agartha</span>
             </div>
-            <div className="bg-[#080d06]/70 backdrop-blur-md px-3 py-2 rounded-lg border border-cream/10">
-              <span className="text-[8px] uppercase tracking-[0.4em] font-bold text-[#a3b18a]">Open Now</span>
+            <div className="bg-surface/85 dark:bg-[#0e1b0b]/85 backdrop-blur-md px-3 py-2 rounded-lg border border-outline/15">
+              <span className="text-[8px] uppercase tracking-[0.4em] font-bold text-primary">Open Now</span>
             </div>
           </motion.div>
         </motion.div>
@@ -674,34 +665,32 @@ const EcosystemPillars = ({ isFullPage = false }: { isFullPage?: boolean }) => {
 
   return (
     <section id="ecosystems" className={cn(
-      "bg-[#0a0e07] text-cream",
+      "bg-forest-section text-[#e0dace]",
       isFullPage ? "py-24 px-6 md:px-24" : "py-20 px-6 md:px-24"
     )}>
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 1 }}
-          className="grid lg:grid-cols-2 gap-12 items-end mb-16 pb-16 border-b border-cream/8"
+          className="grid lg:grid-cols-2 gap-12 items-end mb-16 pb-16 border-b border-white/8"
         >
           <div>
-            <span className="text-cream/30 text-[9px] font-bold uppercase tracking-[0.6em] mb-5 block">The Curation Standard</span>
-            <h2 className="text-5xl md:text-7xl font-light text-cream leading-tight">
+            <span className="text-white/25 text-[9px] font-bold uppercase tracking-[0.6em] mb-5 block">The Curation Standard</span>
+            <h2 className="text-5xl md:text-7xl font-light text-[#e0dace] leading-tight">
               Not every forest<br />
-              <span className="italic font-medium text-[#a3b18a]">makes the cut.</span>
+              <span className="italic font-medium text-[#8aab78]">makes the cut.</span>
             </h2>
           </div>
           <div className="lg:text-right">
-            <p className="text-xl md:text-2xl font-light text-cream/35 leading-relaxed">
-              We maintain four non-negotiable standards before recommending any project to our investors.
+            <p className="text-xl md:text-2xl font-light text-white/30 leading-relaxed">
+              Four non-negotiable standards before we recommend any project to our investors.
             </p>
           </div>
         </motion.div>
 
-        {/* 4 standards — horizontal rows on desktop */}
-        <div className="space-y-0 divide-y divide-cream/8">
+        <div className="space-y-0 divide-y divide-white/8">
           {standards.map((s, i) => (
             <motion.div
               key={i}
@@ -709,12 +698,12 @@ const EcosystemPillars = ({ isFullPage = false }: { isFullPage?: boolean }) => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.08, duration: 0.7 }}
-              className="grid md:grid-cols-[80px_1fr_1fr_200px] gap-6 md:gap-10 py-8 items-center hover:bg-cream/[0.02] transition-colors duration-300 group"
+              className="grid md:grid-cols-[80px_1fr_1fr_200px] gap-6 md:gap-10 py-8 items-center hover:bg-white/[0.025] transition-colors duration-300 group"
             >
-              <span className="text-[11px] font-bold text-[#a3b18a]/40 tracking-[0.4em]">{s.num}</span>
-              <h4 className="text-2xl font-headline font-bold text-cream group-hover:text-[#a3b18a] transition-colors">{s.title}</h4>
-              <p className="text-cream/40 leading-relaxed text-sm">{s.detail}</p>
-              <p className="text-[9px] uppercase tracking-[0.35em] font-bold text-[#a3b18a]/60 md:text-right">{s.proof}</p>
+              <span className="text-[11px] font-bold text-[#8aab78]/40 tracking-[0.4em]">{s.num}</span>
+              <h4 className="text-2xl font-headline font-bold text-[#e0dace] group-hover:text-[#8aab78] transition-colors">{s.title}</h4>
+              <p className="text-white/35 leading-relaxed text-sm">{s.detail}</p>
+              <p className="text-[9px] uppercase tracking-[0.35em] font-bold text-[#8aab78]/55 md:text-right">{s.proof}</p>
             </motion.div>
           ))}
         </div>
@@ -738,8 +727,8 @@ const Advantage = ({ isFullPage = false }: { isFullPage?: boolean }) => {
             transition={{ duration: 1 }}
             className="lg:col-span-5"
           >
-            <h2 className="text-5xl md:text-7xl font-medium text-olive-900">
-              The <span className="italic text-olive-800">Intelligence</span> <br />Gap.
+            <h2 className="text-5xl md:text-7xl font-medium text-on-surface">
+              The <span className="italic text-primary">Intelligence</span> <br />Gap.
             </h2>
             <div className="w-24 h-1 bg-olive-800/20 mt-6"></div>
           </motion.div>
@@ -751,7 +740,7 @@ const Advantage = ({ isFullPage = false }: { isFullPage?: boolean }) => {
             transition={{ duration: 1, delay: 0.2 }}
             className="lg:col-span-7 space-y-6"
           >
-            <p className="text-2xl md:text-4xl font-normal leading-snug text-olive-900/90">
+            <p className="text-2xl md:text-4xl font-normal leading-snug text-on-surface/85">
               "We are not a listing portal. We are the intelligence layer between you and India's most undervalued forest land — before the market prices it in."
             </p>
             <div className="grid sm:grid-cols-2 gap-6 pt-4">
@@ -3739,9 +3728,9 @@ const Sanctuaries = ({ isSubscribed, onNewsletterClick, isFullPage = false, sanc
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col lg:flex-row justify-between items-end mb-10 gap-8">
           <div className="max-w-3xl">
-            <span className="text-olive-800 text-[10px] font-bold uppercase tracking-[0.6em] mb-6 block">Curated Portfolio</span>
-            <h2 className="text-6xl md:text-8xl font-medium text-olive-900">Curated <br /><span className="italic text-olive-800">Sanctuaries.</span></h2>
-            <p className="text-xl md:text-2xl font-light text-olive-900/40 leading-relaxed mt-8">
+            <span className="text-primary text-[10px] font-bold uppercase tracking-[0.6em] mb-6 block">Curated Portfolio</span>
+            <h2 className="text-6xl md:text-8xl font-medium text-on-surface">Curated <br /><span className="italic text-primary">Sanctuaries.</span></h2>
+            <p className="text-xl md:text-2xl font-light text-secondary leading-relaxed mt-8">
               Naturally organic, sustainable, and strictly premium. From the forest peripheral of Narsapur (Free Access) to the vertical landmarks of the highway (Newsletter Access).
             </p>
           </div>
@@ -3816,13 +3805,13 @@ const Membership = () => {
   ];
 
   return (
-    <section id="membership" className="py-16 px-12 md:px-24 bg-olive-800 text-cream">
+    <section id="membership" className="py-16 px-12 md:px-24 bg-forest-section text-[#e0dace]">
       <div className="max-w-7xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div>
             <span className="text-cream/60 text-[10px] font-bold uppercase tracking-[0.6em] mb-8 block">The Membership</span>
             <h2 className="text-5xl md:text-8xl font-medium mb-12">The Power of <br /><span className="italic text-gold">Collective</span> Intelligence.</h2>
-            <p className="text-xl md:text-2xl font-light text-cream/60 leading-relaxed mb-16">
+            <p className="text-xl md:text-2xl font-light text-white/50 leading-relaxed mb-16">
               As independent curators, we partner with visionary developers like MODCON to bring you organic properties that matter. Membership is the key to unlocking India's most serene real estate.
             </p>
             <div className="p-8 border border-gold/20 bg-gold/5 inline-block">
@@ -3833,10 +3822,10 @@ const Membership = () => {
           
           <div className="space-y-12">
             {benefits.map((b, i) => (
-              <div key={i} className="p-10 border border-cream/10 bg-surface/5 backdrop-blur-sm">
+              <div key={i} className="p-10 border border-white/8 bg-white/[0.03] backdrop-blur-sm">
                 <div className="text-gold mb-6">{b.icon}</div>
                 <h4 className="text-2xl font-bold mb-4">{b.title}</h4>
-                <p className="text-cream/60 leading-relaxed">{b.desc}</p>
+                <p className="text-white/50 leading-relaxed">{b.desc}</p>
               </div>
             ))}
           </div>
@@ -4161,14 +4150,14 @@ const Footer = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
   ];
 
   return (
-    <footer className="bg-olive-900 text-cream pt-24 pb-16 px-6 md:px-24">
+    <footer className="bg-forest-section text-[#e0dace] pt-24 pb-16 px-6 md:px-24">
       <div className="max-w-7xl mx-auto">
 
         {/* Top: brand + tagline */}
-        <div className="border-b border-cream/8 pb-16 mb-16 flex flex-col md:flex-row md:items-end justify-between gap-10">
+        <div className="border-b border-white/8 pb-16 mb-16 flex flex-col md:flex-row md:items-end justify-between gap-10">
           <div>
             <Logo className="w-10 h-10 text-cream mb-6" />
-            <p className="text-2xl md:text-3xl font-light text-cream/30 max-w-xl leading-relaxed">
+            <p className="text-2xl md:text-3xl font-light text-white/30 max-w-xl leading-relaxed">
               Curating India's most exclusive pre-launch sanctuaries for a private circle of intelligent investors.
             </p>
           </div>
@@ -4181,15 +4170,15 @@ const Footer = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
         </div>
 
         {/* Agenda grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-cream/5 mb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-white/5 mb-16">
           {agenda.map(item => (
             <button
               key={item.mode}
               onClick={() => onModeChange(item.mode)}
-              className="group text-left p-8 bg-olive-900 hover:bg-olive-800/60 transition-all"
+              className="group text-left p-8 bg-forest-section hover:bg-white/5 transition-all"
             >
-              <p className="text-[8px] uppercase tracking-[0.5em] text-cream/25 font-bold mb-2 group-hover:text-primary/60 transition-colors">{item.sub}</p>
-              <p className="text-base font-medium text-cream/70 group-hover:text-cream transition-colors flex items-center gap-2">
+              <p className="text-[8px] uppercase tracking-[0.5em] text-white/25 font-bold mb-2 group-hover:text-[#8aab78]/70 transition-colors">{item.sub}</p>
+              <p className="text-base font-medium text-white/60 group-hover:text-white transition-colors flex items-center gap-2">
                 {item.label}
                 <ArrowRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
               </p>
@@ -4199,7 +4188,7 @@ const Footer = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
 
         {/* Bottom bar */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-[9px] uppercase tracking-[0.5em] text-cream/15 font-bold">
+          <p className="text-[9px] uppercase tracking-[0.5em] text-white/20 font-bold">
             © {new Date().getFullYear()} The Green Team · Independent Sanctuary Curators · Hyderabad
           </p>
           <div className="flex items-center gap-8">
@@ -4253,7 +4242,7 @@ const TrustSignals = () => {
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-14">
           <span className="text-olive-800 text-[10px] font-bold uppercase tracking-[0.6em] mb-4 block">The Green Team</span>
-          <h2 className="text-4xl md:text-6xl font-light text-olive-900 leading-tight">
+          <h2 className="text-4xl md:text-6xl font-light text-on-surface leading-tight">
             A curation house.<br />
             <span className="italic font-medium">Not a listing portal.</span>
           </h2>
@@ -4328,7 +4317,7 @@ const NewsletterHighlight = ({ onSubscribe }: { onSubscribe: () => void }) => {
   };
 
   return (
-    <section className="py-32 px-6 md:px-24 bg-olive-800 text-cream overflow-hidden relative">
+    <section className="py-32 px-6 md:px-24 bg-forest-section text-[#e0dace] overflow-hidden relative">
       <div className="absolute top-0 right-0 w-1/2 h-full opacity-5 pointer-events-none">
         <svg viewBox="0 0 100 100" className="w-full h-full fill-current">
           <path d="M50 0C22.4 0 0 22.4 0 50s22.4 50 50 50 50-22.4 50-50S77.6 0 50 0zm0 90C28 90 10 72 10 50S28 10 50 10s40 18 40 40-18 40-40 40z" />
@@ -4339,8 +4328,8 @@ const NewsletterHighlight = ({ onSubscribe }: { onSubscribe: () => void }) => {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div>
             <span className="text-gold text-[10px] font-bold uppercase tracking-[0.6em] mb-8 block">The Intelligence Network</span>
-            <h2 className="text-5xl md:text-7xl font-medium mb-12">Stay ahead of <br /><span className="italic text-cream/60">the resource curve.</span></h2>
-            <p className="text-xl font-light text-cream/60 leading-relaxed max-w-md">
+            <h2 className="text-5xl md:text-7xl font-medium mb-12">Stay ahead of <br /><span className="italic text-white/50">the resource curve.</span></h2>
+            <p className="text-xl font-light text-white/50 leading-relaxed max-w-md">
               Receive private briefings on environmental integrity, sanctuary valuations, and new curation alerts.
             </p>
           </div>
@@ -4611,7 +4600,7 @@ const HomeView = ({ isSubscribed, onNewsletterClick, sanctuaries = SANCTUARIES, 
     <Hero onModeChange={onModeChange} />
 
     {/* 2. Company-level credential strip */}
-    <div className="bg-[#080d06] text-cream px-6 md:px-24 py-4 border-b border-cream/5">
+    <div className="bg-surface-container border-b border-outline/10 px-6 md:px-24 py-4">
       <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-wrap gap-6 md:gap-10">
           {[
@@ -4621,14 +4610,14 @@ const HomeView = ({ isSubscribed, onNewsletterClick, sanctuaries = SANCTUARIES, 
             { label: 'Min. AQI Standard', value: 'Sub 25' },
           ].map(s => (
             <div key={s.label}>
-              <p className="text-[7px] uppercase tracking-[0.45em] text-cream/30 font-bold">{s.label}</p>
-              <p className="text-sm font-headline font-bold text-cream/80 mt-0.5">{s.value}</p>
+              <p className="text-[7px] uppercase tracking-[0.45em] text-secondary/40 font-bold">{s.label}</p>
+              <p className="text-sm font-headline font-bold text-on-surface/75 mt-0.5">{s.value}</p>
             </div>
           ))}
         </div>
         <div className="text-right hidden md:block">
-          <p className="text-[7px] uppercase tracking-[0.4em] text-cream/30 font-bold">Entry From</p>
-          <p className="text-sm font-headline font-bold text-[#a3b18a]">Under ₹1 Cr</p>
+          <p className="text-[7px] uppercase tracking-[0.4em] text-secondary/40 font-bold">Entry From</p>
+          <p className="text-sm font-headline font-bold text-primary">Under ₹1 Cr</p>
         </div>
       </div>
     </div>
