@@ -126,10 +126,10 @@ const SANCTUARIES: Sanctuary[] = [
     tagline: 'Where the forest becomes home.',
     description: 'MODCON Agartha is a first-of-its-kind biomorphic residential community carved into the Narsapur forest periphery. 36 thoughtfully sized plots surround a 14,548 sq yd organic amenity core — featuring fluid earth architecture, solar-integrated curved roofs, and living canopies that blur the line between structure and forest. No two plots are the same. No straight lines anywhere.',
     plots: 36,
-    plotRange: '808 – 5,097 sq yds',
+    plotRange: '968 – 4,800 sq yds',
     amenityAcres: '14,548 sq yds',
     architect: 'MODCON Builders',
-    sitePlanSrc: 'https://static.wixstatic.com/media/142b26_8ddd02a733d04a139fdd19e058e72d94~mv2.jpg',
+    sitePlanSrc: '/FINAL-LAYOUT.jpeg',
     brochureUrl: 'https://www.modconbuilders.com/agartha',
     plotImages: [
       'https://static.wixstatic.com/media/142b26_cb62ea3cf3a1420399ec2e43c1dee85f~mv2.png',
@@ -1226,68 +1226,73 @@ const AGARTHA_HOTSPOTS: Hotspot[] = [
   },
 ];
 
-// ──"  Agartha: 53 individual plot dots ────────────────────────────────────────
-// Positions (x%, y%) map onto the portrait site plan image.
-// Sizes reflect the actual MODCON plot range (808 - 5,097 sq yds).
-// Plot 15 = landmark premium corner (dual forest frontage, 5,097 sq yds).
+// ──"  Agartha: 36 individual plot dots ────────────────────────────────────────
+// Positions (x%, y%) mapped from the official FINAL-LAYOUT site plan image.
+// Plot 3 = largest irregular corner plot (~4,800 sq yds, forest boundary).
 
 interface PlotDot { id: number; sqYds: number; x: number; y: number }
 
 const AGARTHA_PLOTS: PlotDot[] = [
-  // ── North outer arc (near Grand Entry boulevard) ──
-  { id:1,  sqYds:1050, x:22, y:22 },
-  { id:2,  sqYds:980,  x:30, y:18 },
-  { id:3,  sqYds:920,  x:38, y:16 },
-  { id:4,  sqYds:900,  x:46, y:17 },
-  { id:5,  sqYds:950,  x:54, y:19 },
-  { id:6,  sqYds:1100, x:62, y:22 },
-  // ── North-East outer ──
-  { id:7,  sqYds:1300, x:70, y:26 },
-  { id:8,  sqYds:1400, x:76, y:32 },
-  { id:9,  sqYds:1500, x:79, y:38 },
-  { id:10, sqYds:1550, x:80, y:44 },
-  { id:11, sqYds:1600, x:79, y:50 },
-  { id:12, sqYds:1500, x:77, y:56 },
-  // ── South-East outer ──
-  { id:13, sqYds:1800, x:73, y:62 },
-  { id:14, sqYds:2000, x:68, y:68 },
-  // ── PLOT 15 — Premium Corner (largest, dual forest frontage) ──
-  { id:15, sqYds:5097, x:14, y:72 },
-  // ── South arc ──
-  { id:16, sqYds:2200, x:62, y:75 },
-  { id:17, sqYds:1900, x:54, y:79 },
-  { id:18, sqYds:1700, x:46, y:81 },
-  { id:19, sqYds:1500, x:38, y:80 },
-  { id:20, sqYds:1350, x:30, y:77 },
-  // ── South-West outer (forest edge) ──
-  { id:21, sqYds:1800, x:24, y:73 },
-  { id:22, sqYds:2400, x:18, y:67 },
-  { id:23, sqYds:2800, x:13, y:61 },
-  // ── West outer (Narsapur forest buffer boundary) ──
-  { id:24, sqYds:3200, x:11, y:54 },
-  { id:25, sqYds:2900, x:9,  y:47 },
-  { id:26, sqYds:2600, x:11, y:40 },
-  // ── North-West outer ──
-  { id:27, sqYds:1700, x:15, y:33 },
-  { id:28, sqYds:1400, x:19, y:26 },
-  { id:29, sqYds:1200, x:15, y:19 },
-  // ── North inner ring ──
-  { id:30, sqYds:870,  x:29, y:30 },
-  { id:31, sqYds:850,  x:36, y:27 },
-  { id:32, sqYds:840,  x:43, y:26 },
-  { id:33, sqYds:855,  x:50, y:28 },
-  { id:34, sqYds:900,  x:57, y:31 },
-  { id:35, sqYds:940,  x:63, y:35 },
-  // ── East inner ring ──
-  { id:36, sqYds:960,  x:66, y:40 },
+  // ── Top row (above main grid) ──
+  { id:1,  sqYds:1003, x:53, y:18 },
+  { id:2,  sqYds:968,  x:42, y:22 },
+  // ── PLOT 3 — Large irregular corner (forest boundary) ──
+  { id:3,  sqYds:4800, x:15, y:33 },
+  // ── Row 2 (left → right) ──
+  { id:4,  sqYds:1690, x:37, y:35 },
+  { id:5,  sqYds:1249, x:48, y:32 },
+  // ── Row 3 (left → right) ──
+  { id:7,  sqYds:1140, x:21, y:44 },
+  { id:6,  sqYds:1167, x:33, y:44 },
+  { id:10, sqYds:1200, x:44, y:45 },
+  // ── Row 4 (left → right) ──
+  { id:8,  sqYds:1120, x:21, y:53 },
+  { id:9,  sqYds:1080, x:33, y:53 },
+  // ── Row 5 (left → right) ──
+  { id:11, sqYds:1050, x:21, y:62 },
+  { id:12, sqYds:1100, x:32, y:62 },
+  { id:13, sqYds:1150, x:44, y:62 },
+  // ── Row 6 ──
+  { id:14, sqYds:1300, x:21, y:71 },
+  // ── Row 7 ──
+  { id:15, sqYds:1400, x:21, y:79 },
+  { id:16, sqYds:1350, x:33, y:79 },
+  // ── Row 8 ──
+  { id:17, sqYds:1250, x:21, y:87 },
+  { id:18, sqYds:1200, x:33, y:87 },
+  // ── Bottom row ──
+  { id:19, sqYds:1100, x:21, y:93 },
+  { id:20, sqYds:1050, x:36, y:93 },
+  // ── Right section, row 2 ──
+  { id:21, sqYds:1210, x:59, y:33 },
+  { id:23, sqYds:1450, x:68, y:32 },
+  { id:24, sqYds:1600, x:78, y:27 },
+  // ── Right section, row 3 ──
+  { id:22, sqYds:1320, x:59, y:44 },
+  { id:25, sqYds:1550, x:78, y:38 },
+  { id:33, sqYds:1500, x:83, y:45 },
+  // ── Right section, row 4 ──
+  { id:26, sqYds:1869, x:59, y:54 },
+  { id:27, sqYds:1700, x:70, y:51 },
+  { id:34, sqYds:1550, x:83, y:54 },
+  // ── Right section, row 5 ──
+  { id:28, sqYds:2057, x:70, y:62 },
+  { id:32, sqYds:1650, x:80, y:62 },
+  { id:35, sqYds:1600, x:83, y:63 },
+  // ── Right section, row 6 ──
+  { id:29, sqYds:1800, x:70, y:71 },
+  { id:31, sqYds:1900, x:80, y:71 },
+  // ── Right section, rows 7-8 ──
+  { id:30, sqYds:1750, x:70, y:82 },
+  { id:36, sqYds:1700, x:83, y:79 },
 ];
 
 const AGARTHA_OLD_RATE = 6199;   // ₹/sq yd - VIP pre-launch rate (2 yrs ago)
 const AGARTHA_NOW_RATE = 7999;   // ₹/sq yd - current rate
 
-/** dot diameter: scales linearly from 7px (808 sq yd) to 18px (5097 sq yd) */
+/** dot diameter: scales linearly from 6px (968 sq yd) to 18px (4800 sq yd) */
 const plotDotSize = (sqYds: number) =>
-  7 + ((sqYds - 808) / (5097 - 808)) * 11;
+  6 + Math.min(1, Math.max(0, (sqYds - 968) / (4800 - 968))) * 12;
 
 const formatRs = (rs: number) =>
   rs >= 1e7 ? `₹${(rs / 1e7).toFixed(2)} Cr` : `₹${(rs / 1e5).toFixed(1)} L`;
@@ -1308,7 +1313,7 @@ const SANCTUARY_HOTSPOTS: Record<string, Hotspot[]> = {
 /** Agartha-specific wrapper - delegates to the generic PropertyInteractiveLayout */
 const AagarthaInteractiveLayout: FC<{ onClose: () => void }> = ({ onClose }) => (
   <PropertyInteractiveLayout
-    sitePlanSrc="https://static.wixstatic.com/media/142b26_8ddd02a733d04a139fdd19e058e72d94~mv2.jpg"
+    sitePlanSrc="/FINAL-LAYOUT.jpeg"
     hotspots={AGARTHA_HOTSPOTS}
     projectName="Agartha"
     developerTag="MODCON Builders · Narsapur"
@@ -2030,7 +2035,7 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
                         const sz     = plotDotSize(p.sqYds);
                         const isActive = activePlot?.id === p.id;
                         const isPremium = p.sqYds >= 3000;
-                        const isLandmark = p.id === 15;
+                        const isLandmark = p.id === 3;
                         return (
                           <button
                             key={p.id}
@@ -2065,7 +2070,7 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
                       </div>
                       <div className="flex items-center gap-1.5">
                         <span className="w-4 h-4 rounded-full bg-amber-400/90 border border-amber-400" />
-                        <span className="text-[8px] text-amber-400/80 uppercase tracking-wider font-bold">Plot 15</span>
+                        <span className="text-[8px] text-amber-400/80 uppercase tracking-wider font-bold">Plot 3 (Corner)</span>
                       </div>
                     </div>
                     <AnimatePresence mode="wait">
@@ -2083,7 +2088,7 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
                               <div>
                                 <p className="text-[8px] uppercase tracking-[0.5em] text-primary/50 font-bold">
                                   Plot {activePlot.id} · {activePlot.sqYds.toLocaleString('en-IN')} sq yds
-                                  {activePlot.id === 15 && <span className="ml-2 text-amber-400">★ Premium Corner</span>}
+                                  {activePlot.id === 3 && <span className="ml-2 text-amber-400">★ Premium Corner</span>}
                                 </p>
                                 <p className="text-xl font-headline font-bold text-white mt-0.5">{formatRs(nowVal)}</p>
                                 <p className="text-[10px] text-white/40">at ₹{AGARTHA_NOW_RATE.toLocaleString('en-IN')}/sq yd</p>
