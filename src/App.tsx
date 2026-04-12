@@ -4858,6 +4858,12 @@ export default function App() {
   const [isDark, setIsDark] = useState(() => {
     return localStorage.getItem('gt_dark') === 'true';
   });
+
+  // Persist dark mode and apply to <html> so all CSS vars + scrollbars respond
+  useEffect(() => {
+    localStorage.setItem('gt_dark', String(isDark));
+    document.documentElement.classList.toggle('dark', isDark);
+  }, [isDark]);
   const [showAdmin, setShowAdmin] = useState(false);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<typeof SANCTUARIES[0] | null>(null);
