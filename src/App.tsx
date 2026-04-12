@@ -572,7 +572,7 @@ const Hero = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
 
           {/* Body */}
           <p className="text-base md:text-xl font-light text-cream/60 leading-relaxed max-w-lg mb-10 md:mb-12">
-            India's most exclusive self-sustaining farm estates — handpicked for a private circle of investors who know the next great asset class isn't in the city. It's beyond it.
+            India's only curation house for conscious forest communities — handpicked for a private circle of investors who know the next great asset class isn't in the city. It's beyond it.
           </p>
 
           {/* CTAs */}
@@ -624,86 +624,67 @@ const Hero = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
 };
 
 const EcosystemPillars = ({ isFullPage = false }: { isFullPage?: boolean }) => {
-  const pillars = [
+  const standards = [
     {
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-10 h-10">
-          <path d="M11 20A7 7 0 0 1 11 6A7 7 0 0 1 11 20Z" />
-          <path d="M11 13V20" />
-          <path d="M11 6C11 6 12 2 15 2C18 2 19 6 19 6" />
-          <path d="M11 6C11 6 10 2 7 2C4 2 3 6 3 6" />
-        </svg>
-      ),
-      title: "Organic Food",
-      desc: "Self-sustaining ecosystems designed to generate farm-to-table organic food, ensuring nutritional security for your family."
+      num: '01',
+      title: 'Forest Adjacency',
+      detail: 'Every property we curate must border verified forest land. AQI below 25. Ambient noise below 25 dB. If it doesn\'t clear the air quality bar, it doesn\'t make the list.',
+      proof: 'Agartha: AQI 12 · 18 dB',
     },
     {
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-10 h-10">
-          <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" />
-          <path d="M12 18C12 18 15 15 15 12C15 9 12 6 12 6C12 6 9 9 9 12C9 15 12 18 12 18Z" />
-          <path d="M12 14C13.1046 14 14 13.1046 14 12C14 10.8954 13.1046 10 12 10C10.8954 10 10 10.8954 10 12C10 13.1046 10.8954 14 12 14Z" />
-        </svg>
-      ),
-      title: "Water Security",
-      desc: "Advanced rainwater harvesting and natural filtration systems to ensure a perpetual supply of pure, life-giving water."
+      num: '02',
+      title: 'Conscious Community',
+      detail: 'Not a subdivision. Not isolated plots sold to strangers. Every community is gated, intentional, and designed around people who choose to live differently — together.',
+      proof: '36 private plots · Curated neighbours',
     },
     {
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-10 h-10">
-          <circle cx="12" cy="12" r="4" />
-          <path d="M12 2V4M12 20V22M4 12H2M22 12H20M19.07 4.93L17.66 6.34M6.34 17.66L4.93 19.07M4.93 4.93L6.34 6.34M17.66 17.66L19.07 19.07" />
-          <path d="M12 8C14.2091 8 16 9.79086 16 12C16 14.2091 14.2091 16 12 16C9.79086 16 8 14.2091 8 12C8 9.79086 9.79086 8 12 8Z" fill="currentColor" className="opacity-20" />
-        </svg>
-      ),
-      title: "Renewable Energy",
-      desc: "Solar-powered microgrids providing clean, renewable energy, making your sanctuary completely independent of the grid."
+      num: '03',
+      title: 'Investment Grade',
+      detail: 'Verified appreciation data. Proximity to infrastructure corridors — RRR, ORR, PVNR. We only list properties where the numbers outperform FD, gold, and index funds.',
+      proof: '+29% in 18 months · ₹7,999/sq yd',
     },
     {
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-10 h-10">
-          <path d="M18 8h1a4 4 0 0 1 0 8h-1" />
-          <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
-          <line x1="6" y1="1" x2="6" y2="4" />
-          <line x1="10" y1="1" x2="10" y2="4" />
-          <line x1="14" y1="1" x2="14" y2="4" />
-        </svg>
-      ),
-      title: "Wellness & Community",
-      desc: "A 36,000 sq ft clubhouse with aquatic pool, kayaking lake, gym, farm-to-table dining, and staycation villas — five premium amenities in one serene forest setting."
-    }
+      num: '04',
+      title: 'Awarded Design',
+      detail: 'Only developers and architects with sustainability credentials. Permaculture, biophilic, or regenerative design is mandatory — not a marketing checkbox.',
+      proof: 'MODCON × ARQEN · Best Eco Project 2024',
+    },
   ];
 
   return (
     <section id="ecosystems" className={cn(
-      "px-6 md:px-24 bg-surface",
-      isFullPage ? "py-16" : "py-14"
+      "px-6 md:px-24 bg-olive-900 text-cream",
+      isFullPage ? "py-20" : "py-16"
     )}>
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 1.2 }}
-          className="mb-10"
+          transition={{ duration: 1 }}
+          className="mb-14"
         >
-          <span className="text-olive-800 text-xs font-bold uppercase tracking-[0.6em] mb-6 block">The Resource Agenda</span>
-          <h2 className="text-5xl md:text-8xl font-medium text-olive-900">Self-Sustaining <br /><span className="italic text-olive-800">Ecosystems.</span></h2>
+          <span className="text-cream/40 text-[10px] font-bold uppercase tracking-[0.6em] mb-5 block">The Curation Standard</span>
+          <h2 className="text-4xl md:text-7xl font-light text-cream leading-tight">
+            Not every forest<br />
+            <span className="italic font-medium text-[#a3b18a]">makes the cut.</span>
+          </h2>
         </motion.div>
-        
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {pillars.map((p, i) => (
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-px bg-cream/10">
+          {standards.map((s, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.15, duration: 0.8 }}
-              className="p-8 border border-olive-800/10 bg-cream/20 hover:bg-cream/40 transition-all rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1"
+              transition={{ delay: i * 0.1, duration: 0.8 }}
+              className="bg-olive-900 p-8 flex flex-col gap-6 hover:bg-[#1a2410] transition-colors duration-300"
             >
-              <div className="text-olive-800 mb-8">{p.icon}</div>
-              <h4 className="text-2xl font-bold text-olive-900 mb-6">{p.title}</h4>
-              <p className="text-olive-900/80 leading-relaxed text-base">{p.desc}</p>
+              <span className="text-[10px] font-bold text-[#a3b18a]/60 tracking-[0.4em]">{s.num}</span>
+              <h4 className="text-xl font-headline font-bold text-cream">{s.title}</h4>
+              <p className="text-cream/50 leading-relaxed text-sm flex-1">{s.detail}</p>
+              <p className="text-[9px] uppercase tracking-[0.35em] font-bold text-[#a3b18a]/70 border-t border-cream/10 pt-4">{s.proof}</p>
             </motion.div>
           ))}
         </div>
@@ -4180,66 +4161,81 @@ const Footer = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
 };
 
 const TrustSignals = () => {
+  const principles = [
+    {
+      label: 'We don\'t list properties.',
+      value: 'We curate communities.',
+    },
+    {
+      label: 'We don\'t chase volume.',
+      value: 'We protect standards.',
+    },
+    {
+      label: 'We don\'t work with every developer.',
+      value: 'Only awarded ones.',
+    },
+  ];
+
   return (
-    <section className="py-24 px-6 md:px-24 bg-surface border-y border-outline/10 text-center">
-      <div className="max-w-4xl mx-auto">
-        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-          <span className="text-olive-800 text-xs font-bold uppercase tracking-[0.6em] mb-4 block">Proven Legacy</span>
-          <h2 className="text-3xl md:text-5xl font-medium text-olive-900 mb-16 italic">Trusted by Visionaries.</h2>
+    <section className="py-20 px-6 md:px-24 bg-surface border-y border-outline/10">
+      <div className="max-w-6xl mx-auto">
+
+        {/* Header */}
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-14">
+          <span className="text-olive-800 text-[10px] font-bold uppercase tracking-[0.6em] mb-4 block">The Green Team</span>
+          <h2 className="text-4xl md:text-6xl font-light text-olive-900 leading-tight">
+            A curation house.<br />
+            <span className="italic font-medium">Not a listing portal.</span>
+          </h2>
         </motion.div>
-        
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 opacity-60 grayscale hover:grayscale-0 transition-all duration-700">
-          <div className="flex flex-col items-center justify-center h-20 gap-1">
-            <h3 className="font-headline font-bold text-xl tracking-widest uppercase">MODCON</h3>
-            <p className="text-[8px] uppercase tracking-widest text-olive-800/50">Builders · Hyderabad</p>
-          </div>
-          <div className="flex flex-col items-center justify-center h-20 gap-1">
-            <h3 className="font-headline font-bold text-xl tracking-widest uppercase">ARQEN</h3>
-            <p className="text-[8px] uppercase tracking-widest text-olive-800/50">Project Architects</p>
-          </div>
-          <div className="flex flex-col items-center justify-center h-20 gap-1">
-            <h3 className="font-headline font-bold text-xl tracking-widest uppercase">Outlook</h3>
-            <p className="text-[8px] uppercase tracking-widest text-olive-800/50">Business Spotlight 2024</p>
-          </div>
-          <div className="flex flex-col items-center justify-center h-20 gap-1">
-            <h3 className="font-headline font-bold text-xl tracking-widest uppercase">Taj Banjara</h3>
-            <p className="text-[8px] uppercase tracking-widest text-olive-800/50">Award Ceremony · Nov 2024</p>
-          </div>
+
+        {/* Principles */}
+        <div className="grid md:grid-cols-3 gap-px bg-outline/10 mb-14">
+          {principles.map((p, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1, duration: 0.7 }}
+              className="bg-surface p-8"
+            >
+              <p className="text-sm text-secondary/60 mb-2">{p.label}</p>
+              <p className="text-xl font-headline font-bold text-olive-900">{p.value}</p>
+            </motion.div>
+          ))}
         </div>
 
-        {/* Award banner */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.15, duration: 0.8 }}
-          className="mt-10 flex items-center justify-center gap-4 border border-gold/30 bg-gold/5 rounded-2xl px-8 py-5"
-        >
-          <span className="text-gold text-2xl">★</span>
-          <div className="text-left">
-            <p className="text-[10px] uppercase tracking-[0.4em] font-bold text-gold">Outlook Business Spotlight Entity Awards 2024</p>
-            <p className="text-base font-headline font-bold text-olive-900 mt-0.5">Best Sustainable Eco-Friendly Project of the Year</p>
+        {/* Partners + Award row */}
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+          <div className="flex flex-wrap gap-8 md:gap-12">
+            {[
+              { name: 'MODCON', sub: 'Developer Partner' },
+              { name: 'ARQEN', sub: 'Architecture' },
+            ].map(p => (
+              <div key={p.name}>
+                <p className="font-headline font-bold text-lg tracking-widest uppercase text-olive-900/70">{p.name}</p>
+                <p className="text-[8px] uppercase tracking-[0.4em] text-secondary/40 font-bold mt-0.5">{p.sub}</p>
+              </div>
+            ))}
           </div>
-          <span className="text-gold text-2xl">★</span>
-        </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }} className="mt-20 p-12 bg-cream/30 rounded-3xl border border-olive-800/5 relative shadow-sm">
-          <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-surface w-12 h-12 rounded-full flex items-center justify-center text-gold shadow-sm border border-olive-800/10">
-            <span className="text-3xl font-serif leading-none mt-2">"</span>
-          </div>
-          <p className="text-xl md:text-2xl font-normal text-olive-900/90 leading-relaxed mb-8 italic">
-            An unparalleled approach to ecological luxury. The Green Team has essentially cracked the code on scaling self-sustaining sanctuaries without compromising on elegance.
-          </p>
-          <div className="flex items-center justify-center gap-4">
-            <div className="w-10 h-10 rounded-full overflow-hidden bg-olive-800/20 border-2 border-white">
-              <img src="https://picsum.photos/seed/kushal/100/100" alt="Member" className="w-full h-full object-cover" />
+          {/* Award */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2, duration: 0.7 }}
+            className="flex items-center gap-3 border border-gold/30 bg-gold/5 px-6 py-4 rounded-xl"
+          >
+            <span className="text-gold text-xl flex-shrink-0">★</span>
+            <div>
+              <p className="text-[8px] uppercase tracking-[0.35em] font-bold text-gold/80">Outlook Business Spotlight · 2024</p>
+              <p className="text-sm font-headline font-bold text-olive-900 mt-0.5">Best Sustainable Eco-Friendly Project</p>
             </div>
-            <div className="text-left">
-              <p className="font-bold text-olive-900 text-sm uppercase tracking-wider">Kushal</p>
-              <p className="text-[10px] text-olive-800/60 uppercase tracking-widest font-bold">Lead Developer, BHEL · Early Member, Agartha</p>
-            </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
+
       </div>
     </section>
   );
@@ -4330,7 +4326,7 @@ const ChatBot = ({ data }: { data: any }) => {
 === THE GREEN TEAM — COMPLETE KNOWLEDGE BASE FOR GROOT ===
 
 ABOUT THE GREEN TEAM:
-The Green Team is an independent luxury sanctuary curator based in Hyderabad, India. We curate India's most exclusive self-sustaining farm estates for a private circle of intelligent investors. We are NOT developers — we are curators. We partner with award-winning developers like MODCON Builders to bring regenerative, organic properties to a reserved investor circle.
+The Green Team is India's only independent curation house for conscious forest communities, based in Hyderabad. We are NOT developers and NOT a listing portal — we are curators. We handpick forest-adjacent conscious living communities for a private circle of intelligent investors. Every property must clear our strict curation standard: verified forest boundary, AQI below 25, intentional community design, investment-grade appreciation, and awarded sustainable architecture. We partner exclusively with developers like MODCON Builders who have won national sustainability awards.
 
 TWO OPTIONS FOR USERS:
 1. NEWSLETTER (Monthly Briefings) — Join our intelligence network for monthly environmental integrity reports, sanctuary valuations, and curation alerts. Free to join.
@@ -4369,12 +4365,13 @@ ENVIRONMENTAL INTELLIGENCE:
 - Real-time environmental heatmaps available in the Map view: AQI in teal, Noise in indigo
 - Green zones near sanctuaries; red zones near Patancheru industrial corridor
 
-THE SELF-SUSTAINING MODEL (why sanctuaries matter):
-- FOOD: Farm-to-table — Goshala, 100+ tree varieties, vegetable beds, spiral herbal garden per plot
-- WATER: Rainwater harvesting + natural filtration — zero municipal dependency
-- ENERGY: Solar-ready plots — clean energy independence
-- WELLNESS: 36,000 sq ft clubhouse, kayaking, pool, gym, dining — resort-level without leaving the forest
-- HEALTH: AQI 12 vs city AQI 85 = dramatically lower cardiovascular and respiratory risk
+WHY CONSCIOUS FOREST COMMUNITIES (the TGT thesis):
+- Both current TGT properties are forest-adjacent — Agartha borders Narsapur forest, near RRR
+- AQI 12 vs Hyderabad city average of 85 = measurably better air, health, and quality of life
+- Forest communities command appreciation premiums as urban pollution worsens — scarcity play
+- Conscious living = intentional neighbours, curated amenities, permaculture farms, resort lifestyle
+- You're not buying a plot — you're buying into a community of people who chose to live differently
+- Near RRR (infrastructure play) + forest boundary (scarcity play) + permaculture (lifestyle play) = triple moat
 
 WHAT GROOT SHOULD DO:
 - Answer questions about Agartha, investment, environment, commute, amenities, lifestyle
@@ -4542,25 +4539,25 @@ const HomeView = ({ isSubscribed, onNewsletterClick, sanctuaries = SANCTUARIES, 
     {/* 1. Emotional hook */}
     <Hero onModeChange={onModeChange} />
 
-    {/* 2. Micro-trust strip — scarcity + credibility before the cards */}
-    <div className="bg-olive-900 text-cream px-6 md:px-24 py-5">
+    {/* 2. Company-level credential strip */}
+    <div className="bg-[#0d1409] text-cream px-6 md:px-24 py-4 border-b border-cream/5">
       <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-wrap gap-6 md:gap-10">
           {[
-            { label: 'Plots Available', value: '36 Only' },
-            { label: 'Air Quality Index', value: 'Sub 25' },
-            { label: 'Commute to City', value: '40 Mins' },
-            { label: 'All-In Entry', value: 'Under ₹1 Cr' },
+            { label: 'Properties Curated', value: '2 Active' },
+            { label: 'Curation Standard', value: 'Forest Only' },
+            { label: 'Avg. Appreciation', value: '+29% / 18 Mo' },
+            { label: 'Min. AQI Threshold', value: 'Sub 25' },
           ].map(s => (
             <div key={s.label}>
-              <p className="text-[8px] uppercase tracking-[0.45em] text-cream/40 font-bold">{s.label}</p>
-              <p className="text-base font-headline font-bold text-cream mt-0.5">{s.value}</p>
+              <p className="text-[7px] uppercase tracking-[0.45em] text-cream/30 font-bold">{s.label}</p>
+              <p className="text-sm font-headline font-bold text-cream/80 mt-0.5">{s.value}</p>
             </div>
           ))}
         </div>
-        <div className="text-right">
-          <p className="text-[8px] uppercase tracking-[0.4em] text-cream/40 font-bold">vs. market</p>
-          <p className="text-sm font-headline font-bold text-gold">₹2 Cr+ bare plots</p>
+        <div className="text-right hidden md:block">
+          <p className="text-[7px] uppercase tracking-[0.4em] text-cream/30 font-bold">Entry From</p>
+          <p className="text-sm font-headline font-bold text-[#a3b18a]">Under ₹1 Cr</p>
         </div>
       </div>
     </div>
