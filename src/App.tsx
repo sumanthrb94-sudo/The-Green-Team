@@ -857,93 +857,68 @@ const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewslet
 };
 
 const SanctuaryPopupContent = ({ loc }: { loc: any }) => (
-  <div className="w-72 p-3 bg-surface">
-    <div className="relative h-32 overflow-hidden mb-4 rounded-lg">
+  <div className="w-72" style={{ background: 'rgba(13,20,9,0.96)', backdropFilter: 'blur(20px)', borderRadius: '14px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.07)', boxShadow: '0 24px 48px rgba(0,0,0,0.7)' }}>
+    {/* Image */}
+    <div className="relative h-36 overflow-hidden">
       {loc.image ? (
-        <img 
-          src={loc.image} 
-          alt={loc.title} 
-          className={cn(
-            "w-full h-full object-cover transition-all duration-700",
-            loc.type === 'traffic-zone' ? "sepia brightness-75" : "grayscale hover:grayscale-0",
-            loc.type === 'infrastructure' && "contrast-125 brightness-90"
-          )}
-          referrerPolicy="no-referrer"
-        />
+        <img src={loc.image} alt={loc.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
       ) : (
-        <div className="w-full h-full bg-primary/5 flex items-center justify-center">
-          <MapPin className="w-8 h-8 text-primary/20" />
+        <div className="w-full h-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.03)' }}>
+          <MapPin className="w-8 h-8" style={{ color: 'rgba(255,255,255,0.1)' }} />
         </div>
       )}
-      {loc.type === 'traffic-zone' && (
-        <div className="absolute top-2 right-2 bg-error text-on-error px-2 py-0.5 text-[7px] uppercase tracking-widest font-bold flex items-center gap-1 rounded">
-          <AlertTriangle className="w-2 h-2" />
-          High Risk Zone
+      <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(13,20,9,0.9) 0%, transparent 60%)' }} />
+      {/* Live AQI badge on image */}
+      {loc.aqi != null && (
+        <div className="absolute bottom-3 left-3 flex items-center gap-1.5">
+          <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: loc.aqi > 50 ? '#f87171' : '#4ade80' }} />
+          <span className="text-[9px] font-bold uppercase tracking-widest" style={{ color: loc.aqi > 50 ? '#f87171' : '#4ade80' }}>
+            AQI {loc.aqi} · {loc.aqi > 50 ? 'Compromised' : 'Pristine'}
+          </span>
         </div>
       )}
-      {loc.type === 'infrastructure' && (
-        <div className="absolute top-2 right-2 bg-on-surface text-surface px-2 py-0.5 text-[7px] uppercase tracking-widest font-bold rounded">
-          {loc.id === 'future-city' ? 'Future Hub' : 'Logistics Hub'}
-        </div>
-      )}
-      {loc.type === 'exit' && (
-        <div className="absolute top-2 right-2 bg-primary/10 text-primary px-2 py-0.5 text-[7px] uppercase tracking-widest font-bold rounded">
-          ORR Exit
+      {/* Type badge */}
+      {loc.type === 'sanctuary' && (
+        <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full text-[7px] uppercase tracking-widest font-bold" style={{ background: 'rgba(100,80,30,0.85)', color: '#fcd34d', border: '1px solid rgba(252,211,77,0.25)' }}>
+          TGT Curated
         </div>
       )}
     </div>
-    
-    <div className="mb-4">
-      <h4 className={cn(
-        "font-headline font-bold text-xl mb-1 uppercase tracking-wider",
-        loc.type === 'traffic-zone' ? "text-error" : "text-on-surface"
-      )}>{loc.title}</h4>
-      <p className="text-[10px] uppercase tracking-widest text-secondary font-bold">{loc.location}</p>
+    {/* Content */}
+    <div className="p-4">
+      <h4 className="font-bold text-lg uppercase tracking-wider mb-0.5 leading-tight" style={{ color: 'rgba(255,255,255,0.92)' }}>{loc.title}</h4>
+      <p className="text-[9px] uppercase tracking-widest font-medium mb-4" style={{ color: 'rgba(255,255,255,0.35)' }}>{loc.location}</p>
+      {/* Stats */}
+      {loc.aqi != null && (
+        <div className="grid grid-cols-2 gap-2 mb-4">
+          <div className="rounded-lg p-2.5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}>
+            <p className="text-[7px] uppercase tracking-widest mb-1" style={{ color: 'rgba(255,255,255,0.25)' }}>Air Quality</p>
+            <p className="text-base font-bold leading-tight" style={{ color: loc.aqi > 50 ? '#f87171' : '#4ade80' }}>{loc.aqi}</p>
+            <p className="text-[7px]" style={{ color: 'rgba(255,255,255,0.3)' }}>{loc.aqi > 50 ? 'Unhealthy' : 'Pristine'}</p>
+          </div>
+          {loc.noise != null && (
+            <div className="rounded-lg p-2.5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}>
+              <p className="text-[7px] uppercase tracking-widest mb-1" style={{ color: 'rgba(255,255,255,0.25)' }}>Noise Level</p>
+              <p className="text-base font-bold leading-tight" style={{ color: loc.noise > 50 ? '#fb923c' : '#4ade80' }}>{loc.noise}<span className="text-[9px] font-normal" style={{ color: 'rgba(255,255,255,0.25)' }}> dB</span></p>
+              <p className="text-[7px]" style={{ color: 'rgba(255,255,255,0.3)' }}>{loc.noise > 50 ? 'Chaotic' : 'Silent'}</p>
+            </div>
+          )}
+        </div>
+      )}
+      {loc.description && (
+        <p className="text-[10px] leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.4)' }}>
+          {loc.type === 'traffic-zone' ? `Disadvantage: ${loc.description}` : loc.type === 'exit' ? 'Strategic access via Outer Ring Road — fast connectivity, urban-level pollution.' : loc.description}
+        </p>
+      )}
+      {loc.type === 'sanctuary' && (
+        <div className="flex items-center justify-between pt-3" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+          <span className="text-[8px] uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.2)' }}>Click marker to explore</span>
+          <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: 'rgba(100,80,30,0.5)', border: '1px solid rgba(252,211,77,0.25)' }}>
+            <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 4h5M4 1.5l2.5 2.5L4 6.5" stroke="#fcd34d" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </div>
+        </div>
+      )}
     </div>
-    
-    {loc.type !== 'exit' && (
-      <div className="flex gap-4 mb-4 py-3 border-y border-outline/10">
-        <div className="flex items-center gap-1.5">
-          <Wind className={cn("w-3 h-3", loc.aqi > 50 ? "text-error" : "text-primary/40")} />
-          <span className={cn("text-[9px] uppercase tracking-widest font-bold", loc.aqi > 50 ? "text-error" : "text-on-surface")}>
-            AQI: {loc.aqi} {loc.aqi > 50 ? '(Hazardous)' : '(Pristine)'}
-          </span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <VolumeX className={cn("w-3 h-3", loc.noise > 50 ? "text-error" : "text-primary/40")} />
-          <span className={cn("text-[9px] uppercase tracking-widest font-bold", loc.noise > 50 ? "text-error" : "text-on-surface")}>
-            {loc.noise}dB {loc.noise > 50 ? '(Chaotic)' : '(Silent)'}
-          </span>
-        </div>
-      </div>
-    )}
-
-    {loc.type === 'exit' && (
-      <div className="flex gap-4 mb-4 py-3 border-y border-outline/10">
-        <div className="flex items-center gap-1.5">
-          <Wind className="w-3 h-3 text-error" />
-          <span className="text-[9px] uppercase tracking-widest font-bold text-on-surface">
-            Avg AQI: {loc.aqi} (Compromised)
-          </span>
-        </div>
-      </div>
-    )}
-
-    <p className="text-xs text-on-surface-variant leading-relaxed mb-4 font-light">
-      {loc.type === 'traffic-zone' ? `Disadvantage: ${loc.description}`
-        : loc.type === 'exit'
-             ? "Strategic access point via Outer Ring Road. High-speed connectivity to the sanctuary corridor, but subject to immediate urban pollution."
-          : loc.description}
-    </p>
-    
-    {(loc.type === 'sanctuary' || loc.type === 'infrastructure') && (
-      <a 
-        href={`#${loc.id}`} 
-        className="text-[9px] uppercase tracking-[0.3em] font-bold text-primary border-b border-primary/20 pb-1 hover:border-primary transition-all"
-      >
-        View Details
-      </a>
-    )}
   </div>
 );
 
@@ -3270,26 +3245,29 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.8, ease: "easeInOut" }}
-            className="absolute inset-0 z-[10000] bg-surface flex flex-col items-center justify-center pointer-events-none"
+            className="absolute inset-0 z-[10000] flex flex-col items-center justify-center pointer-events-none"
+            style={{ background: 'linear-gradient(135deg, #0d1409 0%, #1a2310 100%)' }}
           >
             <motion.div
               animate={{ scale: [0.95, 1.05, 0.95] }}
               transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
             >
-              <Logo className="w-16 h-16 opacity-80" />
+              <Logo className="w-16 h-16" style={{ opacity: 0.9 }} />
             </motion.div>
-            <div className="mt-8 text-olive-800/40 text-[10px] tracking-[0.3em] uppercase font-bold text-center">
-              Awaiting Geographic Signal...
+            <div className="mt-6 flex items-center gap-2">
+              <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#4ade80' }} />
+              <span className="text-[9px] tracking-[0.4em] uppercase font-bold" style={{ color: 'rgba(255,255,255,0.3)' }}>Connecting to Live Environmental Data</span>
             </div>
-            {/* Loading line */}
-            <div className="w-48 h-px bg-olive-800/10 mt-6 relative overflow-hidden">
-              <motion.div 
-                className="absolute top-0 left-0 h-full bg-olive-800/40"
+            <div className="w-48 h-px mt-6 relative overflow-hidden" style={{ background: 'rgba(255,255,255,0.05)' }}>
+              <motion.div
+                className="absolute top-0 left-0 h-full"
+                style={{ background: 'linear-gradient(90deg, transparent, #4ade80, transparent)' }}
                 initial={{ width: "0%" }}
                 animate={{ width: "100%" }}
                 transition={{ duration: 1.8, ease: "linear" }}
               />
             </div>
+            <p className="text-[8px] tracking-[0.2em] uppercase mt-4" style={{ color: 'rgba(255,255,255,0.12)' }}>The Green Team · Environmental Intelligence</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -3317,60 +3295,65 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
         )}
 
 
-        {/* Live AQI badge - visible when AQI Live filter is active */}
-        <AnimatePresence>
-          {showAqi && (
-            <motion.div
-              initial={{ opacity: 0, x: 12 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 12 }}
-              className="absolute top-6 right-6 z-[1000]"
-            >
-              <div className="px-3 py-1.5 bg-red-600 text-white text-[8px] font-bold uppercase tracking-widest rounded-full animate-pulse flex items-center gap-2 shadow-lg shadow-red-600/30">
-                <div className="w-1.5 h-1.5 bg-white rounded-full" />
-                Live AQI Feed
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Google Maps-style Premium Segment Filter Pill Bar */}
-        <div className="absolute top-[4.5rem] left-4 right-4 z-[1000] pointer-events-none">
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15, duration: 0.4, ease: 'easeOut' }}
-            className="filter-pill-bar flex items-center gap-2 overflow-x-auto py-1 pointer-events-auto"
+        {/* ── Unified dark-glass map header bar ─────────────────────────────── */}
+        <motion.div
+          initial={{ opacity: 0, y: -12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.5, ease: 'easeOut' }}
+          className="absolute top-4 left-4 right-4 z-[1000] flex items-center gap-2"
+        >
+          {/* Brand / Live chip */}
+          <div
+            className="flex items-center gap-2 px-3 py-2 rounded-xl flex-shrink-0"
+            style={{ background: 'rgba(13,20,9,0.90)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.07)', boxShadow: '0 4px 24px rgba(0,0,0,0.5)' }}
           >
+            <div className="flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#4ade80' }} />
+              <span className="text-[8px] uppercase tracking-[0.3em] font-bold" style={{ color: 'rgba(255,255,255,0.7)' }}>Live</span>
+            </div>
+            <div className="w-px h-3" style={{ background: 'rgba(255,255,255,0.1)' }} />
+            <span className="text-[8px] uppercase tracking-wider font-medium hidden sm:block" style={{ color: 'rgba(255,255,255,0.35)' }}>TGT Intelligence</span>
+          </div>
+
+          {/* Filter pills */}
+          <div className="flex items-center gap-2 overflow-x-auto flex-1 min-w-0 py-0.5">
             {FILTER_PILLS.map((pill, idx) => {
               const Icon = pill.icon;
               const isActive = activeFilters.has(pill.id);
               return (
                 <motion.button
                   key={pill.id}
-                  initial={{ opacity: 0, scale: 0.85, y: -6 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  transition={{ delay: idx * 0.045 + 0.1, type: 'spring', stiffness: 320, damping: 22 }}
-                  whileHover={{ scale: 1.06, y: -2 }}
+                  initial={{ opacity: 0, scale: 0.85 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: idx * 0.04 + 0.15, type: 'spring', stiffness: 300, damping: 24 }}
+                  whileHover={{ scale: 1.04, y: -1 }}
                   whileTap={{ scale: 0.94 }}
                   onClick={() => toggleFilter(pill.id)}
-                  className={cn(
-                    "flex-shrink-0 flex items-center gap-1.5 h-9 px-3.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-colors duration-200 whitespace-nowrap border cursor-pointer select-none",
-                    isActive
-             ? "bg-primary text-on-primary border-transparent shadow-lg shadow-primary/30"
-                      : "bg-surface/90 backdrop-blur-md text-secondary border-outline/20 shadow-md hover:border-primary/50 hover:text-primary hover:bg-surface"
-                  )}
+                  className="flex-shrink-0 flex items-center gap-1.5 h-9 px-3.5 rounded-xl text-[10px] font-bold uppercase tracking-widest whitespace-nowrap cursor-pointer select-none transition-all duration-200"
+                  style={isActive ? {
+                    background: 'rgba(60,90,50,0.92)',
+                    backdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(74,222,128,0.35)',
+                    color: '#86efac',
+                    boxShadow: '0 0 18px rgba(74,222,128,0.15)',
+                  } : {
+                    background: 'rgba(13,20,9,0.82)',
+                    backdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(255,255,255,0.07)',
+                    color: 'rgba(255,255,255,0.45)',
+                    boxShadow: '0 2px 12px rgba(0,0,0,0.4)',
+                  }}
                 >
                   <Icon className="w-3.5 h-3.5 flex-shrink-0" />
                   <span>{pill.label}</span>
                   {isActive && pill.id === 'aqi-live' && (
-                    <span className="w-1.5 h-1.5 bg-on-primary/75 rounded-full animate-pulse ml-0.5 flex-shrink-0" />
+                    <span className="w-1.5 h-1.5 rounded-full animate-pulse ml-0.5 flex-shrink-0" style={{ background: '#4ade80' }} />
                   )}
                 </motion.button>
               );
             })}
-          </motion.div>
-        </div>
+          </div>
+        </motion.div>
 
         <MapContainer
           center={[17.49, 78.48]}
@@ -3577,19 +3560,17 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
                     }}
                     icon={L.divIcon({
                       className: 'custom-div-icon',
-                      html: `<div class="relative flex flex-col items-center justify-center filter drop-shadow-2xl hover:-translate-y-2 transition-transform duration-500 group">
-                              <div class="absolute -inset-6 bg-gold/10 rounded-full animate-pulse blur-md group-hover:bg-gold/30 transition-all"></div>
-                              <div class="w-14 h-14 bg-surface backdrop-blur-md rounded-full border-[3px] border-olive-900 shadow-[0_15px_30px_-5px_rgba(0,0,0,0.5)] flex items-center justify-center z-10 overflow-hidden relative">
-                                <div class="absolute inset-0 bg-gradient-to-tr from-gold/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                <div class="w-5 h-5 bg-olive-900 rounded border border-gold shadow-inner rotate-45 transform group-hover:scale-110 transition-transform"></div>
+                      html: `<div style="display:flex;flex-direction:column;align-items:center;filter:drop-shadow(0 8px 24px rgba(0,0,0,0.65));">
+                              <div style="width:50px;height:50px;border-radius:50%;background:rgba(13,20,9,0.94);backdrop-filter:blur(16px);border:2px solid rgba(252,211,77,0.55);box-shadow:0 0 0 5px rgba(252,211,77,0.07),0 14px 32px rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;">
+                                <div style="position:absolute;inset:0;background:radial-gradient(circle at 32% 28%, rgba(252,211,77,0.18), transparent 62%);"></div>
+                                <div style="width:18px;height:18px;border-radius:4px;background:rgba(252,211,77,0.14);border:1.5px solid rgba(252,211,77,0.65);transform:rotate(45deg);flex-shrink:0;"></div>
                               </div>
-                              <div class="w-[3px] h-10 bg-gradient-to-b from-olive-900 to-transparent -mt-1 z-0 relative">
-                                <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-1 bg-black/40 blur-[2px] rounded-full"></div>
-                              </div>
+                              <div style="width:2px;height:10px;background:linear-gradient(to bottom,rgba(252,211,77,0.55),transparent);margin-top:-1px;"></div>
+                              <div style="width:5px;height:2px;border-radius:50%;background:rgba(0,0,0,0.4);"></div>
                             </div>`,
-                      iconSize: [56, 96],
-                      iconAnchor: [28, 96],
-                      popupAnchor: [0, -96]
+                      iconSize: [50, 64],
+                      iconAnchor: [25, 64],
+                      popupAnchor: [0, -66]
                     })}
                   >
                     <Popup className="custom-popup">
@@ -3652,6 +3633,60 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
             );
           })}
         </MapContainer>
+
+        {/* ── Bottom live stats bar ─────────────────────────────────────────── */}
+        <div className="absolute bottom-0 left-0 right-0 z-[1000] pointer-events-none">
+          <div
+            className="flex items-stretch"
+            style={{ background: 'rgba(13,20,9,0.92)', backdropFilter: 'blur(20px)', borderTop: '1px solid rgba(255,255,255,0.05)' }}
+          >
+            {/* Agartha reading */}
+            <div className="flex-1 flex items-center gap-3 px-4 py-3" style={{ borderRight: '1px solid rgba(255,255,255,0.04)' }}>
+              <div className="w-2 h-2 rounded-full animate-pulse flex-shrink-0" style={{ background: '#4ade80' }} />
+              <div>
+                <p className="text-[7px] uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.25)' }}>Agartha · Narsapur Forest</p>
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-lg font-bold leading-tight" style={{ color: '#4ade80' }}>12</span>
+                  <span className="text-[8px]" style={{ color: 'rgba(255,255,255,0.25)' }}>AQI · Pristine</span>
+                </div>
+              </div>
+            </div>
+            {/* City reading */}
+            <div className="flex-1 flex items-center gap-3 px-4 py-3" style={{ borderRight: '1px solid rgba(255,255,255,0.04)' }}>
+              <div className="w-2 h-2 rounded-full animate-pulse flex-shrink-0" style={{ background: '#f87171' }} />
+              <div>
+                <p className="text-[7px] uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.25)' }}>City Average · Hyderabad</p>
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-lg font-bold leading-tight" style={{ color: '#f87171' }}>148</span>
+                  <span className="text-[8px]" style={{ color: 'rgba(255,255,255,0.25)' }}>AQI · Unhealthy</span>
+                </div>
+              </div>
+            </div>
+            {/* Delta */}
+            <div className="flex-shrink-0 flex items-center gap-2 px-4 py-3" style={{ borderRight: '1px solid rgba(255,255,255,0.04)' }}>
+              <div>
+                <p className="text-[7px] uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.25)' }}>Air Advantage</p>
+                <p className="font-bold text-sm" style={{ color: '#fcd34d' }}>12.3× cleaner</p>
+              </div>
+            </div>
+            {/* Satellite toggle */}
+            <div className="flex-shrink-0 flex items-center px-3 py-3 pointer-events-auto">
+              <button
+                onClick={() => setIsSatellite(s => !s)}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-all duration-200"
+                style={{
+                  background: isSatellite ? 'rgba(60,90,50,0.8)' : 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                }}
+              >
+                <Layers className="w-3 h-3" style={{ color: 'rgba(255,255,255,0.4)' }} />
+                <span className="text-[9px] font-bold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                  {isSatellite ? 'Satellite' : 'Map'}
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
