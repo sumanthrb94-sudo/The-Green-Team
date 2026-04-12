@@ -4655,18 +4655,104 @@ const AuthModal = ({
   onSuccess: (user: User, isNew: boolean) => void;
 }) => {
   const [emailOpen, setEmailOpen]   = useState(false);
+  const [phoneOpen, setPhoneOpen]   = useState(false);
   const [emailMode, setEmailMode]   = useState<'signin' | 'signup'>('signin');
   const [email, setEmail]           = useState('');
   const [password, setPassword]     = useState('');
-  const [loading, setLoading]       = useState<'google' | 'email' | null>(null);
+  const [phone, setPhone]           = useState('');
+  const [otp, setOtp]               = useState('');
+  const [otpSent, setOtpSent]       = useState(false);
+  const [loading, setLoading]       = useState<'google' | 'email' | 'phone' | null>(null);
   const [error, setError]           = useState('');
+  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
+  const recaptchaVerifierRef = useRef<RecaptchaVerifier | null>(null);
 
   useEffect(() => {
     if (!isOpen) {
-      setEmailOpen(false); setEmailMode('signin');
-      setEmail(''); setPassword(''); setError('');
+      setEmailOpen(false);
+      setPhoneOpen(false);
+      setEmailMode('signin');
+      setEmail('');
+      setPassword('');
+      setPhone('');
+      setOtp('');
+      setOtpSent(false);
+      setError('');
+      setConfirmationResult(null);
     }
   }, [isOpen]);
+
+  // Initialize reCAPTCHA verifier
+  const initializeRecaptcha = useCallback(() => {
+    if (!recaptchaVerifierRef.current && auth) {
+      try {
+        recaptchaVerifierRef.current = new RecaptchaVerifier(auth, 'recaptcha-container', {
+          size: 'invisible',
+          callback: () => {}
+        });
+      } catch (err: any) {
+        console.error('reCAPTCHA init error:', err);
+      }
+    }
+  }, []);
+
+  const handlePhoneSendOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading('phone');
+    
+    try {
+      initializeRecaptcha();
+      
+      // Format phone number with country code if not present
+      let formattedPhone = phone.trim();
+      if (!formattedPhone.startsWith('+')) {
+        formattedPhone = '+91' + formattedPhone.replace(/\D/g, '');
+      }
+      
+      if (recaptchaVerifierRef.current) {
+        const result = await signInWithPhoneNumber(auth, formattedPhone, recaptchaVerifierRef.current);
+        setConfirmationResult(result);
+        setOtpSent(true);
+        setOtp('');
+      }
+    } catch (err: any) {
+      setError(friendlyAuthError(err.code));
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  const handlePhoneVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading('phone');
+    
+    try {
+      if (!confirmationResult) {
+        setError('OTP session expired. Please try again.');
+        setOtpSent(false);
+        setConfirmationResult(null);
+        return;
+      }
+      
+      const cred = await confirmationResult.confirm(otp);
+      const isNew = cred.user.metadata.creationTime === cred.user.metadata.lastSignInTime;
+      onSuccess(cred.user, isNew);
+      onClose();
+    } catch (err: any) {
+      setError(friendlyAuthError(err.code));
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  const handlePhoneBack = () => {
+    setOtpSent(false);
+    setOtp('');
+    setError('');
+    setConfirmationResult(null);
+  };
 
   const handleGoogle = async () => {
     setError(''); setLoading('google');
@@ -4883,7 +4969,83 @@ const AuthModal = ({
                 </motion.form>
               )}
 
-              {error && !emailOpen && <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-red-500 text-xs text-center">{error}</motion.p>}
+              {/* Phone — tertiary option */}
+              {!phoneOpen ? (
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setPhoneOpen(true)}
+                  className="w-full py-3.5 border border-olive-800/15 rounded-2xl text-olive-900/60 text-sm hover:border-olive-800/30 hover:text-olive-900 transition-all"
+                >
+                  Continue with Phone
+                </motion.button>
+              ) : (
+                <motion.form
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  onSubmit={otpSent ? handlePhoneVerifyOtp : handlePhoneSendOtp}
+                  className="space-y-4 overflow-hidden"
+                >
+                  {!otpSent ? (
+                    <>
+                      <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.1 }}>
+                        <label htmlFor="auth-phone" className="text-[9px] uppercase tracking-[0.4em] text-olive-800/40 font-bold block mb-1.5">Phone Number</label>
+                        <input id="auth-phone" name="phone" type="tel" value={phone} onChange={e => setPhone(e.target.value)} required
+                          className="w-full bg-surface border border-outline/20 rounded-xl px-4 py-3 text-sm text-on-surface focus:outline-none focus:border-primary/60 transition-colors"
+                          placeholder="+91 98765 43210" autoFocus />
+                        <p className="text-[8px] text-olive-800/30 mt-1">We'll send you an OTP to verify</p>
+                      </motion.div>
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        type="submit"
+                        disabled={!!loading}
+                        className="w-full py-3.5 bg-gradient-to-r from-olive-900 to-primary text-cream text-sm font-semibold rounded-2xl hover:shadow-lg transition-all disabled:opacity-60 flex items-center justify-center gap-2"
+                      >
+                        {loading === 'phone' ? <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity }}>
+                          <RefreshCw className="w-4 h-4" />
+                        </motion.div> : <Send className="w-4 h-4" />}
+                        {loading === 'phone' ? 'Sending OTP…' : 'Send OTP'}
+                      </motion.button>
+                    </>
+                  ) : (
+                    <>
+                      <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.1 }}>
+                        <label htmlFor="auth-otp" className="text-[9px] uppercase tracking-[0.4em] text-olive-800/40 font-bold block mb-1.5">Enter OTP</label>
+                        <input id="auth-otp" name="otp" type="text" value={otp} onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))} required
+                          className="w-full bg-surface border border-outline/20 rounded-xl px-4 py-3 text-sm text-on-surface focus:outline-none focus:border-primary/60 transition-colors text-center tracking-widest text-lg font-bold"
+                          placeholder="000000" maxLength={6} autoFocus />
+                        <p className="text-[8px] text-olive-800/30 mt-1">Sent to {phone}</p>
+                      </motion.div>
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        type="submit"
+                        disabled={!!loading || otp.length < 6}
+                        className="w-full py-3.5 bg-gradient-to-r from-olive-900 to-primary text-cream text-sm font-semibold rounded-2xl hover:shadow-lg transition-all disabled:opacity-60 flex items-center justify-center gap-2"
+                      >
+                        {loading === 'phone' ? <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity }}>
+                          <RefreshCw className="w-4 h-4" />
+                        </motion.div> : <Check className="w-4 h-4" />}
+                        {loading === 'phone' ? 'Verifying…' : 'Verify OTP'}
+                      </motion.button>
+                      <motion.button
+                        type="button"
+                        onClick={handlePhoneBack}
+                        className="w-full py-2 text-olive-900/60 text-sm hover:text-olive-900 transition-colors"
+                      >
+                        Back to Phone
+                      </motion.button>
+                    </>
+                  )}
+                </motion.form>
+              )}
+
+              {error && !emailOpen && !phoneOpen && <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-red-500 text-xs text-center">{error}</motion.p>}
+              {error && phoneOpen && <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-red-500 text-xs text-center">{error}</motion.p>}
+
+              {/* reCAPTCHA container */}
+              <div id="recaptcha-container" className="hidden" />
 
               <motion.p
                 initial={{ opacity: 0 }}
