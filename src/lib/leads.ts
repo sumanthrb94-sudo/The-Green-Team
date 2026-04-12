@@ -12,6 +12,7 @@ export interface Lead {
   id: string;
   name: string;
   email: string;
+  phone?: string;
   intent?: string;
   source: 'membership';
   createdAt: { seconds: number } | null;
@@ -20,11 +21,11 @@ export interface Lead {
 export interface NewsletterEntry {
   id: string;
   email: string;
-  source: 'modal' | 'inline';
+  source: 'modal' | 'inline' | 'mobile_quick';
   createdAt: { seconds: number } | null;
 }
 
-export async function saveLead(data: { name: string; email: string; intent?: string }) {
+export async function saveLead(data: { name: string; email: string; phone?: string; intent?: string }) {
   if (!db) return new Promise(r => setTimeout(r, 600));
   return addDoc(collection(db, 'leads'), {
     ...data,

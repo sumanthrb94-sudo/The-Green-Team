@@ -105,6 +105,7 @@ interface Sanctuary {
   // Site plan + external brochure - populate for any property with a site plan
   sitePlanSrc?: string;
   brochureUrl?: string;
+  mapUrl?: string;
   gallery?: string[];
 }
 
@@ -125,33 +126,36 @@ const SANCTUARIES: Sanctuary[] = [
     tagline: 'Where the forest becomes home.',
     description: 'MODCON Agartha is a first-of-its-kind biomorphic residential community carved into the Narsapur forest periphery. 53 thoughtfully sized plots surround a 14,548 sq yd organic amenity core - featuring fluid earth architecture, solar-integrated curved roofs, and living canopies that blur the line between structure and forest. No two plots are the same. No straight lines anywhere.',
     plots: 53,
-    plotRange: '808 ? 5,097 sq yds',
+    plotRange: '808 - 5,097 sq yds',
     amenityAcres: '14,548 sq yds',
     architect: 'MODCON Builders',
     sitePlanSrc: '/FINAL-LAYOUT.jpeg',
     brochureUrl: 'https://www.agartha.in/',
+    mapUrl: 'https://maps.app.goo.gl/da9KEKTYMMBnTU3R7',
     gallery: [
-      '/gallery/agartha/1.jpg',
-      '/gallery/agartha/142b26_07ba6ec4ef4e49d680a53ab9a3362f25~mv2.jpg.jpeg',
-      '/gallery/agartha/142b26_0fee06470ac2445c9ff7742be6377273~mv2.jpg.jpeg',
-      '/gallery/agartha/142b26_13ce857bed164143a7d79ce6cef3668e~mv2.jpg.jpeg',
-      '/gallery/agartha/142b26_34c58cd885c64ddebbae12791465bbe3~mv2.jpg.jpeg',
-      '/gallery/agartha/142b26_567e195b978947c9b29be195842095af~mv2.jpg.jpeg',
-      '/gallery/agartha/142b26_5a78474b934e4251b54ce25e16770c68~mv2.jpg.jpeg',
-      '/gallery/agartha/142b26_5f7c47258d394edcbf818b25e3b12965~mv2.jpg.jpeg',
-      '/gallery/agartha/142b26_86e04d7ce83d497997bdac2c29efe900~mv2.jpg.jpeg',
-      '/gallery/agartha/142b26_87ac7f7d92a145b9aa2740c4a6898410~mv2.jpg.jpeg',
-      '/gallery/agartha/142b26_89a3906d085c4518a1ce49864ebda77a~mv2.jpg.jpeg',
-      '/gallery/agartha/142b26_a79caac8357141ef89993d2115817696~mv2.jpg.jpeg',
-      '/gallery/agartha/142b26_a8649ae42bca482cbbafe84794fe8a6e~mv2.jpg.jpeg',
-      '/gallery/agartha/142b26_acda3bc9aaa84bfc976803cdcbdce73f~mv2.jpg.jpeg',
-      '/gallery/agartha/142b26_b52923b4599745df825e9d06157b43d3~mv2.jpg.jpeg',
-      '/gallery/agartha/142b26_bdabb7cd17f741ee815019462732e449~mv2.jpg.jpeg',
-      '/gallery/agartha/142b26_cb62ea3cf3a1420399ec2e43c1dee85f~mv2.png_1.jpeg',
-      '/gallery/agartha/142b26_d9c0a047f545422a8b53ee00aed7b1e0~mv2.png.jpeg',
-      '/gallery/agartha/142b26_d9f37ad4d1d74e65a62892327167ed6b~mv2.jpg.jpeg',
-      '/gallery/agartha/142b26_e952e8d04d6546b5866e374206744e87~mv2.jpg.jpeg',
-      '/gallery/agartha/142b26_e9917bb73fc94531948ef638eba5a051~mv2.jpg.jpeg'
+      '/gallery/agartha/0.png',
+      '/gallery/agartha/1.png',
+      '/gallery/agartha/2.jpg',
+      '/gallery/agartha/3.png',
+      '/gallery/agartha/4.png',
+      '/gallery/agartha/5.png',
+      '/gallery/agartha/6.png',
+      '/gallery/agartha/7.png',
+      '/gallery/agartha/8.png',
+      '/gallery/agartha/9.png',
+      '/gallery/agartha/10.png',
+      '/gallery/agartha/11.png',
+      '/gallery/agartha/12.jpg',
+      '/gallery/agartha/13.jpg',
+      '/gallery/agartha/14.jpg',
+      '/gallery/agartha/15.jpg',
+      '/gallery/agartha/16.jpg',
+      '/gallery/agartha/17.jpg',
+      '/gallery/agartha/18.jpg',
+      '/gallery/agartha/19.jpg',
+      '/gallery/agartha/20.jpg',
+      '/gallery/agartha/21.jpg',
+      '/gallery/agartha/22.jpg',
     ],
     features: [
       'Biomorphic Architecture',
@@ -527,7 +531,7 @@ const SideNavBar = ({ activeMode, onModeChange }: { activeMode: string, onModeCh
   );
 };
 
-const Hero = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
+const Hero = ({ onModeChange, isLoggedIn = false, onNewsletterClick, onAdvisorClick }: { onModeChange: (mode: string) => void, isLoggedIn?: boolean, onNewsletterClick?: () => void, onAdvisorClick?: () => void }) => {
   return (
     <section className="relative flex flex-col justify-start px-6 md:px-24 pt-6 pb-12 overflow-hidden cashew-gradient">
       <div className="absolute inset-0 z-0 opacity-10 mix-blend-multiply">
@@ -561,12 +565,27 @@ const Hero = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 md:gap-8 pt-4">
-              <button onClick={() => onModeChange('membership')} className="btn-membership btn-olive group w-full sm:w-auto shadow-lg hover:shadow-xl shadow-olive-900/20">
-                Apply for Membership <ArrowUpRight className="inline-block ml-2 w-4 h-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
-              </button>
-              <button onClick={() => onModeChange('analytics')} className="btn-membership btn-outline-olive w-full sm:w-auto hover:shadow-lg">
-                The Green Team Advantage
-              </button>
+              {isLoggedIn ? (
+                // Logged-in users: jump straight to Adviser Access
+                <>
+                  <button onClick={onAdvisorClick} className="btn-membership btn-olive group w-full sm:w-auto shadow-lg hover:shadow-xl shadow-olive-900/20">
+                    Request Adviser Access <ArrowUpRight className="inline-block ml-2 w-4 h-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+                  </button>
+                  <button onClick={() => onModeChange('analytics')} className="btn-membership btn-outline-olive w-full sm:w-auto hover:shadow-lg">
+                    Our Advantage
+                  </button>
+                </>
+              ) : (
+                // Guests: primary CTA = Adviser Access, secondary = newsletter
+                <>
+                  <button onClick={onAdvisorClick} className="btn-membership btn-olive group w-full sm:w-auto shadow-lg hover:shadow-xl shadow-olive-900/20">
+                    Apply for Adviser Access <ArrowUpRight className="inline-block ml-2 w-4 h-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+                  </button>
+                  <button onClick={onNewsletterClick} className="btn-membership btn-outline-olive w-full sm:w-auto hover:shadow-lg">
+                    Monthly Briefings
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </motion.div>
@@ -715,84 +734,7 @@ const Advantage = ({ isFullPage = false }: { isFullPage?: boolean }) => {
   );
 };
 
-const TheSIL = ({ isSubscribed, onNewsletterClick, isFullPage = false }: { isSubscribed: boolean, onNewsletterClick: () => void, isFullPage?: boolean }) => {
-  return (
-    <section id="syl" className={cn(
-      "px-12 md:px-24 bg-olive-900 text-cream relative overflow-hidden",
-      isFullPage ? "py-16" : "py-14"
-    )}>
-      {!isSubscribed && (
-        <div className="absolute inset-0 z-20 bg-olive-900/80 backdrop-blur-md flex flex-col items-center justify-center p-12 text-center">
-          <Shield className="w-16 h-16 text-gold mb-8" />
-          <h2 className="text-4xl md:text-6xl font-serif italic mb-6">Exclusive Access Required.</h2>
-          <p className="text-cream/60 max-w-md mb-12 text-lg font-light leading-relaxed">
-            SYL is a restricted landmark. Sign up for our monthly newsletter to unlock the full architectural briefing and coordinates.
-          </p>
-          <button 
-            onClick={onNewsletterClick}
-            className="btn-membership bg-gold text-olive-900 border-gold hover:bg-cream"
-          >
-            Unlock with Newsletter
-          </button>
-        </div>
-      )}
-      
-      <div className="absolute top-0 right-0 w-1/3 h-full opacity-20 grayscale pointer-events-none">
-        <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=1200" className="w-full h-full object-cover" />
-      </div>
-      
-      <div className="max-w-7xl mx-auto relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          <div>
-            <div className="flex items-center gap-4 mb-8">
-              <span className="px-3 py-1 bg-gold text-olive-900 text-[9px] font-bold uppercase tracking-widest">Upcoming Landmark</span>
-              <span className="text-cream/40 text-[9px] uppercase tracking-[0.4em]">Tukkuguda</span>
-            </div>
-            <h2 className="text-5xl md:text-7xl font-medium mb-6">SYL<br />Villament.</h2>
-            <p className="text-lg md:text-xl font-light text-cream/60 leading-relaxed mb-6">
-              Imagine an 18-floor masterpiece where **two floors equal one villa**. Amidst a landscape of traditional villas, SYL stands as the only tower — a soaring statement of exclusivity in Tukkuguda.
-            </p>
-            
-            <div className="grid grid-cols-2 gap-6 mb-8">
-              <div>
-                <p className="text-[9px] uppercase tracking-[0.4em] text-gold mb-2">Location</p>
-                <p className="text-xl font-serif italic">Tukkuguda</p>
-              </div>
-              <div>
-                <p className="text-[9px] uppercase tracking-[0.4em] text-gold mb-2">Exclusivity</p>
-                <p className="text-xl font-serif italic">Only Tower in Villa Zone</p>
-              </div>
-            </div>
 
-            <button onClick={onNewsletterClick} className="btn-membership bg-gold text-olive-900 border-gold hover:bg-cream hover:text-olive-900">
-              Request Early Access Briefing
-            </button>
-          </div>
-          
-          <div className="space-y-8">
-            <div className="p-10 border border-cream/10 bg-surface/5 backdrop-blur-sm">
-              <h4 className="text-2xl font-bold mb-4 text-gold italic">Environmental Integrity</h4>
-              <div className="space-y-6">
-                <div className="flex justify-between items-center border-b border-cream/5 pb-4">
-                  <span className="text-[10px] uppercase tracking-widest text-cream/40">Target AQI</span>
-                  <span className="text-xl font-serif">Sub 25</span>
-                </div>
-                <div className="flex justify-between items-center border-b border-cream/5 pb-4">
-                  <span className="text-[10px] uppercase tracking-widest text-cream/40">Noise Mitigation</span>
-                  <span className="text-xl font-serif">Zero Negligence Tech</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-[10px] uppercase tracking-widest text-cream/40">Commute</span>
-                  <span className="text-xl font-serif">15 Mins to Future City Hub</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-};
 
 const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewsletterClick: () => void, onOpen: () => void }> = ({ sanctuary, isSubscribed, onNewsletterClick, onOpen }) => {
   const isSyl = sanctuary.id === 'syl';
@@ -1310,7 +1252,7 @@ const AGARTHA_HOTSPOTS: Hotspot[] = [
 
 // ──"  Agartha: 53 individual plot dots ────────────────────────────────────────
 // Positions (x%, y%) map onto the portrait site plan image.
-// Sizes reflect the actual MODCON plot range (808 ? 5,097 sq yds).
+// Sizes reflect the actual MODCON plot range (808 - 5,097 sq yds).
 // Plot 15 = landmark premium corner (dual forest frontage, 5,097 sq yds).
 
 interface PlotDot { id: number; sqYds: number; x: number; y: number }
@@ -1385,7 +1327,7 @@ const AdminDashboard: FC<{
   firestoreProps: PropertyDoc[];
   users: UserProfile[];
 }> = ({ onClose, leads, newsletter, firestoreProps, users }) => {
-  const [tab, setTab] = useState<'properties' | 'leads' | 'newsletter' | 'users'>('properties');
+  const [tab, setTab] = useState<'analytics' | 'properties' | 'leads' | 'newsletter' | 'users'>('analytics');
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<PropertyInput>(EMPTY_FORM);
@@ -1464,15 +1406,16 @@ const AdminDashboard: FC<{
 
         {/* Tabs */}
         <div className="flex border-b border-outline/10 flex-shrink-0 overflow-x-auto">
-          {(['properties', 'leads', 'newsletter', 'users'] as const).map(t => (
+          {(['analytics', 'properties', 'leads', 'newsletter', 'users'] as const).map(t => (
             <button key={t} onClick={() => setTab(t)}
               className={cn(
                 "flex-shrink-0 flex-1 py-3.5 text-[9px] uppercase tracking-[0.3em] font-bold transition-all whitespace-nowrap px-3",
                 tab === t ? "text-primary border-b-2 border-primary" : "text-secondary/40 hover:text-secondary"
               )}>
-              {t === 'properties' ? `Props (${firestoreProps.length})`
+              {t === 'analytics' ? `Overview`
+               : t === 'properties' ? `Props (${firestoreProps.length})`
                : t === 'leads' ? `Leads (${leads.length})`
-               : t === 'newsletter' ? `News (${newsletter.length})`
+               : t === 'newsletter' ? `Subs (${newsletter.length})`
                : `Users (${users.length})`}
             </button>
           ))}
@@ -1686,7 +1629,7 @@ const AdminDashboard: FC<{
                   </div>
                   <div>
                     <label htmlFor="adm-plotrange" className={labelCls}>Plot Range</label>
-                    <input id="adm-plotrange" name="plotRange" className={inputCls} placeholder="808 ? 5,097 sq yds" value={form.plotRange ?? ''}
+                    <input id="adm-plotrange" name="plotRange" className={inputCls} placeholder="808 - 5,097 sq yds" value={form.plotRange ?? ''}
                       onChange={e => set('plotRange', e.target.value)} />
                   </div>
                   <div>
@@ -1761,8 +1704,13 @@ const AdminDashboard: FC<{
                     </p>
                   </div>
                   <p className="text-xs text-secondary/60 flex items-center gap-1.5">
-                    <Phone className="w-3 h-3" />{l.email}
+                    <Mail className="w-3 h-3" />{l.email}
                   </p>
+                  {(l as any).phone && (
+                    <p className="text-xs text-primary/70 flex items-center gap-1.5 font-medium">
+                      <Phone className="w-3 h-3" />{(l as any).phone}
+                    </p>
+                  )}
                   {l.intent && (
                     <p className="text-[10px] text-primary/60 font-medium">{l.intent}</p>
                   )}
@@ -2253,6 +2201,91 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
             </motion.div>
           )}
 
+          {/* ══ LAYOUT PROPERTY SUMMARY STRIP (below layout plan) */}
+          {activeTab === 'layout' && (
+            <motion.div key="layout-summary" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="px-4 pb-28 space-y-4">
+
+              {(sanctuary.plots || sanctuary.plotRange || sanctuary.amenityAcres) && (
+                <div>
+                  <p className="text-[9px] uppercase tracking-[0.5em] text-secondary/50 font-bold mb-3">Community Scale</p>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { val: String(sanctuary.plots ?? '53'), label: 'Private Plots' },
+                      { val: sanctuary.plotRange ?? '808 - 5,097', label: 'Sq Yd Range' },
+                      { val: sanctuary.amenityAcres ?? '14,548', label: 'Amenity Sq Yds' },
+                    ].map(s => (
+                      <div key={s.label} className="bg-on-surface/5 rounded-2xl p-3 text-center border border-outline/10">
+                        <p className="text-sm font-headline font-bold text-primary leading-tight">{s.val}</p>
+                        <p className="text-[7px] uppercase tracking-widest text-secondary/50 mt-1">{s.label}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <p className="text-[9px] uppercase tracking-[0.5em] text-secondary/50 font-bold mb-3">Environmental Integrity</p>
+                <div className="space-y-3 bg-on-surface/3 rounded-2xl border border-outline/10 p-4">
+                  {[
+                    { label: 'Air Quality (AQI)', value: sanctuary.aqi + ' — Pristine', bar: Math.min((50 - sanctuary.aqi) / 50, 1), color: 'bg-emerald-500' },
+                    { label: 'Ambient Noise', value: sanctuary.noise + ' dB — Near Silent', bar: Math.min((50 - sanctuary.noise) / 50, 1), color: 'bg-sky-500' },
+                    { label: 'Commute', value: sanctuary.commute, bar: 0.75, color: 'bg-primary/70' },
+                  ].map(item => (
+                    <div key={item.label}>
+                      <div className="flex justify-between text-[9px] mb-1">
+                        <span className="uppercase tracking-widest text-secondary/60">{item.label}</span>
+                        <span className="font-bold text-on-surface/80">{item.value}</span>
+                      </div>
+                      <div className="h-1 bg-on-surface/10 rounded-full overflow-hidden">
+                        <motion.div initial={{ width: 0 }} animate={{ width: item.bar * 100 + '%' }}
+                          transition={{ delay: 0.4, duration: 0.7, ease: 'easeOut' }}
+                          className={'h-full rounded-full ' + item.color} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-on-surface/5 rounded-2xl p-4 border border-outline/10">
+                  <p className="text-[8px] uppercase tracking-widest text-secondary/50 mb-1">Starting Price</p>
+                  <p className="text-base font-headline font-bold text-primary">{sanctuary.valuation}</p>
+                </div>
+                {sanctuary.pricePerSqYd && (
+                  <div className="bg-on-surface/5 rounded-2xl p-4 border border-outline/10">
+                    <p className="text-[8px] uppercase tracking-widest text-secondary/50 mb-1">Rate / Sq Yd</p>
+                    <p className="text-base font-headline font-bold text-on-surface">₹{sanctuary.pricePerSqYd.toLocaleString('en-IN')}</p>
+                  </div>
+                )}
+              </div>
+
+              {sanctuary.features && sanctuary.features.length > 0 && (
+                <div>
+                  <p className="text-[9px] uppercase tracking-[0.5em] text-secondary/50 font-bold mb-3">Key Features</p>
+                  <div className="flex flex-wrap gap-2">
+                    {sanctuary.features.map((f, i) => (
+                      <span key={i} className="px-3 py-1.5 rounded-full bg-primary/10 text-primary text-[9px] uppercase tracking-wider font-bold border border-primary/15">
+                        {f}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {sanctuary.architect && (
+                <div className="flex items-center gap-3 p-4 border border-outline/10 rounded-2xl bg-on-surface/3">
+                  <div className="w-9 h-9 rounded-xl bg-primary/15 flex items-center justify-center flex-shrink-0">
+                    <Award className="w-4 h-4 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-[8px] uppercase tracking-widest text-secondary/50">Developer</p>
+                    <p className="text-sm font-bold text-on-surface">{sanctuary.architect}</p>
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          )}
+
           {/* ══ DETAILS TAB ══════════════════════════════════════════════ */}
           {activeTab === 'details' && (
             <motion.div key="details" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="px-6 py-4 space-y-6 pb-28">
@@ -2264,7 +2297,7 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
                   <div className="grid grid-cols-3 gap-3">
                     {[
                       { val: sanctuary.plots, label: 'Private Plots' },
-                      { val: sanctuary.plotRange ?? '808 ? 5,097', label: 'Sq Yds Range' },
+                      { val: sanctuary.plotRange ?? '808 - 5,097', label: 'Sq Yds Range' },
                       { val: sanctuary.amenityAcres ?? '14,548', label: 'Amenity Sq Yds' },
                     ].map(s => (
                       <div key={s.label} className="bg-on-surface/5 rounded-2xl p-4 text-center border border-outline/10">
@@ -2313,14 +2346,23 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
                 </div>
               )}
 
-              {/* Brochure link */}
-              {sanctuary.brochureUrl && (
-                <a href={sanctuary.brochureUrl} target="_blank" rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-3 w-full py-3.5 border border-outline/20 text-secondary text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl hover:bg-on-surface/5 transition-all">
-                  <ArrowUpRight className="w-4 h-4" />
-                  View Full Brochure
-                </a>
-              )}
+              {/* Brochure + Navigate links */}
+              <div className="flex gap-3">
+                {sanctuary.mapUrl && (
+                  <a href={sanctuary.mapUrl} target="_blank" rel="noopener noreferrer"
+                    className="flex-1 flex items-center justify-center gap-2 py-3.5 border border-outline/20 text-secondary text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl hover:bg-on-surface/5 transition-all">
+                    <Navigation className="w-4 h-4" />
+                    Navigate
+                  </a>
+                )}
+                {sanctuary.brochureUrl && (
+                  <a href={sanctuary.brochureUrl} target="_blank" rel="noopener noreferrer"
+                    className="flex-1 flex items-center justify-center gap-3 py-3.5 border border-outline/20 text-secondary text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl hover:bg-on-surface/5 transition-all">
+                    <ArrowUpRight className="w-4 h-4" />
+                    Full Brochure
+                  </a>
+                )}
+              </div>
             </motion.div>
           )}
 
@@ -2443,10 +2485,15 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
           <ArrowRight className="w-4 h-4" />
           Express Interest
         </button>
-        {sanctuary.brochureUrl && (
-          <a href={sanctuary.brochureUrl} target="_blank" rel="noopener noreferrer"
-            className="py-3.5 px-5 border border-outline/20 text-secondary text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl hover:bg-on-surface/5 transition-all flex items-center gap-2">
-            <ArrowUpRight className="w-4 h-4" />
+        {(sanctuary.mapUrl || sanctuary.brochureUrl) && (
+          <a
+            href={sanctuary.mapUrl || sanctuary.brochureUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Navigate to Property"
+            className="py-3.5 px-5 border border-outline/20 text-secondary text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl hover:bg-on-surface/5 transition-all flex items-center gap-2"
+          >
+            <Navigation className="w-4 h-4" />
           </a>
         )}
       </div>
@@ -3838,7 +3885,7 @@ const NewsletterModal = ({ isOpen, onClose, onSubscribe }: { isOpen: boolean, on
                 {isSubmitting ? "Authenticating..." : "Join Newsletter & Unlock"}
               </button>
               <p className="text-[8px] uppercase tracking-[0.3em] text-olive-800/30 text-center">
-                Unlocks access to SYL and future landmarks.
+                Unlocks access to future landmarks.
               </p>
             </form>
           </motion.div>
@@ -3856,7 +3903,7 @@ const INVESTMENT_BRACKETS = [
   'Prefer not to say',
 ];
 
-const ApplicationForm = () => {
+const ApplicationForm = ({ isLoggedIn = false, onNewsletterClick }: { isLoggedIn?: boolean, onNewsletterClick?: () => void }) => {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
@@ -3876,6 +3923,7 @@ const ApplicationForm = () => {
       await saveLead({
         name: form.name,
         email: form.email,
+        phone: form.phone,
         intent: [
           form.designation && `${form.designation}${form.company ? ' at ' + form.company : ''}`,
           form.investmentBracket && `Budget: ${form.investmentBracket}`,
@@ -3905,7 +3953,9 @@ const ApplicationForm = () => {
               Apply for<br /><span className="italic text-olive-800">Adviser Access.</span>
             </h2>
             <p className="text-base font-light text-olive-900/50 leading-relaxed mb-12">
-              We curate India's most exclusive pre-launch sanctuaries for a reserved investor circle. Our adviser will personally reach out within 24 hours.
+              {isLoggedIn
+                ? "You are in our circle. Request a private adviser call for upcoming pre-launch sanctuaries and early-entry coordinates."
+                : "We curate India's most exclusive pre-launch sanctuaries for a reserved investor circle. Our adviser will personally reach out within 24 hours."}
             </p>
             <div className="space-y-6 border-t border-olive-800/10 pt-8">
               {[
@@ -3922,9 +3972,13 @@ const ApplicationForm = () => {
                 </div>
               ))}
             </div>
-            <p className="text-[9px] text-olive-800/30 uppercase tracking-widest mt-8 leading-relaxed">
-              By applying, your email is enrolled in our monthly sanctuary intelligence newsletter.
-            </p>
+            {!isLoggedIn && onNewsletterClick && (
+              <p className="text-[9px] text-olive-800/30 uppercase tracking-widest mt-8 leading-relaxed">
+                Not ready yet?{' '}
+                <button onClick={onNewsletterClick} className="underline hover:text-olive-800/60 transition-colors">Join our newsletter</button>{' '}
+                for monthly sanctuary briefings.
+              </p>
+            )}
           </div>
 
           {/* Right - form */}
@@ -4003,9 +4057,11 @@ const ApplicationForm = () => {
                   {loading ? 'Submitting ' : 'Request Adviser Call'}
                 </button>
 
-                <p className="text-[9px] text-center text-olive-800/25 uppercase tracking-widest">
-                  Submitting enrolls you in our monthly intelligence newsletter
-                </p>
+                {!isLoggedIn && (
+                  <p className="text-[9px] text-center text-olive-800/25 uppercase tracking-widest">
+                    Submitting enrolls you in our monthly intelligence newsletter
+                  </p>
+                )}
               </form>
             )}
           </div>
@@ -4021,7 +4077,7 @@ const Footer = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
     { label: 'Living Ecosystems', sub: 'Nature-first design philosophy', mode: 'gallery' },
     { label: 'Sanctuary Map', sub: 'Environmental heatmap  AQI  Noise', mode: 'map' },
     { label: 'MODCON Agartha', sub: 'Narsapur Forest  Open access', mode: 'list' },
-    { label: 'SYL Villament', sub: 'Tukkuguda  Newsletter only', mode: 'syl' },
+
     { label: 'Adviser Membership', sub: 'Reserved investor circle  By invitation', mode: 'membership' },
   ];
 
@@ -4033,7 +4089,7 @@ const Footer = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
         <div className="border-b border-cream/8 pb-16 mb-16 flex flex-col md:flex-row md:items-end justify-between gap-10">
           <div>
             <Logo className="w-10 h-10 text-cream mb-6" />
-            <p className="text-2xl md:text-3xl font-light text-cream/30 max-w-xl leading-relaxed">
+            <p className="text-2xl md:text-3xl font-light text-cream/90 max-w-xl leading-relaxed">
               Curating India's most exclusive pre-launch sanctuaries for a private circle of intelligent investors.
             </p>
           </div>
@@ -4064,7 +4120,7 @@ const Footer = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
 
         {/* Bottom bar */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-[9px] uppercase tracking-[0.5em] text-cream/15 font-bold">
+          <p className="text-[9px] uppercase tracking-[0.5em] text-cream/50 font-bold">
             © {new Date().getFullYear()} The Green Team  Independent Sanctuary Curators  Hyderabad
           </p>
           <div className="flex items-center gap-8">
@@ -4225,6 +4281,62 @@ const ChatBot = ({ data }: { data: any }) => {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // ── Embedded knowledge base — Groot always knows all sanctuary data ──────
+  const GROOT_KNOWLEDGE = `
+=== THE GREEN TEAM — COMPLETE KNOWLEDGE BASE FOR GROOT ===
+
+ABOUT THE GREEN TEAM:
+The Green Team is an independent sanctuary curator based in Hyderabad, India. We curate India's most exclusive pre-launch sanctuaries for a private circle of intelligent investors. We are NOT developers — we are curators. We partner with developers like MODCON to bring self-sustaining, organic properties to a reserved investor circle.
+
+TWO OPTIONS FOR USERS:
+1. NEWSLETTER (Monthly Briefings) — Join our intelligence network for monthly environmental integrity reports, sanctuary valuations, and curation alerts. Free to join.
+2. ADVISER ACCESS (Membership) — Apply for a private call with your dedicated adviser. We contact you within 24 hours. You get pre-launch pricing, early-entry coordinates, and monthly briefings.
+
+CURRENT PROPERTY: MODCON AGARTHA
+- Location: Narsapur Forest Peripheral, Hyderabad (GPS: 17.3816° N, 78.3278° E)
+- Type: Biomorphic residential community
+- Developer: MODCON Builders
+- Plots: 53 unique private plots (no two the same, no straight lines)
+- Plot Range: 808 – 5,097 sq yds
+- Price: ₹7,999 per sq yd
+- Starting Value: ₹1.04 Cr (smallest plot at 808 sq yds)
+- Landmark Plot (Plot 15): 5,097 sq yds, dual forest frontage — most premium
+- Amenity Core: 14,548 sq yds of organic shared amenities
+- AQI: 12 (WHO: anything < 25 is pristine — Narsapur is cleaner than Swiss mountain towns)
+- Noise: 18 dB (whisper level; normal Indian urban is 70+ dB)
+- Commute: 45 mins to Financial District (Gachibowli / HITECH City)
+- Architect Theme: Zero right-angle design, earth + bamboo, solar curved rooftops, living canopies
+- Key Features: Biomorphic Architecture, Solar-Curved Rooftops, Narsapur Forest Buffer, Organic Amenity Core, Rainwater Harvesting, Earth & Bamboo Build, Zero Right-Angle Design, Private Plot Community
+- Brochure: https://www.agartha.in/
+
+INVESTMENT ANALYSIS:
+- Pre-Launch Rate (1 yr ago): ₹6,200/sq yd
+- Current Rate: ₹7,999/sq yd
+- Appreciation: +29% in 1 year
+- Annual ROI: ~29% p.a. — significantly outperforming FD (7%), gold (12%), and Sensex (~13% avg)
+- Valuation Example (Plot #15 - 5097 sq yds): Pre-launch ₹3.16 Cr → Today ₹4.08 Cr → Gain of ₹92 L in 1 yr
+
+ENVIRONMENTAL INTELLIGENCE:
+- Narsapur Forest AQI: 12 (pristine — Hyderabad city average is 85)
+- Narsapur Noise: 18 dB (near silent — city average 65-70 dB)
+- Tukkuguda AQI: 22 (SYL zone)
+- Real-time environmental heatmaps on the map view: AQI in red/orange/teal, Noise in blue/indigo/cyan
+- Green zones near sanctuaries; red zones near Patancheru industrial corridor
+
+THE SELF-SUSTAINING MODEL (why sanctuaries matter):
+- FOOD SECURITY: Each sanctuary grows organic produce in community farms — members have access to clean food independent of supply chains
+- WATER SECURITY: Rainwater harvesting + natural filtration — zero municipal dependency
+- ENERGY SECURITY: Solar microgrids — clean energy, no grid dependency
+- HEALTH: AQI 12 vs city AQI 85 = significantly lower cardiovascular and respiratory risk
+
+WHAT GROOT SHOULD DO:
+- Answer questions about Agartha, investment, environment, commute, lifestyle
+- Guide users toward taking action: "Apply for Adviser Access" (scroll to #apply section) or "Join Newsletter"
+- Never share information you don't have — say "I am Groot (I'll connect you with our adviser for that detail)"
+- Be concise, warm, premium — maximum 3-4 sentences per response
+- Keep the "I am Groot" personality but ALWAYS follow it with the actual useful answer
+`;
+
   const handleSend = async () => {
     if (!input.trim() || loading) return;
     const userMsg = input;
@@ -4232,18 +4344,26 @@ const ChatBot = ({ data }: { data: any }) => {
     setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
     setLoading(true);
 
+    // Resolve API key — Vite exposes env vars via import.meta.env (VITE_ prefix required for browser)
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY || (import.meta.env as any).GEMINI_API_KEY;
+
+    if (!apiKey) {
+      setMessages(prev => [...prev, { role: 'model', text: "I am Groot. (My neural pathways need a VITE_GEMINI_API_KEY — add it to your .env.local file and restart the dev server. Ask your developer!)" }]);
+      setLoading(false);
+      return;
+    }
+
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
-      const model = "gemini-3-flash-preview";
-      const systemInstruction = `You are "Groot", a sophisticated AI advisor for "The Green Team". 
-      You have a "Marvel sentiment" - you are heroic, protective of nature, and occasionally witty. 
-      While you are Groot, you MUST be helpful. You can start your responses with "I am Groot" but then provide the actual helpful information in parentheses or as a translation.
-      You are professional, exclusive, and ethical. 
-      You have access to the following data: ${JSON.stringify(data)}.
-      You can also see real-time environmental heatmaps (AQI and Noise) on the map view. 
-      AQI is shown in a red spectrum (red/orange/teal), and Noise is shown in a bluish spectrum (blue/indigo/cyan).
-      Your goal is to help users understand the value of self-sustaining sanctuaries (food, water, energy security) and guide them towards membership.
-      Be concise and maintain a premium tone.`;
+      const ai = new GoogleGenAI({ apiKey });
+      const model = "gemini-2.0-flash";
+      const systemInstruction = `You are "Groot", a sophisticated AI advisor for "The Green Team" sanctuary curation company.
+You have a warm "I am Groot" personality — heroic, protective of nature, and occasionally witty.
+Always start responses with "I am Groot." then provide the actual helpful answer in parentheses immediately after.
+You are professional, exclusive, ethical, and concise. Maximum 3-4 sentences.
+
+${GROOT_KNOWLEDGE}
+
+Additional live context (user data): ${JSON.stringify({ user: data.user?.displayName || 'Guest', sanctuaryCount: data.sanctuaries?.length ?? 1 })}`;
 
       const response = await ai.models.generateContent({
         model,
@@ -4254,7 +4374,7 @@ const ChatBot = ({ data }: { data: any }) => {
       setMessages(prev => [...prev, { role: 'model', text: response.text || "I am Groot. (I apologize, I am currently unable to process your request. Please contact our relationship managers directly.)" }]);
     } catch (error) {
       console.error("ChatBot Error:", error);
-      setMessages(prev => [...prev, { role: 'model', text: "I am Groot. (I encountered an error. Please try again later.)" }]);
+      setMessages(prev => [...prev, { role: 'model', text: "I am Groot. (Something went wrong on my end. Please try again, or reach out directly via the Adviser Access form below.)" }]);
     } finally {
       setLoading(false);
     }
@@ -4362,19 +4482,78 @@ const ChatBot = ({ data }: { data: any }) => {
   );
 };
 
-const HomeView = ({ isSubscribed, onNewsletterClick, sanctuaries = SANCTUARIES, onModeChange, onPropertyClick }: { isSubscribed: boolean, onNewsletterClick: () => void, sanctuaries?: Sanctuary[], onModeChange: (mode: string) => void, onPropertyClick: (s: Sanctuary) => void }) => (
+const HomeView = ({ isSubscribed, onNewsletterClick, sanctuaries = SANCTUARIES, onModeChange, onPropertyClick, isLoggedIn = false }: { isSubscribed: boolean, onNewsletterClick: () => void, sanctuaries?: Sanctuary[], onModeChange: (mode: string) => void, onPropertyClick: (s: Sanctuary) => void, isLoggedIn?: boolean }) => (
   <div className="flex flex-col">
-    <Hero onModeChange={onModeChange} />
+    <Hero onModeChange={onModeChange} isLoggedIn={isLoggedIn} onNewsletterClick={onNewsletterClick} onAdvisorClick={() => { const el = document.getElementById('apply'); if (el) el.scrollIntoView({ behavior: 'smooth' }); }} />
+    <Sanctuaries isSubscribed={isSubscribed} onNewsletterClick={onNewsletterClick} sanctuaries={sanctuaries} onOpen={onPropertyClick} />
     <Advantage />
     <EcosystemPillars />
-    <Sanctuaries isSubscribed={isSubscribed} onNewsletterClick={onNewsletterClick} sanctuaries={sanctuaries} onOpen={onPropertyClick} />
-    {isSubscribed && <TheSIL isSubscribed={isSubscribed} onNewsletterClick={onNewsletterClick} />}
     <TrustSignals />
-    <NewsletterHighlight onSubscribe={onNewsletterClick} />
-    <ApplicationForm />
+    <ApplicationForm isLoggedIn={isLoggedIn} onNewsletterClick={onNewsletterClick} />
     <Footer onModeChange={onModeChange} />
   </div>
 );
+
+
+const MobileQuickCapture = ({ onCaptured }: { onCaptured: () => void }) => {
+  const [phone, setPhone] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [done, setDone] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (phone.length < 10) return;
+    setLoading(true);
+    try {
+      await saveLead({
+        name: "Express Mobile Lead",
+        email: "pending@express.lead",
+        phone: phone,
+        intent: "Quick Mobile Capture CTA (No Login)"
+      });
+      setDone(true);
+      setTimeout(() => onCaptured(), 3000);
+    } catch {
+      // silent
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (done) {
+    return (
+      <div className="fixed bottom-0 left-0 right-0 z-[5000] bg-olive-900 text-cream p-4 flex items-center justify-center gap-3 shadow-[0_-10px_30px_rgba(0,0,0,0.5)] border-t border-gold/30 safe-area-bottom">
+        <Check className="w-5 h-5 text-gold" />
+        <span className="text-[10px] uppercase font-bold tracking-widest text-gold">Adviser Notified</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="fixed bottom-0 left-0 right-0 z-[5000] bg-surface/90 backdrop-blur-xl border-t border-outline/10 p-4 shadow-[0_-10px_30px_rgba(0,0,0,0.1)] md:hidden safe-area-bottom">
+      <form onSubmit={handleSubmit} className="flex items-center gap-3 max-w-md mx-auto">
+        <div className="flex-1 relative">
+          <input 
+            type="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="Enter mobile for VIP Access"
+            className="w-full bg-on-surface/5 border border-outline/20 rounded-full py-3 px-5 text-sm font-medium text-on-surface outline-none focus:border-olive-900 transition-colors"
+            required
+            pattern="[0-9+ ]{10,15}"
+          />
+        </div>
+        <button 
+          type="submit"
+          disabled={loading || phone.length < 10}
+          className="flex-shrink-0 w-12 h-12 bg-olive-900 text-cream rounded-full flex items-center justify-center shadow-lg disabled:opacity-50 transition-all hover:bg-gold"
+        >
+          {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <ArrowRight className="w-5 h-5" />}
+        </button>
+      </form>
+    </div>
+  );
+};
 
 // ──  Auth helpers ────────────────────────────────────────────────────────────" 
 
@@ -4690,8 +4869,8 @@ const ProfileModal = ({
 // ──"  App (main) ──────────────────────────────────────────────────────────────
 
 export default function App() {
-  type ViewMode = 'home' | 'map' | 'list' | 'gallery' | 'analytics' | 'syl' | 'membership';
-  const VIEW_ORDER: ViewMode[] = ['home', 'list', 'gallery', 'analytics', 'syl', 'map'];
+  type ViewMode = 'home' | 'map' | 'list' | 'gallery' | 'analytics' | 'membership';
+  const VIEW_ORDER: ViewMode[] = ['home', 'list', 'gallery', 'analytics', 'map'];
 
   const [authUser, setAuthUser]     = useState<User | null>(null);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -4747,9 +4926,15 @@ export default function App() {
   }, [captureLocation]);
 
   const handleSignOut = async () => {
-    await signOut(auth);
-    setViewMode('home');
+    // Immediately clear local state so UI responds right away
+    setAuthUser(null);
     setShowAdmin(false);
+    setShowAdminPanel(false);
+    setViewMode('home');
+    // Then sign out from Firebase
+    try {
+      if (auth) await signOut(auth);
+    } catch {/* silent */}
   };
 
   const [isSubscribed, setIsSubscribed] = useState(() => {
@@ -4761,6 +4946,7 @@ export default function App() {
   const [viewMode, setViewMode] = useState<ViewMode>('home');
   const [isDark, setIsDark] = useState(false);
   const [showAdmin, setShowAdmin] = useState(false);
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<Sanctuary | null>(null);
   // ── Admin: leads + newsletter + users (lazy-loaded when admin panel opens)  
   const [adminLeads, setAdminLeads] = useState<Lead[]>([]);
@@ -4777,6 +4963,7 @@ export default function App() {
   }, [authUser]);
 
   useEffect(() => { if (showAdmin) fetchAdminData(); }, [showAdmin, fetchAdminData]);
+  useEffect(() => { if (showAdminPanel && showAdmin) fetchAdminData(); }, [showAdminPanel, showAdmin, fetchAdminData]);
 
   // ── Firestore properties (real-time) ──────────────────────────────────── 
   const [firestoreProps, setFirestoreProps] = useState<PropertyDoc[]>([]);
@@ -4851,7 +5038,7 @@ export default function App() {
             authUser={authUser}
             onSignOut={handleSignOut}
             isAdmin={showAdmin}
-            onAdminClick={() => setViewMode('list')} // Admin goes to property dashboard
+            onAdminClick={() => { if (showAdmin) { fetchAdminData(); setShowAdminPanel(true); } }}
             onPropertySelect={(id) => {
               const sanctuary = allSanctuaries.find(s => s.id === id);
               if (sanctuary) setSelectedProperty(sanctuary);
@@ -4886,13 +5073,7 @@ export default function App() {
               
               {viewMode === 'gallery' && <EcosystemPillars isFullPage={true} />}
 
-              {viewMode === 'syl' && (
-                <TheSIL 
-                  isSubscribed={effectivelySubscribed} 
-                  onNewsletterClick={() => setIsNewsletterOpen(true)} 
-                  isFullPage={true} 
-                />
-              )}
+
 
               {viewMode === 'list' && (
                 <div className="px-6 md:px-24 py-16">
@@ -4929,6 +5110,7 @@ export default function App() {
           <ChatBot data={{ sanctuaries: allSanctuaries, user: authUser }} />
         </main>
       </div>
+      <MobileQuickCapture onCaptured={() => {}} />
 
       {/* Global Modals */}
       <AuthModal 
@@ -4971,6 +5153,20 @@ export default function App() {
           </div>
         )}
       </AnimatePresence>
+      {/* Admin Dashboard Panel */}
+      <AnimatePresence>
+        {showAdminPanel && showAdmin && authUser && (
+          <AdminDashboard
+            onClose={() => setShowAdminPanel(false)}
+            authUser={authUser}
+            leads={adminLeads}
+            newsletter={adminNewsletter}
+            firestoreProps={firestoreProps}
+            users={adminUsers}
+          />
+        )}
+      </AnimatePresence>
+
       <NewsletterModal 
         isOpen={isNewsletterOpen} 
         onClose={() => setIsNewsletterOpen(false)}
