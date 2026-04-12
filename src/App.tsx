@@ -2035,7 +2035,7 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
               "flex-1 py-3 text-[9px] uppercase tracking-[0.25em] font-bold transition-all border-b-2",
               pdTab === t ? "text-primary border-primary" : "text-secondary/40 border-transparent hover:text-secondary/70"
             )}>
-            {t === 'gallery' ? 'Gallery' : t === 'plan' ? 'Plan & Details' : 'Invest'}
+            {t === 'gallery' ? 'Gallery' : t === 'plan' ? 'Layout Plan' : 'Invest'}
           </button>
         ))}
       </div>
@@ -2069,41 +2069,19 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
           </div>
         )}
 
-        {/* ── PLAN & DETAILS TAB ── */}
+        {/* ── LAYOUT PLAN TAB ── */}
         {pdTab === 'plan' && (
-          <div className="px-6 py-6 space-y-8">
-            {/* Description */}
-            {sanctuary.description && (
-              <p className="text-sm text-secondary/80 leading-relaxed">{sanctuary.description}</p>
-            )}
+          <div className="space-y-0">
 
-            {/* Plot community stats */}
-            {sanctuary.plots && (
-              <div className="grid grid-cols-3 gap-3">
-                <div className="p-4 bg-primary/5 rounded-2xl text-center">
-                  <p className="text-2xl font-headline font-bold text-primary">{sanctuary.plots}</p>
-                  <p className="text-[8px] uppercase tracking-widest text-secondary/60 mt-1">Private Plots</p>
-                </div>
-                <div className="p-4 bg-primary/5 rounded-2xl text-center">
-                  <p className="text-sm font-headline font-bold text-primary leading-tight">{sanctuary.plotRange ?? '808–5,097'}</p>
-                  <p className="text-[8px] uppercase tracking-widest text-secondary/60 mt-1">Sq Yds Range</p>
-                </div>
-                <div className="p-4 bg-primary/5 rounded-2xl text-center">
-                  <p className="text-sm font-headline font-bold text-primary leading-tight">{sanctuary.amenityAcres ?? '14,548'}</p>
-                  <p className="text-[8px] uppercase tracking-widest text-secondary/60 mt-1">Amenity Sq Yds</p>
-                </div>
-              </div>
-            )}
-
-          {/* ── Interactive Site Plan ── */}
+          {/* ── Interactive Site Plan — full width, no side padding ── */}
           {sanctuary.sitePlanSrc && (plotDots || hotspots) && (
             <div>
-              {/* Section header + mode toggle */}
-              <div className="flex items-center justify-between mb-4">
-                <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold">
-                  {mapMode === 'plots' ? `Site Plan — ${plotDots?.length ?? 0} Plots` : 'Site Plan — Features'}
-                </p>
-                {plotDots && hotspots && (
+              {/* Mode toggle */}
+              {plotDots && hotspots && (
+                <div className="flex items-center justify-between px-6 pt-5 pb-3">
+                  <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold">
+                    {mapMode === 'plots' ? `Site Plan — ${plotDots?.length ?? 0} Plots` : 'Site Plan — Features'}
+                  </p>
                   <div className="flex rounded-full border border-outline/15 overflow-hidden text-[8px] uppercase tracking-widest font-bold">
                     <button onClick={() => setMapMode('plots')}
                       className={cn("px-3 py-1.5 transition-all",
@@ -2116,26 +2094,22 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
                       Features
                     </button>
                   </div>
-                )}
-              </div>
+                </div>
+              )}
 
-              <div className="rounded-2xl overflow-hidden border border-outline/10 bg-[#0a0f07]">
+              <div className="rounded-none overflow-hidden bg-[#0a0f07]">
 
                 {/* ── PLOTS MODE ── */}
                 {mapMode === 'plots' && plotDots && (
                   <>
-                    {/* Map with 53 sized dots */}
                     <div className="relative">
                       <img src={sanctuary.sitePlanSrc} alt="Site plan"
                         className="w-full h-auto object-contain" referrerPolicy="no-referrer" />
-
-                      {/* Investor legend strip at top of image */}
                       <div className="absolute top-2 left-2 right-2 flex items-center gap-2 flex-wrap">
                         <span className="bg-black/60 backdrop-blur-sm text-[7px] uppercase tracking-widest font-bold text-white/70 px-2 py-1 rounded-full">
                           Tap a plot to see its investment snapshot
                         </span>
                       </div>
-
                       {plotDots.map(p => {
                         const sz     = plotDotSize(p.sqYds);
                         const isActive = activePlot?.id === p.id;
@@ -2144,10 +2118,7 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
                         return (
                           <button
                             key={p.id}
-                            style={{
-                              left: `${p.x}%`, top: `${p.y}%`,
-                              width: sz, height: sz,
-                            }}
+                            style={{ left: `${p.x}%`, top: `${p.y}%`, width: sz, height: sz }}
                             className={cn(
                               "absolute -translate-x-1/2 -translate-y-1/2 rounded-full border transition-all duration-150 shadow-md",
                               isLandmark
@@ -2167,8 +2138,6 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
                         );
                       })}
                     </div>
-
-                    {/* Legend */}
                     <div className="flex items-center gap-4 px-4 py-2.5 border-t border-white/5">
                       <div className="flex items-center gap-1.5">
                         <span className="w-2.5 h-2.5 rounded-full bg-primary/70 border border-primary/80" />
@@ -2183,8 +2152,6 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
                         <span className="text-[8px] text-amber-400/80 uppercase tracking-wider font-bold">Plot 15</span>
                       </div>
                     </div>
-
-                    {/* Investment snapshot — shown when plot is tapped */}
                     <AnimatePresence mode="wait">
                       {activePlot && (() => {
                         const oldVal  = activePlot.sqYds * AGARTHA_OLD_RATE;
@@ -2193,13 +2160,9 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
                         const pct     = ((gain / oldVal) * 100).toFixed(1);
                         const annPct  = (parseFloat(pct) / 2).toFixed(1);
                         return (
-                          <motion.div
-                            key={activePlot.id}
+                          <motion.div key={activePlot.id}
                             initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 4 }}
-                            transition={{ duration: 0.18 }}
-                            className="border-t border-white/8 bg-[#0d1409]"
-                          >
-                            {/* Plot header */}
+                            transition={{ duration: 0.18 }} className="border-t border-white/8 bg-[#0d1409]">
                             <div className="flex items-start justify-between px-5 pt-4 pb-3">
                               <div>
                                 <p className="text-[8px] uppercase tracking-[0.5em] text-primary/50 font-bold">
@@ -2213,11 +2176,8 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
                                 <X className="w-3 h-3 text-white/40" />
                               </button>
                             </div>
-
-                            {/* Price comparison bar */}
                             <div className="px-5 pb-3">
                               <div className="rounded-xl bg-white/4 border border-white/5 overflow-hidden">
-                                {/* Two-year-ago row */}
                                 <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
                                   <div>
                                     <p className="text-[8px] uppercase tracking-widest text-white/30 font-bold">VIP Pre-Launch · 2022</p>
@@ -2225,7 +2185,6 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
                                   </div>
                                   <p className="text-[9px] text-white/30">₹{AGARTHA_OLD_RATE.toLocaleString('en-IN')}/sq yd</p>
                                 </div>
-                                {/* Current row */}
                                 <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
                                   <div>
                                     <p className="text-[8px] uppercase tracking-widest text-primary/60 font-bold">Today · 2024</p>
@@ -2233,7 +2192,6 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
                                   </div>
                                   <p className="text-[9px] text-primary/60">₹{AGARTHA_NOW_RATE.toLocaleString('en-IN')}/sq yd</p>
                                 </div>
-                                {/* Gain row */}
                                 <div className="px-4 py-3 bg-primary/8 flex items-center justify-between">
                                   <div className="flex items-center gap-2">
                                     <TrendingDown className="w-4 h-4 text-primary rotate-180" />
@@ -2250,8 +2208,6 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
                                 </div>
                               </div>
                             </div>
-
-                            {/* Context copy */}
                             <div className="px-5 pb-4">
                               <p className="text-[10px] text-white/35 leading-relaxed">
                                 An investor who booked this exact plot at pre-launch in 2022 has seen a paper gain of <span className="text-primary/70 font-bold">{formatRs(gain)}</span> without doing anything — simply because Agartha's land value grew <span className="text-primary/70 font-bold">+{pct}% in 2 years</span>. Today's buyers get the same compounding advantage for the next cycle.
@@ -2317,8 +2273,30 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
             </div>
           )}
 
+          {/* Details below the plan */}
+          <div className="px-6 py-6 space-y-8">
+            {/* Description */}
+            {sanctuary.description && (
+              <p className="text-sm text-secondary/80 leading-relaxed">{sanctuary.description}</p>
+            )}
 
-            {/* Features */}
+            {/* Plot community stats */}
+            {sanctuary.plots && (
+              <div className="grid grid-cols-3 gap-3">
+                <div className="p-4 bg-primary/5 rounded-2xl text-center">
+                  <p className="text-2xl font-headline font-bold text-primary">{sanctuary.plots}</p>
+                  <p className="text-[8px] uppercase tracking-widest text-secondary/60 mt-1">Private Plots</p>
+                </div>
+                <div className="p-4 bg-primary/5 rounded-2xl text-center">
+                  <p className="text-sm font-headline font-bold text-primary leading-tight">{sanctuary.plotRange ?? '808–5,097'}</p>
+                  <p className="text-[8px] uppercase tracking-widest text-secondary/60 mt-1">Sq Yds Range</p>
+                </div>
+                <div className="p-4 bg-primary/5 rounded-2xl text-center">
+                  <p className="text-sm font-headline font-bold text-primary leading-tight">{sanctuary.amenityAcres ?? '14,548'}</p>
+                  <p className="text-[8px] uppercase tracking-widest text-secondary/60 mt-1">Amenity Sq Yds</p>
+                </div>
+              </div>
+            )}            {/* Features */}
             {sanctuary.features && sanctuary.features.length > 0 && (
               <div>
                 <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold mb-4">Curated Features</p>
@@ -2371,6 +2349,7 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
                 </div>
               </div>
             )}
+          </div>
           </div>
         )}
 
