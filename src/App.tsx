@@ -122,7 +122,7 @@ const SANCTUARIES: Sanctuary[] = [
     pricePerSqYd: 7999,
     valuation: '₹1.04 Cr',
     memberPrice: 'From ₹64.6 L',
-    image: 'https://static.wixstatic.com/media/142b26_cb62ea3cf3a1420399ec2e43c1dee85f~mv2.png',
+    image: 'https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&q=80&w=1200',
     tagline: 'Where the forest becomes home.',
     description: 'MODCON Agartha is a 25-acre regenerative permaculture farm estate on the Narsapur forest boundary, near the RRR. 36 unique farm plots — each pre-planted with 100+ tree varieties, drip irrigation, vegetable beds, and a spiral herbal garden — surround a 36,000 sq ft clubhouse with 5 premium amenities: aquatic pool, kayaking lake, gym, farm-to-table dining, and staycation villas. An on-site Goshala with integrated animal husbandry completes the self-sustaining ecosystem. Winner: Best Sustainable Eco-Friendly Project of the Year 2024.',
     plots: 36,
@@ -225,7 +225,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
   ];
 
   const sanctuaryItems = [
-    { name: 'MODCON Agartha', id: 'list', sub: 'Narsapur Forest · From ₹64.6 L', img: 'https://static.wixstatic.com/media/142b26_cb62ea3cf3a1420399ec2e43c1dee85f~mv2.png' },
+    { name: 'MODCON Agartha', id: 'list', sub: 'Narsapur Forest · From ₹64.6 L', img: 'https://images.unsplash.com/photo-1542401886-65d6c61db217?auto=format&fit=crop&q=80&w=400' },
     { name: 'SYL: Vertical Villament', id: 'syl', sub: 'Tukkuguda · From ₹1.9 Cr', img: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=400' },
   ];
 
@@ -525,100 +525,121 @@ const SideNavBar = ({ activeMode, onModeChange }: { activeMode: string, onModeCh
 };
 
 const Hero = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
+  const heroImages = [
+    'https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&q=80&w=900',
+    'https://images.unsplash.com/photo-1542401886-65d6c61db217?auto=format&fit=crop&q=80&w=900',
+    'https://images.unsplash.com/photo-1500964757637-c85e8a162699?auto=format&fit=crop&q=80&w=900',
+  ];
+
   return (
-    <section className="relative min-h-[92vh] flex flex-col justify-between overflow-hidden bg-[#0d1409]">
-      {/* Full-bleed forest image */}
-      <div className="absolute inset-0 z-0">
-        <img
-          src="https://static.wixstatic.com/media/142b26_e9917bb73fc94531948ef638eba5a051~mv2.jpg"
-          alt="Agartha Forest Estate"
-          className="w-full h-full object-cover opacity-40"
-          referrerPolicy="no-referrer"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0d1409]/60 via-[#0d1409]/30 to-[#0d1409]/90" />
-      </div>
+    <section className="min-h-screen bg-[#080d06] flex flex-col overflow-hidden">
+      {/* Main grid */}
+      <div className="flex-1 grid lg:grid-cols-[1fr_480px] xl:grid-cols-[1fr_560px]">
 
-      {/* Award ribbon — top right */}
-      <motion.div
-        initial={{ opacity: 0, x: 20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: 1.2, duration: 0.8 }}
-        className="absolute top-5 right-5 z-20 flex items-center gap-2 bg-gold/10 border border-gold/30 rounded-full px-3 py-1.5 backdrop-blur-sm"
-      >
-        <span className="text-gold text-xs">★</span>
-        <span className="text-[8px] uppercase tracking-[0.3em] font-bold text-gold/80">Best Eco Project · 2024</span>
-      </motion.div>
-
-      {/* Main content */}
-      <div className="relative z-10 flex flex-col justify-center flex-1 px-6 md:px-20 pt-20 pb-10">
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
-        >
-          {/* Eyebrow */}
-          <div className="flex items-center gap-3 mb-6 md:mb-8">
-            <div className="w-6 h-px bg-gold/50" />
-            <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.55em] text-cream/50">
-              Independent Sanctuary Curators · Hyderabad
+        {/* Left — editorial copy */}
+        <div className="flex flex-col justify-between px-8 md:px-16 xl:px-20 pt-16 pb-10 lg:py-20 relative z-10 border-r border-cream/5">
+          {/* Top label */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 0.1 }}
+            className="flex items-center gap-3 mb-0"
+          >
+            <div className="w-1.5 h-1.5 rounded-full bg-[#a3b18a] animate-pulse" />
+            <span className="text-[8px] font-bold uppercase tracking-[0.6em] text-cream/30">
+              Independent Curators · Hyderabad, India
             </span>
-          </div>
+          </motion.div>
 
-          {/* Headline */}
-          <h1 className="text-[3.2rem] sm:text-[4.5rem] md:text-[7rem] font-light text-cream leading-[1.0] tracking-tight mb-6 md:mb-8">
-            Not just land.<br />
-            <span className="italic font-medium text-[#a3b18a]">A curated future.</span>
-          </h1>
+          {/* Big headline */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
+            className="flex-1 flex flex-col justify-center py-12 lg:py-16"
+          >
+            <h1 className="text-[3.2rem] sm:text-[4rem] md:text-[5rem] lg:text-[4.2rem] xl:text-[5.2rem] 2xl:text-[6rem] font-light text-cream leading-[1.0] tracking-tight mb-8">
+              The most<br />
+              <span className="italic font-medium text-[#a3b18a]">valuable forests</span><br />
+              in India.<br />
+              <span className="text-cream/40">We found them</span><br />
+              <span className="italic font-medium text-cream/70">first.</span>
+            </h1>
+            <p className="text-base md:text-lg font-light text-cream/45 leading-relaxed max-w-md mb-12">
+              The Green Team is India's independent curation house — we identify, verify, and represent forest-adjacent communities for a private circle of investors, before the market discovers them.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={() => onModeChange('membership')}
+                className="group px-7 py-4 bg-[#a3b18a] text-[#080d06] text-[9px] uppercase tracking-[0.45em] font-bold hover:bg-cream transition-all duration-300 flex items-center justify-center gap-2"
+              >
+                Apply for Adviser Access
+                <ArrowUpRight className="w-3 h-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+              </button>
+              <button
+                onClick={() => onModeChange('list')}
+                className="px-7 py-4 border border-cream/15 text-cream/55 text-[9px] uppercase tracking-[0.45em] font-bold hover:border-cream/35 hover:text-cream transition-all duration-300"
+              >
+                Current Listing
+              </button>
+            </div>
+          </motion.div>
 
-          {/* Body */}
-          <p className="text-base md:text-xl font-light text-cream/60 leading-relaxed max-w-lg mb-10 md:mb-12">
-            India's only curation house for conscious forest communities — handpicked for a private circle of investors who know the next great asset class isn't in the city. It's beyond it.
-          </p>
+          {/* Bottom KPIs */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1, duration: 0.8 }}
+            className="flex flex-wrap gap-8 md:gap-12 pt-8 border-t border-cream/6"
+          >
+            {[
+              { label: 'Current Listing', value: 'MODCON Agartha' },
+              { label: 'Forest AQI', value: '12 — Pristine' },
+              { label: 'Entry From', value: '₹64.6 L' },
+              { label: 'Appreciation', value: '+29% / 18 Mo' },
+            ].map(s => (
+              <div key={s.label}>
+                <p className="text-[7px] uppercase tracking-[0.45em] text-cream/20 font-bold">{s.label}</p>
+                <p className="text-xs font-headline font-bold text-cream/65 mt-0.5">{s.value}</p>
+              </div>
+            ))}
+          </motion.div>
+        </div>
 
-          {/* CTAs */}
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-            <button
-              onClick={() => onModeChange('membership')}
-              className="group px-8 py-4 bg-[#a3b18a] text-[#0d1409] text-[10px] uppercase tracking-[0.45em] font-bold transition-all duration-300 hover:bg-cream flex items-center justify-center gap-2"
-            >
-              Apply for Adviser Access
-              <ArrowUpRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-            </button>
-            <button
-              onClick={() => onModeChange('list')}
-              className="px-8 py-4 border border-cream/20 text-cream/70 text-[10px] uppercase tracking-[0.45em] font-bold transition-all duration-300 hover:border-cream/50 hover:text-cream"
-            >
-              View Properties
-            </button>
-          </div>
-        </motion.div>
-      </div>
-
-      {/* Bottom credential bar */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.8, duration: 1 }}
-        className="relative z-10 border-t border-cream/10 px-6 md:px-20 py-4 flex flex-wrap items-center justify-between gap-3 bg-[#0d1409]/60 backdrop-blur-sm"
-      >
-        <div className="flex flex-wrap gap-6 md:gap-10">
-          {[
-            { label: 'Currently Curating', value: 'MODCON Agartha' },
-            { label: 'Total Area', value: '25 Acres' },
-            { label: 'Plots Remaining', value: '36 Only' },
-            { label: 'AQI', value: '12 — Pristine' },
-          ].map(s => (
-            <div key={s.label}>
-              <p className="text-[7px] uppercase tracking-[0.4em] text-cream/30 font-bold">{s.label}</p>
-              <p className="text-[11px] md:text-xs font-headline font-bold text-cream/80 mt-0.5">{s.value}</p>
+        {/* Right — image grid */}
+        <motion.div
+          initial={{ opacity: 0, x: 30 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.3, duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
+          className="hidden lg:flex flex-col gap-0.5 relative"
+        >
+          {heroImages.map((src, i) => (
+            <div key={i} className="flex-1 relative overflow-hidden">
+              <img
+                src={src}
+                alt=""
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-[#080d06]/25" />
             </div>
           ))}
-        </div>
-        <div className="text-right hidden sm:block">
-          <p className="text-[7px] uppercase tracking-[0.4em] text-cream/30 font-bold">Entry From</p>
-          <p className="text-sm font-headline font-bold text-[#a3b18a]">Under ₹1 Cr</p>
-        </div>
-      </motion.div>
+          {/* Floating label */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.4, duration: 0.6 }}
+            className="absolute bottom-6 left-6 right-6 flex items-center justify-between"
+          >
+            <div className="flex items-center gap-2 bg-[#080d06]/70 backdrop-blur-md px-3 py-2 rounded-lg border border-cream/10">
+              <div className="w-1.5 h-1.5 rounded-full bg-[#a3b18a] animate-pulse" />
+              <span className="text-[8px] uppercase tracking-[0.4em] font-bold text-cream/50">Featuring · MODCON Agartha</span>
+            </div>
+            <div className="bg-[#080d06]/70 backdrop-blur-md px-3 py-2 rounded-lg border border-cream/10">
+              <span className="text-[8px] uppercase tracking-[0.4em] font-bold text-[#a3b18a]">Open Now</span>
+            </div>
+          </motion.div>
+        </motion.div>
+      </div>
     </section>
   );
 };
@@ -629,62 +650,71 @@ const EcosystemPillars = ({ isFullPage = false }: { isFullPage?: boolean }) => {
       num: '01',
       title: 'Forest Adjacency',
       detail: 'Every property we curate must border verified forest land. AQI below 25. Ambient noise below 25 dB. If it doesn\'t clear the air quality bar, it doesn\'t make the list.',
-      proof: 'Agartha: AQI 12 · 18 dB',
+      proof: 'Agartha (live): AQI 12 · 18 dB',
     },
     {
       num: '02',
-      title: 'Conscious Community',
-      detail: 'Not a subdivision. Not isolated plots sold to strangers. Every community is gated, intentional, and designed around people who choose to live differently — together.',
-      proof: '36 private plots · Curated neighbours',
+      title: 'Intentional Community',
+      detail: 'Not a subdivision. Every community is gated, intentional, and designed around people who choose to live differently — together. We curate neighbours, not just plots.',
+      proof: 'Agartha: 36 curated plots',
     },
     {
       num: '03',
       title: 'Investment Grade',
-      detail: 'Verified appreciation data. Proximity to infrastructure corridors — RRR, ORR, PVNR. We only list properties where the numbers outperform FD, gold, and index funds.',
+      detail: 'Verified appreciation data. Proximity to infrastructure corridors — RRR, ORR. We only partner on properties where the numbers outperform FD, gold, and index funds.',
       proof: '+29% in 18 months · ₹7,999/sq yd',
     },
     {
       num: '04',
-      title: 'Awarded Design',
-      detail: 'Only developers and architects with sustainability credentials. Permaculture, biophilic, or regenerative design is mandatory — not a marketing checkbox.',
-      proof: 'MODCON × ARQEN · Best Eco Project 2024',
+      title: 'Awarded Partners',
+      detail: 'We partner exclusively with developers and architects holding national sustainability credentials. Permaculture, biophilic, regenerative design — mandatory, not a checkbox.',
+      proof: 'MODCON × ARQEN · Eco Award 2024',
     },
   ];
 
   return (
     <section id="ecosystems" className={cn(
-      "px-6 md:px-24 bg-olive-900 text-cream",
-      isFullPage ? "py-20" : "py-16"
+      "bg-[#0a0e07] text-cream",
+      isFullPage ? "py-24 px-6 md:px-24" : "py-20 px-6 md:px-24"
     )}>
       <div className="max-w-7xl mx-auto">
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 1 }}
-          className="mb-14"
+          className="grid lg:grid-cols-2 gap-12 items-end mb-16 pb-16 border-b border-cream/8"
         >
-          <span className="text-cream/40 text-[10px] font-bold uppercase tracking-[0.6em] mb-5 block">The Curation Standard</span>
-          <h2 className="text-4xl md:text-7xl font-light text-cream leading-tight">
-            Not every forest<br />
-            <span className="italic font-medium text-[#a3b18a]">makes the cut.</span>
-          </h2>
+          <div>
+            <span className="text-cream/30 text-[9px] font-bold uppercase tracking-[0.6em] mb-5 block">The Curation Standard</span>
+            <h2 className="text-5xl md:text-7xl font-light text-cream leading-tight">
+              Not every forest<br />
+              <span className="italic font-medium text-[#a3b18a]">makes the cut.</span>
+            </h2>
+          </div>
+          <div className="lg:text-right">
+            <p className="text-xl md:text-2xl font-light text-cream/35 leading-relaxed">
+              We maintain four non-negotiable standards before recommending any project to our investors.
+            </p>
+          </div>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-px bg-cream/10">
+        {/* 4 standards — horizontal rows on desktop */}
+        <div className="space-y-0 divide-y divide-cream/8">
           {standards.map((s, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.1, duration: 0.8 }}
-              className="bg-olive-900 p-8 flex flex-col gap-6 hover:bg-[#1a2410] transition-colors duration-300"
+              transition={{ delay: i * 0.08, duration: 0.7 }}
+              className="grid md:grid-cols-[80px_1fr_1fr_200px] gap-6 md:gap-10 py-8 items-center hover:bg-cream/[0.02] transition-colors duration-300 group"
             >
-              <span className="text-[10px] font-bold text-[#a3b18a]/60 tracking-[0.4em]">{s.num}</span>
-              <h4 className="text-xl font-headline font-bold text-cream">{s.title}</h4>
-              <p className="text-cream/50 leading-relaxed text-sm flex-1">{s.detail}</p>
-              <p className="text-[9px] uppercase tracking-[0.35em] font-bold text-[#a3b18a]/70 border-t border-cream/10 pt-4">{s.proof}</p>
+              <span className="text-[11px] font-bold text-[#a3b18a]/40 tracking-[0.4em]">{s.num}</span>
+              <h4 className="text-2xl font-headline font-bold text-cream group-hover:text-[#a3b18a] transition-colors">{s.title}</h4>
+              <p className="text-cream/40 leading-relaxed text-sm">{s.detail}</p>
+              <p className="text-[9px] uppercase tracking-[0.35em] font-bold text-[#a3b18a]/60 md:text-right">{s.proof}</p>
             </motion.div>
           ))}
         </div>
@@ -722,7 +752,7 @@ const Advantage = ({ isFullPage = false }: { isFullPage?: boolean }) => {
             className="lg:col-span-7 space-y-6"
           >
             <p className="text-2xl md:text-4xl font-normal leading-snug text-olive-900/90">
-              "Market negligence is your opportunity. While the crowd waits for the launch, our members have already secured their legacy."
+              "We are not a listing portal. We are the intelligence layer between you and India's most undervalued forest land — before the market prices it in."
             </p>
             <div className="grid sm:grid-cols-2 gap-6 pt-4">
               <div className="space-y-4">
@@ -801,15 +831,20 @@ const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewslet
       )}
 
       {/* Top badge */}
-      <div className="absolute top-5 left-5 z-20">
+      <div className="absolute top-5 left-5 z-20 flex flex-col gap-2">
         <span className={cn(
           "px-3 py-1 text-[8px] uppercase tracking-[0.4em] font-bold rounded-full",
           isSyl
             ? "bg-[#c8a951] text-[#1a1a0a]"
             : "bg-primary/90 text-on-primary backdrop-blur-sm"
         )}>
-          {isSyl ? 'Newsletter Only' : 'Open Access'}
+          {isSyl ? 'Coming Soon' : 'Open Reservation'}
         </span>
+        {!isSyl && (
+          <span className="px-3 py-1 text-[7px] uppercase tracking-[0.35em] font-bold rounded-full bg-[#080d06]/70 text-cream/60 backdrop-blur-sm border border-cream/10 w-fit">
+            TGT Channel Partner
+          </span>
+        )}
       </div>
 
       {/* Bottom info — hide price for gated SYL */}
@@ -4265,8 +4300,9 @@ const TrustSignals = () => {
           >
             <span className="text-gold text-xl flex-shrink-0">★</span>
             <div>
-              <p className="text-[8px] uppercase tracking-[0.35em] font-bold text-gold/80">Outlook Business Spotlight · 2024</p>
+              <p className="text-[8px] uppercase tracking-[0.35em] font-bold text-gold/80">MODCON Agartha · Outlook Business 2024</p>
               <p className="text-sm font-headline font-bold text-olive-900 mt-0.5">Best Sustainable Eco-Friendly Project</p>
+              <p className="text-[8px] text-olive-900/40 mt-0.5">Our curated partner project</p>
             </div>
           </motion.div>
         </div>
@@ -4575,14 +4611,14 @@ const HomeView = ({ isSubscribed, onNewsletterClick, sanctuaries = SANCTUARIES, 
     <Hero onModeChange={onModeChange} />
 
     {/* 2. Company-level credential strip */}
-    <div className="bg-[#0d1409] text-cream px-6 md:px-24 py-4 border-b border-cream/5">
+    <div className="bg-[#080d06] text-cream px-6 md:px-24 py-4 border-b border-cream/5">
       <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-wrap gap-6 md:gap-10">
           {[
-            { label: 'Properties Curated', value: '2 Active' },
-            { label: 'Curation Standard', value: 'Forest Only' },
-            { label: 'Avg. Appreciation', value: '+29% / 18 Mo' },
-            { label: 'Min. AQI Threshold', value: 'Sub 25' },
+            { label: 'TGT Role', value: 'Channel Partner' },
+            { label: 'Current Partner', value: 'MODCON Agartha' },
+            { label: 'Partner Appreciation', value: '+29% / 18 Mo' },
+            { label: 'Min. AQI Standard', value: 'Sub 25' },
           ].map(s => (
             <div key={s.label}>
               <p className="text-[7px] uppercase tracking-[0.45em] text-cream/30 font-bold">{s.label}</p>
