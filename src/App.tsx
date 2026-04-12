@@ -743,7 +743,7 @@ const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewslet
   return (
     <motion.div
       whileHover={{ y: -4 }}
-      className="group relative aspect-square overflow-hidden rounded-3xl cursor-pointer bg-[#1a1f0e]"
+      className="group relative aspect-[4/3] overflow-hidden rounded-3xl cursor-pointer bg-surface border border-outline/5"
       onClick={() => { if (!isGated) onOpen(); }}
     >
       {/* Full-bleed image - always full color */}
@@ -753,7 +753,7 @@ const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewslet
         className={cn(
           "absolute inset-0 w-full h-full object-cover transition-all duration-700",
           isGated
-             ? "brightness-40 scale-105 blur-sm"
+              ? "brightness-100 scale-100"
             : "brightness-80 group-hover:brightness-95 group-hover:scale-105"
         )}
         referrerPolicy="no-referrer"
@@ -1913,7 +1913,7 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
           {activeTab === 'gallery' && (
             <motion.div key="gallery" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col h-full">
               {/* Hero image */}
-              <div className="relative w-full bg-black" style={{ height: '52vw', maxHeight: 380, minHeight: 200 }}>
+              <div className="relative w-full bg-black" style={{ height: '70vw', maxHeight: 600, minHeight: 350 }}>
                 <AnimatePresence mode="wait">
                   <motion.img
                     key={activeImg}
@@ -2541,7 +2541,7 @@ const RRRBlurOverlay: FC<{ rrrPath: [number, number][] }> = ({ rrrPath }) => {
     const blur = document.createElement('div');
     blur.style.cssText = [
       'position:absolute', 'inset:0',
-      'backdrop-filter:blur(10px)', '-webkit-backdrop-filter:blur(10px)',
+       'backdrop-filter:blur(0px)', '-webkit-backdrop-filter:blur(0px)',
       'z-index:350', 'pointer-events:none',
     ].join(';');
     blurRef.current = blur;
@@ -4667,7 +4667,7 @@ const AuthModal = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 60 }}
             transition={{ type: 'spring', damping: 30, stiffness: 240 }}
-            className="relative w-full sm:max-w-md bg-cream sm:rounded-3xl rounded-t-3xl shadow-2xl overflow-hidden"
+            className="relative w-full sm:max-w-md bg-surface sm:rounded-3xl rounded-t-3xl shadow-2xl overflow-hidden"
           >
             {/* Hero strip */}
             <div className="bg-olive-900 px-10 pt-12 pb-10 text-cream text-center">
@@ -4952,7 +4952,19 @@ export default function App() {
   const effectivelySubscribed = isSubscribed || !!authUser;
   const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('home');
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useState(() => {
+    return localStorage.getItem('gt_dark') === 'true';
+  });
+
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('gt_dark', 'true');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('gt_dark', 'false');
+    }
+  }, [isDark]);
   const [showAdmin, setShowAdmin] = useState(false);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<Sanctuary | null>(null);
