@@ -33,6 +33,12 @@
     <meta name="apple-mobile-web-app-title" content="The Green Team" />
   </head>
   <body>
+    <!-- Apply dark class before React loads to avoid flash of wrong theme -->
+    <script>
+      if (localStorage.getItem('gt_dark') === 'true') {
+        document.documentElement.classList.add('dark');
+      }
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
