@@ -4474,7 +4474,7 @@ const HomeView = ({ isSubscribed, onNewsletterClick, sanctuaries = SANCTUARIES, 
             { label: 'Plots Available', value: '36 Only' },
             { label: 'Air Quality Index', value: 'Sub 25' },
             { label: 'Commute to City', value: '40 Mins' },
-            { label: 'Entry Price', value: '₹24L+' },
+            { label: 'All-In Entry', value: 'Under ₹1 Cr' },
           ].map(s => (
             <div key={s.label}>
               <p className="text-[8px] uppercase tracking-[0.45em] text-cream/40 font-bold">{s.label}</p>
@@ -4482,9 +4482,10 @@ const HomeView = ({ isSubscribed, onNewsletterClick, sanctuaries = SANCTUARIES, 
             </div>
           ))}
         </div>
-        <span className="text-[9px] uppercase tracking-[0.4em] font-bold text-gold border border-gold/30 px-3 py-1.5 rounded-full">
-          Pre-Launch Window Open
-        </span>
+        <div className="text-right">
+          <p className="text-[8px] uppercase tracking-[0.4em] text-cream/40 font-bold">vs. market</p>
+          <p className="text-sm font-headline font-bold text-gold">₹2 Cr+ bare plots</p>
+        </div>
       </div>
     </div>
 
