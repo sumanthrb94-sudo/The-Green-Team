@@ -563,14 +563,14 @@ const Hero = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
           className="flex-1 flex flex-col justify-center py-12 max-w-3xl"
         >
           <h1 className="text-[3.2rem] sm:text-[4.5rem] md:text-[5.5rem] lg:text-[6rem] xl:text-[7rem] font-light text-white leading-[1.0] tracking-tight mb-8">
-            The most<br />
-            <span className="italic font-medium" style={{ color: '#8aab78' }}>valuable forests</span><br />
+            Forest-adjacent<br />
+            <span className="italic font-medium" style={{ color: '#8aab78' }}>conscious communities</span><br />
             in India.<br />
-            <span className="text-white/35">We found them</span><br />
-            <span className="italic font-medium text-white/55">first.</span>
+            <span className="text-white/35">Verified and</span><br />
+            <span className="italic font-medium text-white/55">curated.</span>
           </h1>
           <p className="text-base md:text-xl font-light text-white/50 leading-relaxed max-w-lg mb-12">
-            The Green Team is India's independent curation house — identifying, verifying, and representing forest-adjacent conscious communities for a private circle of investors, before the market discovers them.
+            The Green Team identifies and verifies forest-adjacent conscious communities for investors seeking intentional, investment-grade properties with strong environmental credentials.
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
             <button
@@ -4146,7 +4146,7 @@ const Footer = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
           <div>
             <Logo className="w-10 h-10 text-cream mb-6" />
             <p className="text-2xl md:text-3xl font-light text-white/30 max-w-xl leading-relaxed">
-              Curating India's most exclusive pre-launch sanctuaries for a private circle of intelligent investors.
+              We curate verified forest-adjacent communities for investors seeking intentional, sustainable living with transparent investment fundamentals.
             </p>
           </div>
           <button
