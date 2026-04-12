@@ -4467,7 +4467,6 @@ const HomeView = ({ isSubscribed, onNewsletterClick, sanctuaries = SANCTUARIES, 
     <Advantage />
     <EcosystemPillars />
     <Sanctuaries isSubscribed={isSubscribed} onNewsletterClick={onNewsletterClick} sanctuaries={sanctuaries} />
-    {isSubscribed && <TheSIL isSubscribed={isSubscribed} onNewsletterClick={onNewsletterClick} />}
     <TrustSignals />
     <NewsletterHighlight onSubscribe={onNewsletterClick} />
     <ApplicationForm />
@@ -4975,12 +4974,11 @@ export default function App() {
               transition={{ duration: 0.4, ease: "circOut" }}
             >
               {viewMode === 'home' && (
-                <HomeView 
-                  isSubscribed={effectivelySubscribed} 
-                  onNewsletterClick={() => setIsNewsletterOpen(true)} 
+                <HomeView
+                  isSubscribed={effectivelySubscribed}
+                  onNewsletterClick={() => setIsNewsletterOpen(true)}
                   sanctuaries={allSanctuaries}
                   onModeChange={handleViewChange}
-                  onPropertyClick={setSelectedProperty}
                 />
               )}
 
