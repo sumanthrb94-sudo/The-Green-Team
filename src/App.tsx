@@ -39,7 +39,7 @@ import {
 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { cn } from './lib/utils';
-import { GoogleGenAI } from "@google/genai";
+
 
 import { MapContainer, TileLayer, Marker, Popup, Circle, Polygon, useMap, ZoomControl, Polyline, Tooltip, useMapEvents } from 'react-leaflet';
 import { AlertTriangle, ZoomIn, LogOut, RefreshCw, Users, Mail as MailIcon, ShieldCheck } from 'lucide-react';
@@ -957,7 +957,7 @@ const ZoomTracker = ({ onZoom }: { onZoom: (zoom: number) => void }) => {
 const MapVisibilityTracker = ({ isVisible, onReady }: { isVisible?: boolean; onReady: () => void }) => {
   const map = useMap();
   useEffect(() => {
-    let t1: NodeJS.Timeout, t2: NodeJS.Timeout;
+    let t1: ReturnType<typeof setTimeout>, t2: ReturnType<typeof setTimeout>;
     if (isVisible) {
       t1 = setTimeout(() => { map.invalidateSize(); }, 150);
       t2 = setTimeout(() => { map.invalidateSize(); onReady(); }, 1800); 
@@ -1382,8 +1382,8 @@ const AdminDashboard: FC<{
     await updateProperty(p.id, { status: p.status === 'live' ? 'draft' : 'live' });
   };
 
-  const inputCls = "w-full bg-surface border border-outline/20 rounded-xl px-4 py-3 text-sm text-on-surface placeholder-secondary/30 focus:outline-none focus:border-primary/60 transition-colors";
-  const labelCls = "block text-[9px] uppercase tracking-[0.4em] font-bold text-secondary/50 mb-1.5";
+  const inputCls = "w-full bg-surface border border-outline/40 rounded-xl px-4 py-3 text-sm text-on-surface placeholder:text-on-surface/30 focus:border-primary transition-all";
+  const labelCls = "block text-[9px] uppercase tracking-[0.4em] font-bold text-on-surface/70 mb-1.5";
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
@@ -3948,11 +3948,11 @@ const ApplicationForm = ({ isLoggedIn = false, onNewsletterClick }: { isLoggedIn
 
           {/* Left - copy */}
           <div className="lg:col-span-2">
-            <span className="text-[9px] uppercase tracking-[0.6em] text-olive-800/40 font-bold block mb-8">Private Membership</span>
+            <span className="text-[9px] uppercase tracking-[0.6em] text-olive-800/70 font-bold block mb-8">Private Membership</span>
             <h2 className="text-5xl md:text-6xl font-medium text-olive-900 leading-tight mb-8">
               Apply for<br /><span className="italic text-olive-800">Adviser Access.</span>
             </h2>
-            <p className="text-base font-light text-olive-900/50 leading-relaxed mb-12">
+            <p className="text-base font-light text-olive-900/80 leading-relaxed mb-12">
               {isLoggedIn
                 ? "You are in our circle. Request a private adviser call for upcoming pre-launch sanctuaries and early-entry coordinates."
                 : "We curate India's most exclusive pre-launch sanctuaries for a reserved investor circle. Our adviser will personally reach out within 24 hours."}
@@ -3964,10 +3964,10 @@ const ApplicationForm = ({ isLoggedIn = false, onNewsletterClick }: { isLoggedIn
                 { label: 'Monthly Briefings', desc: 'Auto-enrolled in our intelligence network' },
               ].map(i => (
                 <div key={i.label} className="flex gap-4">
-                  <div className="w-1.5 h-1.5 rounded-full bg-olive-800/40 mt-2 flex-shrink-0" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-olive-800/70 mt-2 flex-shrink-0" />
                   <div>
                     <p className="text-sm font-bold text-olive-900">{i.label}</p>
-                    <p className="text-xs text-olive-800/40 mt-0.5">{i.desc}</p>
+                    <p className="text-xs text-olive-800/70 mt-0.5">{i.desc}</p>
                   </div>
                 </div>
               ))}
@@ -4036,8 +4036,8 @@ const ApplicationForm = ({ isLoggedIn = false, onNewsletterClick }: { isLoggedIn
                         className={cn(
                           "px-3 py-1.5 text-[9px] uppercase tracking-widest font-bold border transition-all rounded-lg",
                           form.investmentBracket === b
-             ? "bg-olive-900 text-cream border-olive-900"
-                            : "border-olive-800/20 text-olive-800/50 hover:border-olive-800/50"
+                            ? "bg-olive-900 text-cream border-olive-900"
+                            : "border-olive-800/40 text-olive-800/70 hover:border-olive-800/80"
                         )}
                       >{b}</button>
                     ))}
@@ -4058,7 +4058,7 @@ const ApplicationForm = ({ isLoggedIn = false, onNewsletterClick }: { isLoggedIn
                 </button>
 
                 {!isLoggedIn && (
-                  <p className="text-[9px] text-center text-olive-800/25 uppercase tracking-widest">
+                  <p className="text-[9px] text-center text-olive-800/50 uppercase tracking-widest">
                     Submitting enrolls you in our monthly intelligence newsletter
                   </p>
                 )}
@@ -4344,18 +4344,9 @@ WHAT GROOT SHOULD DO:
     setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
     setLoading(true);
 
-    // Resolve API key — Vite exposes env vars via import.meta.env (VITE_ prefix required for browser)
-    const apiKey = import.meta.env.VITE_GEMINI_API_KEY || (import.meta.env as any).GEMINI_API_KEY;
 
-    if (!apiKey) {
-      setMessages(prev => [...prev, { role: 'model', text: "I am Groot. (My neural pathways need a VITE_GEMINI_API_KEY — add it to your .env.local file and restart the dev server. Ask your developer!)" }]);
-      setLoading(false);
-      return;
-    }
 
     try {
-      const ai = new GoogleGenAI({ apiKey });
-      const model = "gemini-2.0-flash";
       const systemInstruction = `You are "Groot", a sophisticated AI advisor for "The Green Team" sanctuary curation company.
 You have a warm "I am Groot" personality — heroic, protective of nature, and occasionally witty.
 Always start responses with "I am Groot." then provide the actual helpful answer in parentheses immediately after.
@@ -4365,16 +4356,33 @@ ${GROOT_KNOWLEDGE}
 
 Additional live context (user data): ${JSON.stringify({ user: data.user?.displayName || 'Guest', sanctuaryCount: data.sanctuaries?.length ?? 1 })}`;
 
-      const response = await ai.models.generateContent({
-        model,
-        contents: messages.map(m => ({ role: m.role, parts: [{ text: m.text }] })).concat({ role: 'user', parts: [{ text: userMsg }] }),
-        config: { systemInstruction }
+      // Prepare conversation history for Pollinations (OpenAI format)
+      const payload = {
+        messages: [
+          { role: "system", content: systemInstruction },
+          ...messages.map(m => ({ 
+            role: m.role === 'model' ? 'assistant' : 'user', 
+            content: m.text 
+          })),
+          { role: "user", content: userMsg }
+        ],
+        model: "openai",
+        jsonMode: false
+      };
+
+      const res = await fetch("https://text.pollinations.ai/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
       });
 
-      setMessages(prev => [...prev, { role: 'model', text: response.text || "I am Groot. (I apologize, I am currently unable to process your request. Please contact our relationship managers directly.)" }]);
+      if (!res.ok) throw new Error(`Pollinations API error: ${res.status}`);
+      
+      const responseText = await res.text();
+      setMessages(prev => [...prev, { role: 'model', text: responseText || "I am Groot. (I apologize, I am currently unable to process your request. Please contact our relationship managers directly.)" }]);
     } catch (error) {
       console.error("ChatBot Error:", error);
-      setMessages(prev => [...prev, { role: 'model', text: "I am Groot. (Something went wrong on my end. Please try again, or reach out directly via the Adviser Access form below.)" }]);
+      setMessages(prev => [...prev, { role: 'model', text: "I am Groot. (My neural pathways are currently recharging. Please reach out directly via the Adviser Access form below.)" }]);
     } finally {
       setLoading(false);
     }

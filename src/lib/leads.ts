@@ -56,3 +56,21 @@ export async function getNewsletterSubs(): Promise<NewsletterEntry[]> {
   const snap = await getDocs(q);
   return snap.docs.map(d => ({ id: d.id, ...d.data() } as NewsletterEntry));
 }
+
+import { onSnapshot } from 'firebase/firestore';
+
+export function subscribeLeads(callback: (leads: Lead[]) => void): () => void {
+  if (!db) return () => {};
+  const q = query(collection(db, 'leads'), orderBy('createdAt', 'desc'));
+  return onSnapshot(q, (snap) => {
+    callback(snap.docs.map(d => ({ id: d.id, ...d.data() } as Lead)));
+  });
+}
+
+export function subscribeNewsletter(callback: (subs: NewsletterEntry[]) => void): () => void {
+  if (!db) return () => {};
+  const q = query(collection(db, 'newsletter'), orderBy('createdAt', 'desc'));
+  return onSnapshot(q, (snap) => {
+    callback(snap.docs.map(d => ({ id: d.id, ...d.data() } as NewsletterEntry)));
+  });
+}
