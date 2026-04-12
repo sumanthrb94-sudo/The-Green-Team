@@ -121,8 +121,8 @@ const SANCTUARIES: Sanctuary[] = [
     memberPrice: 'From ₹64.6 L',
     image: 'https://static.wixstatic.com/media/142b26_5a1d622ef5d5437aa5da964188a3266e~mv2.png',
     tagline: 'Where the forest becomes home.',
-    description: 'MODCON Agartha is a first-of-its-kind biomorphic residential community carved into the Narsapur forest periphery. 53 thoughtfully sized plots surround a 14,548 sq yd organic amenity core — featuring fluid earth architecture, solar-integrated curved roofs, and living canopies that blur the line between structure and forest. No two plots are the same. No straight lines anywhere.',
-    plots: 53,
+    description: 'MODCON Agartha is a first-of-its-kind biomorphic residential community carved into the Narsapur forest periphery. 36 thoughtfully sized plots surround a 14,548 sq yd organic amenity core — featuring fluid earth architecture, solar-integrated curved roofs, and living canopies that blur the line between structure and forest. No two plots are the same. No straight lines anywhere.',
+    plots: 36,
     plotRange: '808 – 5,097 sq yds',
     amenityAcres: '14,548 sq yds',
     architect: 'MODCON Builders',
@@ -1295,10 +1295,10 @@ const AGARTHA_HOTSPOTS: Hotspot[] = [
   },
   {
     id: 'plot-community', num: 5, x: 62, y: 60,
-    label: '53-Plot Private Community',
+    label: '36-Plot Private Community',
     tag: 'From ₹64.6 L',
-    detail: '53 plots, each unique — no two the same. Sizes from 808 to 5,097 sq yds at ₹7,999/sq yd. A true private forest community, not a subdivision.',
-    stats: [{ label: 'Total Plots', value: '53' }, { label: 'Starting', value: '₹64.6 L (808 sq yds)' }, { label: 'Rate', value: '₹7,999/sq yd' }],
+    detail: '36 plots, each unique — no two the same. Sizes from 808 to 5,097 sq yds at ₹7,999/sq yd. A true private forest community, not a subdivision.',
+    stats: [{ label: 'Total Plots', value: '36' }, { label: 'Starting', value: '₹64.6 L (808 sq yds)' }, { label: 'Rate', value: '₹7,999/sq yd' }],
   },
 ];
 
@@ -1356,27 +1356,6 @@ const AGARTHA_PLOTS: PlotDot[] = [
   { id:35, sqYds:940,  x:63, y:35 },
   // ── East inner ring ──
   { id:36, sqYds:960,  x:66, y:40 },
-  { id:37, sqYds:970,  x:67, y:46 },
-  { id:38, sqYds:980,  x:66, y:52 },
-  { id:39, sqYds:1000, x:63, y:57 },
-  // ── South-East inner ──
-  { id:40, sqYds:1050, x:58, y:62 },
-  { id:41, sqYds:1100, x:52, y:65 },
-  { id:42, sqYds:1150, x:45, y:66 },
-  { id:43, sqYds:1120, x:38, y:64 },
-  // ── South-West inner ──
-  { id:44, sqYds:1080, x:32, y:61 },
-  { id:45, sqYds:1020, x:27, y:57 },
-  { id:46, sqYds:990,  x:25, y:51 },
-  { id:47, sqYds:960,  x:26, y:45 },
-  // ── West inner ──
-  { id:48, sqYds:940,  x:27, y:38 },
-  { id:49, sqYds:920,  x:21, y:40 },
-  { id:50, sqYds:908,  x:21, y:47 },
-  { id:51, sqYds:915,  x:22, y:54 },
-  // ── NW inner + smallest plots ──
-  { id:52, sqYds:880,  x:25, y:34 },
-  { id:53, sqYds:808,  x:33, y:36 },
 ];
 
 const AGARTHA_OLD_RATE = 6199;   // ₹/sq yd — VIP pre-launch rate (2 yrs ago)
@@ -1389,7 +1368,7 @@ const plotDotSize = (sqYds: number) =>
 const formatRs = (rs: number) =>
   rs >= 1e7 ? `₹${(rs / 1e7).toFixed(2)} Cr` : `₹${(rs / 1e5).toFixed(1)} L`;
 
-/** lookup: sanctuary id → its 53 plot dots */
+/** lookup: sanctuary id → its 36 plot dots */
 const SANCTUARY_PLOTS: Record<string, PlotDot[]> = {
   agartha: AGARTHA_PLOTS,
 };
@@ -1409,7 +1388,7 @@ const AagarthaInteractiveLayout: FC<{ onClose: () => void }> = ({ onClose }) => 
     hotspots={AGARTHA_HOTSPOTS}
     projectName="Agartha"
     developerTag="MODCON Builders · Narsapur"
-    tagline="53 plots · Forest community · From ₹64.6 L"
+    tagline="36 plots · Forest community · From ₹64.6 L"
     brochureUrl="https://www.modconbuilders.com/agartha"
     intentPrefix="Agartha"
     onClose={onClose}
