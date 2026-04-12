@@ -712,37 +712,6 @@ const Advantage = ({ isFullPage = false }: { isFullPage?: boolean }) => {
   );
 };
 
-
-            <button onClick={onNewsletterClick} className="btn-membership bg-gold text-olive-900 border-gold hover:bg-cream hover:text-olive-900">
-              Request Early Access Briefing
-            </button>
-          </div>
-          
-          <div className="space-y-8">
-            <div className="p-10 border border-cream/10 bg-surface/5 backdrop-blur-sm">
-              <h4 className="text-2xl font-bold mb-4 text-gold italic">Environmental Integrity</h4>
-              <div className="space-y-6">
-                <div className="flex justify-between items-center border-b border-cream/5 pb-4">
-                  <span className="text-[10px] uppercase tracking-widest text-cream/40">Target AQI</span>
-                  <span className="text-xl font-serif">Sub 25</span>
-                </div>
-                <div className="flex justify-between items-center border-b border-cream/5 pb-4">
-                  <span className="text-[10px] uppercase tracking-widest text-cream/40">Noise Mitigation</span>
-                  <span className="text-xl font-serif">Zero Negligence Tech</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-[10px] uppercase tracking-widest text-cream/40">Commute</span>
-                  <span className="text-xl font-serif">15 Mins to Future City Hub</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-};
-
 const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewsletterClick: () => void, onOpen: () => void }> = ({ sanctuary, isSubscribed, onNewsletterClick, onOpen }) => {
   const isSyl = sanctuary.id === 'syl';
   const isGated = isSyl && !isSubscribed;
@@ -2223,6 +2192,8 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
                   </>
                 )}
               </div>
+            </div>
+          )}
 
           {/* Details below the plan */}
           <div className="px-6 py-6 space-y-8">
@@ -4835,37 +4806,6 @@ export default function App() {
       { timeout: 8000, maximumAge: 300000 }
     );
   }, []);
-
-  // Called after any successful sign-in
-  const handleAuthSuccess = useCallback((user: User, isNew: boolean) => {
-    setAuthUser(user);
-    if (user.email === ADMIN_EMAIL) setShowAdmin(true);
-    // Request geolocation silently after a short delay
-    setTimeout(() => captureLocation(user.uid), 1500);
-    // Show profile modal for new users (or returning users who never filled it)
-    if (isNew) {
-      setProfileUser(user);
-      setShowProfile(true);
-    } else {
-      // For returning users: check if they have a profile, if not show it
-      upsertUserProfile(user.uid, {
-        uid: user.uid, email: user.email, displayName: user.displayName, photoURL: user.photoURL,
-      }).then(wasNew => {
-        if (wasNew) { setProfileUser(user); setShowProfile(true); }
-      }).catch(() => {});
-    }
-  }, [captureLocation]);
-
-  // Global auth state listener (handles page reload / session restore)
-  useEffect(() => {
-    const unsub = onAuthStateChanged(auth, u => {
-      setAuthUser(u);
-      if (u?.email === ADMIN_EMAIL) setShowAdmin(true);
-      // Silent location refresh on session restore
-      if (u) setTimeout(() => captureLocation(u.uid), 2000);
-    });
-    return unsub;
-  }, [captureLocation]);
 
   // Called after any successful sign-in
   const handleAuthSuccess = useCallback((user: User, isNew: boolean) => {
