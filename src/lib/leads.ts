@@ -25,7 +25,7 @@ export interface NewsletterEntry {
   createdAt: { seconds: number } | null;
 }
 
-export async function saveLead(data: { name: string; email: string; intent?: string }) {
+export async function saveLead(data: { name: string; email?: string; phone?: string; intent?: string; source?: string }) {
   if (!db) throw new Error('[Lead] Firestore not initialized — check VITE_FIREBASE_* env vars');
   return addDoc(collection(db, 'leads'), {
     ...data,

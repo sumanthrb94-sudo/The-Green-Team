@@ -1882,12 +1882,6 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
 
   const badge = sanctuary.id === 'syl' ? 'Upcoming' : 'Open for Reservation';
 
-  const TABS: { id: Tab; label: string }[] = [
-    { id: 'gallery', label: 'Gallery' },
-    { id: 'layout', label: 'Layout Plan' },
-    { id: 'details', label: 'Details' },
-    { id: 'investment', label: 'Investment' },
-  ];
 
   return (
     <motion.div
@@ -2294,7 +2288,7 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
               <div className="px-3 py-4 text-center">
                 <p className="text-[8px] uppercase tracking-widest text-secondary/50 mb-1">Commute</p>
                 <p className="text-lg font-bold text-on-surface">{commuteTime}m</p>
-                <p className="text-[9px] text-secondary/50">{commuteShort}</p>
+                <p className="text-[9px] text-secondary/50">{commuteDest}</p>
               </div>
             </div>
 
@@ -3652,7 +3646,7 @@ const Sanctuaries = ({ isSubscribed, onNewsletterClick, isFullPage = false, sanc
               sanctuary={s}
               isSubscribed={isSubscribed}
               onNewsletterClick={onNewsletterClick}
-              onOpen={() => { if (onOpen) onOpen(s); else setSelectedSanctuary(s); }}
+              onOpen={() => setSelectedSanctuary(s)}
             />
           ))}
         </div>
@@ -4865,6 +4859,15 @@ export default function App() {
   const [isDark, setIsDark] = useState(() => {
     return localStorage.getItem('gt_dark') === 'true';
   });
+  const [showAdmin, setShowAdmin] = useState(false);
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
+  const [selectedProperty, setSelectedProperty] = useState<typeof SANCTUARIES[0] | null>(null);
+
+  const handleSubscribe = useCallback(() => {
+    setIsSubscribed(true);
+    localStorage.setItem('gt_subscribed', 'true');
+    setIsNewsletterOpen(false);
+  }, []);
 
   // ── Admin: leads + newsletter + users (lazy-loaded when admin panel opens) ─
   const [adminLeads, setAdminLeads] = useState<Lead[]>([]);
@@ -5028,50 +5031,6 @@ export default function App() {
           <ChatBot data={{ sanctuaries: allSanctuaries, user: authUser }} />
         </main>
       </div>
-      <MobileQuickCapture onCaptured={() => {}} />
-
-      {/* Global Modals */}
-      <AuthModal 
-        isOpen={isAuthOpen} 
-        onClose={() => setIsAuthOpen(false)} 
-        onSuccess={handleAuthSuccess} 
-      />
-      
-      <ProfileModal 
-        isOpen={showProfile} 
-        user={profileUser} 
-        onDone={() => setShowProfile(false)} 
-      />
-
-      <main className="flex-1 flex overflow-hidden relative">
-        {/* Groot — available on every screen */}
-        <ChatBot data={{ sanctuaries: SANCTUARIES }} />
-
-        {/* Center - Map or other views */}
-        <div className="flex-1 relative overflow-hidden bg-surface">
-          {/* Map is always mounted to preserve Leaflet pan/zoom/filter state */}
-          <div className={viewMode === 'map' ? 'absolute inset-0 z-10' : 'hidden'}>
-            <SanctuaryMapLayout isVisible={viewMode === 'map'} />
-          </div>
-          {viewMode !== 'map' && (
-            <div ref={scrollRef} className="h-full w-full overflow-y-auto">
-              {viewMode === 'home' && <HomeView isSubscribed={effectivelySubscribed} onNewsletterClick={() => { if (!effectivelySubscribed) setIsNewsletterOpen(true); }} sanctuaries={allSanctuaries} onModeChange={handleViewChange} />}
-              {viewMode === 'list' && <Sanctuaries isSubscribed={effectivelySubscribed} onNewsletterClick={() => { if (!effectivelySubscribed) setIsNewsletterOpen(true); }} isFullPage sanctuaries={allSanctuaries} />}
-              {viewMode === 'gallery' && <EcosystemPillars isFullPage />}
-              {viewMode === 'analytics' && <Advantage isFullPage />}
-              {viewMode === 'syl' && <TheSIL isSubscribed={effectivelySubscribed} onNewsletterClick={() => { if (!effectivelySubscribed) setIsNewsletterOpen(true); }} isFullPage />}
-              {viewMode === 'membership' && (
-                <div className="flex flex-col">
-                  <Membership />
-                  <ApplicationForm />
-                  <Footer onModeChange={handleViewChange} />
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </main>
-
       {/* Admin Dashboard overlay — only for sumanthbolla97@gmail.com */}
       <AnimatePresence>
         {selectedProperty && (
@@ -5112,23 +5071,6 @@ export default function App() {
           />
         )}
       </AnimatePresence>
-
-      {/* Auth Modal */}
-      <AuthModal
-        isOpen={isAuthOpen}
-        onClose={() => setIsAuthOpen(false)}
-        onSuccess={(user, isNew) => {
-          setIsAuthOpen(false);
-          handleAuthSuccess(user, isNew);
-        }}
-      />
-
-      {/* Profile collection modal — appears once after sign-in */}
-      <ProfileModal
-        isOpen={showProfile}
-        user={profileUser}
-        onDone={() => setShowProfile(false)}
-      />
 
       <NewsletterModal
         isOpen={isNewsletterOpen}
