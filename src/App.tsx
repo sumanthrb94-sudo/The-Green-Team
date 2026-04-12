@@ -525,112 +525,100 @@ const SideNavBar = ({ activeMode, onModeChange }: { activeMode: string, onModeCh
 };
 
 const Hero = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
-  const heroImages = [
-    'https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&q=80&w=900',
-    'https://images.unsplash.com/photo-1542401886-65d6c61db217?auto=format&fit=crop&q=80&w=900',
-    'https://images.unsplash.com/photo-1500964757637-c85e8a162699?auto=format&fit=crop&q=80&w=900',
-  ];
-
   return (
-    <section className="min-h-screen bg-surface flex flex-col overflow-hidden">
-      <div className="flex-1 grid lg:grid-cols-[1fr_480px] xl:grid-cols-[1fr_560px]">
+    <section className="relative min-h-screen flex flex-col overflow-hidden">
+      {/* Full-bleed backdrop */}
+      <div className="absolute inset-0 z-0">
+        <img
+          src="/hero-backdrop.jpg"
+          alt=""
+          className="w-full h-full object-cover object-center"
+        />
+        {/* Layered gradient — bottom-heavy for text legibility, preserves the forest house glow */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0a1208]/90 via-[#0a1208]/40 to-[#0a1208]/20" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0a1208]/70 via-[#0a1208]/20 to-transparent" />
+      </div>
 
-        {/* Left — editorial copy */}
-        <div className="flex flex-col justify-between px-8 md:px-16 xl:px-20 pt-16 pb-10 lg:py-20 border-r border-outline/10">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8 }}
-            className="flex items-center gap-3"
-          >
-            <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-            <span className="text-[8px] font-bold uppercase tracking-[0.6em] text-secondary/60">
-              Independent Curators · Hyderabad, India
-            </span>
-          </motion.div>
+      {/* Content */}
+      <div className="relative z-10 flex flex-col flex-1 justify-between px-8 md:px-16 xl:px-20 pt-20 pb-0">
 
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
-            className="flex-1 flex flex-col justify-center py-12 lg:py-16"
-          >
-            <h1 className="text-[3.2rem] sm:text-[4rem] md:text-[5rem] lg:text-[4.2rem] xl:text-[5.2rem] font-light text-on-surface leading-[1.0] tracking-tight mb-8">
-              The most<br />
-              <span className="italic font-medium text-primary">valuable forests</span><br />
-              in India.<br />
-              <span className="text-on-surface/35">We found them</span><br />
-              <span className="italic font-medium text-on-surface/55">first.</span>
-            </h1>
-            <p className="text-base md:text-lg font-light text-secondary leading-relaxed max-w-md mb-12">
-              The Green Team is India's independent curation house — identifying, verifying, and representing forest-adjacent communities for a private circle of investors before the market discovers them.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <button
-                onClick={() => onModeChange('membership')}
-                className="group px-7 py-4 bg-primary text-on-primary text-[9px] uppercase tracking-[0.45em] font-bold hover:opacity-90 transition-all duration-300 flex items-center justify-center gap-2"
-              >
-                Apply for Adviser Access
-                <ArrowUpRight className="w-3 h-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-              </button>
-              <button
-                onClick={() => onModeChange('list')}
-                className="px-7 py-4 border border-outline/30 text-on-surface/55 text-[9px] uppercase tracking-[0.45em] font-bold hover:border-primary/50 hover:text-primary transition-all duration-300"
-              >
-                Current Listing
-              </button>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.9, duration: 0.8 }}
-            className="flex flex-wrap gap-8 md:gap-12 pt-8 border-t border-outline/15"
-          >
-            {[
-              { label: 'Current Listing', value: 'MODCON Agartha' },
-              { label: 'Forest AQI', value: '12 — Pristine' },
-              { label: 'Entry From', value: '₹64.6 L' },
-              { label: 'Appreciation', value: '+29% / 18 Mo' },
-            ].map(s => (
-              <div key={s.label}>
-                <p className="text-[7px] uppercase tracking-[0.45em] text-secondary/40 font-bold">{s.label}</p>
-                <p className="text-xs font-headline font-bold text-on-surface/70 mt-0.5">{s.value}</p>
-              </div>
-            ))}
-          </motion.div>
-        </div>
-
-        {/* Right — image grid */}
+        {/* Top label */}
         <motion.div
-          initial={{ opacity: 0, x: 30 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.3, duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
-          className="hidden lg:flex flex-col gap-0.5 relative overflow-hidden"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
+          className="flex items-center gap-3"
         >
-          {heroImages.map((src, i) => (
-            <div key={i} className="flex-1 relative overflow-hidden">
-              <img src={src} alt="" className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-surface/5 dark:bg-[#0a1408]/45" />
-            </div>
-          ))}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.4, duration: 0.6 }}
-            className="absolute bottom-6 left-6 right-6 flex items-center justify-between"
-          >
-            <div className="flex items-center gap-2 bg-surface/85 dark:bg-[#0e1b0b]/85 backdrop-blur-md px-3 py-2 rounded-lg border border-outline/15">
-              <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-              <span className="text-[8px] uppercase tracking-[0.4em] font-bold text-secondary/70">Featuring · MODCON Agartha</span>
-            </div>
-            <div className="bg-surface/85 dark:bg-[#0e1b0b]/85 backdrop-blur-md px-3 py-2 rounded-lg border border-outline/15">
-              <span className="text-[8px] uppercase tracking-[0.4em] font-bold text-primary">Open Now</span>
-            </div>
-          </motion.div>
+          <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#8aab78' }} />
+          <span className="text-[8px] font-bold uppercase tracking-[0.6em] text-white/45">
+            Independent Curators · Hyderabad, India
+          </span>
+        </motion.div>
+
+        {/* Main headline */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
+          className="flex-1 flex flex-col justify-center py-12 max-w-3xl"
+        >
+          <h1 className="text-[3.2rem] sm:text-[4.5rem] md:text-[5.5rem] lg:text-[6rem] xl:text-[7rem] font-light text-white leading-[1.0] tracking-tight mb-8">
+            The most<br />
+            <span className="italic font-medium" style={{ color: '#8aab78' }}>valuable forests</span><br />
+            in India.<br />
+            <span className="text-white/35">We found them</span><br />
+            <span className="italic font-medium text-white/55">first.</span>
+          </h1>
+          <p className="text-base md:text-xl font-light text-white/50 leading-relaxed max-w-lg mb-12">
+            The Green Team is India's independent curation house — identifying, verifying, and representing forest-adjacent conscious communities for a private circle of investors, before the market discovers them.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button
+              onClick={() => onModeChange('membership')}
+              className="group px-8 py-4 text-[9px] uppercase tracking-[0.45em] font-bold transition-all duration-300 flex items-center justify-center gap-2"
+              style={{ background: '#8aab78', color: '#0a1208' }}
+              onMouseEnter={e => (e.currentTarget.style.background = '#a3c490')}
+              onMouseLeave={e => (e.currentTarget.style.background = '#8aab78')}
+            >
+              Apply for Adviser Access
+              <ArrowUpRight className="w-3 h-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+            </button>
+            <button
+              onClick={() => onModeChange('list')}
+              className="px-8 py-4 border border-white/20 text-white/60 text-[9px] uppercase tracking-[0.45em] font-bold hover:border-white/40 hover:text-white transition-all duration-300"
+            >
+              Current Listing
+            </button>
+          </div>
         </motion.div>
       </div>
+
+      {/* Bottom KPI bar — glassmorphic */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.9, duration: 0.8 }}
+        className="relative z-10 border-t border-white/8 px-8 md:px-16 xl:px-20 py-5 flex flex-wrap items-center justify-between gap-4"
+        style={{ background: 'rgba(10,18,8,0.65)', backdropFilter: 'blur(12px)' }}
+      >
+        <div className="flex flex-wrap gap-8 md:gap-14">
+          {[
+            { label: 'Channel Partner', value: 'MODCON Agartha' },
+            { label: 'Forest AQI', value: '12 — Pristine' },
+            { label: 'Entry From', value: '₹64.6 L' },
+            { label: 'Appreciation', value: '+29% · 18 Mo' },
+          ].map(s => (
+            <div key={s.label}>
+              <p className="text-[7px] uppercase tracking-[0.45em] font-bold" style={{ color: 'rgba(255,255,255,0.25)' }}>{s.label}</p>
+              <p className="text-xs font-headline font-bold mt-0.5" style={{ color: 'rgba(255,255,255,0.70)' }}>{s.value}</p>
+            </div>
+          ))}
+        </div>
+        <div className="hidden sm:flex items-center gap-2">
+          <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#8aab78' }} />
+          <p className="text-xs font-headline font-bold" style={{ color: '#8aab78' }}>Open for Reservation</p>
+        </div>
+      </motion.div>
     </section>
   );
 };
