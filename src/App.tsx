@@ -119,7 +119,7 @@ const SANCTUARIES: Sanctuary[] = [
     pricePerSqYd: 7999,
     valuation: '₹1.04 Cr',
     memberPrice: 'From ₹64.6 L',
-    image: 'https://static.wixstatic.com/media/142b26_5a1d622ef5d5437aa5da964188a3266e~mv2.png',
+    image: 'https://static.wixstatic.com/media/142b26_cb62ea3cf3a1420399ec2e43c1dee85f~mv2.png',
     tagline: 'Where the forest becomes home.',
     description: 'MODCON Agartha is a first-of-its-kind biomorphic residential community carved into the Narsapur forest periphery. 36 thoughtfully sized plots surround a 14,548 sq yd organic amenity core — featuring fluid earth architecture, solar-integrated curved roofs, and living canopies that blur the line between structure and forest. No two plots are the same. No straight lines anywhere.',
     plots: 36,
@@ -221,7 +221,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
   ];
 
   const sanctuaryItems = [
-    { name: 'MODCON Agartha', id: 'list', sub: 'Narsapur Forest · From ₹64.6 L', img: 'https://static.wixstatic.com/media/142b26_5a1d622ef5d5437aa5da964188a3266e~mv2.png' },
+    { name: 'MODCON Agartha', id: 'list', sub: 'Narsapur Forest · From ₹64.6 L', img: 'https://static.wixstatic.com/media/142b26_cb62ea3cf3a1420399ec2e43c1dee85f~mv2.png' },
     { name: 'SYL: Vertical Villament', id: 'syl', sub: 'Tukkuguda · From ₹1.9 Cr', img: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=400' },
   ];
 
