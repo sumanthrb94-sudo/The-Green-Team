@@ -4991,12 +4991,16 @@ export default function App() {
   }, [captureLocation]);
 
   const handleSignOut = async () => {
-    // Immediately clear local state so UI responds right away
-    setAuthUser(null);
-    setShowAdmin(false);
-    setShowAdminPanel(false);
-    setViewMode('home');
-    setShowAdmin(false);
+    try {
+      await signOut(auth);
+      // Immediately clear local state so UI responds right away
+      setAuthUser(null);
+      setShowAdmin(false);
+      setShowAdminPanel(false);
+      setViewMode('home');
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
   };
 
   const [isSubscribed, setIsSubscribed] = useState(() => {

@@ -34,7 +34,7 @@ export async function saveLead(data: { name: string; email?: string; phone?: str
   });
 }
 
-export async function saveNewsletter(email: string, source: 'modal' | 'inline') {
+export async function saveNewsletter(email: string, source: 'modal' | 'inline' | 'mobile_quick') {
   if (!db) throw new Error('[Newsletter] Firestore not initialized — check VITE_FIREBASE_* env vars');
   return addDoc(collection(db, 'newsletter'), {
     email,
