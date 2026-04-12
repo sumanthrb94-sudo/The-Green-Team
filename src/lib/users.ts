@@ -43,12 +43,3 @@ export async function getAllUsers(): Promise<UserProfile[]> {
   const snap = await getDocs(collection(db, 'users'));
   return snap.docs.map(d => d.data() as UserProfile);
 }
-
-import { onSnapshot } from 'firebase/firestore';
-
-export function subscribeUsers(callback: (users: UserProfile[]) => void): () => void {
-  if (!db) return () => {};
-  return onSnapshot(collection(db, 'users'), (snap) => {
-    callback(snap.docs.map(d => d.data() as UserProfile));
-  });
-}

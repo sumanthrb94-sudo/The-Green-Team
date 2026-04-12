@@ -122,40 +122,38 @@ const SANCTUARIES: Sanctuary[] = [
     pricePerSqYd: 7999,
     valuation: '₹1.04 Cr',
     memberPrice: 'From ₹64.6 L',
-    image: '/agartha-official-render.png',
+    image: 'https://static.wixstatic.com/media/142b26_cb62ea3cf3a1420399ec2e43c1dee85f~mv2.png',
     tagline: 'Where the forest becomes home.',
-    description: 'MODCON Agartha is a first-of-its-kind biomorphic residential community carved into the Narsapur forest periphery. 53 thoughtfully sized plots surround a 14,548 sq yd organic amenity core - featuring fluid earth architecture, solar-integrated curved roofs, and living canopies that blur the line between structure and forest. No two plots are the same. No straight lines anywhere.',
-    plots: 53,
-    plotRange: '808 - 5,097 sq yds',
+    description: 'MODCON Agartha is a first-of-its-kind biomorphic residential community carved into the Narsapur forest periphery. 36 thoughtfully sized plots surround a 14,548 sq yd organic amenity core — featuring fluid earth architecture, solar-integrated curved roofs, and living canopies that blur the line between structure and forest. No two plots are the same. No straight lines anywhere.',
+    plots: 36,
+    plotRange: '808 – 5,097 sq yds',
     amenityAcres: '14,548 sq yds',
     architect: 'MODCON Builders',
-    sitePlanSrc: '/FINAL-LAYOUT.jpeg',
-    brochureUrl: 'https://www.agartha.in/',
-    mapUrl: 'https://maps.app.goo.gl/da9KEKTYMMBnTU3R7',
-    gallery: [
-      '/gallery/agartha/0.png',
-      '/gallery/agartha/1.png',
-      '/gallery/agartha/2.jpg',
-      '/gallery/agartha/3.png',
-      '/gallery/agartha/4.png',
-      '/gallery/agartha/5.png',
-      '/gallery/agartha/6.png',
-      '/gallery/agartha/7.png',
-      '/gallery/agartha/8.png',
-      '/gallery/agartha/9.png',
-      '/gallery/agartha/10.png',
-      '/gallery/agartha/11.png',
-      '/gallery/agartha/12.jpg',
-      '/gallery/agartha/13.jpg',
-      '/gallery/agartha/14.jpg',
-      '/gallery/agartha/15.jpg',
-      '/gallery/agartha/16.jpg',
-      '/gallery/agartha/17.jpg',
-      '/gallery/agartha/18.jpg',
-      '/gallery/agartha/19.jpg',
-      '/gallery/agartha/20.jpg',
-      '/gallery/agartha/21.jpg',
-      '/gallery/agartha/22.jpg',
+    sitePlanSrc: 'https://static.wixstatic.com/media/142b26_8ddd02a733d04a139fdd19e058e72d94~mv2.jpg',
+    brochureUrl: 'https://www.modconbuilders.com/agartha',
+    plotImages: [
+      'https://static.wixstatic.com/media/142b26_cb62ea3cf3a1420399ec2e43c1dee85f~mv2.png',
+      'https://static.wixstatic.com/media/142b26_3a60dc75703c4cc2a29c6d44f41b8e21~mv2.png',
+      'https://static.wixstatic.com/media/142b26_a329de8538c44092bb941ee925dbcd7c~mv2.png',
+      'https://static.wixstatic.com/media/142b26_b52923b4599745df825e9d06157b43d3~mv2.jpg',
+      'https://static.wixstatic.com/media/142b26_5f7c47258d394edcbf818b25e3b12965~mv2.jpg',
+      'https://static.wixstatic.com/media/142b26_e9917bb73fc94531948ef638eba5a051~mv2.jpg',
+      'https://static.wixstatic.com/media/142b26_86e04d7ce83d497997bdac2c29efe900~mv2.jpg',
+      'https://static.wixstatic.com/media/142b26_d9f37ad4d1d74e65a62892327167ed6b~mv2.jpg',
+      'https://static.wixstatic.com/media/142b26_acda3bc9aaa84bfc976803cdcbdce73f~mv2.jpg',
+      'https://static.wixstatic.com/media/142b26_0fee06470ac2445c9ff7742be6377273~mv2.jpg',
+      'https://static.wixstatic.com/media/142b26_567e195b978947c9b29be195842095af~mv2.jpg',
+      'https://static.wixstatic.com/media/142b26_07ba6ec4ef4e49d680a53ab9a3362f25~mv2.jpg',
+      'https://static.wixstatic.com/media/142b26_a8649ae42bca482cbbafe84794fe8a6e~mv2.jpg',
+      'https://static.wixstatic.com/media/142b26_13ce857bed164143a7d79ce6cef3668e~mv2.jpg',
+      'https://static.wixstatic.com/media/142b26_87ac7f7d92a145b9aa2740c4a6898410~mv2.jpg',
+      'https://static.wixstatic.com/media/142b26_e952e8d04d6546b5866e374206744e87~mv2.jpg',
+      'https://static.wixstatic.com/media/142b26_bdabb7cd17f741ee815019462732e449~mv2.jpg',
+      'https://static.wixstatic.com/media/142b26_5a78474b934e4251b54ce25e16770c68~mv2.jpg',
+      'https://static.wixstatic.com/media/142b26_a79caac8357141ef89993d2115817696~mv2.jpg',
+      'https://static.wixstatic.com/media/142b26_04f61d366de9472cb87db76b28b272fc~mv2.jpg',
+      'https://static.wixstatic.com/media/142b26_34c58cd885c64ddebbae12791465bbe3~mv2.jpg',
+      'https://static.wixstatic.com/media/142b26_89a3906d085c4518a1ce49864ebda77a~mv2.jpg',
     ],
     features: [
       'Biomorphic Architecture',
@@ -227,8 +225,8 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
   ];
 
   const sanctuaryItems = [
-    { name: 'MODCON Agartha', id: 'list', sub: 'Narsapur Forest  From ₹64.6 L', img: '/agartha-render.jpg' },
-    { name: 'SYL: Vertical Villament', id: 'syl', sub: 'Tukkuguda  From ₹1.9 Cr', img: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=400' },
+    { name: 'MODCON Agartha', id: 'list', sub: 'Narsapur Forest · From ₹64.6 L', img: 'https://static.wixstatic.com/media/142b26_cb62ea3cf3a1420399ec2e43c1dee85f~mv2.png' },
+    { name: 'SYL: Vertical Villament', id: 'syl', sub: 'Tukkuguda · From ₹1.9 Cr', img: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=400' },
   ];
 
   const avatarLetter = (authUser?.displayName?.[0] || authUser?.email?.[0] || authUser?.phoneNumber?.[1] || '?').toUpperCase();
@@ -246,7 +244,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
           className={cn(
             "flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border text-[8px] uppercase tracking-widest font-bold transition-all",
             isDark
-             ? "bg-primary/10 border-primary/20 text-primary"
+              ? "bg-primary/10 border-primary/20 text-primary"
               : "bg-outline/8 border-outline/20 text-secondary/60 hover:border-primary/30 hover:text-primary"
           )}
         >
@@ -332,7 +330,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
                         className={cn(
                           "text-2xl md:text-3xl uppercase tracking-[0.1em] font-headline font-bold transition-all flex items-center justify-between group text-left",
                           item.id === 'membership'
-             ? "text-primary"
+                            ? "text-primary"
                             : "text-on-surface hover:text-primary"
                         )}
                       >
@@ -340,13 +338,13 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
                         <ArrowRight className={cn(
                           "w-5 h-5 transition-all duration-500",
                           item.id === 'membership'
-             ? "opacity-100 translate-x-0"
+                            ? "opacity-100 translate-x-0"
                             : "opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0"
                         )} />
                       </button>
                     ))}
 
-                    {/* Sanctuaries - expandable dropdown */}
+                    {/* Sanctuaries — expandable dropdown */}
                     <div>
                       <button
                         onClick={() => setSanctuariesOpen(v => !v)}
@@ -368,12 +366,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
                             <div className="flex flex-col gap-3 pl-2 border-l-2 border-primary/20">
                               {sanctuaryItems.map(s => (
                                 <button key={s.id}
-                                  onClick={() => { 
-                                    // Map 'list' back to 'agartha' for direct opening
-                                    onPropertySelect(s.id === 'list' ? 'agartha' : s.id); 
-                                    setIsMenuOpen(false); 
-                                    setSanctuariesOpen(false); 
-                                  }}
+                                  onClick={() => { onModeChange(s.id as any); setIsMenuOpen(false); setSanctuariesOpen(false); }}
                                   className="flex items-center gap-4 group/item text-left hover:translate-x-1 transition-transform duration-200"
                                 >
                                   <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-outline/10">
@@ -531,7 +524,7 @@ const SideNavBar = ({ activeMode, onModeChange }: { activeMode: string, onModeCh
   );
 };
 
-const Hero = ({ onModeChange, isLoggedIn = false, onNewsletterClick, onAdvisorClick }: { onModeChange: (mode: string) => void, isLoggedIn?: boolean, onNewsletterClick?: () => void, onAdvisorClick?: () => void }) => {
+const Hero = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
   return (
     <section className="relative flex flex-col justify-start px-6 md:px-24 pt-6 pb-12 overflow-hidden cashew-gradient">
       <div className="absolute inset-0 z-0 opacity-10 mix-blend-multiply">
@@ -565,27 +558,12 @@ const Hero = ({ onModeChange, isLoggedIn = false, onNewsletterClick, onAdvisorCl
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 md:gap-8 pt-4">
-              {isLoggedIn ? (
-                // Logged-in users: jump straight to Adviser Access
-                <>
-                  <button onClick={onAdvisorClick} className="btn-membership btn-olive group w-full sm:w-auto shadow-lg hover:shadow-xl shadow-olive-900/20">
-                    Request Adviser Access <ArrowUpRight className="inline-block ml-2 w-4 h-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
-                  </button>
-                  <button onClick={() => onModeChange('analytics')} className="btn-membership btn-outline-olive w-full sm:w-auto hover:shadow-lg">
-                    Our Advantage
-                  </button>
-                </>
-              ) : (
-                // Guests: primary CTA = Adviser Access, secondary = newsletter
-                <>
-                  <button onClick={onAdvisorClick} className="btn-membership btn-olive group w-full sm:w-auto shadow-lg hover:shadow-xl shadow-olive-900/20">
-                    Apply for Adviser Access <ArrowUpRight className="inline-block ml-2 w-4 h-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
-                  </button>
-                  <button onClick={onNewsletterClick} className="btn-membership btn-outline-olive w-full sm:w-auto hover:shadow-lg">
-                    Monthly Briefings
-                  </button>
-                </>
-              )}
+              <button onClick={() => onModeChange('membership')} className="btn-membership btn-olive group w-full sm:w-auto shadow-lg hover:shadow-xl shadow-olive-900/20">
+                Apply for Membership <ArrowUpRight className="inline-block ml-2 w-4 h-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+              </button>
+              <button onClick={() => onModeChange('analytics')} className="btn-membership btn-outline-olive w-full sm:w-auto hover:shadow-lg">
+                The Green Team Advantage
+              </button>
             </div>
           </div>
         </motion.div>
@@ -735,6 +713,35 @@ const Advantage = ({ isFullPage = false }: { isFullPage?: boolean }) => {
 };
 
 
+            <button onClick={onNewsletterClick} className="btn-membership bg-gold text-olive-900 border-gold hover:bg-cream hover:text-olive-900">
+              Request Early Access Briefing
+            </button>
+          </div>
+          
+          <div className="space-y-8">
+            <div className="p-10 border border-cream/10 bg-surface/5 backdrop-blur-sm">
+              <h4 className="text-2xl font-bold mb-4 text-gold italic">Environmental Integrity</h4>
+              <div className="space-y-6">
+                <div className="flex justify-between items-center border-b border-cream/5 pb-4">
+                  <span className="text-[10px] uppercase tracking-widest text-cream/40">Target AQI</span>
+                  <span className="text-xl font-serif">Sub 25</span>
+                </div>
+                <div className="flex justify-between items-center border-b border-cream/5 pb-4">
+                  <span className="text-[10px] uppercase tracking-widest text-cream/40">Noise Mitigation</span>
+                  <span className="text-xl font-serif">Zero Negligence Tech</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] uppercase tracking-widest text-cream/40">Commute</span>
+                  <span className="text-xl font-serif">15 Mins to Future City Hub</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
 
 const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewsletterClick: () => void, onOpen: () => void }> = ({ sanctuary, isSubscribed, onNewsletterClick, onOpen }) => {
   const isSyl = sanctuary.id === 'syl';
@@ -743,17 +750,17 @@ const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewslet
   return (
     <motion.div
       whileHover={{ y: -4 }}
-      className="group relative aspect-[4/3] overflow-hidden rounded-3xl cursor-pointer bg-surface border border-outline/5"
+      className="group relative aspect-square overflow-hidden rounded-3xl cursor-pointer bg-[#1a1f0e]"
       onClick={() => { if (!isGated) onOpen(); }}
     >
-      {/* Full-bleed image - always full color */}
+      {/* Full-bleed image — always full color */}
       <img
         src={sanctuary.image}
         alt={sanctuary.title}
         className={cn(
           "absolute inset-0 w-full h-full object-cover transition-all duration-700",
           isGated
-              ? "brightness-100 scale-100"
+            ? "brightness-40 scale-105 blur-sm"
             : "brightness-80 group-hover:brightness-95 group-hover:scale-105"
         )}
         referrerPolicy="no-referrer"
@@ -768,8 +775,8 @@ const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewslet
           <div className="w-14 h-14 rounded-2xl bg-[#c8a951]/15 border border-[#c8a951]/30 flex items-center justify-center mb-5">
             <Shield className="w-6 h-6 text-[#c8a951]" />
           </div>
-          <h4 className="text-xl font-headline font-bold text-white mb-2 leading-tight">Newsletter Access Required</h4>
-          <p className="text-[10px] text-white/50 mb-6 max-w-[200px] mx-auto leading-relaxed">
+          <h4 className="text-xl font-headline font-bold text-white mb-2">Newsletter Access Required</h4>
+          <p className="text-xs text-white/50 mb-6 max-w-[200px] leading-relaxed">
             SYL: Vertical Villament is reserved for our intelligence network subscribers.
           </p>
           <button onClick={e => { e.stopPropagation(); onNewsletterClick(); }}
@@ -784,14 +791,14 @@ const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewslet
         <span className={cn(
           "px-3 py-1 text-[8px] uppercase tracking-[0.4em] font-bold rounded-full",
           isSyl
-             ? "bg-[#c8a951] text-[#1a1a0a]"
+            ? "bg-[#c8a951] text-[#1a1a0a]"
             : "bg-primary/90 text-on-primary backdrop-blur-sm"
         )}>
           {isSyl ? 'Newsletter Only' : 'Open Access'}
         </span>
       </div>
 
-      {/* Bottom info - hide price for gated SYL */}
+      {/* Bottom info — hide price for gated SYL */}
       <div className={cn("absolute bottom-0 left-0 right-0 px-6 pb-6 pt-10 z-20", isGated && "opacity-0")}>
         <div className="flex items-end justify-between gap-3 mb-4">
           <div className="min-w-0">
@@ -1243,10 +1250,10 @@ const AGARTHA_HOTSPOTS: Hotspot[] = [
   },
   {
     id: 'plot-community', num: 5, x: 62, y: 60,
-    label: '53-Plot Private Community',
+    label: '36-Plot Private Community',
     tag: 'From ₹64.6 L',
-    detail: '53 plots, each unique - no two the same. Sizes from 808 to 5,097 sq yds at ₹7,999/sq yd. A true private forest community, not a subdivision.',
-    stats: [{ label: 'Total Plots', value: '53' }, { label: 'Starting', value: '₹64.6 L (808 sq yds)' }, { label: 'Rate', value: '₹7,999/sq yd' }],
+    detail: '36 plots, each unique — no two the same. Sizes from 808 to 5,097 sq yds at ₹7,999/sq yd. A true private forest community, not a subdivision.',
+    stats: [{ label: 'Total Plots', value: '36' }, { label: 'Starting', value: '₹64.6 L (808 sq yds)' }, { label: 'Rate', value: '₹7,999/sq yd' }],
   },
 ];
 
@@ -1258,13 +1265,52 @@ const AGARTHA_HOTSPOTS: Hotspot[] = [
 interface PlotDot { id: number; sqYds: number; x: number; y: number }
 
 const AGARTHA_PLOTS: PlotDot[] = [
-  // ── Representative Size Samples ──
-  { id: 1,  sqYds: 808,  x: 20, y: 65 }, // Smallest typical
-  { id: 2,  sqYds: 1050, x: 35, y: 55 }, // Standard
-  { id: 3,  sqYds: 1400, x: 50, y: 45 }, // Large
-  { id: 4,  sqYds: 2200, x: 65, y: 35 }, // Estate size
-  { id: 5,  sqYds: 3200, x: 80, y: 50 }, // Premium
-  { id: 15, sqYds: 5097, x: 50, y: 75 }, // Largest landmark plot
+  // ── North outer arc (near Grand Entry boulevard) ──
+  { id:1,  sqYds:1050, x:22, y:22 },
+  { id:2,  sqYds:980,  x:30, y:18 },
+  { id:3,  sqYds:920,  x:38, y:16 },
+  { id:4,  sqYds:900,  x:46, y:17 },
+  { id:5,  sqYds:950,  x:54, y:19 },
+  { id:6,  sqYds:1100, x:62, y:22 },
+  // ── North-East outer ──
+  { id:7,  sqYds:1300, x:70, y:26 },
+  { id:8,  sqYds:1400, x:76, y:32 },
+  { id:9,  sqYds:1500, x:79, y:38 },
+  { id:10, sqYds:1550, x:80, y:44 },
+  { id:11, sqYds:1600, x:79, y:50 },
+  { id:12, sqYds:1500, x:77, y:56 },
+  // ── South-East outer ──
+  { id:13, sqYds:1800, x:73, y:62 },
+  { id:14, sqYds:2000, x:68, y:68 },
+  // ── PLOT 15 — Premium Corner (largest, dual forest frontage) ──
+  { id:15, sqYds:5097, x:14, y:72 },
+  // ── South arc ──
+  { id:16, sqYds:2200, x:62, y:75 },
+  { id:17, sqYds:1900, x:54, y:79 },
+  { id:18, sqYds:1700, x:46, y:81 },
+  { id:19, sqYds:1500, x:38, y:80 },
+  { id:20, sqYds:1350, x:30, y:77 },
+  // ── South-West outer (forest edge) ──
+  { id:21, sqYds:1800, x:24, y:73 },
+  { id:22, sqYds:2400, x:18, y:67 },
+  { id:23, sqYds:2800, x:13, y:61 },
+  // ── West outer (Narsapur forest buffer boundary) ──
+  { id:24, sqYds:3200, x:11, y:54 },
+  { id:25, sqYds:2900, x:9,  y:47 },
+  { id:26, sqYds:2600, x:11, y:40 },
+  // ── North-West outer ──
+  { id:27, sqYds:1700, x:15, y:33 },
+  { id:28, sqYds:1400, x:19, y:26 },
+  { id:29, sqYds:1200, x:15, y:19 },
+  // ── North inner ring ──
+  { id:30, sqYds:870,  x:29, y:30 },
+  { id:31, sqYds:850,  x:36, y:27 },
+  { id:32, sqYds:840,  x:43, y:26 },
+  { id:33, sqYds:855,  x:50, y:28 },
+  { id:34, sqYds:900,  x:57, y:31 },
+  { id:35, sqYds:940,  x:63, y:35 },
+  // ── East inner ring ──
+  { id:36, sqYds:960,  x:66, y:40 },
 ];
 
 const AGARTHA_OLD_RATE = 6199;   // ₹/sq yd - VIP pre-launch rate (2 yrs ago)
@@ -1277,7 +1323,7 @@ const plotDotSize = (sqYds: number) =>
 const formatRs = (rs: number) =>
   rs >= 1e7 ? `₹${(rs / 1e7).toFixed(2)} Cr` : `₹${(rs / 1e5).toFixed(1)} L`;
 
-/** lookup: sanctuary id - its 53 plot dots */
+/** lookup: sanctuary id → its 36 plot dots */
 const SANCTUARY_PLOTS: Record<string, PlotDot[]> = {
   agartha: AGARTHA_PLOTS,
 };
@@ -1293,11 +1339,11 @@ const SANCTUARY_HOTSPOTS: Record<string, Hotspot[]> = {
 /** Agartha-specific wrapper - delegates to the generic PropertyInteractiveLayout */
 const AagarthaInteractiveLayout: FC<{ onClose: () => void }> = ({ onClose }) => (
   <PropertyInteractiveLayout
-    sitePlanSrc="/agartha-layout.jpg"
+    sitePlanSrc="https://static.wixstatic.com/media/142b26_8ddd02a733d04a139fdd19e058e72d94~mv2.jpg"
     hotspots={AGARTHA_HOTSPOTS}
     projectName="Agartha"
-    developerTag="MODCON Builders - Narsapur"
-    tagline="53 plots - Forest community - From ₹64.6 L"
+    developerTag="MODCON Builders · Narsapur"
+    tagline="36 plots · Forest community · From ₹64.6 L"
     brochureUrl="https://www.modconbuilders.com/agartha"
     intentPrefix="Agartha"
     onClose={onClose}
@@ -1327,7 +1373,7 @@ const AdminDashboard: FC<{
   firestoreProps: PropertyDoc[];
   users: UserProfile[];
 }> = ({ onClose, leads, newsletter, firestoreProps, users }) => {
-  const [tab, setTab] = useState<'analytics' | 'properties' | 'leads' | 'newsletter' | 'users'>('analytics');
+  const [tab, setTab] = useState<'properties' | 'leads' | 'newsletter' | 'users'>('properties');
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<PropertyInput>(EMPTY_FORM);
@@ -1406,16 +1452,15 @@ const AdminDashboard: FC<{
 
         {/* Tabs */}
         <div className="flex border-b border-outline/10 flex-shrink-0 overflow-x-auto">
-          {(['analytics', 'properties', 'leads', 'newsletter', 'users'] as const).map(t => (
+          {(['properties', 'leads', 'newsletter', 'users'] as const).map(t => (
             <button key={t} onClick={() => setTab(t)}
               className={cn(
                 "flex-shrink-0 flex-1 py-3.5 text-[9px] uppercase tracking-[0.3em] font-bold transition-all whitespace-nowrap px-3",
                 tab === t ? "text-primary border-b-2 border-primary" : "text-secondary/40 hover:text-secondary"
               )}>
-              {t === 'analytics' ? `Overview`
-               : t === 'properties' ? `Props (${firestoreProps.length})`
+              {t === 'properties' ? `Props (${firestoreProps.length})`
                : t === 'leads' ? `Leads (${leads.length})`
-               : t === 'newsletter' ? `Subs (${newsletter.length})`
+               : t === 'newsletter' ? `News (${newsletter.length})`
                : `Users (${users.length})`}
             </button>
           ))}
@@ -1591,7 +1636,7 @@ const AdminDashboard: FC<{
                   </div>
                 </div>
                 <div>
-                  <label htmlFor="adm-pricepersqyd" className={labelCls}>Price per Sq Yd (₹) - leave blank if not applicable</label>
+                  <label htmlFor="adm-pricepersqyd" className={labelCls}>Price per Sq Yd (₹) — leave blank if not applicable</label>
                   <input id="adm-pricepersqyd" name="pricePerSqYd" type="number" className={inputCls} placeholder="7999" value={form.pricePerSqYd ?? ''}
                     onChange={e => set('pricePerSqYd', e.target.value ? parseInt(e.target.value) : undefined)} />
                 </div>
@@ -1608,7 +1653,7 @@ const AdminDashboard: FC<{
                 <div>
                   <label htmlFor="adm-description" className={labelCls}>Description</label>
                   <textarea id="adm-description" name="description" rows={4} className={cn(inputCls, 'resize-none')}
-                    placeholder="Full description of the property " value={form.description ?? ''}
+                    placeholder="Full description of the property…" value={form.description ?? ''}
                     onChange={e => set('description', e.target.value)} />
                 </div>
                 <div>
@@ -1629,7 +1674,7 @@ const AdminDashboard: FC<{
                   </div>
                   <div>
                     <label htmlFor="adm-plotrange" className={labelCls}>Plot Range</label>
-                    <input id="adm-plotrange" name="plotRange" className={inputCls} placeholder="808 - 5,097 sq yds" value={form.plotRange ?? ''}
+                    <input id="adm-plotrange" name="plotRange" className={inputCls} placeholder="808–5,097 sq yds" value={form.plotRange ?? ''}
                       onChange={e => set('plotRange', e.target.value)} />
                   </div>
                   <div>
@@ -1752,7 +1797,8 @@ const AdminDashboard: FC<{
                 <div key={u.uid} className="p-4 border border-outline/10 rounded-2xl space-y-2">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-3">
-                      {u.photoURL ? <img src={u.photoURL} referrerPolicy="no-referrer" alt="" className="w-9 h-9 rounded-full object-cover flex-shrink-0" />
+                      {u.photoURL
+                        ? <img src={u.photoURL} referrerPolicy="no-referrer" alt="" className="w-9 h-9 rounded-full object-cover flex-shrink-0" />
                         : <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 text-primary font-bold text-sm">
                             {(u.displayName?.[0] || u.email?.[0] || '?').toUpperCase()}
                           </div>
@@ -1771,13 +1817,13 @@ const AdminDashboard: FC<{
                   </div>
                   {(u.occupation || u.city) && (
                     <p className="text-[10px] text-secondary/50 pl-12">
-                      {[u.occupation, u.city].filter(Boolean).join('  ')}
+                      {[u.occupation, u.city].filter(Boolean).join(' · ')}
                     </p>
                   )}
                   {(u.lat && u.lng) && (
                     <p className="text-[9px] text-secondary/30 pl-12 font-mono">
                       {u.lat.toFixed(5)}, {u.lng.toFixed(5)}
-                      {u.locationAccuracy ? `  ${Math.round(u.locationAccuracy)}m` : ''}
+                      {u.locationAccuracy ? ` ±${Math.round(u.locationAccuracy)}m` : ''}
                     </p>
                   )}
                   <p className="text-[9px] text-secondary/20 pl-12">
@@ -1809,31 +1855,42 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
   isSubscribed?: boolean;
   onNewsletterSignup?: () => void;
 }) => {
-  type Tab = 'gallery' | 'layout' | 'details' | 'investment';
-  const [activeTab, setActiveTab] = useState<Tab>('gallery');
-  const [activeImg, setActiveImg] = useState(0);
-  const [leadName, setLeadName] = useState('');
-  const [leadPhone, setLeadPhone] = useState('');
-  const [leadSubmitted, setLeadSubmitted] = useState(false);
-  const [leadLoading, setLeadLoading] = useState(false);
-
-  const hotspots = SANCTUARY_HOTSPOTS[sanctuary.id] ?? null;
+  const hotspots  = SANCTUARY_HOTSPOTS[sanctuary.id] ?? null;
   const plotDots  = SANCTUARY_PLOTS[sanctuary.id]    ?? null;
-  const [activeSpot, setActiveSpot] = useState<Hotspot | null>(hotspots?.[0] ?? null);
-  const [activePlot, setActivePlot] = useState<PlotDot | null>(null);
-  const [mapMode, setMapMode] = useState<'plots' | 'features'>(plotDots ? 'plots' : 'features');
-  const [mapperActive, setMapperActive] = useState(false);
-  const [mappedPlots, setMappedPlots] = useState<{id:number, x:number, y:number, sqYds:number}[]>([]);
+  const [pdTab, setPdTab]             = useState<'gallery' | 'plan' | 'invest'>('gallery');
+  const [activeSpot, setActiveSpot]   = useState<Hotspot | null>(hotspots?.[0] ?? null);
+  const [activePlot, setActivePlot]   = useState<PlotDot | null>(null);
+  const [mapMode, setMapMode]         = useState<'plots' | 'features'>(plotDots ? 'plots' : 'features');
+  const [leadName, setLeadName]       = useState('');
+  const [leadPhone, setLeadPhone]     = useState('');
+  const [leadSubmitted, setLeadSubmitted] = useState(false);
+  const [leadLoading, setLeadLoading]    = useState(false);
+  const [leadError, setLeadError]        = useState<string | null>(null);
 
-  const handleMapClick = (e: React.MouseEvent<HTMLImageElement>) => {
-    if (!mapperActive) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = Number(((e.clientX - rect.left) / rect.width * 100).toFixed(2));
-    const y = Number(((e.clientY - rect.top) / rect.height * 100).toFixed(2));
-    setMappedPlots(prev => [...prev, { id: prev.length + 1, x, y, sqYds: 1000 }]);
+  // Timed newsletter prompt — appears after 25s if not already subscribed
+  const [showNewsletterPrompt, setShowNewsletterPrompt] = useState(false);
+  const [nlEmail, setNlEmail]     = useState('');
+  const [nlDone, setNlDone]       = useState(false);
+  const [nlLoading, setNlLoading] = useState(false);
+  useEffect(() => {
+    if (isSubscribed) return;
+    const t = setTimeout(() => setShowNewsletterPrompt(true), 25000);
+    return () => clearTimeout(t);
+  }, [isSubscribed]);
+
+  const handleNlSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!nlEmail.trim()) return;
+    setNlLoading(true);
+    try {
+      await saveNewsletter(nlEmail.trim(), 'modal');
+      await saveLead({ name: nlEmail.trim(), email: nlEmail.trim(), intent: `${sanctuary.title} — Newsletter Prompt` });
+      onNewsletterSignup?.();
+    } catch {/* ignore */} finally {
+      setNlLoading(false);
+      setNlDone(true);
+    }
   };
-
-  const gallery = sanctuary.gallery && sanctuary.gallery.length > 0 ? sanctuary.gallery : [sanctuary.image];
 
   const commuteTime = sanctuary.commute.match(/\d+/)?.[0] ?? '—';
   const commuteDest = sanctuary.commute.replace(/^\d+ mins? to /i, '');
@@ -1842,16 +1899,15 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
     e.preventDefault();
     if (!leadName.trim() || !leadPhone.trim()) return;
     setLeadLoading(true);
+    setLeadError(null);
     try {
-      await saveLead({ 
-        name: leadName.trim(), 
-        phone: leadPhone.trim(), 
-        intent: `${sanctuary.title} - Site Visit Request`,
-        source: 'site_visit'
-      });
-    } catch {/* fire and forget */} finally {
-      setLeadLoading(false);
+      await saveLead({ name: leadName.trim(), email: leadPhone.trim(), intent: `${sanctuary.title} — Site Visit Request` });
       setLeadSubmitted(true);
+    } catch (err) {
+      console.error('[Lead] Save failed:', err);
+      setLeadError('Could not save your details. Please try again or WhatsApp us directly.');
+    } finally {
+      setLeadLoading(false);
     }
   };
 
@@ -1892,586 +1948,502 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
         </button>
       </div>
 
-      {/* ── TAB BAR ──────────────────────────────────────────────────── */}
-      <div className="flex-shrink-0 flex items-center gap-1 px-6 pb-3 z-20">
-        {TABS.map(t => (
-          <button
-            key={t.id}
-            onClick={() => setActiveTab(t.id)}
-            className={cn(
-              "px-4 py-1.5 rounded-full text-[10px] uppercase tracking-[0.4em] font-bold transition-all",
-              activeTab === t.id
-             ? "bg-primary text-on-primary"
-                : "text-secondary/60 hover:text-on-surface"
+      {/* Non-scrollable header — title + price */}
+      <div className="px-6 pt-5 pb-4 border-b border-outline/10 flex-shrink-0">
+        <div className="flex justify-between items-start gap-3">
+          <div>
+            {sanctuary.tagline && (
+              <p className="text-[9px] uppercase tracking-[0.5em] text-primary font-bold mb-1">{sanctuary.tagline}</p>
             )}
-          >
-            {t.label}
+            <h2 className="text-xl font-headline font-bold text-on-surface leading-tight">{sanctuary.title}</h2>
+            <div className="flex items-center gap-1.5 text-secondary text-xs mt-1.5">
+              <MapPin className="w-3 h-3 flex-shrink-0" />
+              {sanctuary.location}
+            </div>
+          </div>
+          <div className="text-right flex-shrink-0">
+            {sanctuary.pricePerSqYd ? (
+              <>
+                <p className="text-xl font-headline font-bold text-primary">
+                  ₹{sanctuary.pricePerSqYd.toLocaleString('en-IN')}
+                  <span className="text-xs font-normal text-secondary/60">/sq yd</span>
+                </p>
+                <p className="text-[9px] text-secondary/50">{sanctuary.memberPrice}</p>
+              </>
+            ) : (
+              <>
+                <p className="text-xl font-headline font-bold text-primary">{sanctuary.memberPrice}</p>
+                <p className="text-xs text-secondary/40 line-through">{sanctuary.valuation}</p>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Tab nav ── */}
+      <div className="flex border-b border-outline/10 flex-shrink-0">
+        {(['gallery', 'plan', 'invest'] as const).map(t => (
+          <button key={t} onClick={() => setPdTab(t)}
+            className={cn(
+              "flex-1 py-3 text-[9px] uppercase tracking-[0.25em] font-bold transition-all border-b-2",
+              pdTab === t ? "text-primary border-primary" : "text-secondary/40 border-transparent hover:text-secondary/70"
+            )}>
+            {t === 'gallery' ? 'Gallery' : t === 'plan' ? 'Layout Plan' : 'Invest'}
           </button>
         ))}
       </div>
 
-      {/* ── CONTENT AREA ── */}
+      {/* ── Tab content — scrollable ── */}
       <div className="flex-1 overflow-y-auto">
-        <AnimatePresence mode="wait">
 
-          {/* ══ GALLERY TAB ══════════════════════════════════════════════ */}
-          {activeTab === 'gallery' && (
-            <motion.div key="gallery" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col h-full">
-              {/* Hero image */}
-              <div className="relative w-full bg-black" style={{ height: '70vw', maxHeight: 600, minHeight: 350 }}>
-                <AnimatePresence mode="wait">
-                  <motion.img
-                    key={activeImg}
-                    src={gallery[activeImg]}
-                    alt={`${sanctuary.title} - ${activeImg + 1}`}
-                    className="absolute inset-0 w-full h-full object-cover"
+        {/* ── GALLERY TAB ── */}
+        {pdTab === 'gallery' && (
+          <div className="py-4">
+            {sanctuary.plotImages && sanctuary.plotImages.length > 0 ? (
+              <div className="grid grid-cols-2 gap-0.5">
+                {sanctuary.plotImages.map((src, i) => (
+                  <img
+                    key={i}
+                    src={src}
+                    alt={`${sanctuary.title} — photo ${i + 1}`}
+                    className={cn(
+                      "w-full object-cover",
+                      i === 0 ? "col-span-2 h-56" : "h-40"
+                    )}
                     referrerPolicy="no-referrer"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.35 }}
+                    loading="lazy"
                   />
-                </AnimatePresence>
-                {/* Gradient overlays */}
-                <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-black/30 pointer-events-none" />
+                ))}
+              </div>
+            ) : (
+              <img src={sanctuary.image} alt={sanctuary.title}
+                className="w-full h-72 object-cover" referrerPolicy="no-referrer" />
+            )}
+          </div>
+        )}
 
-                {/* Badge + counter */}
-                <div className="absolute top-4 left-4 flex items-center gap-2">
-                  <span className="px-3 py-1 bg-primary text-on-primary text-[8px] uppercase tracking-widest font-bold rounded-full shadow-lg">
-                    {badge}
-                  </span>
+        {/* ── LAYOUT PLAN TAB ── */}
+        {pdTab === 'plan' && (
+          <div className="space-y-0">
+
+          {/* ── Interactive Site Plan — full width, no side padding ── */}
+          {sanctuary.sitePlanSrc && (plotDots || hotspots) && (
+            <div>
+              {/* Mode toggle */}
+              {plotDots && hotspots && (
+                <div className="flex items-center justify-between px-6 pt-5 pb-3">
+                  <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold">
+                    {mapMode === 'plots' ? `Site Plan — ${plotDots?.length ?? 0} Plots` : 'Site Plan — Features'}
+                  </p>
+                  <div className="flex rounded-full border border-outline/15 overflow-hidden text-[8px] uppercase tracking-widest font-bold">
+                    <button onClick={() => setMapMode('plots')}
+                      className={cn("px-3 py-1.5 transition-all",
+                        mapMode === 'plots' ? "bg-primary text-on-primary" : "text-secondary/50 hover:text-secondary")}>
+                      Plots
+                    </button>
+                    <button onClick={() => setMapMode('features')}
+                      className={cn("px-3 py-1.5 transition-all",
+                        mapMode === 'features' ? "bg-primary text-on-primary" : "text-secondary/50 hover:text-secondary")}>
+                      Features
+                    </button>
+                  </div>
                 </div>
-                <span className="absolute top-4 right-4 px-2.5 py-1 bg-black/50 backdrop-blur-sm text-white/70 text-[9px] rounded-full font-bold">
-                  {activeImg + 1} / {gallery.length}
-                </span>
+              )}
 
-                {/* Left / Right arrows */}
-                {gallery.length > 1 && (
+              <div className="rounded-none overflow-hidden bg-[#0a0f07]">
+
+                {/* ── PLOTS MODE ── */}
+                {mapMode === 'plots' && plotDots && (
                   <>
-                    <button
-                      onClick={() => setActiveImg(i => (i - 1 + gallery.length) % gallery.length)}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center text-white/80 hover:bg-black/80 transition-all"
-                    >
-                      <ArrowRight className="w-4 h-4 rotate-180" />
-                    </button>
-                    <button
-                      onClick={() => setActiveImg(i => (i + 1) % gallery.length)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center text-white/80 hover:bg-black/80 transition-all"
-                    >
-                      <ArrowRight className="w-4 h-4" />
-                    </button>
+                    <div className="relative">
+                      <img src={sanctuary.sitePlanSrc} alt="Site plan"
+                        className="w-full h-auto object-contain" referrerPolicy="no-referrer" />
+                      <div className="absolute top-2 left-2 right-2 flex items-center gap-2 flex-wrap">
+                        <span className="bg-black/60 backdrop-blur-sm text-[7px] uppercase tracking-widest font-bold text-white/70 px-2 py-1 rounded-full">
+                          Tap a plot to see its investment snapshot
+                        </span>
+                      </div>
+                      {plotDots.map(p => {
+                        const sz     = plotDotSize(p.sqYds);
+                        const isActive = activePlot?.id === p.id;
+                        const isPremium = p.sqYds >= 3000;
+                        const isLandmark = p.id === 15;
+                        return (
+                          <button
+                            key={p.id}
+                            style={{ left: `${p.x}%`, top: `${p.y}%`, width: sz, height: sz }}
+                            className={cn(
+                              "absolute -translate-x-1/2 -translate-y-1/2 rounded-full border transition-all duration-150 shadow-md",
+                              isLandmark
+                                ? "border-amber-400 bg-amber-400/90 scale-110"
+                                : isPremium
+                                ? "border-amber-500/80 bg-amber-500/70"
+                                : isActive
+                                ? "border-primary bg-primary scale-125"
+                                : "border-primary/80 bg-primary/60 hover:bg-primary hover:scale-110"
+                            )}
+                            onClick={() => setActivePlot(isActive ? null : p)}
+                          >
+                            {isActive && (
+                              <span className="absolute inset-0 rounded-full bg-primary/40 animate-ping pointer-events-none" />
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <div className="flex items-center gap-4 px-4 py-2.5 border-t border-white/5">
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-2.5 h-2.5 rounded-full bg-primary/70 border border-primary/80" />
+                        <span className="text-[8px] text-white/40 uppercase tracking-wider font-bold">Standard</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-3.5 h-3.5 rounded-full bg-amber-500/70 border border-amber-500/80" />
+                        <span className="text-[8px] text-white/40 uppercase tracking-wider font-bold">Premium (3,000+ sq yds)</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-4 h-4 rounded-full bg-amber-400/90 border border-amber-400" />
+                        <span className="text-[8px] text-amber-400/80 uppercase tracking-wider font-bold">Plot 15</span>
+                      </div>
+                    </div>
+                    <AnimatePresence mode="wait">
+                      {activePlot && (() => {
+                        const oldVal  = activePlot.sqYds * AGARTHA_OLD_RATE;
+                        const nowVal  = activePlot.sqYds * AGARTHA_NOW_RATE;
+                        const gain    = nowVal - oldVal;
+                        const pct     = ((gain / oldVal) * 100).toFixed(1);
+                        const annPct  = (parseFloat(pct) / 2).toFixed(1);
+                        return (
+                          <motion.div key={activePlot.id}
+                            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 4 }}
+                            transition={{ duration: 0.18 }} className="border-t border-white/8 bg-[#0d1409]">
+                            <div className="flex items-start justify-between px-5 pt-4 pb-3">
+                              <div>
+                                <p className="text-[8px] uppercase tracking-[0.5em] text-primary/50 font-bold">
+                                  Plot {activePlot.id} · {activePlot.sqYds.toLocaleString('en-IN')} sq yds
+                                  {activePlot.id === 15 && <span className="ml-2 text-amber-400">★ Premium Corner</span>}
+                                </p>
+                                <p className="text-xl font-headline font-bold text-white mt-0.5">{formatRs(nowVal)}</p>
+                                <p className="text-[10px] text-white/40">at ₹{AGARTHA_NOW_RATE.toLocaleString('en-IN')}/sq yd</p>
+                              </div>
+                              <button onClick={() => setActivePlot(null)} className="p-1.5 rounded-full bg-white/5 hover:bg-white/10 transition-all mt-0.5">
+                                <X className="w-3 h-3 text-white/40" />
+                              </button>
+                            </div>
+                            <div className="px-5 pb-3">
+                              <div className="rounded-xl bg-white/4 border border-white/5 overflow-hidden">
+                                <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
+                                  <div>
+                                    <p className="text-[8px] uppercase tracking-widest text-white/30 font-bold">VIP Pre-Launch · 2022</p>
+                                    <p className="text-base font-headline font-bold text-white/60 mt-0.5">{formatRs(oldVal)}</p>
+                                  </div>
+                                  <p className="text-[9px] text-white/30">₹{AGARTHA_OLD_RATE.toLocaleString('en-IN')}/sq yd</p>
+                                </div>
+                                <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
+                                  <div>
+                                    <p className="text-[8px] uppercase tracking-widest text-primary/60 font-bold">Today · 2024</p>
+                                    <p className="text-base font-headline font-bold text-white mt-0.5">{formatRs(nowVal)}</p>
+                                  </div>
+                                  <p className="text-[9px] text-primary/60">₹{AGARTHA_NOW_RATE.toLocaleString('en-IN')}/sq yd</p>
+                                </div>
+                                <div className="px-4 py-3 bg-primary/8 flex items-center justify-between">
+                                  <div className="flex items-center gap-2">
+                                    <TrendingDown className="w-4 h-4 text-primary rotate-180" />
+                                    <div>
+                                      <p className="text-[8px] uppercase tracking-widest text-primary/70 font-bold">Early Investor Gain</p>
+                                      <p className="text-lg font-headline font-bold text-primary">{formatRs(gain)}</p>
+                                    </div>
+                                  </div>
+                                  <div className="text-right">
+                                    <p className="text-xl font-headline font-bold text-primary">+{pct}%</p>
+                                    <p className="text-[9px] text-primary/50">in 2 years</p>
+                                    <p className="text-[9px] text-primary/40">({annPct}% p.a.)</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="px-5 pb-4">
+                              <p className="text-[10px] text-white/35 leading-relaxed">
+                                An investor who booked this exact plot at pre-launch in 2022 has seen a paper gain of <span className="text-primary/70 font-bold">{formatRs(gain)}</span> without doing anything — simply because Agartha's land value grew <span className="text-primary/70 font-bold">+{pct}% in 2 years</span>. Today's buyers get the same compounding advantage for the next cycle.
+                              </p>
+                            </div>
+                          </motion.div>
+                        );
+                      })()}
+                    </AnimatePresence>
+                  </>
+                )}
+
+                {/* ── FEATURES MODE ── */}
+                {mapMode === 'features' && hotspots && (
+                  <>
+                    <div className="relative">
+                      <img src={sanctuary.sitePlanSrc} alt="Site plan"
+                        className="w-full h-auto object-contain" referrerPolicy="no-referrer" />
+                      {hotspots.map(h => {
+                        const isActive = activeSpot?.id === h.id;
+                        return (
+                          <button key={h.id} style={{ left: `${h.x}%`, top: `${h.y}%` }}
+                            className="absolute -translate-x-1/2 -translate-y-1/2" onClick={() => setActiveSpot(h)}>
+                            <span className={cn(
+                              "relative block rounded-full border-2 border-white shadow-lg transition-all duration-200",
+                              isActive ? "w-4 h-4 bg-primary scale-125" : "w-3 h-3 bg-white/60 hover:bg-white hover:scale-125"
+                            )} />
+                            {isActive && <span className="absolute inset-0 rounded-full bg-primary/50 animate-ping pointer-events-none" />}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <div className="flex gap-2 overflow-x-auto px-4 py-3 border-t border-white/5 no-scrollbar">
+                      {hotspots.map(h => (
+                        <button key={h.id} onClick={() => setActiveSpot(h)}
+                          className={cn("flex-shrink-0 text-[8px] uppercase tracking-widest font-bold px-3 py-1.5 rounded-full border transition-all",
+                            activeSpot?.id === h.id ? "bg-primary border-primary text-on-primary" : "border-white/15 text-white/40 hover:border-primary/40 hover:text-primary")}>
+                          {h.label.split(' ').slice(0, 2).join(' ')}
+                        </button>
+                      ))}
+                    </div>
+                    {activeSpot && (
+                      <AnimatePresence mode="wait">
+                        <motion.div key={activeSpot.id} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                          transition={{ duration: 0.15 }} className="px-5 py-4 border-t border-white/5 space-y-2">
+                          <p className="text-[8px] uppercase tracking-[0.4em] text-primary/60 font-bold">{activeSpot.tag}</p>
+                          <h4 className="text-sm font-headline font-bold text-white">{activeSpot.label}</h4>
+                          <p className="text-[11px] text-white/50 leading-relaxed">{activeSpot.detail}</p>
+                          <div className="grid grid-cols-3 gap-2 pt-1">
+                            {activeSpot.stats.map(s => (
+                              <div key={s.label} className="bg-white/5 rounded-lg px-2 py-2 text-center">
+                                <p className="text-[7px] uppercase tracking-wider text-white/30 font-bold mb-0.5">{s.label}</p>
+                                <p className="text-[10px] font-bold text-white">{s.value}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </motion.div>
+                      </AnimatePresence>
+                    )}
                   </>
                 )}
               </div>
 
-              {/* Thumbnail strip */}
-              {gallery.length > 1 && (
-                <div className="flex gap-2 overflow-x-auto px-6 py-3 no-scrollbar flex-shrink-0">
-                  {gallery.map((img, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setActiveImg(i)}
-                      className={cn(
-                        "flex-shrink-0 w-16 h-12 rounded-xl overflow-hidden border-2 transition-all",
-                        i === activeImg ? "border-primary scale-105" : "border-transparent opacity-50 hover:opacity-80"
-                      )}
-                    >
-                      <img src={img} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                    </button>
+          {/* Details below the plan */}
+          <div className="px-6 py-6 space-y-8">
+            {/* Description */}
+            {sanctuary.description && (
+              <p className="text-sm text-secondary/80 leading-relaxed">{sanctuary.description}</p>
+            )}
+
+            {/* Plot community stats */}
+            {sanctuary.plots && (
+              <div className="grid grid-cols-3 gap-3">
+                <div className="p-4 bg-primary/5 rounded-2xl text-center">
+                  <p className="text-2xl font-headline font-bold text-primary">{sanctuary.plots}</p>
+                  <p className="text-[8px] uppercase tracking-widest text-secondary/60 mt-1">Private Plots</p>
+                </div>
+                <div className="p-4 bg-primary/5 rounded-2xl text-center">
+                  <p className="text-sm font-headline font-bold text-primary leading-tight">{sanctuary.plotRange ?? '808–5,097'}</p>
+                  <p className="text-[8px] uppercase tracking-widest text-secondary/60 mt-1">Sq Yds Range</p>
+                </div>
+                <div className="p-4 bg-primary/5 rounded-2xl text-center">
+                  <p className="text-sm font-headline font-bold text-primary leading-tight">{sanctuary.amenityAcres ?? '14,548'}</p>
+                  <p className="text-[8px] uppercase tracking-widest text-secondary/60 mt-1">Amenity Sq Yds</p>
+                </div>
+              </div>
+            )}            {/* Features */}
+            {sanctuary.features && sanctuary.features.length > 0 && (
+              <div>
+                <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold mb-4">Curated Features</p>
+                <div className="grid grid-cols-2 gap-3">
+                  {sanctuary.features.map((feature, i) => (
+                    <div key={i} className="flex items-center gap-3 p-3 rounded-xl border border-outline/10 bg-surface-container-low/50">
+                      <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
+                        {featureIcon(feature)}
+                      </div>
+                      <span className="text-[10px] font-medium text-on-surface leading-tight">{feature}</span>
+                    </div>
                   ))}
                 </div>
-              )}
+              </div>
+            )}
 
-              {/* Key stat pills */}
-              <div className="grid grid-cols-3 gap-3 px-6 py-4">
+            {/* Environmental integrity */}
+            <div>
+              <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold mb-4">Environmental Integrity</p>
+              <div className="space-y-3">
                 {[
-                  { label: 'AQI', value: sanctuary.aqi, sub: 'Pure Air', color: 'text-emerald-400' },
-                  { label: 'Noise', value: `${sanctuary.noise} dB`, sub: 'Near Silent', color: 'text-sky-400' },
-                  { label: 'Commute', value: `${commuteTime}m`, sub: commuteDest.slice(0, 14), color: 'text-amber-400' },
-                ].map(s => (
-                  <div key={s.label} className="bg-on-surface/5 rounded-2xl p-4 text-center border border-outline/10">
-                    <p className="text-[8px] uppercase tracking-widest text-secondary/50 font-bold mb-1">{s.label}</p>
-                    <p className={cn("text-xl font-headline font-bold", s.color)}>{s.value}</p>
-                    <p className="text-[8px] text-secondary/50 mt-0.5">{s.sub}</p>
+                  { label: 'Air Quality Index', value: `${sanctuary.aqi} — Pristine`, bar: Math.min((50 - sanctuary.aqi) / 50, 1) },
+                  { label: 'Ambient Noise', value: `${sanctuary.noise} dB — Near Silent`, bar: Math.min((50 - sanctuary.noise) / 50, 1) },
+                  { label: 'Forest Proximity', value: 'Direct Boundary Access', bar: 0.95 },
+                ].map(item => (
+                  <div key={item.label}>
+                    <div className="flex justify-between text-[9px] mb-1">
+                      <span className="uppercase tracking-widest text-secondary/60">{item.label}</span>
+                      <span className="font-bold text-on-surface">{item.value}</span>
+                    </div>
+                    <div className="h-1 bg-outline/10 rounded-full overflow-hidden">
+                      <motion.div initial={{ width: 0 }} animate={{ width: `${item.bar * 100}%` }}
+                        transition={{ delay: 0.3, duration: 0.8, ease: 'easeOut' }}
+                        className="h-full bg-primary rounded-full" />
+                    </div>
                   </div>
                 ))}
               </div>
+            </div>
 
-              {/* Description */}
-              {sanctuary.description && (
-                <div className="px-6 pb-4">
-                  <p className="text-sm text-secondary leading-relaxed">{sanctuary.description}</p>
+            {/* Developer credit */}
+            {sanctuary.architect && (
+              <div className="flex items-center gap-3 p-4 border border-outline/10 rounded-2xl">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <Award className="w-5 h-5 text-primary" />
                 </div>
-              )}
-
-              {/* Features grid */}
-              {sanctuary.features && sanctuary.features.length > 0 && (
-                <div className="px-6 pb-6">
-                  <p className="text-[9px] uppercase tracking-[0.5em] text-secondary/60 font-bold mb-3">Curated Features</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    {sanctuary.features.map((f, i) => (
-                      <div key={i} className="flex items-center gap-2.5 p-3 rounded-xl bg-on-surface/4 border border-outline/10">
-                        <div className="w-6 h-6 rounded-lg bg-primary/15 flex items-center justify-center text-primary flex-shrink-0">
-                          {featureIcon(f)}
-                        </div>
-                        <span className="text-[10px] font-medium text-on-surface/70 leading-tight">{f}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </motion.div>
-          )}
-
-          {/* ══ LAYOUT PLAN TAB ══════════════════════════════════════════ */}
-          {activeTab === 'layout' && (
-            <motion.div key="layout" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="px-4 py-4 space-y-4">
-              {sanctuary.sitePlanSrc ? (
-                <>
-                  {/* Mode toggle */}
-                  {plotDots && hotspots && (
-                    <div className="flex rounded-full border border-outline/20 overflow-hidden w-fit text-[9px] uppercase tracking-widest font-bold">
-                      {(['plots', 'features'] as const).map(m => (
-                        <button
-                          key={m}
-                          onClick={() => setMapMode(m)}
-                          className={cn("px-4 py-2 transition-all", mapMode === m ? "bg-primary text-on-primary" : "text-secondary/60 hover:text-on-surface")}
-                        >
-                          {m}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-
-                  <div className="rounded-2xl overflow-hidden border border-outline/10 bg-surface-container-low">
-                    {/* PLOTS MODE */}
-                    {(mapMode === 'plots' || !hotspots) && plotDots && (
-                      <>
-                        <div className="relative">
-                          <button
-                            onClick={() => setMapperActive(!mapperActive)}
-                            className="absolute top-2 left-2 z-50 px-3 py-1 bg-black/80 text-white text-[8px] uppercase tracking-widest font-bold border border-white/10 rounded-full"
-                          >
-                            {mapperActive ? `Mapper Active (${mappedPlots.length}) - Disable` : 'Enable Visual Mapper'}
-                          </button>
-                          {mapperActive && mappedPlots.length > 0 && (
-                            <div className="absolute top-12 left-2 right-2 z-50 flex gap-2">
-                              <button onClick={() => setMappedPlots(prev => prev.slice(0, -1))} className="px-3 py-1 bg-red-500/80 text-white text-[8px] uppercase font-bold rounded-full">Undo</button>
-                              <button onClick={() => { navigator.clipboard.writeText(JSON.stringify(mappedPlots, null, 2)); alert('Copied!'); }} className="px-3 py-1 bg-primary text-on-primary text-[8px] uppercase font-bold rounded-full">Copy</button>
-                            </div>
-                          )}
-                          <img
-                            src={sanctuary.sitePlanSrc}
-                            alt="Site plan"
-                            className={cn("w-full h-auto object-contain", mapperActive && "cursor-crosshair")}
-                            referrerPolicy="no-referrer"
-                            onClick={handleMapClick}
-                          />
-                          {(mapperActive ? mappedPlots : plotDots).map(p => {
-                            const sz = mapperActive ? 12 : plotDotSize(p.sqYds);
-                            const isActive = activePlot?.id === p.id;
-                            return (
-                              <button
-                                key={p.id}
-                                style={{ left: `${p.x}%`, top: `${p.y}%`, width: sz, height: sz }}
-                                className={cn(
-                                  "absolute -translate-x-1/2 -translate-y-1/2 rounded-full border transition-all duration-150 shadow-md",
-                                  mapperActive ? "bg-red-500 border-red-300" :
-                                  isActive ? "border-primary bg-primary scale-125" : "border-primary/80 bg-primary/60 hover:bg-primary hover:scale-110"
-                                )}
-                                onClick={() => !mapperActive && setActivePlot(isActive ? null : p as any)}
-                              >
-                                {mapperActive && <span className="absolute -top-4 -left-2 text-[8px] text-red-400 font-bold bg-black/60 px-1 rounded">{p.id}</span>}
-                                {isActive && !mapperActive && <span className="absolute inset-0 rounded-full bg-primary/40 animate-ping pointer-events-none" />}
-                              </button>
-                            );
-                          })}
-                        </div>
-
-                        {/* Legend */}
-                        <div className="flex items-center gap-4 px-4 py-2.5 border-t border-outline/10">
-                          {[
-                            { cls: 'bg-primary/70 border-primary/80', label: 'Standard' },
-                            { cls: 'bg-amber-500/70 border-amber-500/80 w-3.5 h-3.5', label: 'Premium 3000+ sq yds' },
-                          ].map(l => (
-                            <div key={l.label} className="flex items-center gap-1.5">
-                              <span className={cn("w-2.5 h-2.5 rounded-full border", l.cls)} />
-                              <span className="text-[8px] text-secondary/60 uppercase tracking-wider font-bold">{l.label}</span>
-                            </div>
-                          ))}
-                        </div>
-
-                        {/* Plot investment card */}
-                        <AnimatePresence mode="wait">
-                          {activePlot && (() => {
-                            const oldVal = activePlot.sqYds * AGARTHA_OLD_RATE;
-                            const nowVal = activePlot.sqYds * AGARTHA_NOW_RATE;
-                            const gain   = nowVal - oldVal;
-                            const pct    = ((gain / oldVal) * 100).toFixed(1);
-                            const annPct = (parseFloat(pct) / 2).toFixed(1);
-                            return (
-                              <motion.div
-                                key={activePlot.id}
-                                initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 4 }}
-                                className="border-t border-outline/10 bg-surface-container px-5 py-4 space-y-3"
-                              >
-                                <div className="flex items-start justify-between">
-                                  <div>
-                                    <p className="text-[8px] uppercase tracking-[0.5em] text-primary/50 font-bold">
-                                      Plot {activePlot.id}  {activePlot.sqYds.toLocaleString('en-IN')} sq yds
-                                      {activePlot.id === 15 && <span className="ml-2 text-amber-400"> … Premium</span>}
-                                    </p>
-                                    <p className="text-xl font-headline font-bold text-on-surface mt-0.5">{formatRs(nowVal)}</p>
-                                  </div>
-                                  <button onClick={() => setActivePlot(null)} className="p-1.5 rounded-full bg-on-surface/5 hover:bg-on-surface/10">
-                                    <X className="w-3 h-3 text-secondary/60" />
-                                  </button>
-                                </div>
-                                <div className="grid grid-cols-3 gap-2 text-center">
-                                  {[
-                                    { label: 'Pre-Launch 2022', val: formatRs(oldVal), sub: `₹${AGARTHA_OLD_RATE.toLocaleString('en-IN')}/yd`, color: 'text-white/50' },
-                                    { label: 'Today 2024', val: formatRs(nowVal), sub: `₹${AGARTHA_NOW_RATE.toLocaleString('en-IN')}/yd`, color: 'text-white' },
-                                    { label: 'Gain', val: `+${pct}%`, sub: `${annPct}% p.a.`, color: 'text-primary' },
-                                  ].map(r => (
-                                    <div key={r.label} className="bg-white/4 rounded-xl p-3 border border-white/5">
-                                      <p className="text-[7px] uppercase tracking-wider text-white/30 font-bold mb-1">{r.label}</p>
-                                      <p className={cn("text-sm font-headline font-bold", r.color)}>{r.val}</p>
-                                      <p className="text-[8px] text-white/30 mt-0.5">{r.sub}</p>
-                                    </div>
-                                  ))}
-                                </div>
-                              </motion.div>
-                            );
-                          })()}
-                        </AnimatePresence>
-                      </>
-                    )}
-
-                    {/* FEATURES MODE */}
-                    {(mapMode === 'features' || !plotDots) && hotspots && (
-                      <>
-                        <div className="relative">
-                          <img src={sanctuary.sitePlanSrc} alt="Site plan" className="w-full h-auto object-contain" referrerPolicy="no-referrer" />
-                          {hotspots.map(h => {
-                            const isActive = activeSpot?.id === h.id;
-                            return (
-                              <button key={h.id} style={{ left: `${h.x}%`, top: `${h.y}%` }}
-                                className="absolute -translate-x-1/2 -translate-y-1/2" onClick={() => setActiveSpot(h)}>
-                                <span className={cn("relative block rounded-full border-2 border-white shadow-lg transition-all duration-200",
-                                  isActive ? "w-4 h-4 bg-primary scale-125" : "w-3 h-3 bg-white/60 hover:bg-white hover:scale-125")} />
-                                {isActive && <span className="absolute inset-0 rounded-full bg-primary/50 animate-ping pointer-events-none" />}
-                              </button>
-                            );
-                          })}
-                        </div>
-                        <div className="flex gap-2 overflow-x-auto px-4 py-3 border-t border-outline/10 no-scrollbar">
-                          {hotspots.map(h => (
-                            <button key={h.id} onClick={() => setActiveSpot(h)}
-                              className={cn("flex-shrink-0 text-[8px] uppercase tracking-widest font-bold px-3 py-1.5 rounded-full border transition-all",
-                                activeSpot?.id === h.id ? "bg-primary border-primary text-on-primary" : "border-outline/20 text-secondary/60 hover:border-primary/40 hover:text-primary")}>
-                              {h.label.split(' ').slice(0, 2).join(' ')}
-                            </button>
-                          ))}
-                        </div>
-                        {activeSpot && (
-                          <AnimatePresence mode="wait">
-                            <motion.div key={activeSpot.id} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-                              className="px-5 py-4 border-t border-outline/10 space-y-2">
-                              <p className="text-[8px] uppercase tracking-[0.4em] text-primary/60 font-bold">{activeSpot.tag}</p>
-                              <h4 className="text-sm font-headline font-bold text-on-surface">{activeSpot.label}</h4>
-                              <p className="text-[11px] text-secondary leading-relaxed">{activeSpot.detail}</p>
-                              <div className="grid grid-cols-3 gap-2 pt-1">
-                                {activeSpot.stats.map(s => (
-                                  <div key={s.label} className="bg-on-surface/5 rounded-lg px-2 py-2 text-center">
-                                    <p className="text-[7px] uppercase tracking-wider text-secondary/50 font-bold mb-0.5">{s.label}</p>
-                                    <p className="text-[10px] font-bold text-on-surface">{s.value}</p>
-                                  </div>
-                                ))}
-                              </div>
-                            </motion.div>
-                          </AnimatePresence>
-                        )}
-                      </>
-                    )}
-                  </div>
-                </>
-              ) : (
-                <div className="flex flex-col items-center justify-center py-24 text-center">
-                  <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mb-4">
-                    <MapPin className="w-8 h-8 text-white/20" />
-                  </div>
-                  <p className="text-white/30 text-sm">Layout plan coming soon.</p>
-                </div>
-              )}
-            </motion.div>
-          )}
-
-          {/* ══ LAYOUT PROPERTY SUMMARY STRIP (below layout plan) */}
-          {activeTab === 'layout' && (
-            <motion.div key="layout-summary" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="px-4 pb-28 space-y-4">
-
-              {(sanctuary.plots || sanctuary.plotRange || sanctuary.amenityAcres) && (
                 <div>
-                  <p className="text-[9px] uppercase tracking-[0.5em] text-secondary/50 font-bold mb-3">Community Scale</p>
-                  <div className="grid grid-cols-3 gap-2">
-                    {[
-                      { val: String(sanctuary.plots ?? '53'), label: 'Private Plots' },
-                      { val: sanctuary.plotRange ?? '808 - 5,097', label: 'Sq Yd Range' },
-                      { val: sanctuary.amenityAcres ?? '14,548', label: 'Amenity Sq Yds' },
-                    ].map(s => (
-                      <div key={s.label} className="bg-on-surface/5 rounded-2xl p-3 text-center border border-outline/10">
-                        <p className="text-sm font-headline font-bold text-primary leading-tight">{s.val}</p>
-                        <p className="text-[7px] uppercase tracking-widest text-secondary/50 mt-1">{s.label}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <div>
-                <p className="text-[9px] uppercase tracking-[0.5em] text-secondary/50 font-bold mb-3">Environmental Integrity</p>
-                <div className="space-y-3 bg-on-surface/3 rounded-2xl border border-outline/10 p-4">
-                  {[
-                    { label: 'Air Quality (AQI)', value: sanctuary.aqi + ' — Pristine', bar: Math.min((50 - sanctuary.aqi) / 50, 1), color: 'bg-emerald-500' },
-                    { label: 'Ambient Noise', value: sanctuary.noise + ' dB — Near Silent', bar: Math.min((50 - sanctuary.noise) / 50, 1), color: 'bg-sky-500' },
-                    { label: 'Commute', value: sanctuary.commute, bar: 0.75, color: 'bg-primary/70' },
-                  ].map(item => (
-                    <div key={item.label}>
-                      <div className="flex justify-between text-[9px] mb-1">
-                        <span className="uppercase tracking-widest text-secondary/60">{item.label}</span>
-                        <span className="font-bold text-on-surface/80">{item.value}</span>
-                      </div>
-                      <div className="h-1 bg-on-surface/10 rounded-full overflow-hidden">
-                        <motion.div initial={{ width: 0 }} animate={{ width: item.bar * 100 + '%' }}
-                          transition={{ delay: 0.4, duration: 0.7, ease: 'easeOut' }}
-                          className={'h-full rounded-full ' + item.color} />
-                      </div>
-                    </div>
-                  ))}
+                  <p className="text-[8px] uppercase tracking-widest text-secondary/50">Developed by</p>
+                  <p className="text-sm font-bold text-on-surface">{sanctuary.architect}</p>
                 </div>
               </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div className="bg-on-surface/5 rounded-2xl p-4 border border-outline/10">
-                  <p className="text-[8px] uppercase tracking-widest text-secondary/50 mb-1">Starting Price</p>
-                  <p className="text-base font-headline font-bold text-primary">{sanctuary.valuation}</p>
-                </div>
-                {sanctuary.pricePerSqYd && (
-                  <div className="bg-on-surface/5 rounded-2xl p-4 border border-outline/10">
-                    <p className="text-[8px] uppercase tracking-widest text-secondary/50 mb-1">Rate / Sq Yd</p>
-                    <p className="text-base font-headline font-bold text-on-surface">₹{sanctuary.pricePerSqYd.toLocaleString('en-IN')}</p>
-                  </div>
-                )}
-              </div>
-
-              {sanctuary.features && sanctuary.features.length > 0 && (
-                <div>
-                  <p className="text-[9px] uppercase tracking-[0.5em] text-secondary/50 font-bold mb-3">Key Features</p>
-                  <div className="flex flex-wrap gap-2">
-                    {sanctuary.features.map((f, i) => (
-                      <span key={i} className="px-3 py-1.5 rounded-full bg-primary/10 text-primary text-[9px] uppercase tracking-wider font-bold border border-primary/15">
-                        {f}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {sanctuary.architect && (
-                <div className="flex items-center gap-3 p-4 border border-outline/10 rounded-2xl bg-on-surface/3">
-                  <div className="w-9 h-9 rounded-xl bg-primary/15 flex items-center justify-center flex-shrink-0">
-                    <Award className="w-4 h-4 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-[8px] uppercase tracking-widest text-secondary/50">Developer</p>
-                    <p className="text-sm font-bold text-on-surface">{sanctuary.architect}</p>
-                  </div>
-                </div>
-              )}
-            </motion.div>
-          )}
-
-          {/* ══ DETAILS TAB ══════════════════════════════════════════════ */}
-          {activeTab === 'details' && (
-            <motion.div key="details" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="px-6 py-4 space-y-6 pb-28">
-
-              {/* Plot community stats */}
-              {sanctuary.plots && (
-                <div>
-                  <p className="text-[9px] uppercase tracking-[0.5em] text-secondary/60 font-bold mb-3">Community Scale</p>
-                  <div className="grid grid-cols-3 gap-3">
-                    {[
-                      { val: sanctuary.plots, label: 'Private Plots' },
-                      { val: sanctuary.plotRange ?? '808 - 5,097', label: 'Sq Yds Range' },
-                      { val: sanctuary.amenityAcres ?? '14,548', label: 'Amenity Sq Yds' },
-                    ].map(s => (
-                      <div key={s.label} className="bg-on-surface/5 rounded-2xl p-4 text-center border border-outline/10">
-                        <p className="text-lg font-headline font-bold text-primary leading-tight">{s.val}</p>
-                        <p className="text-[8px] uppercase tracking-widest text-secondary/50 mt-1">{s.label}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Environmental integrity */}
-              <div>
-                <p className="text-[9px] uppercase tracking-[0.5em] text-secondary/60 font-bold mb-3">Environmental Integrity</p>
-                <div className="space-y-4 bg-on-surface/3 rounded-2xl border border-outline/10 p-5">
-                  {[
-                    { label: 'Air Quality Index', value: `${sanctuary.aqi} - Pristine`, bar: Math.min((50 - sanctuary.aqi) / 50, 1), color: 'bg-emerald-500' },
-                    { label: 'Ambient Noise', value: `${sanctuary.noise} dB - Near Silent`, bar: Math.min((50 - sanctuary.noise) / 50, 1), color: 'bg-sky-500' },
-                    { label: 'Forest Proximity', value: 'Direct Boundary Access', bar: 0.95, color: 'bg-primary' },
-                  ].map(item => (
-                    <div key={item.label}>
-                      <div className="flex justify-between text-[9px] mb-1.5">
-                        <span className="uppercase tracking-widest text-secondary/60">{item.label}</span>
-                        <span className="font-bold text-on-surface/80">{item.value}</span>
-                      </div>
-                      <div className="h-1.5 bg-on-surface/10 rounded-full overflow-hidden">
-                        <motion.div initial={{ width: 0 }} animate={{ width: `${item.bar * 100}%` }}
-                          transition={{ delay: 0.3, duration: 0.8, ease: 'easeOut' }}
-                          className={cn("h-full rounded-full", item.color)} />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Developer credit */}
-              {sanctuary.architect && (
-                <div className="flex items-center gap-3 p-4 border border-outline/10 rounded-2xl bg-on-surface/3">
-                  <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center">
-                    <Award className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-[8px] uppercase tracking-widest text-secondary/50">Developed by</p>
-                    <p className="text-sm font-bold text-on-surface">{sanctuary.architect}</p>
-                  </div>
-                </div>
-              )}
-
-              {/* Brochure + Navigate links */}
-              <div className="flex gap-3">
-                {sanctuary.mapUrl && (
-                  <a href={sanctuary.mapUrl} target="_blank" rel="noopener noreferrer"
-                    className="flex-1 flex items-center justify-center gap-2 py-3.5 border border-outline/20 text-secondary text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl hover:bg-on-surface/5 transition-all">
-                    <Navigation className="w-4 h-4" />
-                    Navigate
-                  </a>
-                )}
-                {sanctuary.brochureUrl && (
-                  <a href={sanctuary.brochureUrl} target="_blank" rel="noopener noreferrer"
-                    className="flex-1 flex items-center justify-center gap-3 py-3.5 border border-outline/20 text-secondary text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl hover:bg-on-surface/5 transition-all">
-                    <ArrowUpRight className="w-4 h-4" />
-                    Full Brochure
-                  </a>
-                )}
-              </div>
-            </motion.div>
-          )}
-
-          {/* ══ INVESTMENT TAB ════════════════════════════════════════════ */}
-          {activeTab === 'investment' && (
-            <motion.div key="investment" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="px-6 py-4 space-y-6 pb-28">
-
-              {/* Pricing hero */}
-              <div className="rounded-3xl bg-gradient-to-br from-primary/10 to-surface-container border border-primary/20 p-6">
-                <p className="text-[9px] uppercase tracking-[0.5em] text-primary/70 font-bold mb-1">Exclusive Member Price</p>
-                <p className="text-4xl font-headline font-bold text-on-surface">{sanctuary.memberPrice}</p>
-                {sanctuary.pricePerSqYd && (
-                  <p className="text-sm text-primary/60 mt-1">@ ₹{sanctuary.pricePerSqYd.toLocaleString('en-IN')} / sq yd</p>
-                )}
-                {sanctuary.valuation && sanctuary.valuation !== sanctuary.memberPrice && (
-                  <p className="text-xs text-secondary/40 line-through mt-0.5">Market: {sanctuary.valuation}</p>
-                )}
-              </div>
-
-              {/* Price calculator */}
-              {sanctuary.pricePerSqYd && (
-                <div>
-                  <p className="text-[9px] uppercase tracking-[0.5em] text-secondary/60 font-bold mb-3">Price Calculator</p>
-                  <div className="rounded-2xl overflow-hidden border border-outline/10">
-                    {[
-                      { label: 'Smallest Plot', sqYds: 808 },
-                      { label: 'Typical Plot', sqYds: 1300 },
-                      { label: 'Large Plot', sqYds: 2000 },
-                      { label: 'Premium Plot', sqYds: 3000 },
-                      { label: 'Largest Plot', sqYds: 5097 },
-                    ].map((row, i) => {
-                      const totalRs = row.sqYds * sanctuary.pricePerSqYd!;
-                      const display = totalRs >= 1e7 ? `₹${(totalRs / 1e7).toFixed(2)} Cr` : `₹${(totalRs / 1e5).toFixed(1)} L`;
-                      return (
-                        <div key={i} className={cn("grid grid-cols-3 px-4 py-3.5 text-[10px]", i % 2 === 0 ? "bg-on-surface/3" : "bg-transparent")}>
-                          <span className="text-secondary font-medium">{row.label}</span>
-                          <span className="text-center font-bold text-on-surface/70">{row.sqYds.toLocaleString('en-IN')} sq yds</span>
-                          <span className="text-right font-bold text-primary">{display}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* Early investor ROI */}
-              {sanctuary.id === 'agartha' && (
-                <div>
-                  <p className="text-[9px] uppercase tracking-[0.5em] text-secondary/60 font-bold mb-3">Early Investor Returns</p>
-                  <div className="rounded-2xl border border-outline/10 bg-on-surface/3 p-5 space-y-4">
-                    <div className="grid grid-cols-2 gap-3">
-                      {[
-                        { label: 'Pre-Launch Rate (2022)', val: `₹${AGARTHA_OLD_RATE.toLocaleString('en-IN')}/sq yd`, color: 'text-white/60' },
-                        { label: 'Current Rate (2024)', val: `₹${AGARTHA_NOW_RATE.toLocaleString('en-IN')}/sq yd`, color: 'text-primary' },
-                      ].map(r => (
-                        <div key={r.label} className="bg-white/4 rounded-xl p-3 text-center border border-white/5">
-                          <p className="text-[7px] uppercase tracking-wider text-white/30 font-bold mb-1">{r.label}</p>
-                          <p className={cn("text-sm font-bold", r.color)}>{r.val}</p>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="bg-primary/10 rounded-xl p-4 flex items-center justify-between border border-primary/20">
-                      <div>
-                        <p className="text-[8px] uppercase tracking-widest text-primary/60 font-bold">Appreciation (2 years)</p>
-                        <p className="text-2xl font-headline font-bold text-primary mt-0.5">
-                          +{(((AGARTHA_NOW_RATE - AGARTHA_OLD_RATE) / AGARTHA_OLD_RATE) * 100).toFixed(1)}%
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-[8px] uppercase tracking-widest text-primary/40 font-bold">Per Annum</p>
-                        <p className="text-lg font-headline font-bold text-primary/80">
-                          +{((((AGARTHA_NOW_RATE - AGARTHA_OLD_RATE) / AGARTHA_OLD_RATE) * 100) / 2).toFixed(1)}% p.a.
-                        </p>
-                      </div>
-                    </div>
-                    <p className="text-[10px] text-white/30 leading-relaxed">
-                      An investor who booked at pre-launch in 2022 has seen paper gains purely through land value appreciation - without any development or rental income. Today's buyers sit at the same inflection point for the next cycle.
-                    </p>
-                  </div>
-                </div>
-              )}
-
-
-            </motion.div>
-          )}
-
-        </AnimatePresence>
-      </div>
-
-      {/* ── STICKY BOTTOM CTA ────────────────────────────────────────── */}
-      <div className="flex-shrink-0 px-6 py-4 bg-surface border-t border-outline/10 flex gap-3">
-
-        {(sanctuary.mapUrl || sanctuary.brochureUrl) && (
-          <a
-            href={sanctuary.mapUrl || sanctuary.brochureUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            title="Navigate to Property"
-            className="py-3.5 px-5 border border-outline/20 text-secondary text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl hover:bg-on-surface/5 transition-all flex items-center gap-2"
-          >
-            <Navigation className="w-4 h-4" />
-          </a>
+            )}
+          </div>
+          </div>
         )}
+
+        {/* ── INVEST TAB ── */}
+        {pdTab === 'invest' && (
+          <div className="px-6 py-6 space-y-6">
+
+            {/* Key stats row */}
+            <div className="grid grid-cols-3 divide-x divide-outline/10 rounded-2xl border border-outline/10 overflow-hidden">
+              <div className="px-3 py-4 text-center">
+                <p className="text-[8px] uppercase tracking-widest text-secondary/50 mb-1">AQI</p>
+                <p className="text-lg font-bold text-primary">{sanctuary.aqi}</p>
+                <p className="text-[9px] text-secondary/50">Pure Air</p>
+              </div>
+              <div className="px-3 py-4 text-center">
+                <p className="text-[8px] uppercase tracking-widest text-secondary/50 mb-1">Noise</p>
+                <p className="text-lg font-bold text-on-surface">{sanctuary.noise} dB</p>
+                <p className="text-[9px] text-secondary/50">Near Silent</p>
+              </div>
+              <div className="px-3 py-4 text-center">
+                <p className="text-[8px] uppercase tracking-widest text-secondary/50 mb-1">Commute</p>
+                <p className="text-lg font-bold text-on-surface">{commuteTime}m</p>
+                <p className="text-[9px] text-secondary/50">{commuteShort}</p>
+              </div>
+            </div>
+
+            {/* Price breakdown table */}
+            {sanctuary.pricePerSqYd && (
+              <div>
+                <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold mb-4">
+                  Price Calculator — ₹{sanctuary.pricePerSqYd.toLocaleString('en-IN')}/sq yd
+                </p>
+                <div className="rounded-2xl overflow-hidden border border-outline/10">
+                  {[
+                    { label: 'Plot 01 (Smallest)', sqYds: 808 },
+                    { label: 'Typical Plot', sqYds: 1300 },
+                    { label: 'Large Plot', sqYds: 2000 },
+                    { label: 'Premium Plot', sqYds: 3000 },
+                    { label: 'Plot 15 (Largest)', sqYds: 5097 },
+                  ].map((row, i) => {
+                    const totalRs = row.sqYds * sanctuary.pricePerSqYd!;
+                    const display = totalRs >= 1e7 ? `₹${(totalRs / 1e7).toFixed(2)} Cr` : `₹${(totalRs / 1e5).toFixed(1)} L`;
+                    return (
+                      <div key={i} className={cn("grid grid-cols-3 px-4 py-3 text-[10px]", i % 2 === 0 ? "bg-primary/3" : "bg-transparent")}>
+                        <span className="text-secondary/60 font-medium">{row.label}</span>
+                        <span className="text-center font-bold text-on-surface">{row.sqYds.toLocaleString('en-IN')} sq yds</span>
+                        <span className="text-right font-bold text-primary">{display}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+                <p className="text-[8px] text-secondary/40 mt-2">Rate: ₹{sanctuary.pricePerSqYd.toLocaleString('en-IN')}/sq yd</p>
+              </div>
+            )}
+
+            {/* Lead capture */}
+            <div className="space-y-4 pb-4">
+              <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold">Reserve Your Interest</p>
+              {leadSubmitted ? (
+                <div className="p-6 rounded-2xl bg-primary/5 border border-primary/10 text-center space-y-2">
+                  <div className="w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center mx-auto">
+                    <Check className="w-5 h-5 text-primary" />
+                  </div>
+                  <p className="text-sm font-bold text-on-surface">We'll be in touch soon.</p>
+                  <p className="text-[11px] text-secondary/50">Our team will reach out within 24 hours.</p>
+                </div>
+              ) : (
+                <form onSubmit={handleLeadSubmit} className="space-y-3">
+                  <input type="text" placeholder="Your Name" value={leadName}
+                    onChange={e => setLeadName(e.target.value)}
+                    className="w-full bg-surface-container-low border border-outline/15 rounded-xl px-4 py-3.5 text-sm text-on-surface placeholder-secondary/30 focus:outline-none focus:border-primary/50 transition-colors" />
+                  <input type="tel" placeholder="Phone Number" value={leadPhone}
+                    onChange={e => setLeadPhone(e.target.value)}
+                    className="w-full bg-surface-container-low border border-outline/15 rounded-xl px-4 py-3.5 text-sm text-on-surface placeholder-secondary/30 focus:outline-none focus:border-primary/50 transition-colors" />
+                  <button type="submit" disabled={leadLoading || !leadName.trim() || !leadPhone.trim()}
+                    className="w-full py-4 bg-primary text-on-primary text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all flex items-center justify-center gap-3 disabled:opacity-50">
+                    <ArrowRight className="w-4 h-4" />
+                    {leadLoading ? 'Sending…' : 'Request Site Visit'}
+                  </button>
+                  {leadError && (
+                    <p className="text-[10px] text-red-500 text-center pt-1">{leadError}</p>
+                  )}
+                </form>
+              )}
+              {sanctuary.brochureUrl && (
+                <a href={sanctuary.brochureUrl} target="_blank" rel="noopener noreferrer"
+                  className="w-full py-3.5 border border-outline/20 text-on-surface text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl hover:bg-primary/5 transition-all flex items-center justify-center gap-3">
+                  <ArrowRight className="w-4 h-4" />
+                  View Full Brochure
+                </a>
+              )}
+            </div>
+          </div>
+        )}
+
       </div>
+
+      {/* ── Timed newsletter prompt (slides up after 25s) ── */}
+      <AnimatePresence>
+        {showNewsletterPrompt && !nlDone && (
+          <motion.div
+            initial={{ y: '100%', opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: '100%', opacity: 0 }}
+            transition={{ type: 'spring', damping: 28, stiffness: 220 }}
+            className="absolute bottom-0 left-0 right-0 bg-[#0a0f07] border-t border-primary/20 px-6 py-5 z-10"
+          >
+            <button onClick={() => setShowNewsletterPrompt(false)}
+              className="absolute top-3 right-4 p-1 text-white/30 hover:text-white/60 transition-colors">
+              <X className="w-4 h-4" />
+            </button>
+            <p className="text-[8px] uppercase tracking-[0.5em] text-primary/60 font-bold mb-1">Still exploring?</p>
+            <p className="text-sm font-headline font-bold text-white mb-3">
+              Get exclusive {sanctuary.title} updates — pricing alerts, site visit slots &amp; VIP access.
+            </p>
+            <form onSubmit={handleNlSubmit} className="flex gap-2">
+              <input
+                type="email" placeholder="your@email.com" value={nlEmail}
+                onChange={e => setNlEmail(e.target.value)}
+                className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-primary/50 transition-colors"
+              />
+              <button type="submit" disabled={nlLoading || !nlEmail.trim()}
+                className="px-4 py-2.5 bg-primary text-on-primary text-[9px] uppercase tracking-widest font-bold rounded-xl hover:bg-primary/90 transition-all disabled:opacity-50 flex-shrink-0">
+                {nlLoading ? '…' : 'Notify Me'}
+              </button>
+            </form>
+          </motion.div>
+        )}
+        {nlDone && showNewsletterPrompt && (
+          <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
+            transition={{ type: 'spring', damping: 28, stiffness: 220 }}
+            className="absolute bottom-0 left-0 right-0 bg-[#0a0f07] border-t border-primary/20 px-6 py-5 z-10 flex items-center gap-3">
+            <Check className="w-5 h-5 text-primary flex-shrink-0" />
+            <div>
+              <p className="text-sm font-bold text-white">You're on the list.</p>
+              <p className="text-[10px] text-white/40">We'll reach out within 24 hours.</p>
+            </div>
+            <button onClick={() => setShowNewsletterPrompt(false)} className="ml-auto text-white/30 hover:text-white/60">
+              <X className="w-4 h-4" />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };
@@ -3682,7 +3654,7 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
   );
 };
 
-const Sanctuaries = ({ isSubscribed, onNewsletterClick, isFullPage = false, sanctuaries = SANCTUARIES, onOpen }: { isSubscribed: boolean, onNewsletterClick: () => void, isFullPage?: boolean, sanctuaries?: Sanctuary[], onOpen?: (s: Sanctuary) => void }) => {
+const Sanctuaries = ({ isSubscribed, onNewsletterClick, isFullPage = false, sanctuaries = SANCTUARIES }: { isSubscribed: boolean, onNewsletterClick: () => void, isFullPage?: boolean, sanctuaries?: Sanctuary[] }) => {
   const [selectedSanctuary, setSelectedSanctuary] = useState<Sanctuary | null>(null);
 
 
@@ -3716,23 +3688,20 @@ const Sanctuaries = ({ isSubscribed, onNewsletterClick, isFullPage = false, sanc
       </div>
 
       {/* Property detail overlay */}
-      {createPortal(
-        <AnimatePresence>
-          {selectedSanctuary && (
-            <div key="property-overlay" className="fixed inset-0 z-[10000] overflow-hidden">
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setSelectedSanctuary(null)}
-                className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-              />
-              <PropertyDetailOverlay sanctuary={selectedSanctuary} onClose={() => setSelectedSanctuary(null)} isSubscribed={isSubscribed} onNewsletterSignup={onNewsletterClick} />
-            </div>
-          )}
-        </AnimatePresence>,
-        document.body
-      )}
+      <AnimatePresence>
+        {selectedSanctuary && (
+          <div className="fixed inset-0 z-[80] overflow-hidden">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedSanctuary(null)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            />
+            <PropertyDetailOverlay sanctuary={selectedSanctuary} onClose={() => setSelectedSanctuary(null)} isSubscribed={isSubscribed} onNewsletterSignup={onNewsletterClick} />
+          </div>
+        )}
+      </AnimatePresence>
     </section>
   );
 };
@@ -3746,7 +3715,7 @@ const Membership = () => {
         </svg>
       ),
       title: "Limited Collective",
-      desc: "A deliberately reserved investor circle - no public roster, no published count. Exclusivity is our core mandate."
+      desc: "A deliberately reserved investor circle — no public roster, no published count. Exclusivity is our core mandate."
     },
     {
       icon: (
@@ -3758,7 +3727,7 @@ const Membership = () => {
         </svg>
       ),
       title: "Project Scarcity",
-      desc: "A finite number of seats per project, never disclosed publicly. Early entry is not just an advantage - it's a prerequisite."
+      desc: "A finite number of seats per project, never disclosed publicly. Early entry is not just an advantage — it's a prerequisite."
     },
     {
       icon: (
@@ -3785,7 +3754,7 @@ const Membership = () => {
             </p>
             <div className="p-8 border border-gold/20 bg-gold/5 inline-block">
               <p className="text-gold text-[10px] uppercase tracking-[0.4em] font-bold mb-2">Current Capacity</p>
-              <p className="text-3xl font-serif italic">A Reserved Investor Circle - By Invitation Only</p>
+              <p className="text-3xl font-serif italic">A Reserved Investor Circle — By Invitation Only</p>
             </div>
           </div>
           
@@ -3871,16 +3840,17 @@ const NewsletterModal = ({ isOpen, onClose, onSubscribe }: { isOpen: boolean, on
 };
 
 const INVESTMENT_BRACKETS = [
-  '₹50 L - ₹1 Cr',
-  '₹1 Cr - ₹2 Cr',
-  '₹2 Cr - ₹5 Cr',
+  '₹50 L – ₹1 Cr',
+  '₹1 Cr – ₹2 Cr',
+  '₹2 Cr – ₹5 Cr',
   '₹5 Cr+',
   'Prefer not to say',
 ];
 
-const ApplicationForm = ({ isLoggedIn = false, onNewsletterClick }: { isLoggedIn?: boolean, onNewsletterClick?: () => void }) => {
+const ApplicationForm = () => {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [form, setForm] = useState({
     name: '', email: '', phone: '',
     company: '', designation: '', investmentBracket: '',
@@ -3894,22 +3864,21 @@ const ApplicationForm = ({ isLoggedIn = false, onNewsletterClick }: { isLoggedIn
     if (!form.name || !form.email || !form.phone) return;
     setLoading(true);
     try {
-      // Save as premium lead with full profile
       await saveLead({
         name: form.name,
         email: form.email,
-        phone: form.phone,
         intent: [
           form.designation && `${form.designation}${form.company ? ' at ' + form.company : ''}`,
           form.investmentBracket && `Budget: ${form.investmentBracket}`,
           form.intent,
         ].filter(Boolean).join(' | '),
-        source: 'adviser_call'
       });
-      // Auto-subscribe to newsletter - membership includes intelligence briefings
       await saveNewsletter(form.email, 'modal');
       setSubmitted(true);
-    } catch {/* silent */} finally {
+    } catch (err) {
+      console.error('[ApplicationForm] Lead save failed:', err);
+      setSubmitError('Submission failed — please check your connection and try again.');
+    } finally {
       setLoading(false);
     }
   };
@@ -3918,131 +3887,192 @@ const ApplicationForm = ({ isLoggedIn = false, onNewsletterClick }: { isLoggedIn
   const labelCls = "block text-[8px] uppercase tracking-[0.5em] text-olive-800/40 font-bold mb-1";
 
   return (
-    <section id="apply" className="py-24 px-6 md:px-24 bg-[#f7f3ec]">
-      <div className="max-w-6xl mx-auto">
-        <div className="grid lg:grid-cols-5 gap-16 items-start">
+    <section id="apply" className="relative bg-olive-900 overflow-hidden">
 
-          {/* Left - copy */}
-          <div className="lg:col-span-2">
-            <span className="text-[9px] uppercase tracking-[0.6em] text-olive-800/70 font-bold block mb-8">Private Membership</span>
-            <h2 className="text-5xl md:text-6xl font-medium text-olive-900 leading-tight mb-8">
-              Apply for<br /><span className="italic text-olive-800">Adviser Access.</span>
+      {/* Background texture — subtle organic pattern */}
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none">
+        <svg width="100%" height="100%"><defs><pattern id="grain" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r="1" fill="white"/><circle cx="5" cy="5" r="0.5" fill="white"/><circle cx="35" cy="35" r="0.5" fill="white"/><circle cx="5" cy="35" r="0.7" fill="white"/><circle cx="35" cy="5" r="0.7" fill="white"/></pattern></defs><rect width="100%" height="100%" fill="url(#grain)"/></svg>
+      </div>
+
+      {/* Gold accent line top */}
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#c8a951]/60 to-transparent" />
+
+      <div className="relative max-w-7xl mx-auto px-6 md:px-24 py-28 md:py-36">
+        <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-start">
+
+          {/* ── Left — editorial copy ── */}
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.9, ease: 'easeOut' }}
+            className="lg:sticky lg:top-24"
+          >
+            <div className="flex items-center gap-4 mb-10">
+              <div className="w-8 h-px bg-[#c8a951]/60" />
+              <span className="text-[#c8a951] text-[9px] font-bold uppercase tracking-[0.6em]">Reserved Investor Circle</span>
+            </div>
+
+            <h2 className="text-5xl md:text-6xl lg:text-7xl font-medium text-cream leading-[1.05] mb-10">
+              Request Your<br />
+              <span className="italic text-[#c8a951]">Adviser Call.</span>
             </h2>
-            <p className="text-base font-light text-olive-900/80 leading-relaxed mb-12">
-              {isLoggedIn
-                ? "You are in our circle. Request a private adviser call for upcoming pre-launch sanctuaries and early-entry coordinates."
-                : "We curate India's most exclusive pre-launch sanctuaries for a reserved investor circle. Our adviser will personally reach out within 24 hours."}
+
+            <p className="text-lg font-light text-cream/40 leading-relaxed mb-14 max-w-md">
+              Our adviser reviews every application personally. If your profile aligns with our collective, you'll receive a private call within 24 hours.
             </p>
-            <div className="space-y-6 border-t border-olive-800/10 pt-8">
+
+            {/* What you get */}
+            <div className="space-y-0 border border-cream/10 divide-y divide-cream/10">
               {[
-                { label: 'Personal Call', desc: 'Your adviser contacts you within 24hrs' },
-                { label: 'Pre-Launch Pricing', desc: 'Access before public announcement' },
-                { label: 'Monthly Briefings', desc: 'Auto-enrolled in our intelligence network' },
-              ].map(i => (
-                <div key={i.label} className="flex gap-4">
-                  <div className="w-1.5 h-1.5 rounded-full bg-olive-800/70 mt-2 flex-shrink-0" />
+                { num: '01', title: 'Personal Adviser Call', desc: 'Direct conversation — no forms, no bots' },
+                { num: '02', title: 'Pre-Launch Entry Price', desc: 'The only price that compounds before the public knows' },
+                { num: '03', title: 'Intelligence Briefings', desc: 'Monthly sanctuary reports, auto-enrolled' },
+              ].map(item => (
+                <div key={item.num} className="flex gap-6 p-6 group hover:bg-cream/[0.03] transition-colors">
+                  <span className="text-[#c8a951]/40 text-xs font-bold font-mono mt-1 flex-shrink-0">{item.num}</span>
                   <div>
-                    <p className="text-sm font-bold text-olive-900">{i.label}</p>
-                    <p className="text-xs text-olive-800/70 mt-0.5">{i.desc}</p>
+                    <p className="text-cream/90 text-sm font-semibold mb-1">{item.title}</p>
+                    <p className="text-cream/30 text-xs font-light leading-relaxed">{item.desc}</p>
                   </div>
                 </div>
               ))}
             </div>
-            {!isLoggedIn && onNewsletterClick && (
-              <p className="text-[9px] text-olive-800/30 uppercase tracking-widest mt-8 leading-relaxed">
-                Not ready yet?{' '}
-                <button onClick={onNewsletterClick} className="underline hover:text-olive-800/60 transition-colors">Join our newsletter</button>{' '}
-                for monthly sanctuary briefings.
-              </p>
-            )}
-          </div>
 
-          {/* Right - form */}
-          <div className="lg:col-span-3">
+            <p className="text-[9px] text-cream/15 uppercase tracking-widest mt-8 leading-relaxed">
+              Submission auto-enrolls your email in our monthly intelligence newsletter.
+            </p>
+          </motion.div>
+
+          {/* ── Right — floating form card ── */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.9, ease: 'easeOut', delay: 0.15 }}
+          >
             {submitted ? (
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-olive-900 text-cream p-16 text-center"
+                initial={{ opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="bg-[#c8a951]/10 border border-[#c8a951]/30 p-16 md:p-20 text-center"
               >
-                <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-8">
-                  <Check className="w-8 h-8 text-primary" />
+                <div className="w-20 h-20 rounded-full border border-[#c8a951]/40 flex items-center justify-center mx-auto mb-10">
+                  <Check className="w-9 h-9 text-[#c8a951]" />
                 </div>
-                <h3 className="text-3xl font-serif italic mb-4">Application Received.</h3>
-                <p className="text-cream/50 font-light leading-relaxed max-w-sm mx-auto">
-                  Our adviser will contact you within 24 hours for a private briefing. You're also now part of our monthly intelligence network.
+                <p className="text-[9px] uppercase tracking-[0.6em] text-[#c8a951]/60 font-bold mb-4">Application Logged</p>
+                <h3 className="text-3xl md:text-4xl font-serif italic text-cream mb-6">We'll be in touch.</h3>
+                <p className="text-cream/40 font-light leading-relaxed max-w-xs mx-auto text-sm">
+                  Your adviser will reach out personally within 24 hours. You're now part of our monthly intelligence network.
                 </p>
               </motion.div>
             ) : (
-              <form onSubmit={handleSubmit} className="bg-white p-10 md:p-14 shadow-xl border border-olive-800/5 space-y-8">
-                <div className="grid grid-cols-2 gap-8">
+              <form onSubmit={handleSubmit} className="bg-[#f5f0e8] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.5)]">
+
+                {/* Form header strip */}
+                <div className="bg-olive-800 px-10 py-7 flex items-center justify-between">
                   <div>
-                    <label htmlFor="m-name" className={labelCls}>Full Name *</label>
-                    <input id="m-name" name="name" value={form.name} onChange={e => set('name', e.target.value)} required className={inputCls} placeholder="Your full name" />
+                    <p className="text-[8px] uppercase tracking-[0.5em] text-cream/40 font-bold">Private Application</p>
+                    <p className="text-cream text-sm font-semibold mt-0.5">Adviser Membership · The Green Team</p>
                   </div>
+                  <div className="w-8 h-8 rounded-full bg-[#c8a951]/20 border border-[#c8a951]/30 flex items-center justify-center flex-shrink-0">
+                    <ShieldCheck className="w-4 h-4 text-[#c8a951]" />
+                  </div>
+                </div>
+
+                <div className="p-10 md:p-12 space-y-9">
+
+                  {/* Row 1 */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                    <div className="group">
+                      <label htmlFor="m-name" className="block text-[8px] uppercase tracking-[0.5em] text-olive-800/40 font-bold mb-2">Full Name *</label>
+                      <input id="m-name" name="name" value={form.name} onChange={e => set('name', e.target.value)} required
+                        className="w-full bg-transparent border-b-2 border-olive-800/15 focus:border-olive-900 py-3 text-olive-900 text-sm font-medium placeholder:text-olive-800/20 focus:outline-none transition-colors"
+                        placeholder="Your full name" />
+                    </div>
+                    <div className="group">
+                      <label htmlFor="m-phone" className="block text-[8px] uppercase tracking-[0.5em] text-olive-800/40 font-bold mb-2">Mobile *</label>
+                      <input id="m-phone" name="phone" type="tel" value={form.phone} onChange={e => set('phone', e.target.value)} required
+                        className="w-full bg-transparent border-b-2 border-olive-800/15 focus:border-olive-900 py-3 text-olive-900 text-sm font-medium placeholder:text-olive-800/20 focus:outline-none transition-colors"
+                        placeholder="+91 98765 43210" />
+                    </div>
+                  </div>
+
+                  {/* Row 2 */}
                   <div>
-                    <label htmlFor="m-phone" className={labelCls}>Phone for Adviser *</label>
-                    <input id="m-phone" name="phone" type="tel" value={form.phone} onChange={e => set('phone', e.target.value)} required className={inputCls} placeholder="+91 98765 43210" />
+                    <label htmlFor="m-email" className="block text-[8px] uppercase tracking-[0.5em] text-olive-800/40 font-bold mb-2">Private Email *</label>
+                    <input id="m-email" name="email" type="email" value={form.email} onChange={e => set('email', e.target.value)} required
+                      className="w-full bg-transparent border-b-2 border-olive-800/15 focus:border-olive-900 py-3 text-olive-900 text-sm font-medium placeholder:text-olive-800/20 focus:outline-none transition-colors"
+                      placeholder="email@company.com" />
                   </div>
-                </div>
 
-                <div>
-                  <label htmlFor="m-email" className={labelCls}>Private Email *</label>
-                  <input id="m-email" name="email" type="email" value={form.email} onChange={e => set('email', e.target.value)} required className={inputCls} placeholder="email@company.com" />
-                </div>
+                  {/* Row 3 */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                    <div>
+                      <label htmlFor="m-designation" className="block text-[8px] uppercase tracking-[0.5em] text-olive-800/40 font-bold mb-2">Designation</label>
+                      <input id="m-designation" name="designation" value={form.designation} onChange={e => set('designation', e.target.value)}
+                        className="w-full bg-transparent border-b-2 border-olive-800/15 focus:border-olive-900 py-3 text-olive-900 text-sm font-medium placeholder:text-olive-800/20 focus:outline-none transition-colors"
+                        placeholder="Founder, Director…" />
+                    </div>
+                    <div>
+                      <label htmlFor="m-company" className="block text-[8px] uppercase tracking-[0.5em] text-olive-800/40 font-bold mb-2">Company / Venture</label>
+                      <input id="m-company" name="company" value={form.company} onChange={e => set('company', e.target.value)}
+                        className="w-full bg-transparent border-b-2 border-olive-800/15 focus:border-olive-900 py-3 text-olive-900 text-sm font-medium placeholder:text-olive-800/20 focus:outline-none transition-colors"
+                        placeholder="Your organisation" />
+                    </div>
+                  </div>
 
-                <div className="grid grid-cols-2 gap-8">
+                  {/* Investment appetite */}
                   <div>
-                    <label htmlFor="m-designation" className={labelCls}>Designation / Role</label>
-                    <input id="m-designation" name="designation" value={form.designation} onChange={e => set('designation', e.target.value)} className={inputCls} placeholder="e.g. Founder, Director" />
+                    <label className="block text-[8px] uppercase tracking-[0.5em] text-olive-800/40 font-bold mb-4">Investment Appetite</label>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {INVESTMENT_BRACKETS.map(b => (
+                        <button key={b} type="button" onClick={() => set('investmentBracket', b)}
+                          className={cn(
+                            "py-3 px-3 text-[9px] uppercase tracking-widest font-bold border-2 transition-all text-center leading-tight",
+                            form.investmentBracket === b
+                              ? "bg-olive-900 text-[#c8a951] border-olive-900 shadow-lg"
+                              : "bg-transparent border-olive-800/15 text-olive-800/40 hover:border-olive-800/40 hover:text-olive-900"
+                          )}>
+                          {b}
+                        </button>
+                      ))}
+                    </div>
                   </div>
+
+                  {/* Intent */}
                   <div>
-                    <label htmlFor="m-company" className={labelCls}>Company / Venture</label>
-                    <input id="m-company" name="company" value={form.company} onChange={e => set('company', e.target.value)} className={inputCls} placeholder="Your organisation" />
+                    <label htmlFor="m-intent" className="block text-[8px] uppercase tracking-[0.5em] text-olive-800/40 font-bold mb-2">What draws you here? <span className="normal-case tracking-normal font-normal opacity-60">(optional)</span></label>
+                    <textarea id="m-intent" name="intent" value={form.intent} onChange={e => set('intent', e.target.value)} rows={3}
+                      className="w-full bg-olive-800/5 border border-olive-800/10 px-5 py-4 text-olive-900 text-sm font-light placeholder:text-olive-800/20 focus:outline-none focus:border-olive-800/30 transition-colors resize-none"
+                      placeholder="What draws you to pre-launch sanctuary investing?" />
+                  </div>
+
+                  {/* Submit */}
+                  <div className="pt-2">
+                    <button type="submit" disabled={loading}
+                      className="w-full py-5 bg-olive-900 text-cream text-[10px] uppercase tracking-[0.6em] font-bold hover:bg-[#c8a951] hover:text-olive-900 transition-all duration-300 flex items-center justify-center gap-4 disabled:opacity-50 group">
+                      {loading
+                        ? <><RefreshCw className="w-4 h-4 animate-spin" /> Submitting…</>
+                        : <><span>Request Adviser Call</span><ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></>
+                      }
+                    </button>
+                    {submitError && (
+                      <p className="text-[10px] text-red-500 text-center mt-3">{submitError}</p>
+                    )}
+                    <p className="text-[8px] text-center text-olive-800/25 uppercase tracking-widest mt-4">
+                      Your details are private · Auto-enrolled in monthly intelligence briefings
+                    </p>
                   </div>
                 </div>
-
-                <div>
-                  <label className={labelCls}>Investment Appetite</label>
-                  <div className="flex flex-wrap gap-2 pt-1">
-                    {INVESTMENT_BRACKETS.map(b => (
-                      <button
-                        key={b} type="button"
-                        onClick={() => set('investmentBracket', b)}
-                        className={cn(
-                          "px-3 py-1.5 text-[9px] uppercase tracking-widest font-bold border transition-all rounded-lg",
-                          form.investmentBracket === b
-                            ? "bg-olive-900 text-cream border-olive-900"
-                            : "border-olive-800/40 text-olive-800/70 hover:border-olive-800/80"
-                        )}
-                      >{b}</button>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="m-intent" className={labelCls}>Why do you seek this?</label>
-                  <textarea id="m-intent" name="intent" value={form.intent} onChange={e => set('intent', e.target.value)} rows={3}
-                    className={cn(inputCls, "resize-none border-b-0 border border-olive-800/20 px-4 py-3 rounded-lg mt-1")}
-                    placeholder="Optional - what draws you to pre-launch sanctuary investing?" />
-                </div>
-
-                <button type="submit" disabled={loading}
-                  className="w-full py-5 bg-olive-900 text-cream text-[10px] uppercase tracking-[0.5em] font-bold hover:bg-primary transition-all flex items-center justify-center gap-4 disabled:opacity-60">
-                  {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <ArrowRight className="w-4 h-4" />}
-                  {loading ? 'Submitting ' : 'Request Adviser Call'}
-                </button>
-
-                {!isLoggedIn && (
-                  <p className="text-[9px] text-center text-olive-800/50 uppercase tracking-widest">
-                    Submitting enrolls you in our monthly intelligence newsletter
-                  </p>
-                )}
               </form>
             )}
-          </div>
+          </motion.div>
         </div>
       </div>
+
+      {/* Gold accent line bottom */}
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#c8a951]/40 to-transparent" />
     </section>
   );
 };
@@ -4051,10 +4081,10 @@ const Footer = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
   const agenda = [
     { label: 'The Intelligence Gap', sub: 'Why early entry wins', mode: 'analytics' },
     { label: 'Living Ecosystems', sub: 'Nature-first design philosophy', mode: 'gallery' },
-    { label: 'Sanctuary Map', sub: 'Environmental heatmap  AQI  Noise', mode: 'map' },
-    { label: 'MODCON Agartha', sub: 'Narsapur Forest  Open access', mode: 'list' },
-
-    { label: 'Adviser Membership', sub: 'Reserved investor circle  By invitation', mode: 'membership' },
+    { label: 'Sanctuary Map', sub: 'Environmental heatmap · AQI · Noise', mode: 'map' },
+    { label: 'MODCON Agartha', sub: 'Narsapur Forest · Open access', mode: 'list' },
+    { label: 'SYL Villament', sub: 'Tukkuguda · Newsletter only', mode: 'syl' },
+    { label: 'Adviser Membership', sub: 'Reserved investor circle · By invitation', mode: 'membership' },
   ];
 
   return (
@@ -4065,7 +4095,7 @@ const Footer = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
         <div className="border-b border-cream/8 pb-16 mb-16 flex flex-col md:flex-row md:items-end justify-between gap-10">
           <div>
             <Logo className="w-10 h-10 text-cream mb-6" />
-            <p className="text-2xl md:text-3xl font-light text-cream/90 max-w-xl leading-relaxed">
+            <p className="text-2xl md:text-3xl font-light text-cream/30 max-w-xl leading-relaxed">
               Curating India's most exclusive pre-launch sanctuaries for a private circle of intelligent investors.
             </p>
           </div>
@@ -4096,8 +4126,8 @@ const Footer = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
 
         {/* Bottom bar */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-[9px] uppercase tracking-[0.5em] text-cream/50 font-bold">
-            © {new Date().getFullYear()} The Green Team  Independent Sanctuary Curators  Hyderabad
+          <p className="text-[9px] uppercase tracking-[0.5em] text-cream/15 font-bold">
+            © {new Date().getFullYear()} The Green Team · Independent Sanctuary Curators · Hyderabad
           </p>
           <div className="flex items-center gap-8">
             <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-cream/20 hover:text-cream transition-all">
@@ -4168,7 +4198,7 @@ const TrustSignals = () => {
             </div>
             <div className="text-left">
               <p className="font-bold text-olive-900 text-sm uppercase tracking-wider">Kushal</p>
-              <p className="text-[10px] text-olive-800/60 uppercase tracking-widest font-bold">Lead Developer, BHEL  Early Member, Agartha</p>
+              <p className="text-[10px] text-olive-800/60 uppercase tracking-widest font-bold">Lead Developer, BHEL · Early Member, Agartha</p>
             </div>
           </div>
         </motion.div>
@@ -4229,7 +4259,7 @@ const NewsletterHighlight = ({ onSubscribe }: { onSubscribe: () => void }) => {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     className="w-full bg-transparent border-b border-white/20 py-6 outline-none focus:border-gold transition-all font-light text-2xl text-cream placeholder:text-on-surface/10"
-                    placeholder="email@domain.com" 
+                    placeholder="email@domain.com"
                   />
                 </div>
                 <button 
@@ -4466,80 +4496,21 @@ Additional live context (user data): ${JSON.stringify({ user: data.user?.display
   );
 };
 
-const HomeView = ({ isSubscribed, onNewsletterClick, sanctuaries = SANCTUARIES, onModeChange, onPropertyClick, isLoggedIn = false }: { isSubscribed: boolean, onNewsletterClick: () => void, sanctuaries?: Sanctuary[], onModeChange: (mode: string) => void, onPropertyClick: (s: Sanctuary) => void, isLoggedIn?: boolean }) => (
+const HomeView = ({ isSubscribed, onNewsletterClick, sanctuaries = SANCTUARIES, onModeChange }: { isSubscribed: boolean, onNewsletterClick: () => void, sanctuaries?: Sanctuary[], onModeChange: (mode: string) => void }) => (
   <div className="flex flex-col">
-    <Hero onModeChange={onModeChange} isLoggedIn={isLoggedIn} onNewsletterClick={onNewsletterClick} onAdvisorClick={() => { const el = document.getElementById('apply'); if (el) el.scrollIntoView({ behavior: 'smooth' }); }} />
-    <Sanctuaries isSubscribed={isSubscribed} onNewsletterClick={onNewsletterClick} sanctuaries={sanctuaries} onOpen={onPropertyClick} />
+    <Hero onModeChange={onModeChange} />
     <Advantage />
     <EcosystemPillars />
+    <Sanctuaries isSubscribed={isSubscribed} onNewsletterClick={onNewsletterClick} sanctuaries={sanctuaries} />
+    {isSubscribed && <TheSIL isSubscribed={isSubscribed} onNewsletterClick={onNewsletterClick} />}
     <TrustSignals />
-    <ApplicationForm isLoggedIn={isLoggedIn} onNewsletterClick={onNewsletterClick} />
+    <NewsletterHighlight onSubscribe={onNewsletterClick} />
+    <ApplicationForm />
     <Footer onModeChange={onModeChange} />
   </div>
 );
 
-
-const MobileQuickCapture = ({ onCaptured }: { onCaptured: () => void }) => {
-  const [phone, setPhone] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [done, setDone] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (phone.length < 10) return;
-    setLoading(true);
-    try {
-      await saveLead({
-        name: "Express Mobile Lead",
-        email: "pending@express.lead",
-        phone: phone,
-        intent: "Quick Mobile Capture CTA (No Login)"
-      });
-      setDone(true);
-      setTimeout(() => onCaptured(), 3000);
-    } catch {
-      // silent
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (done) {
-    return (
-      <div className="fixed bottom-0 left-0 right-0 z-[5000] bg-olive-900 text-cream p-4 flex items-center justify-center gap-3 shadow-[0_-10px_30px_rgba(0,0,0,0.5)] border-t border-gold/30 safe-area-bottom">
-        <Check className="w-5 h-5 text-gold" />
-        <span className="text-[10px] uppercase font-bold tracking-widest text-gold">Adviser Notified</span>
-      </div>
-    );
-  }
-
-  return (
-    <div className="fixed bottom-0 left-0 right-0 z-[5000] bg-surface/90 backdrop-blur-xl border-t border-outline/10 p-4 shadow-[0_-10px_30px_rgba(0,0,0,0.1)] md:hidden safe-area-bottom">
-      <form onSubmit={handleSubmit} className="flex items-center gap-3 max-w-md mx-auto">
-        <div className="flex-1 relative">
-          <input 
-            type="tel"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder="Enter mobile for VIP Access"
-            className="w-full bg-on-surface/5 border border-outline/20 rounded-full py-3 px-5 text-sm font-medium text-on-surface outline-none focus:border-olive-900 transition-colors"
-            required
-            pattern="[0-9+ ]{10,15}"
-          />
-        </div>
-        <button 
-          type="submit"
-          disabled={loading || phone.length < 10}
-          className="flex-shrink-0 w-12 h-12 bg-olive-900 text-cream rounded-full flex items-center justify-center shadow-lg disabled:opacity-50 transition-all hover:bg-gold"
-        >
-          {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <ArrowRight className="w-5 h-5" />}
-        </button>
-      </form>
-    </div>
-  );
-};
-
-// ──  Auth helpers ────────────────────────────────────────────────────────────" 
+// ─── Auth helpers ─────────────────────────────────────────────────────────────
 
 const friendlyAuthError = (code: string) => {
   const map: Record<string, string> = {
@@ -4557,7 +4528,7 @@ const friendlyAuthError = (code: string) => {
   return map[code] || 'Something went wrong. Please try again.';
 };
 
-// ──  Auth Modal ──────────────────────────────────────────────────────────────" 
+// ─── Auth Modal ───────────────────────────────────────────────────────────────
 
 const AuthModal = ({
   isOpen,
@@ -4584,18 +4555,11 @@ const AuthModal = ({
 
   const handleGoogle = async () => {
     setError(''); setLoading('google');
-    if (!auth) {
-      setTimeout(() => {
-        onSuccess({ uid: 'guest', email: 'guest@sanctuary.local', displayName: 'Guest Investor', metadata: {} } as any, true);
-        onClose();
-        setLoading(null);
-      }, 800);
-      return;
-    }
     try {
       const { user, operationType } = await signInWithPopup(auth, googleProvider);
       // isNew if it's a sign-up operation (first time)
-      const isNew = operationType === 'signIn' && !user.metadata.creationTime ? false
+      const isNew = operationType === 'signIn' && !user.metadata.creationTime
+        ? false
         : user.metadata.creationTime === user.metadata.lastSignInTime;
       onSuccess(user, isNew);
       onClose();
@@ -4608,17 +4572,10 @@ const AuthModal = ({
 
   const handleEmail = async (e: React.FormEvent) => {
     e.preventDefault(); setError(''); setLoading('email');
-    if (!auth) {
-      setTimeout(() => {
-        onSuccess({ uid: 'guest_email', email, displayName: email.split('@')[0], metadata: {} } as any, emailMode === 'signup');
-        onClose();
-        setLoading(null);
-      }, 800);
-      return;
-    }
     try {
       const isSignup = emailMode === 'signup';
-      const cred = isSignup ? await createUserWithEmailAndPassword(auth, email, password)
+      const cred = isSignup
+        ? await createUserWithEmailAndPassword(auth, email, password)
         : await signInWithEmailAndPassword(auth, email, password);
       onSuccess(cred.user, isSignup);
       onClose();
@@ -4643,7 +4600,7 @@ const AuthModal = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 60 }}
             transition={{ type: 'spring', damping: 30, stiffness: 240 }}
-            className="relative w-full sm:max-w-md bg-surface sm:rounded-3xl rounded-t-3xl shadow-2xl overflow-hidden"
+            className="relative w-full sm:max-w-md bg-cream sm:rounded-3xl rounded-t-3xl shadow-2xl overflow-hidden"
           >
             {/* Hero strip */}
             <div className="bg-olive-900 px-10 pt-12 pb-10 text-cream text-center">
@@ -4651,17 +4608,18 @@ const AuthModal = ({
                 <Leaf className="w-6 h-6 text-primary" />
               </div>
               <h2 className="text-2xl font-serif italic mb-1">Unlock The Sanctuaries</h2>
-              <p className="text-cream/50 text-xs font-light tracking-wide">Pre-launch access  Exclusive investor pricing</p>
+              <p className="text-cream/50 text-xs font-light tracking-wide">Pre-launch access · Exclusive investor pricing</p>
             </div>
 
             <div className="px-10 py-8 space-y-5">
-              {/* Google - PRIMARY CTA */}
+              {/* Google — PRIMARY CTA */}
               <button
                 onClick={handleGoogle}
                 disabled={!!loading}
                 className="w-full flex items-center justify-center gap-3 py-4 bg-white border border-olive-800/10 rounded-2xl text-olive-900 text-sm font-semibold shadow-sm hover:shadow-md hover:border-olive-800/20 transition-all disabled:opacity-60"
               >
-                {loading === 'google' ? <RefreshCw className="w-5 h-5 animate-spin text-olive-800/40" />
+                {loading === 'google'
+                  ? <RefreshCw className="w-5 h-5 animate-spin text-olive-800/40" />
                   : (
                     <svg className="w-5 h-5" viewBox="0 0 24 24">
                       <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -4671,7 +4629,7 @@ const AuthModal = ({
                     </svg>
                   )
                 }
-                {loading === 'google' ? 'Connecting ' : 'Continue with Google'}
+                {loading === 'google' ? 'Connecting…' : 'Continue with Google'}
               </button>
 
               {/* Divider */}
@@ -4681,7 +4639,7 @@ const AuthModal = ({
                 <div className="flex-1 h-px bg-olive-800/10" />
               </div>
 
-              {/* Email - secondary, expandable */}
+              {/* Email — secondary, expandable */}
               {!emailOpen ? (
                 <button
                   onClick={() => setEmailOpen(true)}
@@ -4706,13 +4664,13 @@ const AuthModal = ({
                     <label htmlFor="auth-password" className="text-[9px] uppercase tracking-[0.4em] text-olive-800/40 font-bold block mb-1.5">Password</label>
                     <input id="auth-password" name="password" type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6}
                       className="w-full bg-surface border border-outline/20 rounded-xl px-4 py-3 text-sm text-on-surface focus:outline-none focus:border-primary/60 transition-colors"
-                      placeholder="       " />
+                      placeholder="••••••••" />
                   </div>
                   {error && <p className="text-red-500 text-xs">{error}</p>}
                   <button type="submit" disabled={!!loading}
                     className="w-full py-3.5 bg-olive-900 text-cream text-sm font-semibold rounded-2xl hover:bg-primary transition-all disabled:opacity-60 flex items-center justify-center gap-2">
                     {loading === 'email' ? <RefreshCw className="w-4 h-4 animate-spin" /> : <ArrowRight className="w-4 h-4" />}
-                    {loading === 'email' ? 'Please wait ' : emailMode === 'signin' ? 'Sign In' : 'Create Account'}
+                    {loading === 'email' ? 'Please wait…' : emailMode === 'signin' ? 'Sign In' : 'Create Account'}
                   </button>
                   <p className="text-center text-[10px] text-olive-800/40">
                     {emailMode === 'signin' ? "New here? " : 'Have an account? '}
@@ -4727,7 +4685,7 @@ const AuthModal = ({
               {error && !emailOpen && <p className="text-red-500 text-xs text-center">{error}</p>}
 
               <p className="text-center text-[9px] text-olive-800/20 uppercase tracking-widest leading-relaxed">
-                By continuing, you agree to our terms.<br />We never spam - only sanctuary intelligence.
+                By continuing, you agree to our terms.<br />We never spam — only sanctuary intelligence.
               </p>
             </div>
           </motion.div>
@@ -4737,7 +4695,7 @@ const AuthModal = ({
   );
 };
 
-// ──"  Profile Modal (post sign-in) ────────────────────────────────────────────
+// ─── Profile Modal (post sign-in) ────────────────────────────────────────────
 
 const ProfileModal = ({
   isOpen,
@@ -4789,7 +4747,8 @@ const ProfileModal = ({
             {/* Top bar */}
             <div className="flex items-center justify-between px-8 pt-8 pb-4">
               <div className="flex items-center gap-3">
-                {user.photoURL ? <img src={user.photoURL} referrerPolicy="no-referrer" alt="You" className="w-11 h-11 rounded-full object-cover ring-2 ring-primary/20" />
+                {user.photoURL
+                  ? <img src={user.photoURL} referrerPolicy="no-referrer" alt="You" className="w-11 h-11 rounded-full object-cover ring-2 ring-primary/20" />
                   : <div className="w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-lg">
                       {(user.displayName?.[0] || user.email?.[0] || '?').toUpperCase()}
                     </div>
@@ -4807,7 +4766,7 @@ const ProfileModal = ({
             <div className="px-8 pb-10 space-y-6">
               <div>
                 <h2 className="text-xl font-serif italic text-olive-900">One quick thing</h2>
-                <p className="text-olive-800/40 text-xs font-light mt-1 leading-relaxed">Help us match you with the right sanctuary. Totally optional - skip anytime.</p>
+                <p className="text-olive-800/40 text-xs font-light mt-1 leading-relaxed">Help us match you with the right sanctuary. Totally optional — skip anytime.</p>
               </div>
 
               <div className="space-y-4">
@@ -4835,7 +4794,7 @@ const ProfileModal = ({
                 <button onClick={() => handleSave(false)} disabled={saving}
                   className="flex-1 py-4 bg-olive-900 text-cream text-sm font-semibold rounded-2xl hover:bg-primary transition-all disabled:opacity-60 flex items-center justify-center gap-2">
                   {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-                  {saving ? 'Saving ' : 'Complete Profile'}
+                  {saving ? 'Saving…' : 'Complete Profile'}
                 </button>
                 <button onClick={() => handleSave(true)} disabled={saving}
                   className="px-6 py-4 border border-olive-800/10 text-olive-800/40 text-xs font-bold rounded-2xl hover:border-olive-800/30 hover:text-olive-900 transition-all">
@@ -4850,18 +4809,18 @@ const ProfileModal = ({
   );
 };
 
-// ──"  App (main) ──────────────────────────────────────────────────────────────
+// ─── App (main) ──────────────────────────────────────────────────────────────
 
 export default function App() {
-  type ViewMode = 'home' | 'map' | 'list' | 'gallery' | 'analytics' | 'membership';
-  const VIEW_ORDER: ViewMode[] = ['home', 'list', 'gallery', 'analytics', 'map'];
+  type ViewMode = 'home' | 'map' | 'list' | 'gallery' | 'analytics' | 'syl' | 'membership';
+  const VIEW_ORDER: ViewMode[] = ['home', 'list', 'gallery', 'analytics', 'syl', 'map'];
 
   const [authUser, setAuthUser]     = useState<User | null>(null);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [profileUser, setProfileUser] = useState<User | null>(null);
 
-  // Silent geolocation capture - saves to Firestore without any UI
+  // Silent geolocation capture — saves to Firestore without any UI
   const captureLocation = useCallback((uid: string) => {
     if (!('geolocation' in navigator)) return;
     navigator.geolocation.getCurrentPosition(
@@ -4872,10 +4831,41 @@ export default function App() {
           locationAccuracy: pos.coords.accuracy,
         }).catch(() => {});
       },
-      () => { /* user denied - silent fail */ },
+      () => { /* user denied — silent fail */ },
       { timeout: 8000, maximumAge: 300000 }
     );
   }, []);
+
+  // Called after any successful sign-in
+  const handleAuthSuccess = useCallback((user: User, isNew: boolean) => {
+    setAuthUser(user);
+    if (user.email === ADMIN_EMAIL) setShowAdmin(true);
+    // Request geolocation silently after a short delay
+    setTimeout(() => captureLocation(user.uid), 1500);
+    // Show profile modal for new users (or returning users who never filled it)
+    if (isNew) {
+      setProfileUser(user);
+      setShowProfile(true);
+    } else {
+      // For returning users: check if they have a profile, if not show it
+      upsertUserProfile(user.uid, {
+        uid: user.uid, email: user.email, displayName: user.displayName, photoURL: user.photoURL,
+      }).then(wasNew => {
+        if (wasNew) { setProfileUser(user); setShowProfile(true); }
+      }).catch(() => {});
+    }
+  }, [captureLocation]);
+
+  // Global auth state listener (handles page reload / session restore)
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, u => {
+      setAuthUser(u);
+      if (u?.email === ADMIN_EMAIL) setShowAdmin(true);
+      // Silent location refresh on session restore
+      if (u) setTimeout(() => captureLocation(u.uid), 2000);
+    });
+    return unsub;
+  }, [captureLocation]);
 
   // Called after any successful sign-in
   const handleAuthSuccess = useCallback((user: User, isNew: boolean) => {
@@ -4922,10 +4912,7 @@ export default function App() {
     setShowAdmin(false);
     setShowAdminPanel(false);
     setViewMode('home');
-    // Then sign out from Firebase
-    try {
-      if (auth) await signOut(auth);
-    } catch {/* silent */}
+    setShowAdmin(false);
   };
 
   const [isSubscribed, setIsSubscribed] = useState(() => {
@@ -4939,19 +4926,7 @@ export default function App() {
     return localStorage.getItem('gt_dark') === 'true';
   });
 
-  useEffect(() => {
-    if (isDark) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('gt_dark', 'true');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('gt_dark', 'false');
-    }
-  }, [isDark]);
-  const [showAdmin, setShowAdmin] = useState(false);
-  const [showAdminPanel, setShowAdminPanel] = useState(false);
-  const [selectedProperty, setSelectedProperty] = useState<Sanctuary | null>(null);
-  // ── Admin: leads + newsletter + users (lazy-loaded when admin panel opens)  
+  // ── Admin: leads + newsletter + users (lazy-loaded when admin panel opens) ─
   const [adminLeads, setAdminLeads] = useState<Lead[]>([]);
   const [adminNewsletter, setAdminNewsletter] = useState<NewsletterEntry[]>([]);
   const [adminUsers, setAdminUsers] = useState<UserProfile[]>([]);
@@ -5128,8 +5103,36 @@ export default function App() {
         onDone={() => setShowProfile(false)} 
       />
 
-      
-      {/* Property Detail Portal */}
+      <main className="flex-1 flex overflow-hidden relative">
+        {/* Groot — available on every screen */}
+        <ChatBot data={{ sanctuaries: SANCTUARIES }} />
+
+        {/* Center - Map or other views */}
+        <div className="flex-1 relative overflow-hidden bg-surface">
+          {/* Map is always mounted to preserve Leaflet pan/zoom/filter state */}
+          <div className={viewMode === 'map' ? 'absolute inset-0 z-10' : 'hidden'}>
+            <SanctuaryMapLayout isVisible={viewMode === 'map'} />
+          </div>
+          {viewMode !== 'map' && (
+            <div ref={scrollRef} className="h-full w-full overflow-y-auto">
+              {viewMode === 'home' && <HomeView isSubscribed={effectivelySubscribed} onNewsletterClick={() => { if (!effectivelySubscribed) setIsNewsletterOpen(true); }} sanctuaries={allSanctuaries} onModeChange={handleViewChange} />}
+              {viewMode === 'list' && <Sanctuaries isSubscribed={effectivelySubscribed} onNewsletterClick={() => { if (!effectivelySubscribed) setIsNewsletterOpen(true); }} isFullPage sanctuaries={allSanctuaries} />}
+              {viewMode === 'gallery' && <EcosystemPillars isFullPage />}
+              {viewMode === 'analytics' && <Advantage isFullPage />}
+              {viewMode === 'syl' && <TheSIL isSubscribed={effectivelySubscribed} onNewsletterClick={() => { if (!effectivelySubscribed) setIsNewsletterOpen(true); }} isFullPage />}
+              {viewMode === 'membership' && (
+                <div className="flex flex-col">
+                  <Membership />
+                  <ApplicationForm />
+                  <Footer onModeChange={handleViewChange} />
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </main>
+
+      {/* Admin Dashboard overlay — only for sumanthbolla97@gmail.com */}
       <AnimatePresence>
         {selectedProperty && (
           <div className="fixed inset-0 z-[10000] overflow-hidden flex items-center justify-center">
@@ -5170,10 +5173,27 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      <NewsletterModal 
-        isOpen={isNewsletterOpen} 
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={isAuthOpen}
+        onClose={() => setIsAuthOpen(false)}
+        onSuccess={(user, isNew) => {
+          setIsAuthOpen(false);
+          handleAuthSuccess(user, isNew);
+        }}
+      />
+
+      {/* Profile collection modal — appears once after sign-in */}
+      <ProfileModal
+        isOpen={showProfile}
+        user={profileUser}
+        onDone={() => setShowProfile(false)}
+      />
+
+      <NewsletterModal
+        isOpen={isNewsletterOpen}
         onClose={() => setIsNewsletterOpen(false)}
-        onSubscribe={() => setIsSubscribed(true)}
+        onSubscribe={handleSubscribe}
       />
     </div>
   );
