@@ -526,7 +526,7 @@ const SideNavBar = ({ activeMode, onModeChange }: { activeMode: string, onModeCh
 
 const Hero = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
   return (
-    <section className="relative flex flex-col justify-start px-6 md:px-24 pt-6 pb-12 overflow-hidden cashew-gradient">
+    <section className="relative flex flex-col justify-start px-6 md:px-24 pt-6 pb-8 overflow-hidden cashew-gradient">
       <div className="absolute inset-0 z-0 opacity-10 mix-blend-multiply">
         <img 
           src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&q=80&w=1920" 
@@ -4463,10 +4463,39 @@ Additional live context (user data): ${JSON.stringify({ user: data.user?.display
 
 const HomeView = ({ isSubscribed, onNewsletterClick, sanctuaries = SANCTUARIES, onModeChange }: { isSubscribed: boolean, onNewsletterClick: () => void, sanctuaries?: Sanctuary[], onModeChange: (mode: string) => void }) => (
   <div className="flex flex-col">
+    {/* 1. Emotional hook */}
     <Hero onModeChange={onModeChange} />
+
+    {/* 2. Micro-trust strip — scarcity + credibility before the cards */}
+    <div className="bg-olive-900 text-cream px-6 md:px-24 py-5">
+      <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap gap-6 md:gap-10">
+          {[
+            { label: 'Plots Available', value: '36 Only' },
+            { label: 'Air Quality Index', value: 'Sub 25' },
+            { label: 'Commute to City', value: '40 Mins' },
+            { label: 'Entry Price', value: '₹24L+' },
+          ].map(s => (
+            <div key={s.label}>
+              <p className="text-[8px] uppercase tracking-[0.45em] text-cream/40 font-bold">{s.label}</p>
+              <p className="text-base font-headline font-bold text-cream mt-0.5">{s.value}</p>
+            </div>
+          ))}
+        </div>
+        <span className="text-[9px] uppercase tracking-[0.4em] font-bold text-gold border border-gold/30 px-3 py-1.5 rounded-full">
+          Pre-Launch Window Open
+        </span>
+      </div>
+    </div>
+
+    {/* 3. The product — property cards immediately visible */}
+    <Sanctuaries isSubscribed={isSubscribed} onNewsletterClick={onNewsletterClick} sanctuaries={sanctuaries} />
+
+    {/* 4. Education for scrollers — why this exists, what you're buying into */}
     <Advantage />
     <EcosystemPillars />
-    <Sanctuaries isSubscribed={isSubscribed} onNewsletterClick={onNewsletterClick} sanctuaries={sanctuaries} />
+
+    {/* 5. Social proof + final CTAs */}
     <TrustSignals />
     <NewsletterHighlight onSubscribe={onNewsletterClick} />
     <ApplicationForm />
