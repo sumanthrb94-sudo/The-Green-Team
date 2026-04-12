@@ -5088,10 +5088,11 @@ const AuthModal = ({
                 By continuing, you agree to our terms.<br />We never spam — only sanctuary intelligence.
               </motion.p>
             </motion.div>
-          </motion.div>
-        </div>
-      )}
-    </AnimatePresence>
+          </div>
+        </motion.div>
+      </div>
+    )}
+  </AnimatePresence>
   );
 };
 
