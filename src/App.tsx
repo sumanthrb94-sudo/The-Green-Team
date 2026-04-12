@@ -115,19 +115,19 @@ const SANCTUARIES: Sanctuary[] = [
   {
     id: 'agartha',
     title: 'MODCON Agartha',
-    location: 'Narsapur Forest Peripheral, Hyderabad',
+    location: 'Janakampet, Narsapur · Hyderabad',
     aqi: 12,
     noise: 18,
-    commute: '45 mins to Financial District',
+    commute: '40 mins to Financial District',
     pricePerSqYd: 7999,
     valuation: '₹1.04 Cr',
     memberPrice: 'From ₹64.6 L',
     image: 'https://static.wixstatic.com/media/142b26_cb62ea3cf3a1420399ec2e43c1dee85f~mv2.png',
     tagline: 'Where the forest becomes home.',
-    description: 'MODCON Agartha is a first-of-its-kind biomorphic residential community carved into the Narsapur forest periphery. 36 thoughtfully sized plots surround a 14,548 sq yd organic amenity core — featuring fluid earth architecture, solar-integrated curved roofs, and living canopies that blur the line between structure and forest. No two plots are the same. No straight lines anywhere.',
+    description: 'MODCON Agartha is a 25-acre regenerative permaculture farm estate on the Narsapur forest boundary, near the RRR. 36 unique farm plots — each pre-planted with 100+ tree varieties, drip irrigation, vegetable beds, and a spiral herbal garden — surround a 36,000 sq ft clubhouse with 5 premium amenities: aquatic pool, kayaking lake, gym, farm-to-table dining, and staycation villas. An on-site Goshala with integrated animal husbandry completes the self-sustaining ecosystem. Winner: Best Sustainable Eco-Friendly Project of the Year 2024.',
     plots: 36,
-    plotRange: '968 – 4,800 sq yds',
-    amenityAcres: '14,548 sq yds',
+    plotRange: '808 – 4,800 sq yds',
+    amenityAcres: '36,000 sq ft Clubhouse',
     architect: 'MODCON Builders',
     sitePlanSrc: '/FINAL-LAYOUT.jpeg',
     brochureUrl: 'https://www.modconbuilders.com/agartha',
@@ -156,14 +156,14 @@ const SANCTUARIES: Sanctuary[] = [
       'https://static.wixstatic.com/media/142b26_89a3906d085c4518a1ce49864ebda77a~mv2.jpg',
     ],
     features: [
-      'Biomorphic Architecture',
-      'Solar-Curved Rooftops',
-      'Narsapur Forest Buffer',
-      'Organic Amenity Core',
-      'Rainwater Harvesting',
-      'Earth & Bamboo Build',
-      'Zero Right-Angle Design',
-      'Private Plot Community',
+      '36,000 sq ft Clubhouse',
+      'Kayaking & Aquatic Pool',
+      'Farm-to-Table Dining',
+      'Drip Irrigation (Each Plot)',
+      '100+ Tree Varieties / Plot',
+      'Goshala & Animal Husbandry',
+      'Spiral Herbal Garden',
+      'Near RRR · 40 Min City Access',
     ],
   },
   {
@@ -607,6 +607,19 @@ const EcosystemPillars = ({ isFullPage = false }: { isFullPage?: boolean }) => {
       ),
       title: "Renewable Energy",
       desc: "Solar-powered microgrids providing clean, renewable energy, making your sanctuary completely independent of the grid."
+    },
+    {
+      icon: (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-10 h-10">
+          <path d="M18 8h1a4 4 0 0 1 0 8h-1" />
+          <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
+          <line x1="6" y1="1" x2="6" y2="4" />
+          <line x1="10" y1="1" x2="10" y2="4" />
+          <line x1="14" y1="1" x2="14" y2="4" />
+        </svg>
+      ),
+      title: "Wellness & Community",
+      desc: "A 36,000 sq ft clubhouse with aquatic pool, kayaking lake, gym, farm-to-table dining, and staycation villas — five premium amenities in one serene forest setting."
     }
   ];
 
@@ -627,14 +640,14 @@ const EcosystemPillars = ({ isFullPage = false }: { isFullPage?: boolean }) => {
           <h2 className="text-5xl md:text-8xl font-medium text-olive-900">Self-Sustaining <br /><span className="italic text-olive-800">Ecosystems.</span></h2>
         </motion.div>
         
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {pillars.map((p, i) => (
-            <motion.div 
-              key={i} 
+            <motion.div
+              key={i}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.2, duration: 0.8 }}
+              transition={{ delay: i * 0.15, duration: 0.8 }}
               className="p-8 border border-olive-800/10 bg-cream/20 hover:bg-cream/40 transition-all rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1"
             >
               <div className="text-olive-800 mb-8">{p.icon}</div>
@@ -1190,39 +1203,39 @@ const PropertyInteractiveLayout: FC<PropertyLayoutConfig & { onClose: () => void
 
 const AGARTHA_HOTSPOTS: Hotspot[] = [
   {
-    id: 'amenity-core', num: 1, x: 44, y: 50,
-    label: 'Organic Amenity Core',
-    tag: '14,548 Sq Yds',
-    detail: 'The biomorphic heart of Agartha. Zero right angles - every curve echoes the surrounding forest. Infinity lap pool, social pavilions, canopy walkways, all in earth and bamboo.',
-    stats: [{ label: 'Size', value: '14,548 sq yds' }, { label: 'Style', value: 'Biomorphic' }, { label: 'Material', value: 'Earth + Bamboo' }],
+    id: 'amenity-core', num: 1, x: 52, y: 68,
+    label: '36,000 Sq Ft Clubhouse',
+    tag: '5 Premium Amenities',
+    detail: 'The 36,000 sq ft heart of Agartha. 5 premium amenities: a resort-style aquatic pool, fully-equipped gym, kayaking lake, farm-to-table restaurant, and children\'s play area. Staycation villas for weekend escapes — without leaving the forest.',
+    stats: [{ label: 'Clubhouse', value: '36,000 sq ft' }, { label: 'Amenities', value: '5 Premium' }, { label: 'Access', value: 'Residents + guests' }],
   },
   {
     id: 'forest-buffer', num: 2, x: 8, y: 40,
     label: 'Narsapur Forest Buffer',
     tag: 'AQI 12',
-    detail: 'Direct boundary with the Narsapur forest reserve. AQI 12 - one of the cleanest micro-climates in the Hyderabad metro. Native bird corridors, natural white noise.',
-    stats: [{ label: 'AQI', value: '12 - Pristine' }, { label: 'Noise', value: '18 dB' }, { label: 'Forest', value: 'Native Dry Deciduous' }],
+    detail: 'Direct boundary with the Narsapur forest reserve. AQI 12 — one of the cleanest micro-climates in the Hyderabad metro. Native bird corridors, natural white noise, and a living green lung at your doorstep.',
+    stats: [{ label: 'AQI', value: '12 — Pristine' }, { label: 'Noise', value: '18 dB' }, { label: 'Forest', value: 'Native Dry Deciduous' }],
   },
   {
-    id: 'grand-entry', num: 3, x: 48, y: 8,
-    label: 'Grand Entry Boulevard',
-    tag: 'Gated Access',
-    detail: 'A winding, landscaped approach lined with native canopy trees. No straight lines - the boulevard curves through the forest edge before revealing the community.',
-    stats: [{ label: 'Access', value: 'Single gated entry' }, { label: 'Landscape', value: 'Native canopy' }, { label: 'Design', value: 'No straight lines' }],
+    id: 'goshala', num: 3, x: 36, y: 82,
+    label: 'Goshala & Organic Farm',
+    tag: 'Farm-to-Table',
+    detail: 'An on-site Goshala with integrated animal husbandry for holistic farming. Each plot is pre-planted with 100+ tree varieties, advanced drip irrigation, vegetable beds, and a spiral herbal garden — your private edible forest.',
+    stats: [{ label: 'Trees / Plot', value: '100+ varieties' }, { label: 'Irrigation', value: 'Drip system' }, { label: 'Farming', value: 'Permaculture' }],
   },
   {
-    id: 'premium-corner', num: 4, x: 14, y: 72,
-    label: 'Premium Corner - Plot 15',
-    tag: '5,097 Sq Yds  ₹4.08 Cr',
-    detail: 'The largest plot in Agartha. Corner positioning gives dual forest frontage and the greatest separation from neighbours. At ₹7,999/sq yd: ₹4.08 Cr.',
-    stats: [{ label: 'Size', value: '5,097 sq yds' }, { label: 'Price', value: '₹4.08 Cr' }, { label: 'Frontage', value: 'Dual forest-facing' }],
+    id: 'premium-corner', num: 4, x: 15, y: 33,
+    label: 'Premium Corner — Plot 3',
+    tag: '4,800 Sq Yds · ₹3.84 Cr',
+    detail: 'The largest plot in Agartha. Corner positioning on the forest boundary gives maximum green frontage and the greatest separation from neighbours. At ₹7,999/sq yd: ₹3.84 Cr.',
+    stats: [{ label: 'Size', value: '~4,800 sq yds' }, { label: 'Price', value: '~₹3.84 Cr' }, { label: 'Frontage', value: 'Forest boundary' }],
   },
   {
-    id: 'plot-community', num: 5, x: 62, y: 60,
+    id: 'plot-community', num: 5, x: 62, y: 48,
     label: '36-Plot Private Community',
     tag: 'From ₹64.6 L',
-    detail: '36 plots, each unique — no two the same. Sizes from 808 to 5,097 sq yds at ₹7,999/sq yd. A true private forest community, not a subdivision.',
-    stats: [{ label: 'Total Plots', value: '36' }, { label: 'Starting', value: '₹64.6 L (808 sq yds)' }, { label: 'Rate', value: '₹7,999/sq yd' }],
+    detail: '36 unique farm plots across 25 acres — each pre-planted and drip-irrigated. Sizes from 808 to 4,800 sq yds at ₹7,999/sq yd. Near RRR, 40 mins from Financial District. Winner: Best Eco-Friendly Project 2024.',
+    stats: [{ label: 'Total Area', value: '25 Acres' }, { label: 'Starting', value: '₹64.6 L' }, { label: 'Rate', value: '₹7,999/sq yd' }],
   },
 ];
 
@@ -4139,21 +4152,37 @@ const TrustSignals = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 opacity-60 grayscale hover:grayscale-0 transition-all duration-700">
           <div className="flex flex-col items-center justify-center h-20 gap-1">
             <h3 className="font-headline font-bold text-xl tracking-widest uppercase">MODCON</h3>
-            <p className="text-[8px] uppercase tracking-widest text-olive-800/50">Builders</p>
+            <p className="text-[8px] uppercase tracking-widest text-olive-800/50">Builders · Hyderabad</p>
           </div>
           <div className="flex flex-col items-center justify-center h-20 gap-1">
-            <h3 className="font-headline font-bold text-xl tracking-widest uppercase">Agartha</h3>
-            <p className="text-[8px] uppercase tracking-widest text-olive-800/50">Forest Community</p>
+            <h3 className="font-headline font-bold text-xl tracking-widest uppercase">ARQEN</h3>
+            <p className="text-[8px] uppercase tracking-widest text-olive-800/50">Project Architects</p>
           </div>
           <div className="flex flex-col items-center justify-center h-20 gap-1">
-            <h3 className="font-headline font-bold text-xl tracking-widest uppercase">Griha</h3>
-            <p className="text-[8px] uppercase tracking-widest text-olive-800/50">Telangana Homes</p>
+            <h3 className="font-headline font-bold text-xl tracking-widest uppercase">Outlook</h3>
+            <p className="text-[8px] uppercase tracking-widest text-olive-800/50">Business Spotlight 2024</p>
           </div>
           <div className="flex flex-col items-center justify-center h-20 gap-1">
-            <h3 className="font-headline font-bold text-xl tracking-widest uppercase">Vastu</h3>
-            <p className="text-[8px] uppercase tracking-widest text-olive-800/50">Hyderabad Realty</p>
+            <h3 className="font-headline font-bold text-xl tracking-widest uppercase">Taj Banjara</h3>
+            <p className="text-[8px] uppercase tracking-widest text-olive-800/50">Award Ceremony · Nov 2024</p>
           </div>
         </div>
+
+        {/* Award banner */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.15, duration: 0.8 }}
+          className="mt-10 flex items-center justify-center gap-4 border border-gold/30 bg-gold/5 rounded-2xl px-8 py-5"
+        >
+          <span className="text-gold text-2xl">★</span>
+          <div className="text-left">
+            <p className="text-[10px] uppercase tracking-[0.4em] font-bold text-gold">Outlook Business Spotlight Entity Awards 2024</p>
+            <p className="text-base font-headline font-bold text-olive-900 mt-0.5">Best Sustainable Eco-Friendly Project of the Year</p>
+          </div>
+          <span className="text-gold text-2xl">★</span>
+        </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }} className="mt-20 p-12 bg-cream/30 rounded-3xl border border-olive-800/5 relative shadow-sm">
           <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-surface w-12 h-12 rounded-full flex items-center justify-center text-gold shadow-sm border border-olive-800/10">
