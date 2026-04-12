@@ -526,48 +526,99 @@ const SideNavBar = ({ activeMode, onModeChange }: { activeMode: string, onModeCh
 
 const Hero = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
   return (
-    <section className="relative flex flex-col justify-start px-6 md:px-24 pt-6 pb-8 overflow-hidden cashew-gradient">
-      <div className="absolute inset-0 z-0 opacity-10 mix-blend-multiply">
-        <img 
-          src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&q=80&w=1920" 
-          alt="Atmospheric landscape" 
-          className="w-full h-full object-cover grayscale"
+    <section className="relative min-h-[92vh] flex flex-col justify-between overflow-hidden bg-[#0d1409]">
+      {/* Full-bleed forest image */}
+      <div className="absolute inset-0 z-0">
+        <img
+          src="https://static.wixstatic.com/media/142b26_e9917bb73fc94531948ef638eba5a051~mv2.jpg"
+          alt="Agartha Forest Estate"
+          className="w-full h-full object-cover opacity-40"
           referrerPolicy="no-referrer"
         />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0d1409]/60 via-[#0d1409]/30 to-[#0d1409]/90" />
       </div>
-      
-      <div className="relative z-10 max-w-6xl">
+
+      {/* Award ribbon — top right */}
+      <motion.div
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 1.2, duration: 0.8 }}
+        className="absolute top-5 right-5 z-20 flex items-center gap-2 bg-gold/10 border border-gold/30 rounded-full px-3 py-1.5 backdrop-blur-sm"
+      >
+        <span className="text-gold text-xs">★</span>
+        <span className="text-[8px] uppercase tracking-[0.3em] font-bold text-gold/80">Best Eco Project · 2024</span>
+      </motion.div>
+
+      {/* Main content */}
+      <div className="relative z-10 flex flex-col justify-center flex-1 px-6 md:px-20 pt-20 pb-10">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.2, ease: "circOut" }}
+          transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
         >
-          <div className="flex items-center gap-3 md:gap-4 mb-4 md:mb-6">
-            <div className="w-8 md:w-12 h-px bg-olive-800/40"></div>
-            <span className="text-olive-800 text-[8px] md:text-[10px] font-bold uppercase tracking-[0.4em] md:tracking-[0.6em]">Independent Sanctuary Curators</span>
+          {/* Eyebrow */}
+          <div className="flex items-center gap-3 mb-6 md:mb-8">
+            <div className="w-6 h-px bg-gold/50" />
+            <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.55em] text-cream/50">
+              Independent Sanctuary Curators · Hyderabad
+            </span>
           </div>
-          
-          <h1 className="text-5xl sm:text-7xl md:text-[8rem] font-light text-olive-900 mb-8 md:mb-12 leading-[1.1] md:leading-[0.9] tracking-tighter">
-            The Science of <br />
-            <span className="italic text-olive-800 font-medium">Early Entry.</span>
+
+          {/* Headline */}
+          <h1 className="text-[3.2rem] sm:text-[4.5rem] md:text-[7rem] font-light text-cream leading-[1.0] tracking-tight mb-6 md:mb-8">
+            Not just land.<br />
+            <span className="italic font-medium text-[#a3b18a]">A curated future.</span>
           </h1>
-          
-          <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-end">
-            <p className="text-lg md:text-2xl font-normal text-olive-900/90 leading-relaxed max-w-xl">
-              A growing community in Hyderabad and India's metropolitans, securing self-sustaining sanctuaries where food, water, and energy are curated for the future.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 md:gap-8 pt-4">
-              <button onClick={() => onModeChange('membership')} className="btn-membership btn-olive group w-full sm:w-auto shadow-lg hover:shadow-xl shadow-olive-900/20">
-                Apply for Membership <ArrowUpRight className="inline-block ml-2 w-4 h-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
-              </button>
-              <button onClick={() => onModeChange('analytics')} className="btn-membership btn-outline-olive w-full sm:w-auto hover:shadow-lg">
-                The Green Team Advantage
-              </button>
-            </div>
+
+          {/* Body */}
+          <p className="text-base md:text-xl font-light text-cream/60 leading-relaxed max-w-lg mb-10 md:mb-12">
+            India's most exclusive self-sustaining farm estates — handpicked for a private circle of investors who know the next great asset class isn't in the city. It's beyond it.
+          </p>
+
+          {/* CTAs */}
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+            <button
+              onClick={() => onModeChange('membership')}
+              className="group px-8 py-4 bg-[#a3b18a] text-[#0d1409] text-[10px] uppercase tracking-[0.45em] font-bold transition-all duration-300 hover:bg-cream flex items-center justify-center gap-2"
+            >
+              Apply for Adviser Access
+              <ArrowUpRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            </button>
+            <button
+              onClick={() => onModeChange('list')}
+              className="px-8 py-4 border border-cream/20 text-cream/70 text-[10px] uppercase tracking-[0.45em] font-bold transition-all duration-300 hover:border-cream/50 hover:text-cream"
+            >
+              View Properties
+            </button>
           </div>
         </motion.div>
       </div>
+
+      {/* Bottom credential bar */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.8, duration: 1 }}
+        className="relative z-10 border-t border-cream/10 px-6 md:px-20 py-4 flex flex-wrap items-center justify-between gap-3 bg-[#0d1409]/60 backdrop-blur-sm"
+      >
+        <div className="flex flex-wrap gap-6 md:gap-10">
+          {[
+            { label: 'Currently Curating', value: 'MODCON Agartha' },
+            { label: 'Total Area', value: '25 Acres' },
+            { label: 'Plots Remaining', value: '36 Only' },
+            { label: 'AQI', value: '12 — Pristine' },
+          ].map(s => (
+            <div key={s.label}>
+              <p className="text-[7px] uppercase tracking-[0.4em] text-cream/30 font-bold">{s.label}</p>
+              <p className="text-[11px] md:text-xs font-headline font-bold text-cream/80 mt-0.5">{s.value}</p>
+            </div>
+          ))}
+        </div>
+        <div className="text-right hidden sm:block">
+          <p className="text-[7px] uppercase tracking-[0.4em] text-cream/30 font-bold">Entry From</p>
+          <p className="text-sm font-headline font-bold text-[#a3b18a]">Under ₹1 Cr</p>
+        </div>
+      </motion.div>
     </section>
   );
 };
@@ -2210,7 +2261,7 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
                   <p className="text-[8px] uppercase tracking-widest text-secondary/60 mt-1">Private Plots</p>
                 </div>
                 <div className="p-4 bg-primary/5 rounded-2xl text-center">
-                  <p className="text-sm font-headline font-bold text-primary leading-tight">{sanctuary.plotRange ?? '808–5,097'}</p>
+                  <p className="text-sm font-headline font-bold text-primary leading-tight">{sanctuary.plotRange ?? '808–4,800'}</p>
                   <p className="text-[8px] uppercase tracking-widest text-secondary/60 mt-1">Sq Yds Range</p>
                 </div>
                 <div className="p-4 bg-primary/5 rounded-2xl text-center">
@@ -4279,55 +4330,58 @@ const ChatBot = ({ data }: { data: any }) => {
 === THE GREEN TEAM — COMPLETE KNOWLEDGE BASE FOR GROOT ===
 
 ABOUT THE GREEN TEAM:
-The Green Team is an independent sanctuary curator based in Hyderabad, India. We curate India's most exclusive pre-launch sanctuaries for a private circle of intelligent investors. We are NOT developers — we are curators. We partner with developers like MODCON to bring self-sustaining, organic properties to a reserved investor circle.
+The Green Team is an independent luxury sanctuary curator based in Hyderabad, India. We curate India's most exclusive self-sustaining farm estates for a private circle of intelligent investors. We are NOT developers — we are curators. We partner with award-winning developers like MODCON Builders to bring regenerative, organic properties to a reserved investor circle.
 
 TWO OPTIONS FOR USERS:
 1. NEWSLETTER (Monthly Briefings) — Join our intelligence network for monthly environmental integrity reports, sanctuary valuations, and curation alerts. Free to join.
-2. ADVISER ACCESS (Membership) — Apply for a private call with your dedicated adviser. We contact you within 24 hours. You get pre-launch pricing, early-entry coordinates, and monthly briefings.
+2. ADVISER ACCESS — Apply for a private call with your dedicated adviser. We contact you within 24 hours. You get VIP pricing, early-entry coordinates, and monthly briefings.
 
-CURRENT PROPERTY: MODCON AGARTHA
-- Location: Narsapur Forest Peripheral, Hyderabad (GPS: 17.3816° N, 78.3278° E)
-- Type: Biomorphic residential community
-- Developer: MODCON Builders
-- Plots: 53 unique private plots (no two the same, no straight lines)
-- Plot Range: 808 – 5,097 sq yds
+CURRENT PROPERTY: MODCON AGARTHA — "Roots of Earth"
+- Location: Janakampet, Narsapur, Hyderabad, Telangana (near RRR — Regional Ring Road)
+- Type: 25-acre regenerative permaculture farm estate
+- Developer: MODCON Builders (Co-founders: Chandu Reddy & Manikanta Sridhar Malladi)
+- Architects: ARQEN
+- Award: Best Sustainable Eco-Friendly Project of the Year 2024 — Outlook Business Spotlight Entity Awards, Taj Banjara, Hyderabad
+- Plots: 36 unique farm plots (808 – 4,800 sq yds)
 - Price: ₹7,999 per sq yd
-- Starting Value: ₹1.04 Cr (smallest plot at 808 sq yds)
-- Landmark Plot (Plot 15): 5,097 sq yds, dual forest frontage — most premium
-- Amenity Core: 14,548 sq yds of organic shared amenities
-- AQI: 12 (WHO: anything < 25 is pristine — Narsapur is cleaner than Swiss mountain towns)
-- Noise: 18 dB (whisper level; normal Indian urban is 70+ dB)
-- Commute: 45 mins to Financial District (Gachibowli / HITECH City)
-- Architect Theme: Zero right-angle design, earth + bamboo, solar curved rooftops, living canopies
-- Key Features: Biomorphic Architecture, Solar-Curved Rooftops, Narsapur Forest Buffer, Organic Amenity Core, Rainwater Harvesting, Earth & Bamboo Build, Zero Right-Angle Design, Private Plot Community
-- Brochure: https://www.agartha.in/
+- Starting: From ₹64.6 L (808 sq yds) — all-in entry under ₹1 Cr with mud house concept included
+- Premium Corner (Plot 3): ~4,800 sq yds, forest boundary — largest plot (~₹3.84 Cr)
+- Clubhouse: 36,000 sq ft with 5 premium amenities
+- 5 Amenities: Aquatic pool, fully-equipped gym, kayaking lake, farm-to-table restaurant, children's play area + staycation villas
+- Each plot includes: Advanced drip irrigation, 100+ tree varieties pre-planted, vegetable beds, spiral herbal garden
+- Goshala: On-site with integrated animal husbandry for holistic farming
+- AQI: 12 (WHO pristine — Hyderabad city average is 85)
+- Noise: 18 dB (near silent — city average 65-70 dB)
+- Commute: 40 mins to Financial District (Gachibowli / HITECH City)
+- Website: https://www.agartha.in/
 
 INVESTMENT ANALYSIS:
-- Pre-Launch Rate (1 yr ago): ₹6,200/sq yd
-- Current Rate: ₹7,999/sq yd
-- Appreciation: +29% in 1 year
-- Annual ROI: ~29% p.a. — significantly outperforming FD (7%), gold (12%), and Sensex (~13% avg)
-- Valuation Example (Plot #15 - 5097 sq yds): Pre-launch ₹3.16 Cr → Today ₹4.08 Cr → Gain of ₹92 L in 1 yr
+- VIP Pre-Launch Rate (Aug 2024): ₹6,199/sq yd
+- Current Rate (2026): ₹7,999/sq yd
+- Appreciation: +29% in ~18 months
+- Annualised ROI: ~19% p.a. — significantly outperforming FD (7%), gold (12%), and Sensex (~13% avg)
+- Example (Plot 28 — 2,057 sq yds): Pre-launch ₹1.28 Cr → Today ₹1.65 Cr → Gain of ₹37 L in 18 months
+- This is farmland near RRR — infrastructure appreciation (RRR corridor) compounds the organic permaculture value
 
 ENVIRONMENTAL INTELLIGENCE:
 - Narsapur Forest AQI: 12 (pristine — Hyderabad city average is 85)
 - Narsapur Noise: 18 dB (near silent — city average 65-70 dB)
-- Tukkuguda AQI: 22 (SYL zone)
-- Real-time environmental heatmaps on the map view: AQI in red/orange/teal, Noise in blue/indigo/cyan
+- Real-time environmental heatmaps available in the Map view: AQI in teal, Noise in indigo
 - Green zones near sanctuaries; red zones near Patancheru industrial corridor
 
 THE SELF-SUSTAINING MODEL (why sanctuaries matter):
-- FOOD SECURITY: Each sanctuary grows organic produce in community farms — members have access to clean food independent of supply chains
-- WATER SECURITY: Rainwater harvesting + natural filtration — zero municipal dependency
-- ENERGY SECURITY: Solar microgrids — clean energy, no grid dependency
-- HEALTH: AQI 12 vs city AQI 85 = significantly lower cardiovascular and respiratory risk
+- FOOD: Farm-to-table — Goshala, 100+ tree varieties, vegetable beds, spiral herbal garden per plot
+- WATER: Rainwater harvesting + natural filtration — zero municipal dependency
+- ENERGY: Solar-ready plots — clean energy independence
+- WELLNESS: 36,000 sq ft clubhouse, kayaking, pool, gym, dining — resort-level without leaving the forest
+- HEALTH: AQI 12 vs city AQI 85 = dramatically lower cardiovascular and respiratory risk
 
 WHAT GROOT SHOULD DO:
-- Answer questions about Agartha, investment, environment, commute, lifestyle
-- Guide users toward taking action: "Apply for Adviser Access" (scroll to #apply section) or "Join Newsletter"
-- Never share information you don't have — say "I am Groot (I'll connect you with our adviser for that detail)"
-- Be concise, warm, premium — maximum 3-4 sentences per response
-- Keep the "I am Groot" personality but ALWAYS follow it with the actual useful answer
+- Answer questions about Agartha, investment, environment, commute, amenities, lifestyle
+- Guide users toward action: "Apply for Adviser Access" or "Join Newsletter"
+- Never invent data you don't have — say "I am Groot. (I'll connect you with our adviser for that detail.)"
+- Be concise, warm, exclusive — maximum 3-4 sentences per response
+- Always start with "I am Groot." then provide the actual helpful answer in parentheses
 `;
 
   const handleSend = async () => {
