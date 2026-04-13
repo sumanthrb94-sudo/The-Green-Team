@@ -4101,7 +4101,7 @@ const ApplicationForm = () => {
                 </p>
               </motion.div>
             ) : (
-              <form onSubmit={handleSubmit} className="bg-[#f5f0e8] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.5)]">
+              <form onSubmit={handleSubmit} className="bg-surface shadow-[0_40px_80px_-20px_rgba(0,0,0,0.5)] border border-outline/10">
 
                 {/* Form header strip */}
                 <div className="bg-olive-800 px-10 py-7 flex items-center justify-between">
@@ -4230,7 +4230,7 @@ const Footer = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
           <div>
             <Logo className="w-10 h-10 text-cream mb-6" />
             <p className="text-2xl md:text-3xl font-light text-white/30 max-w-xl leading-relaxed">
-              Curating India's most exclusive pre-launch sanctuaries for a private circle of intelligent investors.
+              We curate verified forest-adjacent communities for investors seeking intentional, sustainable living with transparent investment fundamentals.
             </p>
           </div>
           <button
@@ -4711,7 +4711,7 @@ const friendlyAuthError = (code: string) => {
   return map[code] || 'Something went wrong. Please try again.';
 };
 
-// ─── Auth Modal ───────────────────────────────────────────────────────────────
+// ─── Auth Modal (Premium Animated) ────────────────────────────────────────────
 
 const AuthModal = ({
   isOpen,
@@ -4723,18 +4723,109 @@ const AuthModal = ({
   onSuccess: (user: User, isNew: boolean) => void;
 }) => {
   const [emailOpen, setEmailOpen]   = useState(false);
+  const [phoneOpen, setPhoneOpen]   = useState(false);
   const [emailMode, setEmailMode]   = useState<'signin' | 'signup'>('signin');
   const [email, setEmail]           = useState('');
   const [password, setPassword]     = useState('');
-  const [loading, setLoading]       = useState<'google' | 'email' | null>(null);
+  const [phone, setPhone]           = useState('');
+  const [otp, setOtp]               = useState('');
+  const [otpSent, setOtpSent]       = useState(false);
+  const [loading, setLoading]       = useState<'google' | 'email' | 'phone' | null>(null);
   const [error, setError]           = useState('');
+  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
+  const recaptchaVerifierRef = useRef<RecaptchaVerifier | null>(null);
 
   useEffect(() => {
     if (!isOpen) {
-      setEmailOpen(false); setEmailMode('signin');
-      setEmail(''); setPassword(''); setError('');
+      setEmailOpen(false);
+      setPhoneOpen(false);
+      setEmailMode('signin');
+      setEmail('');
+      setPassword('');
+      setPhone('');
+      setOtp('');
+      setOtpSent(false);
+      setError('');
+      setConfirmationResult(null);
     }
   }, [isOpen]);
+
+  // Initialize reCAPTCHA verifier
+  const initializeRecaptcha = useCallback(() => {
+    if (!recaptchaVerifierRef.current && auth) {
+      try {
+        recaptchaVerifierRef.current = new RecaptchaVerifier(auth, 'recaptcha-container', {
+          size: 'invisible',
+          callback: () => {}
+        });
+      } catch (err: any) {
+        console.error('reCAPTCHA init error:', err);
+      }
+    }
+  }, []);
+
+  const handlePhoneSendOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading('phone');
+    
+    try {
+      initializeRecaptcha();
+      
+      // Format phone number with country code if not present
+      let formattedPhone = phone.trim().replace(/\s/g, '');
+      if (!formattedPhone.startsWith('+')) {
+        // If it starts with 91 but no +, add +
+        if (formattedPhone.startsWith('91') && formattedPhone.length > 10) {
+          formattedPhone = '+' + formattedPhone;
+        } else {
+          formattedPhone = '+91' + formattedPhone.replace(/\D/g, '');
+        }
+      }
+      
+      if (recaptchaVerifierRef.current) {
+        const result = await signInWithPhoneNumber(auth, formattedPhone, recaptchaVerifierRef.current);
+        setConfirmationResult(result);
+        setOtpSent(true);
+        setOtp('');
+      }
+    } catch (err: any) {
+      setError(friendlyAuthError(err.code));
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  const handlePhoneVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading('phone');
+    
+    try {
+      if (!confirmationResult) {
+        setError('OTP session expired. Please try again.');
+        setOtpSent(false);
+        setConfirmationResult(null);
+        return;
+      }
+      
+      const cred = await confirmationResult.confirm(otp);
+      const isNew = cred.user.metadata.creationTime === cred.user.metadata.lastSignInTime;
+      onSuccess(cred.user, isNew);
+      onClose();
+    } catch (err: any) {
+      setError(friendlyAuthError(err.code));
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  const handlePhoneBack = () => {
+    setOtpSent(false);
+    setOtp('');
+    setError('');
+    setConfirmationResult(null);
+  };
 
   const handleGoogle = async () => {
     setError(''); setLoading('google');
@@ -4769,40 +4860,144 @@ const AuthModal = ({
     }
   };
 
+  // Animated logo component
+  const AnimatedLogo = () => (
+    <motion.div
+      initial={{ scale: 0, opacity: 0, rotate: -180 }}
+      animate={{ scale: 1, opacity: 1, rotate: 0 }}
+      transition={{ type: 'spring', damping: 20, stiffness: 150, delay: 0.2 }}
+      className="flex justify-center mb-8"
+    >
+      <motion.div
+        animate={{ y: [0, -8, 0] }}
+        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+        className="relative"
+      >
+        <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-[#3a5630]/20 to-[#3a5630]/5 flex items-center justify-center relative">
+          {/* Glow effect */}
+          <motion.div
+            animate={{ opacity: [0.2, 0.5, 0.2], scale: [1, 1.1, 1] }}
+            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+            className="absolute inset-0 bg-[#3a5630]/20 blur-2xl rounded-full"
+          />
+          <svg viewBox="0 0 100 100" className="w-12 h-12 fill-current">
+            <path d="M50 95C50 95 48 80 40 70C30 60 10 55 5 40C0 25 15 5 40 10C55 13 65 25 70 40C75 55 65 75 50 95Z" className="text-[#3a5630] opacity-30" />
+            <path d="M50 90C50 90 52 75 60 65C70 55 90 50 95 35C100 20 85 0 60 5C45 8 35 20 30 35C25 50 35 70 50 90Z" className="text-[#3a5630]" />
+            <path d="M50 90L50 40M50 90C50 90 45 70 35 60M50 90C50 90 55 70 65 60" fill="none" stroke="#3a5630" strokeWidth="1" strokeLinecap="round" className="opacity-50" />
+          </svg>
+        </div>
+        {/* Animated rings around logo */}
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
+          className="absolute inset-0 rounded-3xl border-2 border-transparent border-t-[#3a5630]/40 border-r-[#3a5630]/20"
+        />
+      </motion.div>
+    </motion.div>
+  );
+
   return (
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-[9998] flex items-end sm:items-center justify-center">
+          {/* Animated backdrop with gradient */}
           <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-olive-900/80 backdrop-blur-xl"
+            className="absolute inset-0 bg-gradient-to-b from-olive-900/60 to-olive-900/90 backdrop-blur-xl"
           />
+          
+          {/* Main modal container */}
           <motion.div
-            initial={{ opacity: 0, y: 60 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 60 }}
-            transition={{ type: 'spring', damping: 30, stiffness: 240 }}
-            className="relative w-full sm:max-w-md bg-cream sm:rounded-3xl rounded-t-3xl shadow-2xl overflow-hidden"
+            initial={{ opacity: 0, y: 100, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 100, scale: 0.9 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            className="relative w-full sm:max-w-4xl bg-cream sm:rounded-3xl rounded-t-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row"
           >
-            {/* Hero strip */}
-            <div className="bg-olive-900 px-10 pt-12 pb-10 text-cream text-center">
-              <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center mx-auto mb-5">
-                <Leaf className="w-6 h-6 text-primary" />
+            {/* Left: Image (Hidden on mobile) */}
+            <div className="hidden md:block md:w-1/2 relative overflow-hidden">
+              <img 
+                src="https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&q=80&w=1200" 
+                alt="Sanctuary" 
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-olive-900/40 backdrop-blur-[2px]" />
+              <div className="absolute inset-0 p-12 flex flex-col justify-end text-cream">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  <p className="text-[10px] uppercase tracking-[0.6em] font-bold mb-4 text-primary-foreground/60">The Green Team</p>
+                  <h3 className="text-4xl font-serif italic leading-tight mb-6">Where the forest <br />becomes home.</h3>
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-px bg-cream/30" />
+                    <p className="text-xs font-light tracking-widest uppercase opacity-60">Independent Sanctuary Curators</p>
+                  </div>
+                </motion.div>
               </div>
-              <h2 className="text-2xl font-serif italic mb-1">Unlock The Sanctuaries</h2>
-              <p className="text-cream/50 text-xs font-light tracking-wide">Pre-launch access · Exclusive investor pricing</p>
             </div>
 
-            <div className="px-10 py-8 space-y-5">
+            {/* Right: Form content */}
+            <div className="w-full md:w-1/2 flex flex-col">
+              {/* Animated gradient header */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.1 }}
+                className="relative bg-gradient-to-br from-olive-900 via-olive-800 to-primary/20 px-10 pt-12 pb-12 text-cream text-center overflow-hidden"
+              >
+                {/* Animated background elements */}
+                <motion.div
+                  animate={{ opacity: [0.1, 0.3, 0.1] }}
+                  transition={{ duration: 4, repeat: Infinity }}
+                  className="absolute inset-0 bg-gradient-to-t from-primary/10 to-transparent"
+                />
+                
+                {/* Logo */}
+                <div className="relative z-10">
+                  <AnimatedLogo />
+                  <motion.h2
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="text-3xl font-serif italic mb-2 font-bold tracking-tight"
+                  >
+                    Unlock The Sanctuaries
+                  </motion.h2>
+                  <motion.p
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                    className="text-cream/60 text-xs font-light tracking-wide"
+                  >
+                    Pre-launch access · Exclusive investor pricing
+                  </motion.p>
+                </div>
+              </motion.div>
+
+              {/* Form content */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="px-10 py-10 space-y-6 flex-1 overflow-y-auto"
+              >
               {/* Google — PRIMARY CTA */}
-              <button
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={handleGoogle}
                 disabled={!!loading}
-                className="w-full flex items-center justify-center gap-3 py-4 bg-white border border-olive-800/10 rounded-2xl text-olive-900 text-sm font-semibold shadow-sm hover:shadow-md hover:border-olive-800/20 transition-all disabled:opacity-60"
+                className="w-full flex items-center justify-center gap-3 py-4 bg-white border border-olive-800/10 rounded-2xl text-olive-900 text-sm font-semibold shadow-sm hover:shadow-lg hover:border-olive-800/20 transition-all disabled:opacity-60"
               >
                 {loading === 'google'
-                  ? <RefreshCw className="w-5 h-5 animate-spin text-olive-800/40" />
+                  ? <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity }}>
+                      <RefreshCw className="w-5 h-5 text-olive-800/40" />
+                    </motion.div>
                   : (
                     <svg className="w-5 h-5" viewBox="0 0 24 24">
                       <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -4812,24 +5007,31 @@ const AuthModal = ({
                     </svg>
                   )
                 }
-                {loading === 'google' ? 'Connecting…' : 'Continue with Google'}
-              </button>
+                <span>{loading === 'google' ? 'Connecting…' : 'Continue with Google'}</span>
+              </motion.button>
 
               {/* Divider */}
-              <div className="flex items-center gap-4">
-                <div className="flex-1 h-px bg-olive-800/10" />
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className="flex items-center gap-4"
+              >
+                <motion.div className="flex-1 h-px bg-gradient-to-r from-transparent via-olive-800/20 to-transparent" />
                 <span className="text-[9px] uppercase tracking-[0.4em] text-olive-800/30 font-bold">or</span>
-                <div className="flex-1 h-px bg-olive-800/10" />
-              </div>
+                <motion.div className="flex-1 h-px bg-gradient-to-r from-transparent via-olive-800/20 to-transparent" />
+              </motion.div>
 
               {/* Email — secondary, expandable */}
               {!emailOpen ? (
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={() => setEmailOpen(true)}
                   className="w-full py-3.5 border border-olive-800/15 rounded-2xl text-olive-900/60 text-sm hover:border-olive-800/30 hover:text-olive-900 transition-all"
                 >
                   Continue with Email
-                </button>
+                </motion.button>
               ) : (
                 <motion.form
                   initial={{ opacity: 0, height: 0 }}
@@ -4837,44 +5039,133 @@ const AuthModal = ({
                   onSubmit={handleEmail}
                   className="space-y-4 overflow-hidden"
                 >
-                  <div>
+                  <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.1 }}>
                     <label htmlFor="auth-email" className="text-[9px] uppercase tracking-[0.4em] text-olive-800/40 font-bold block mb-1.5">Email</label>
                     <input id="auth-email" name="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required
                       className="w-full bg-surface border border-outline/20 rounded-xl px-4 py-3 text-sm text-on-surface focus:outline-none focus:border-primary/60 transition-colors"
                       placeholder="email@domain.com" autoFocus />
-                  </div>
-                  <div>
+                  </motion.div>
+                  <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.15 }}>
                     <label htmlFor="auth-password" className="text-[9px] uppercase tracking-[0.4em] text-olive-800/40 font-bold block mb-1.5">Password</label>
                     <input id="auth-password" name="password" type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6}
                       className="w-full bg-surface border border-outline/20 rounded-xl px-4 py-3 text-sm text-on-surface focus:outline-none focus:border-primary/60 transition-colors"
                       placeholder="••••••••" />
-                  </div>
-                  {error && <p className="text-red-500 text-xs">{error}</p>}
-                  <button type="submit" disabled={!!loading}
-                    className="w-full py-3.5 bg-olive-900 text-cream text-sm font-semibold rounded-2xl hover:bg-primary transition-all disabled:opacity-60 flex items-center justify-center gap-2">
-                    {loading === 'email' ? <RefreshCw className="w-4 h-4 animate-spin" /> : <ArrowRight className="w-4 h-4" />}
+                  </motion.div>
+                  {error && <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-red-500 text-xs">{error}</motion.p>}
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    type="submit"
+                    disabled={!!loading}
+                    className="w-full py-3.5 bg-gradient-to-r from-olive-900 to-primary text-cream text-sm font-semibold rounded-2xl hover:shadow-lg transition-all disabled:opacity-60 flex items-center justify-center gap-2"
+                  >
+                    {loading === 'email' ? <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity }}>
+                      <RefreshCw className="w-4 h-4" />
+                    </motion.div> : <ArrowRight className="w-4 h-4" />}
                     {loading === 'email' ? 'Please wait…' : emailMode === 'signin' ? 'Sign In' : 'Create Account'}
-                  </button>
-                  <p className="text-center text-[10px] text-olive-800/40">
+                  </motion.button>
+                  <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center text-[10px] text-olive-800/40">
                     {emailMode === 'signin' ? "New here? " : 'Have an account? '}
                     <button type="button" onClick={() => { setEmailMode(m => m === 'signin' ? 'signup' : 'signin'); setError(''); }}
-                      className="text-primary underline underline-offset-2 font-bold">
+                      className="text-primary underline underline-offset-2 font-bold hover:text-primary/80 transition-colors">
                       {emailMode === 'signin' ? 'Sign Up' : 'Sign In'}
                     </button>
-                  </p>
+                  </motion.p>
                 </motion.form>
               )}
 
-              {error && !emailOpen && <p className="text-red-500 text-xs text-center">{error}</p>}
+              {/* Phone — tertiary option */}
+              {!phoneOpen ? (
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setPhoneOpen(true)}
+                  className="w-full py-3.5 border border-olive-800/15 rounded-2xl text-olive-900/60 text-sm hover:border-olive-800/30 hover:text-olive-900 transition-all"
+                >
+                  Continue with Phone
+                </motion.button>
+              ) : (
+                <motion.form
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  onSubmit={otpSent ? handlePhoneVerifyOtp : handlePhoneSendOtp}
+                  className="space-y-4 overflow-hidden"
+                >
+                  {!otpSent ? (
+                    <>
+                      <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.1 }}>
+                        <label htmlFor="auth-phone" className="text-[9px] uppercase tracking-[0.4em] text-olive-800/40 font-bold block mb-1.5">Phone Number</label>
+                        <input id="auth-phone" name="phone" type="tel" value={phone} onChange={e => setPhone(e.target.value)} required
+                          className="w-full bg-surface border border-outline/20 rounded-xl px-4 py-3 text-sm text-on-surface focus:outline-none focus:border-primary/60 transition-colors"
+                          placeholder="+91 98765 43210" autoFocus />
+                        <p className="text-[8px] text-olive-800/30 mt-1">We'll send you an OTP to verify</p>
+                      </motion.div>
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        type="submit"
+                        disabled={!!loading}
+                        className="w-full py-3.5 bg-gradient-to-r from-olive-900 to-primary text-cream text-sm font-semibold rounded-2xl hover:shadow-lg transition-all disabled:opacity-60 flex items-center justify-center gap-2"
+                      >
+                        {loading === 'phone' ? <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity }}>
+                          <RefreshCw className="w-4 h-4" />
+                        </motion.div> : <Send className="w-4 h-4" />}
+                        {loading === 'phone' ? 'Sending OTP…' : 'Send OTP'}
+                      </motion.button>
+                    </>
+                  ) : (
+                    <>
+                      <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.1 }}>
+                        <label htmlFor="auth-otp" className="text-[9px] uppercase tracking-[0.4em] text-olive-800/40 font-bold block mb-1.5">Enter OTP</label>
+                        <input id="auth-otp" name="otp" type="text" value={otp} onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))} required
+                          className="w-full bg-surface border border-outline/20 rounded-xl px-4 py-3 text-sm text-on-surface focus:outline-none focus:border-primary/60 transition-colors text-center tracking-widest text-lg font-bold"
+                          placeholder="000000" maxLength={6} autoFocus />
+                        <p className="text-[8px] text-olive-800/30 mt-1">Sent to {phone}</p>
+                      </motion.div>
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        type="submit"
+                        disabled={!!loading || otp.length < 6}
+                        className="w-full py-3.5 bg-gradient-to-r from-olive-900 to-primary text-cream text-sm font-semibold rounded-2xl hover:shadow-lg transition-all disabled:opacity-60 flex items-center justify-center gap-2"
+                      >
+                        {loading === 'phone' ? <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity }}>
+                          <RefreshCw className="w-4 h-4" />
+                        </motion.div> : <Check className="w-4 h-4" />}
+                        {loading === 'phone' ? 'Verifying…' : 'Verify OTP'}
+                      </motion.button>
+                      <motion.button
+                        type="button"
+                        onClick={handlePhoneBack}
+                        className="w-full py-2 text-olive-900/60 text-sm hover:text-olive-900 transition-colors"
+                      >
+                        Back to Phone
+                      </motion.button>
+                    </>
+                  )}
+                </motion.form>
+              )}
 
-              <p className="text-center text-[9px] text-olive-800/20 uppercase tracking-widest leading-relaxed">
+              {error && !emailOpen && !phoneOpen && <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-red-500 text-xs text-center">{error}</motion.p>}
+              {error && phoneOpen && <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-red-500 text-xs text-center">{error}</motion.p>}
+
+              {/* reCAPTCHA container */}
+              <div id="recaptcha-container" className="hidden" />
+
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4 }}
+                className="text-center text-[9px] text-olive-800/20 uppercase tracking-widest leading-relaxed"
+              >
                 By continuing, you agree to our terms.<br />We never spam — only sanctuary intelligence.
-              </p>
-            </div>
-          </motion.div>
-        </div>
-      )}
-    </AnimatePresence>
+              </motion.p>
+            </motion.div>
+          </div>
+        </motion.div>
+      </div>
+    )}
+  </AnimatePresence>
   );
 };
 
@@ -5059,12 +5350,16 @@ export default function App() {
   }, [captureLocation]);
 
   const handleSignOut = async () => {
-    // Immediately clear local state so UI responds right away
-    setAuthUser(null);
-    setShowAdmin(false);
-    setShowAdminPanel(false);
-    setViewMode('home');
-    setShowAdmin(false);
+    try {
+      await signOut(auth);
+      // Immediately clear local state so UI responds right away
+      setAuthUser(null);
+      setShowAdmin(false);
+      setShowAdminPanel(false);
+      setViewMode('home');
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
   };
 
   const [isSubscribed, setIsSubscribed] = useState(() => {
@@ -5299,6 +5594,20 @@ export default function App() {
         isOpen={isNewsletterOpen}
         onClose={() => setIsNewsletterOpen(false)}
         onSubscribe={handleSubscribe}
+      />
+
+      {/* Auth Modal — Sign In / Sign Up */}
+      <AuthModal
+        isOpen={isAuthOpen}
+        onClose={() => setIsAuthOpen(false)}
+        onSuccess={handleAuthSuccess}
+      />
+
+      {/* Profile Modal — Post Sign-In Profile Setup */}
+      <ProfileModal
+        isOpen={showProfile}
+        user={profileUser}
+        onDone={() => setShowProfile(false)}
       />
     </div>
   );
