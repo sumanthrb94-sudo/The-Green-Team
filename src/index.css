@@ -33,53 +33,53 @@
 
 @layer base {
   :root {
-    --primary: #3a5630;
+    --primary: #2d3a1d;
     --on-primary: #ffffff;
-    --background: #f1ebe2;
-    --surface: #f1ebe2;
-    --on-surface: #1c1f18;
-    --secondary: #5a6355;
+    --background: #faf9f6;
+    --surface: #faf9f6;
+    --on-surface: #1a1c1a;
+    --secondary: #586062;
     --tertiary: #8a3d36;
-    --surface-container: #e5dfd6;
-    --surface-container-low: #f6f1e8;
-    --surface-container-highest: #dbd5cc;
-    --outline: #889480;
+    --surface-container: #f2f4f2;
+    --surface-container-low: #f8faf8;
+    --surface-container-highest: #e0e4e0;
+    --outline: #8c9c8c;
 
-    --olive-900: #1c2b14;
-    --olive-800: #2d4020;
+    --olive-900: #1a2410;
+    --olive-800: #2d3a1d;
     --olive-700: #4a5c3d;
-    --cashew: #e5dfd6;
-    --cream: #f1ebe2;
-    --gold: #a87c0a;
-    --charcoal: #1c1c18;
+    --cashew: #f2f4f2;
+    --cream: #faf9f6;
+    --gold: #b8860b;
+    --charcoal: #1a1a1a;
 
     /* Section-level dark bg: used in Hero, EcosystemPillars, Footer, credential strip */
-    --forest-section: #1c2b14;
+    --forest-section: #1a2410;
   }
 
   .dark {
-    --primary: #8aab78;
+    --primary: #a3b18a;
     --on-primary: #0c1809;
-    --background: #0e1b0b;
-    --surface: #0e1b0b;
-    --on-surface: #e0dace;
+    --background: #141a11;
+    --surface: #141a11;
+    --on-surface: #eae6da;
     --secondary: #8da284;
     --tertiary: #f5b8b0;
-    --surface-container: #162614;
-    --surface-container-low: #112010;
-    --surface-container-highest: #20381c;
+    --surface-container: #1a2417;
+    --surface-container-low: #161f13;
+    --surface-container-highest: #243320;
     --outline: #5a6c54;
 
-    --olive-900: #e0dace;
-    --olive-800: #cec8be;
+    --olive-900: #eae6da;
+    --olive-800: #d0cbbf;
     --olive-700: #b4b0a8;
-    --cashew: #162614;
-    --cream: #0e1b0b;
+    --cashew: #1a2417;
+    --cream: #141a11;
     --gold: #ccac58;
     --charcoal: #e8e4de;
 
     /* Section-level dark bg in dark mode */
-    --forest-section: #0a1408;
+    --forest-section: #0c1409;
   }
 
   /* Prevent layout shift from scrollbar appearing/disappearing */

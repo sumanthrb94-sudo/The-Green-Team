@@ -562,32 +562,31 @@ const Hero = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
           transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
           className="flex-1 flex flex-col justify-center py-12 max-w-3xl"
         >
-          <h1 className="text-[3.2rem] sm:text-[4.5rem] md:text-[5.5rem] lg:text-[6rem] xl:text-[7rem] font-light text-white leading-[1.0] tracking-tight mb-8">
-            The most<br />
-            <span className="italic font-medium" style={{ color: '#8aab78' }}>valuable forests</span><br />
-            in India.<br />
-            <span className="text-white/35">We found them</span><br />
-            <span className="italic font-medium text-white/55">first.</span>
+          <h1 className="text-[3.2rem] sm:text-[4.5rem] md:text-[5.5rem] lg:text-[6rem] xl:text-[6.5rem] font-light text-white leading-[1.0] tracking-tight mb-8">
+            Live close<br />
+            <span className="italic font-medium" style={{ color: '#a3b18a' }}>to the forest.</span><br />
+            <span className="text-white/70">Still reach</span><br />
+            <span className="italic font-medium text-white/55">work in 45 min.</span>
           </h1>
-          <p className="text-base md:text-xl font-light text-white/50 leading-relaxed max-w-lg mb-12">
-            The Green Team is India's independent curation house — identifying, verifying, and representing forest-adjacent conscious communities for a private circle of investors, before the market discovers them.
+          <p className="text-base md:text-xl font-light text-white/55 leading-relaxed max-w-lg mb-12">
+            We are channel partners who curate homes near forests — where the air is clean, the design is thoughtful, and the city is still within reach. Apartments, villas, plots — any type, as long as it meets our bar.
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
             <button
               onClick={() => onModeChange('membership')}
               className="group px-8 py-4 text-[9px] uppercase tracking-[0.45em] font-bold transition-all duration-300 flex items-center justify-center gap-2"
-              style={{ background: '#8aab78', color: '#0a1208' }}
-              onMouseEnter={e => (e.currentTarget.style.background = '#a3c490')}
-              onMouseLeave={e => (e.currentTarget.style.background = '#8aab78')}
+              style={{ background: '#a3b18a', color: '#0a1208' }}
+              onMouseEnter={e => (e.currentTarget.style.background = '#b8c8a0')}
+              onMouseLeave={e => (e.currentTarget.style.background = '#a3b18a')}
             >
-              Apply for Adviser Access
+              See What We Curate
               <ArrowUpRight className="w-3 h-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
             </button>
             <button
               onClick={() => onModeChange('list')}
               className="px-8 py-4 border border-white/20 text-white/60 text-[9px] uppercase tracking-[0.45em] font-bold hover:border-white/40 hover:text-white transition-all duration-300"
             >
-              Current Listing
+              View Properties
             </button>
           </div>
         </motion.div>
@@ -603,10 +602,10 @@ const Hero = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
       >
         <div className="flex flex-wrap gap-8 md:gap-14">
           {[
-            { label: 'Channel Partner', value: 'MODCON Agartha' },
-            { label: 'Forest AQI', value: '12 — Pristine' },
-            { label: 'Entry From', value: '₹64.6 L' },
-            { label: 'Appreciation', value: '+29% · 18 Mo' },
+            { label: 'AQI at our curated sites', value: '12 — Pristine' },
+            { label: 'Ambient Noise', value: '18 dB' },
+            { label: 'Commute to city', value: 'Under 45 min' },
+            { label: 'Property types', value: 'Plots · Villas · Flats' },
           ].map(s => (
             <div key={s.label}>
               <p className="text-[7px] uppercase tracking-[0.45em] font-bold" style={{ color: 'rgba(255,255,255,0.25)' }}>{s.label}</p>
@@ -615,39 +614,170 @@ const Hero = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
           ))}
         </div>
         <div className="hidden sm:flex items-center gap-2">
-          <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#8aab78' }} />
-          <p className="text-xs font-headline font-bold" style={{ color: '#8aab78' }}>Open for Reservation</p>
+          <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#a3b18a' }} />
+          <p className="text-xs font-headline font-bold" style={{ color: '#a3b18a' }}>Open for Reservation</p>
         </div>
       </motion.div>
     </section>
   );
 };
 
-const EcosystemPillars = ({ isFullPage = false }: { isFullPage?: boolean }) => {
-  const standards = [
+// ─── What We Do ──────────────────────────────────────────────────────────────
+const WhatWeDo = () => {
+  const steps = [
     {
       num: '01',
-      title: 'Forest Adjacency',
-      detail: 'Every property we curate must border verified forest land. AQI below 25. Ambient noise below 25 dB. If it doesn\'t clear the air quality bar, it doesn\'t make the list.',
-      proof: 'Agartha (live): AQI 12 · 18 dB',
+      title: 'We Find It',
+      desc: 'We scout properties near forests, rivers, and open land — where the air quality is verified below AQI 25 and ambient noise stays under 25 dB.',
+      icon: <Search className="w-5 h-5" />,
     },
     {
       num: '02',
-      title: 'Intentional Community',
-      detail: 'Not a subdivision. Every community is gated, intentional, and designed around people who choose to live differently — together. We curate neighbours, not just plots.',
-      proof: 'Agartha: 36 curated plots',
+      title: 'We Verify It',
+      desc: 'We check AQI readings, noise levels, commute times, design quality, and developer credentials before we show it to anyone.',
+      icon: <Check className="w-5 h-5" />,
     },
     {
       num: '03',
-      title: 'Investment Grade',
-      detail: 'Verified appreciation data. Proximity to infrastructure corridors — RRR, ORR. We only partner on properties where the numbers outperform FD, gold, and index funds.',
-      proof: '+29% in 18 months · ₹7,999/sq yd',
+      title: 'We Connect You',
+      desc: 'As channel partners, we introduce you directly to the developer. Apartments, villas, plots — any property type that meets our bar qualifies.',
+      icon: <ArrowRight className="w-5 h-5" />,
+    },
+  ];
+
+  return (
+    <section className="py-20 px-6 md:px-24 bg-surface border-b border-outline/10">
+      <div className="max-w-6xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mb-14"
+        >
+          <span className="text-primary text-[10px] font-bold uppercase tracking-[0.6em] mb-4 block">How it works</span>
+          <h2 className="text-4xl md:text-5xl font-light text-on-surface leading-tight">
+            We are channel partners.<br />
+            <span className="italic font-medium text-primary">We curate, you decide.</span>
+          </h2>
+        </motion.div>
+
+        <div className="grid md:grid-cols-3 gap-px bg-outline/10">
+          {steps.map((s, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1 }}
+              className="bg-surface p-10"
+            >
+              <div className="flex items-center gap-3 mb-6">
+                <span className="text-[10px] font-bold text-primary/40 tracking-[0.5em]">{s.num}</span>
+                <div className="w-9 h-9 rounded-xl bg-primary/8 flex items-center justify-center text-primary">
+                  {s.icon}
+                </div>
+              </div>
+              <h3 className="text-2xl font-headline font-bold text-on-surface mb-3">{s.title}</h3>
+              <p className="text-secondary leading-relaxed">{s.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// ─── Why It Matters ───────────────────────────────────────────────────────────
+const WhyItMatters = () => {
+  const rows = [
+    { metric: 'Air Quality (AQI)', tgt: '12 — Pristine', city: '100–180 — Unhealthy', better: true },
+    { metric: 'Ambient Noise', tgt: '18 dB', city: '65+ dB', better: true },
+    { metric: 'Forest / Nature', tgt: 'On your doorstep', city: '45 min drive', better: true },
+    { metric: 'Commute to office', tgt: 'Under 45 min', city: 'Already there', better: false },
+    { metric: 'Property types', tgt: 'Plots, Villas, Flats', city: 'All types', better: false },
+  ];
+
+  return (
+    <section className="py-20 px-6 md:px-24 bg-surface-container-low border-b border-outline/10">
+      <div className="max-w-5xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mb-14"
+        >
+          <span className="text-primary text-[10px] font-bold uppercase tracking-[0.6em] mb-4 block">Why it matters</span>
+          <h2 className="text-4xl md:text-5xl font-light text-on-surface leading-tight">
+            You can live near a forest<br />
+            <span className="italic font-medium text-primary">and still be close to work.</span>
+          </h2>
+        </motion.div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-outline/20">
+                <th className="text-left py-4 pr-8 text-[10px] uppercase tracking-[0.5em] font-bold text-secondary/50 w-1/3">What we measure</th>
+                <th className="text-left py-4 pr-8 text-[10px] uppercase tracking-[0.5em] font-bold text-primary/70">Our curated sites</th>
+                <th className="text-left py-4 text-[10px] uppercase tracking-[0.5em] font-bold text-secondary/50">Typical city</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-outline/10">
+              {rows.map((r, i) => (
+                <motion.tr
+                  key={i}
+                  initial={{ opacity: 0, x: -10 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.06 }}
+                >
+                  <td className="py-5 pr-8 font-medium text-on-surface/70">{r.metric}</td>
+                  <td className="py-5 pr-8">
+                    <span className={cn(
+                      "inline-flex items-center gap-1.5 font-headline font-bold",
+                      r.better ? "text-primary" : "text-on-surface/80"
+                    )}>
+                      {r.better && <Check className="w-3.5 h-3.5 flex-shrink-0" />}
+                      {r.tgt}
+                    </span>
+                  </td>
+                  <td className="py-5 text-secondary/60">{r.city}</td>
+                </motion.tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// ─── Our Checklist ────────────────────────────────────────────────────────────
+const EcosystemPillars = ({ isFullPage = false }: { isFullPage?: boolean }) => {
+  const checks = [
+    {
+      icon: '🌿',
+      title: 'Forest or nature nearby',
+      desc: 'The property must sit within or right next to forest, hills, or open green land — not just a park. If it\'s a drive away, it doesn\'t qualify.',
+      proof: 'Agartha (live): surrounded by forest reserve',
     },
     {
-      num: '04',
-      title: 'Awarded Partners',
-      detail: 'We partner exclusively with developers and architects holding national sustainability credentials. Permaculture, biophilic, regenerative design — mandatory, not a checkbox.',
-      proof: 'MODCON × ARQEN · Eco Award 2024',
+      icon: '💨',
+      title: 'Clean air — AQI under 25',
+      desc: 'We check AQI data before we show any property. City air is 100–180. Our minimum standard is below 25. Breathing matters where you live.',
+      proof: 'Current site: AQI 12',
+    },
+    {
+      icon: '🏗️',
+      title: 'Well-designed, built to last',
+      desc: 'We only work with developers whose architecture has won recognition. Biophilic layouts, natural materials, spaces that feel like they belong in the landscape.',
+      proof: 'Partner: MODCON × ARQEN · Eco Award 2024',
+    },
+    {
+      icon: '🚗',
+      title: 'Office within 45 minutes',
+      desc: 'Living in nature shouldn\'t mean sacrificing your commute. Every property we recommend is reachable from Hyderabad\'s key corridors within 45 min.',
+      proof: 'RRR / ORR proximity verified',
     },
   ];
 
@@ -656,42 +786,34 @@ const EcosystemPillars = ({ isFullPage = false }: { isFullPage?: boolean }) => {
       "bg-forest-section text-[#e0dace]",
       isFullPage ? "py-24 px-6 md:px-24" : "py-20 px-6 md:px-24"
     )}>
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 1 }}
-          className="grid lg:grid-cols-2 gap-12 items-end mb-16 pb-16 border-b border-white/8"
+          className="mb-14"
         >
-          <div>
-            <span className="text-white/25 text-[9px] font-bold uppercase tracking-[0.6em] mb-5 block">The Curation Standard</span>
-            <h2 className="text-5xl md:text-7xl font-light text-[#e0dace] leading-tight">
-              Not every forest<br />
-              <span className="italic font-medium text-[#8aab78]">makes the cut.</span>
-            </h2>
-          </div>
-          <div className="lg:text-right">
-            <p className="text-xl md:text-2xl font-light text-white/30 leading-relaxed">
-              Four non-negotiable standards before we recommend any project to our investors.
-            </p>
-          </div>
+          <span className="text-white/25 text-[9px] font-bold uppercase tracking-[0.6em] mb-5 block">Our bar</span>
+          <h2 className="text-4xl md:text-6xl font-light text-[#e0dace] leading-tight">
+            Four things every property<br />
+            <span className="italic font-medium" style={{ color: '#a3b18a' }}>must pass.</span>
+          </h2>
         </motion.div>
 
-        <div className="space-y-0 divide-y divide-white/8">
-          {standards.map((s, i) => (
+        <div className="grid md:grid-cols-2 gap-px bg-white/5">
+          {checks.map((c, i) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.08, duration: 0.7 }}
-              className="grid md:grid-cols-[80px_1fr_1fr_200px] gap-6 md:gap-10 py-8 items-center hover:bg-white/[0.025] transition-colors duration-300 group"
+              transition={{ delay: i * 0.08 }}
+              className="bg-forest-section p-10 hover:bg-white/[0.03] transition-colors"
             >
-              <span className="text-[11px] font-bold text-[#8aab78]/40 tracking-[0.4em]">{s.num}</span>
-              <h4 className="text-2xl font-headline font-bold text-[#e0dace] group-hover:text-[#8aab78] transition-colors">{s.title}</h4>
-              <p className="text-white/35 leading-relaxed text-sm">{s.detail}</p>
-              <p className="text-[9px] uppercase tracking-[0.35em] font-bold text-[#8aab78]/55 md:text-right">{s.proof}</p>
+              <div className="text-3xl mb-5">{c.icon}</div>
+              <h3 className="text-xl font-headline font-bold text-[#e0dace] mb-3">{c.title}</h3>
+              <p className="text-white/40 leading-relaxed text-sm mb-4">{c.desc}</p>
+              <p className="text-[9px] uppercase tracking-[0.4em] font-bold" style={{ color: '#a3b18a' }}>{c.proof}</p>
             </motion.div>
           ))}
         </div>
@@ -701,64 +823,26 @@ const EcosystemPillars = ({ isFullPage = false }: { isFullPage?: boolean }) => {
 };
 
 const Advantage = ({ isFullPage = false }: { isFullPage?: boolean }) => {
+  // Kept for non-home views (AboutView, etc.) — simple version
   return (
     <section id="the-advantage" className={cn(
-      "px-12 md:px-24 bg-surface/[0.01] border-y border-olive-800/5",
+      "px-12 md:px-24 bg-surface border-y border-outline/10",
       isFullPage ? "py-16" : "py-14"
     )}>
-      <div className="max-w-7xl mx-auto">
-        <div className="grid lg:grid-cols-12 gap-8">
-          <motion.div 
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 1 }}
-            className="lg:col-span-5"
-          >
-            <h2 className="text-5xl md:text-7xl font-medium text-on-surface">
-              The <span className="italic text-primary">Intelligence</span> <br />Gap.
-            </h2>
-            <div className="w-24 h-1 bg-olive-800/20 mt-6"></div>
-          </motion.div>
-          
-          <motion.div 
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 1, delay: 0.2 }}
-            className="lg:col-span-7 space-y-6"
-          >
-            <p className="text-2xl md:text-4xl font-normal leading-snug text-on-surface/85">
-              "We are not a listing portal. We are the intelligence layer between you and India's most undervalued forest land — before the market prices it in."
-            </p>
-            <div className="grid sm:grid-cols-2 gap-6 pt-4">
-              <div className="space-y-4">
-                <div className="w-12 h-12 bg-olive-800/10 flex items-center justify-center rounded-xl shadow-sm">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-olive-800 w-6 h-6">
-                    <path d="M3 12c0 4.97 4.03 9 9 9s9-4.03 9-9-4.03-9-9-9-9 4.03-9 9z" />
-                    <path d="M12 16v-4M12 8h.01" />
-                  </svg>
-                </div>
-                <h4 className="text-xl font-bold text-olive-900">The 1 Cr Learning Curve</h4>
-                <p className="text-olive-900/80 text-base leading-relaxed">
-                  Knowing before the market is the difference between a 1 Crore entry and a 2 Crore regret. We bridge that gap for our elite circle.
-                </p>
-              </div>
-              <div className="space-y-4">
-                <div className="w-12 h-12 bg-olive-800/10 flex items-center justify-center rounded-xl shadow-sm">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-olive-800 w-6 h-6">
-                    <path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z" />
-                    <circle cx="12" cy="10" r="3" />
-                  </svg>
-                </div>
-                <h4 className="text-xl font-bold text-olive-900">The 40-Minute Radius</h4>
-                <p className="text-olive-900/80 text-base leading-relaxed">
-                  The projects we curate meet our minimum standards: reach your work in 40 minutes while living away from the polluted jungles.
-                </p>
-              </div>
-            </div>
-          </motion.div>
-        </div>
+      <div className="max-w-5xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mb-10"
+        >
+          <h2 className="text-4xl md:text-5xl font-light text-on-surface">
+            We are <span className="italic text-primary">channel partners.</span>
+          </h2>
+          <p className="mt-4 text-lg text-secondary leading-relaxed max-w-2xl">
+            Not developers, not portals. We independently curate properties, verify every claim ourselves, and connect you with the developer directly. No middleman markup — just our honest recommendation.
+          </p>
+        </motion.div>
       </div>
     </section>
   );
@@ -4584,41 +4668,25 @@ Additional live context (user data): ${JSON.stringify({ user: data.user?.display
 
 const HomeView = ({ isSubscribed, onNewsletterClick, sanctuaries = SANCTUARIES, onModeChange }: { isSubscribed: boolean, onNewsletterClick: () => void, sanctuaries?: Sanctuary[], onModeChange: (mode: string) => void }) => (
   <div className="flex flex-col">
-    {/* 1. Emotional hook */}
+    {/* 1. Hero — backdrop image + KPI bar */}
     <Hero onModeChange={onModeChange} />
 
-    {/* 2. Company-level credential strip */}
-    <div className="bg-surface-container border-b border-outline/10 px-6 md:px-24 py-4">
-      <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-4">
-        <div className="flex flex-wrap gap-6 md:gap-10">
-          {[
-            { label: 'TGT Role', value: 'Channel Partner' },
-            { label: 'Current Partner', value: 'MODCON Agartha' },
-            { label: 'Partner Appreciation', value: '+29% / 18 Mo' },
-            { label: 'Min. AQI Standard', value: 'Sub 25' },
-          ].map(s => (
-            <div key={s.label}>
-              <p className="text-[7px] uppercase tracking-[0.45em] text-secondary/40 font-bold">{s.label}</p>
-              <p className="text-sm font-headline font-bold text-on-surface/75 mt-0.5">{s.value}</p>
-            </div>
-          ))}
-        </div>
-        <div className="text-right hidden md:block">
-          <p className="text-[7px] uppercase tracking-[0.4em] text-secondary/40 font-bold">Entry From</p>
-          <p className="text-sm font-headline font-bold text-primary">Under ₹1 Cr</p>
-        </div>
-      </div>
-    </div>
+    {/* 2. How it works — 3-step simple explainer */}
+    <WhatWeDo />
 
-    {/* 3. The product — property cards immediately visible */}
+    {/* 3. Properties — what we currently curate */}
     <Sanctuaries isSubscribed={isSubscribed} onNewsletterClick={onNewsletterClick} sanctuaries={sanctuaries} />
 
-    {/* 4. Education for scrollers — why this exists, what you're buying into */}
-    <Advantage />
+    {/* 4. Side-by-side comparison — why nature living is realistic */}
+    <WhyItMatters />
+
+    {/* 5. Our 4-point checklist — what every property must pass */}
     <EcosystemPillars />
 
-    {/* 5. Social proof + final CTAs */}
+    {/* 6. Social proof */}
     <TrustSignals />
+
+    {/* 7. Newsletter + contact */}
     <NewsletterHighlight onSubscribe={onNewsletterClick} />
     <ApplicationForm />
     <Footer onModeChange={onModeChange} />
