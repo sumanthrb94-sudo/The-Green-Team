@@ -5576,17 +5576,19 @@ export default function App() {
   const scrollRef       = useRef<HTMLDivElement>(null);
 
   const handleViewChange = useCallback((next: ViewMode) => {
-    if (scrollRef.current) {
-      scrollPositions.current[viewMode] = scrollRef.current.scrollTop;
-    }
+    // We always want to load from the top when switching views/menu items
     setViewMode(next);
-    // Restore or reset scroll position for the next view
+    
+    // Reset scroll position to top for the next view
     setTimeout(() => {
       if (scrollRef.current) {
-        scrollRef.current.scrollTop = scrollPositions.current[next] || 0;
+        scrollRef.current.scrollTo({
+          top: 0,
+          behavior: 'instant'
+        });
       }
     }, 0);
-  }, [viewMode]);
+  }, []);
 
   return (
     <div className={cn("min-h-screen font-sans transition-colors duration-700", isDark ? "dark" : "")}>
