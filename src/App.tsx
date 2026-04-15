@@ -174,7 +174,7 @@ const SANCTUARIES: Sanctuary[] = [
     noise: 24,
     commute: '10 mins to Airport · 30-45 mins to Financial District',
     valuation: '',
-    memberPrice: 'Price on Request',
+    memberPrice: '₹4,499 / SFT',
     image: '/gallery/syl/1776279315359.png',
     tagline: 'A modern address where luxury meets nature.',
     description: 'MODCON SYL Residences is a 4.5-acre biophilic development at Tukkuguda, ORR Exit-14 — offering luxury villaments from 2,500 to 4,500 SFT with large forest-view balconies, natural light, and sunrise views. The 22,000 sq ft clubhouse is a wellness retreat with a chemical-free Natural Bio Pool and Yoga Pavilion. Commercial spaces are also available at exclusive one-time investor prices — contact us for details. Located 10 minutes from the international airport and at the threshold of Hyderabad\'s Fourth City growth corridor.',
@@ -2068,7 +2068,8 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
               ) : (
                 <>
                   <p className="text-lg font-headline font-bold text-primary">{sanctuary.memberPrice}</p>
-                  <p className="text-[10px] text-secondary/40 line-through">{sanctuary.valuation}</p>
+                  {sanctuary.valuation && <p className="text-[10px] text-secondary/40 line-through">{sanctuary.valuation}</p>}
+                  {sanctuary.id === 'syl' && <p className="text-[9px] text-secondary/50">2,500 – 4,500 SFT</p>}
                 </>
               )}
             </div>
@@ -2431,7 +2432,61 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
               </div>
             </div>
 
-            {/* Price breakdown table */}
+            {/* SYL Price breakdown + CTA */}
+            {sanctuary.id === 'syl' && (
+              <div className="space-y-4">
+                <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold">
+                  Price Estimate — ₹4,499 / SFT
+                </p>
+                <div className="rounded-2xl overflow-hidden border border-outline/10">
+                  {[
+                    { label: 'Compact Villament', sft: 2500 },
+                    { label: 'Standard Villament', sft: 3000 },
+                    { label: 'Large Villament', sft: 3500 },
+                    { label: 'Premium Villament', sft: 4500 },
+                  ].map((row, i) => {
+                    const total = row.sft * 4499;
+                    const display = `₹${(total / 1e7).toFixed(2)} Cr`;
+                    return (
+                      <div key={i} className={cn("flex items-center justify-between px-4 py-3 text-sm", i % 2 === 0 ? "bg-surface" : "bg-surface-container-low")}>
+                        <div>
+                          <p className="font-medium text-on-surface text-[13px]">{row.label}</p>
+                          <p className="text-[10px] text-secondary/50">{row.sft.toLocaleString('en-IN')} SFT</p>
+                        </div>
+                        <p className="font-headline font-bold text-primary">{display}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Negotiation CTA */}
+                <div className="rounded-2xl border border-primary/20 bg-primary/5 p-5 space-y-3">
+                  <p className="text-xs text-secondary leading-relaxed">
+                    Prices above are indicative. <span className="font-semibold text-on-surface">Better pricing is available for in-person visits.</span> Visit our office or schedule a site visit to get the best deal.
+                  </p>
+                  <div className="flex flex-col gap-2">
+                    <a
+                      href="tel:+919534869999"
+                      className="flex items-center justify-center gap-2 w-full py-3 bg-primary text-on-primary text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl transition-all hover:bg-olive-900"
+                    >
+                      <Phone className="w-3.5 h-3.5" />
+                      Call to Negotiate · +91 95348 69999
+                    </a>
+                    <a
+                      href="https://www.modconbuilders.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 w-full py-3 border border-primary/30 text-primary text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl transition-all hover:bg-primary/10"
+                    >
+                      <MapPin className="w-3.5 h-3.5" />
+                      Visit Office · Financial District
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Agartha Price breakdown table */}
             {sanctuary.pricePerSqYd && (
               <div>
                 <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold mb-4">
