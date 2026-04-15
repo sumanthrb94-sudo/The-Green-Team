@@ -119,9 +119,9 @@ const SANCTUARIES: Sanctuary[] = [
     aqi: 12,
     noise: 18,
     commute: '40 mins to Financial District',
-    pricePerSqYd: 7999,
-    valuation: '₹1.04 Cr',
-    memberPrice: 'From ₹64.6 L',
+    pricePerSqYd: 8500,
+    valuation: '',
+    memberPrice: 'From ₹68.7 L',
     image: 'https://static.wixstatic.com/media/142b26_e9917bb73fc94531948ef638eba5a051~mv2.jpg',
     tagline: 'Where the forest becomes home.',
     description: 'MODCON Agartha is a 25-acre regenerative permaculture farm estate on the Narsapur forest boundary, near the RRR. 36 unique farm plots — each pre-planted with 100+ tree varieties, drip irrigation, vegetable beds, and a spiral herbal garden — surround a 36,000 sq ft clubhouse with 5 premium amenities: aquatic pool, kayaking lake, gym, farm-to-table dining, and staycation villas. An on-site Goshala with integrated animal husbandry completes the self-sustaining ecosystem. Winner: Best Sustainable Eco-Friendly Project of the Year 2024.',
@@ -255,7 +255,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
   ];
 
   const sanctuaryItems = [
-    { name: 'MODCON Agartha', id: 'list', sub: 'Narsapur Forest · From ₹64.6 L', img: 'https://images.unsplash.com/photo-1542401886-65d6c61db217?auto=format&fit=crop&q=80&w=400' },
+    { name: 'MODCON Agartha', id: 'list', sub: 'Narsapur Forest · From ₹68.7 L', img: 'https://images.unsplash.com/photo-1542401886-65d6c61db217?auto=format&fit=crop&q=80&w=400' },
     { name: 'MODCON SYL Residences', id: 'syl', sub: 'Tukkuguda, ORR Exit-14 · Villaments', img: '/gallery/syl/1776279315359.png' },
   ];
 
@@ -929,11 +929,16 @@ const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewslet
             ? "bg-[#c8a951] text-[#1a1a0a]"
             : "bg-primary/90 text-on-primary backdrop-blur-sm"
         )}>
-          {isSyl ? 'Coming Soon' : 'Open Reservation'}
+          {isSyl ? 'Pre-Investor Phase' : 'Open Reservation'}
         </span>
         {!isSyl && (
           <span className="px-3 py-1 text-[7px] uppercase tracking-[0.35em] font-bold rounded-full bg-[#080d06]/70 text-cream/60 backdrop-blur-sm border border-cream/10 w-fit">
             TGT Channel Partner
+          </span>
+        )}
+        {isSyl && (
+          <span className="px-3 py-1 text-[8px] font-bold rounded-full bg-[#080d06]/75 text-white/70 backdrop-blur-sm border border-white/10 w-fit leading-relaxed">
+            Missed Agartha? Don't miss this.
           </span>
         )}
       </div>
@@ -1359,16 +1364,16 @@ const AGARTHA_HOTSPOTS: Hotspot[] = [
   {
     id: 'premium-corner', num: 4, x: 15, y: 33,
     label: 'Premium Corner — Plot 3',
-    tag: '4,800 Sq Yds · ₹3.84 Cr',
-    detail: 'The largest plot in Agartha. Corner positioning on the forest boundary gives maximum green frontage and the greatest separation from neighbours. At ₹7,999/sq yd: ₹3.84 Cr.',
-    stats: [{ label: 'Size', value: '~4,800 sq yds' }, { label: 'Price', value: '~₹3.84 Cr' }, { label: 'Frontage', value: 'Forest boundary' }],
+    tag: '4,800 Sq Yds · ₹4.08 Cr',
+    detail: 'The largest plot in Agartha. Corner positioning on the forest boundary gives maximum green frontage and the greatest separation from neighbours. At ₹8,500/sq yd: ₹4.08 Cr.',
+    stats: [{ label: 'Size', value: '~4,800 sq yds' }, { label: 'Price', value: '~₹4.08 Cr' }, { label: 'Frontage', value: 'Forest boundary' }],
   },
   {
     id: 'plot-community', num: 5, x: 62, y: 48,
     label: '36-Plot Private Community',
-    tag: 'From ₹64.6 L',
-    detail: '36 unique farm plots across 25 acres — each pre-planted and drip-irrigated. Sizes from 808 to 4,800 sq yds at ₹7,999/sq yd. Near RRR, 40 mins from Financial District. Winner: Best Eco-Friendly Project 2024.',
-    stats: [{ label: 'Total Area', value: '25 Acres' }, { label: 'Starting', value: '₹64.6 L' }, { label: 'Rate', value: '₹7,999/sq yd' }],
+    tag: 'From ₹68.7 L',
+    detail: '36 unique farm plots across 25 acres — each pre-planted and drip-irrigated. Sizes from 808 to 4,800 sq yds at ₹8,500/sq yd. Near RRR, 40 mins from Financial District. Winner: Best Eco-Friendly Project 2024.',
+    stats: [{ label: 'Total Area', value: '25 Acres' }, { label: 'Starting', value: '₹68.7 L' }, { label: 'Rate', value: '₹8,500/sq yd' }],
   },
 ];
 
@@ -1434,7 +1439,7 @@ const AGARTHA_PLOTS: PlotDot[] = [
 ];
 
 const AGARTHA_OLD_RATE = 6199;   // ₹/sq yd - VIP pre-launch rate (2 yrs ago)
-const AGARTHA_NOW_RATE = 7999;   // ₹/sq yd - current rate
+const AGARTHA_NOW_RATE = 8500;   // ₹/sq yd - current rate
 
 /** dot diameter: scales linearly from 6px (968 sq yd) to 18px (4800 sq yd) */
 const plotDotSize = (sqYds: number) =>
@@ -1463,7 +1468,7 @@ const AagarthaInteractiveLayout: FC<{ onClose: () => void }> = ({ onClose }) => 
     hotspots={AGARTHA_HOTSPOTS}
     projectName="Agartha"
     developerTag="MODCON Builders · Narsapur"
-    tagline="36 plots · Forest community · From ₹64.6 L"
+    tagline="36 plots · Forest community · From ₹68.7 L"
     brochureUrl="https://www.modconbuilders.com/agartha"
     intentPrefix="Agartha"
     onClose={onClose}
@@ -2435,6 +2440,91 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
             {/* SYL Price breakdown + CTA */}
             {sanctuary.id === 'syl' && (
               <div className="space-y-4">
+
+                {/* Pre-Investor Phase Banner */}
+                <div className="rounded-2xl overflow-hidden border border-[#c8a951]/30" style={{ background: 'linear-gradient(135deg, rgba(200,169,81,0.07) 0%, rgba(200,169,81,0.03) 100%)' }}>
+                  {/* Header */}
+                  <div className="px-4 py-2.5 flex items-center gap-2" style={{ background: 'rgba(200,169,81,0.14)' }}>
+                    <TrendingDown className="w-3.5 h-3.5 text-[#c8a951] rotate-180 flex-shrink-0" />
+                    <p className="text-[9px] uppercase tracking-[0.4em] font-bold text-[#c8a951]">Pre-Investor Phase · Now Running</p>
+                  </div>
+
+                  {/* FOMO callout */}
+                  <div className="px-4 pt-4">
+                    <div className="rounded-xl bg-[#c8a951]/10 border border-[#c8a951]/20 px-3 py-2.5 mb-3">
+                      <p className="text-[11px] font-semibold text-on-surface leading-snug">
+                        Agartha investors gained <span className="text-[#c8a951]">+37% in 18 months.</span>
+                      </p>
+                      <p className="text-[10px] text-secondary/60 mt-0.5">
+                        SYL Residences is the next opportunity — and you're still in the pre-investor window.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Phase progression */}
+                  <div className="px-4 pt-0 pb-3">
+                    <p className="text-[8px] uppercase tracking-[0.35em] text-secondary/50 font-bold mb-3">Investment Phase Roadmap</p>
+                    <div className="flex items-stretch gap-0">
+                      {/* Phase 1 — active */}
+                      <div className="flex-1 rounded-l-xl border border-[#c8a951]/40 overflow-hidden" style={{ background: 'rgba(200,169,81,0.1)' }}>
+                        <div className="px-3 py-2.5">
+                          <div className="flex items-center gap-1 mb-1">
+                            <div className="w-1.5 h-1.5 rounded-full bg-[#c8a951] animate-pulse" />
+                            <p className="text-[8px] font-bold text-[#c8a951] uppercase tracking-widest">Now</p>
+                          </div>
+                          <p className="text-[10px] font-bold text-on-surface">Pre-Investor</p>
+                          <p className="text-base font-headline font-bold text-[#c8a951] mt-0.5">₹4,499</p>
+                          <p className="text-[8px] text-secondary/50">per SFT</p>
+                        </div>
+                      </div>
+                      {/* Arrow */}
+                      <div className="flex items-center px-0.5 z-10">
+                        <div className="w-3 h-3 border-t-2 border-r-2 border-[#c8a951]/30 rotate-45 -ml-1.5" />
+                      </div>
+                      {/* Phase 2 */}
+                      <div className="flex-1 border border-outline/10 overflow-hidden" style={{ background: 'rgba(0,0,0,0.02)' }}>
+                        <div className="px-3 py-2.5">
+                          <p className="text-[8px] font-bold text-secondary/40 uppercase tracking-widest mb-1">Next</p>
+                          <p className="text-[10px] font-bold text-secondary/60">Pre-Launch</p>
+                          <p className="text-base font-headline font-bold text-secondary/40 mt-0.5">Higher</p>
+                          <p className="text-[8px] text-secondary/30">at booking milestone</p>
+                        </div>
+                      </div>
+                      {/* Arrow */}
+                      <div className="flex items-center px-0.5 z-10">
+                        <div className="w-3 h-3 border-t-2 border-r-2 border-outline/20 rotate-45 -ml-1.5" />
+                      </div>
+                      {/* Phase 3 */}
+                      <div className="flex-1 rounded-r-xl border border-outline/10 overflow-hidden">
+                        <div className="px-3 py-2.5">
+                          <p className="text-[8px] font-bold text-secondary/40 uppercase tracking-widest mb-1">Launch</p>
+                          <p className="text-[10px] font-bold text-secondary/50">Public</p>
+                          <p className="text-base font-headline font-bold text-secondary/30 mt-0.5">Market</p>
+                          <p className="text-[8px] text-secondary/30">post-launch rate</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Why now */}
+                  <div className="px-4 pb-4 space-y-2">
+                    <p className="text-[9px] uppercase tracking-[0.3em] text-secondary/50 font-bold">Why Pre-Investor Phase Matters</p>
+                    {[
+                      { icon: '⬇', title: 'Lowest possible rate', desc: 'Pre-investor pricing is always below the pre-launch and public launch rate. Once booking targets are hit, this phase closes.' },
+                      { icon: '🏆', title: 'First pick of units', desc: 'Best floor plans, preferred views, and corner units go to pre-investors — before the project is even advertised.' },
+                      { icon: '📈', title: 'Appreciation from day one', desc: 'Tukkuguda is in Hyderabad\'s 4th City corridor. Early investors capture the full growth curve from ground up.' },
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-start gap-2.5">
+                        <span className="text-sm flex-shrink-0 mt-0.5">{item.icon}</span>
+                        <div>
+                          <p className="text-[10px] font-semibold text-on-surface">{item.title}</p>
+                          <p className="text-[9px] text-secondary/50 leading-relaxed">{item.desc}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
                 <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold">
                   Price Estimate — ₹4,499 / SFT
                 </p>
@@ -2494,11 +2584,11 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
               </div>
             )}
 
-            {/* Agartha Price breakdown table */}
-            {sanctuary.pricePerSqYd && (
-              <div>
-                <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold mb-4">
-                  Price Calculator — ₹{sanctuary.pricePerSqYd.toLocaleString('en-IN')}/sq yd
+            {/* Agartha Price breakdown + WhatsApp CTAs */}
+            {sanctuary.id === 'agartha' && (
+              <div className="space-y-4">
+                <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold">
+                  Price Estimate — ₹8,500 / sq yd
                 </p>
                 <div className="rounded-2xl overflow-hidden border border-outline/10">
                   {[
@@ -2506,9 +2596,9 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
                     { label: 'Typical Plot', sqYds: 1300 },
                     { label: 'Large Plot', sqYds: 2000 },
                     { label: 'Premium Plot', sqYds: 3000 },
-                    { label: 'Plot 15 (Largest)', sqYds: 5097 },
+                    { label: 'Plot 3 (Largest)', sqYds: 4800 },
                   ].map((row, i) => {
-                    const totalRs = row.sqYds * sanctuary.pricePerSqYd!;
+                    const totalRs = row.sqYds * 8500;
                     const display = totalRs >= 1e7 ? `₹${(totalRs / 1e7).toFixed(2)} Cr` : `₹${(totalRs / 1e5).toFixed(1)} L`;
                     return (
                       <div key={i} className={cn("grid grid-cols-3 px-4 py-3 text-[10px]", i % 2 === 0 ? "bg-primary/3" : "bg-transparent")}>
@@ -2519,7 +2609,75 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
                     );
                   })}
                 </div>
-                <p className="text-[8px] text-secondary/40 mt-2">Rate: ₹{sanctuary.pricePerSqYd.toLocaleString('en-IN')}/sq yd</p>
+                <p className="text-[8px] text-secondary/40">Rate: ₹8,500/sq yd · Plots from 808 to 4,800 sq yds</p>
+
+                {/* Biomorphic Construction Add-On */}
+                <div className="rounded-2xl border border-primary/20 bg-primary/3 p-5 space-y-3">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Leaf className="w-4 h-4 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-[9px] uppercase tracking-[0.4em] text-primary font-bold mb-1">Biomorphic Construction Add-On</p>
+                      <p className="text-xs text-secondary leading-relaxed">
+                        MODCON's <span className="font-semibold text-on-surface">biomorphic design studio</span> can build a 150 sq yd home within your plot using mud · bamboo · lime · Bali-style architecture — a sustainable retreat that's yours from day one.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="rounded-xl bg-surface border border-outline/10 p-3 text-center">
+                      <p className="text-[9px] text-secondary/50 uppercase tracking-widest mb-0.5">Built-Up</p>
+                      <p className="text-sm font-bold text-on-surface">150 sq yds</p>
+                      <p className="text-[9px] text-secondary/40">1,350 SFT</p>
+                    </div>
+                    <div className="rounded-xl bg-surface border border-outline/10 p-3 text-center">
+                      <p className="text-[9px] text-secondary/50 uppercase tracking-widest mb-0.5">Add-On Cost</p>
+                      <p className="text-sm font-bold text-primary">₹35 – 50 L</p>
+                      <p className="text-[9px] text-secondary/40">Additional</p>
+                    </div>
+                    <div className="rounded-xl bg-surface border border-outline/10 p-3 text-center">
+                      <p className="text-[9px] text-secondary/50 uppercase tracking-widest mb-0.5">Style</p>
+                      <p className="text-sm font-bold text-on-surface">Bali</p>
+                      <p className="text-[9px] text-secondary/40">Mud · Bamboo · Lime</p>
+                    </div>
+                  </div>
+                  <p className="text-[9px] text-secondary/40 leading-relaxed">
+                    Biomorphic architecture by MODCON's design team. Pricing is indicative — enquire for a custom build quote.
+                  </p>
+                </div>
+
+                {/* WhatsApp CTAs */}
+                <div className="rounded-2xl border border-[#25D366]/30 bg-[#25D366]/5 p-5 space-y-3">
+                  <p className="text-xs text-secondary leading-relaxed">
+                    Rate is ₹8,500/sq yd. <span className="font-semibold text-on-surface">Better pricing available for in-person visits — we negotiate on your behalf.</span> Message us on WhatsApp to enquire or book a site visit.
+                  </p>
+                  <div className="flex flex-col gap-2">
+                    {/* WhatsApp — Enquire */}
+                    <a
+                      href="https://wa.me/919700144003?text=Hi%2C%20I%27m%20interested%20in%20MODCON%20Agartha%20(Narsapur%2C%20Hyderabad).%20Could%20you%20share%20the%20best%20available%20plots%20and%20pricing%3F"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2.5 w-full py-3.5 rounded-xl text-[10px] uppercase tracking-[0.4em] font-bold text-white transition-all"
+                      style={{ background: '#25D366' }}
+                    >
+                      <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current flex-shrink-0">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                        <path d="M12 0C5.373 0 0 5.373 0 12c0 2.128.558 4.121 1.533 5.851L.057 23.882l6.198-1.625A11.953 11.953 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.002-1.37l-.359-.214-3.68.965.981-3.595-.234-.371A9.818 9.818 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/>
+                      </svg>
+                      WhatsApp · Enquire Now
+                    </a>
+                    {/* WhatsApp — Book Site Visit */}
+                    <a
+                      href="https://wa.me/919700144003?text=Hi%2C%20I%27d%20like%20to%20book%20a%20site%20visit%20for%20MODCON%20Agartha%20(Narsapur).%20Please%20share%20available%20slots."
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 w-full py-3.5 border-2 border-[#25D366]/40 text-[#25D366] text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl transition-all hover:bg-[#25D366]/10"
+                    >
+                      <MapPin className="w-3.5 h-3.5" />
+                      Book Site Visit · WhatsApp
+                    </a>
+                  </div>
+                </div>
               </div>
             )}
 
@@ -4564,9 +4722,10 @@ CURRENT PROPERTY: MODCON AGARTHA — "Roots of Earth"
 - Architects: ARQEN
 - Award: Best Sustainable Eco-Friendly Project of the Year 2024 — Outlook Business Spotlight Entity Awards, Taj Banjara, Hyderabad
 - Plots: 36 unique farm plots (808 – 4,800 sq yds)
-- Price: ₹7,999 per sq yd
-- Starting: From ₹64.6 L (808 sq yds) — all-in entry under ₹1 Cr with mud house concept included
-- Premium Corner (Plot 3): ~4,800 sq yds, forest boundary — largest plot (~₹3.84 Cr)
+- Price: ₹8,500 per sq yd
+- Starting: From ₹68.7 L (808 sq yds) — entry under ₹1 Cr; better pricing available on in-person visit (negotiate)
+- Premium Corner (Plot 3): ~4,800 sq yds, forest boundary — largest plot (~₹4.08 Cr)
+- Biomorphic Construction Add-On: MODCON's biomorphic design studio offers a 150 sq yd (1,350 SFT) mud · bamboo · lime · Bali-style home within the plot for an additional ₹35–50 Lakhs. Enquire for custom build quote.
 - Clubhouse: 36,000 sq ft with 5 premium amenities
 - 5 Amenities: Aquatic pool, fully-equipped gym, kayaking lake, farm-to-table restaurant, children's play area + staycation villas
 - Each plot includes: Advanced drip irrigation, 100+ tree varieties pre-planted, vegetable beds, spiral herbal garden
@@ -4578,10 +4737,10 @@ CURRENT PROPERTY: MODCON AGARTHA — "Roots of Earth"
 
 INVESTMENT ANALYSIS:
 - VIP Pre-Launch Rate (Aug 2024): ₹6,199/sq yd
-- Current Rate (2026): ₹7,999/sq yd
-- Appreciation: +29% in ~18 months
-- Annualised ROI: ~19% p.a. — significantly outperforming FD (7%), gold (12%), and Sensex (~13% avg)
-- Example (Plot 28 — 2,057 sq yds): Pre-launch ₹1.28 Cr → Today ₹1.65 Cr → Gain of ₹37 L in 18 months
+- Current Rate (2026): ₹8,500/sq yd
+- Appreciation: +37.1% in ~18 months
+- Annualised ROI: ~24.7% p.a. — significantly outperforming FD (7%), gold (12%), and Sensex (~13% avg)
+- Example (Plot 28 — 2,057 sq yds): Pre-launch ₹1.28 Cr → Today ₹1.75 Cr → Gain of ₹47 L in 18 months
 - This is farmland near RRR — infrastructure appreciation (RRR corridor) compounds the organic permaculture value
 
 ENVIRONMENTAL INTELLIGENCE:
@@ -4617,6 +4776,9 @@ SECOND PROPERTY: MODCON SYL RESIDENCES
 - Villament sizes: 2,500 SFT to 4,500 SFT
 - Access: Newsletter subscribers only (gated)
 - Growth Corridor: Tukkuguda is in Hyderabad's 4th City expansion corridor — early-stage investment with strong appreciation potential
+- Current Phase: Pre-Investor Phase — NOW RUNNING. This is the lowest pricing available. Once booking targets are hit, price moves to pre-launch rate (higher). Then public launch rate (higher still).
+- Investor Advantage: Pre-investor pricing locked at ₹4,499/SFT · First pick of best units/floors/views · Full appreciation from ground up
+- FOMO Angle: Agartha investors gained +37% in 18 months. SYL at Tukkuguda's 4th City corridor is the same opportunity — but early. If someone asks why now, explain the phase structure.
 - Contact: +91 9700144003 (WhatsApp) · Modconbuilderpvt.ltd@gmail.com · modconbuilders.com
 - TGT Role: Channel partner — we introduce interested buyers directly to MODCON Builders
 
