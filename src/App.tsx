@@ -2373,8 +2373,8 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
               <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold mb-4">Environmental Integrity</p>
               <div className="space-y-3">
                 {[
-                  { label: 'Air Quality Index', value: `${sanctuary.aqi} — Pristine`, bar: Math.min((50 - sanctuary.aqi) / 50, 1) },
-                  { label: 'Ambient Noise', value: `${sanctuary.noise} dB — Near Silent`, bar: Math.min((50 - sanctuary.noise) / 50, 1) },
+                  { label: 'Air Quality Index', value: `${sanctuary.aqi} — Pristine`, bar: Math.min((100 - sanctuary.aqi) / 100, 1) },
+                  { label: 'Ambient Noise', value: `${sanctuary.noise} dB — Near Silent`, bar: Math.min((100 - sanctuary.noise) / 100, 1) },
                   { label: 'Forest Proximity', value: 'Direct Boundary Access', bar: 0.95 },
                 ].map(item => (
                   <div key={item.label}>
