@@ -913,32 +913,61 @@ const PreInvestorGold = () => {
         >
           <div className="flex items-center gap-4 mb-6">
             <div className="w-12 h-px bg-[#c8a951]" />
-            <span className="text-[#c8a951] text-[10px] font-bold uppercase tracking-[0.8em]">Institutional Grade</span>
+            <span className="text-[#c8a951] text-[10px] font-bold uppercase tracking-[0.8em]">Current Gold Fish</span>
           </div>
           <h2 className="text-5xl md:text-7xl font-light leading-tight mb-8">
-            Pre-Investor <span className="italic font-medium text-[#c8a951]">Gold™</span>
+            SYL Residences <span className="italic font-medium text-[#c8a951]">Gold™</span>
           </h2>
           <p className="text-xl md:text-2xl text-white/60 font-light max-w-3xl leading-relaxed">
-            We apply the same rigor and sophistication used by global real estate investment trusts (REITs) to private individual portfolios. This is property management at a billion-dollar scale.
+            Agartha investors gained +37% in 18 months. SYL Residences is the next opportunity — and you're still in the pre-investor window.
           </p>
+        </motion.div>
+
+        {/* Investment Roadmap Table */}
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          className="mb-24 overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-sm"
+        >
+          <div className="grid grid-cols-3 border-b border-white/10 bg-white/5">
+            <div className="p-6 text-[10px] uppercase tracking-widest font-bold text-white/40">Phase</div>
+            <div className="p-6 text-[10px] uppercase tracking-widest font-bold text-white/40">Timeline</div>
+            <div className="p-6 text-[10px] uppercase tracking-widest font-bold text-white/40">Rate (SFT)</div>
+          </div>
+          <div className="grid grid-cols-3 border-b border-white/10 bg-[#c8a951]/10">
+            <div className="p-8 font-bold text-[#c8a951]">Pre-Investor</div>
+            <div className="p-8 text-white/80">Now Running</div>
+            <div className="p-8 font-headline text-2xl text-[#c8a951]">₹4,499</div>
+          </div>
+          <div className="grid grid-cols-3 border-b border-white/10">
+            <div className="p-8 font-medium text-white/60">Pre-Launch</div>
+            <div className="p-8 text-white/40">At Booking Milestone</div>
+            <div className="p-8 text-white/60">Higher</div>
+          </div>
+          <div className="grid grid-cols-3">
+            <div className="p-8 font-medium text-white/60">Public Launch</div>
+            <div className="p-8 text-white/40">Market Launch</div>
+            <div className="p-8 text-white/60">Market Rate</div>
+          </div>
         </motion.div>
 
         <div className="grid md:grid-cols-3 gap-12">
           {[
             {
-              title: 'Portfolio Optimization',
-              desc: 'We don\'t just find properties; we engineer portfolios. Our team analyzes macro-economic trends, infrastructure corridors, and urban growth patterns to identify high-yield opportunities before they hit the mainstream.',
-              icon: <Layers className="w-6 h-6 text-[#c8a951]" />
+              title: 'Lowest Possible Rate',
+              desc: 'Pre-investor pricing is always below the pre-launch and public launch rate. Once booking targets are hit, this phase closes.',
+              icon: <TrendingDown className="w-6 h-6 text-[#c8a951]" />
             },
             {
-              title: 'Asset Management',
-              desc: 'Full-lifecycle management from acquisition to exit. We handle the complexities of legal due diligence, tax structuring, and property maintenance, ensuring your assets remain pristine and profitable.',
-              icon: <Shield className="w-6 h-6 text-[#c8a951]" />
-            },
-            {
-              title: 'Exclusive Access',
-              desc: 'Our "Gold" members receive first-right-of-refusal on all pre-launch opportunities, institutional-grade reporting, and dedicated relationship managers for a seamless experience.',
+              title: 'First Pick of Units',
+              desc: 'Best floor plans, preferred views, and corner units go to pre-investors — before the project is even advertised.',
               icon: <Award className="w-6 h-6 text-[#c8a951]" />
+            },
+            {
+              title: 'Appreciation from Day One',
+              desc: 'Tukkuguda is in Hyderabad\'s 4th City corridor. Early investors capture the full growth curve from ground up.',
+              icon: <Zap className="w-6 h-6 text-[#c8a951]" />
             }
           ].map((item, i) => (
             <motion.div
