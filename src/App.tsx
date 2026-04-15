@@ -248,7 +248,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
   const desktopNav = [
     { name: 'Map', id: 'map' },
     { name: 'Edge + Nature', id: 'analytics' },
-    { name: 'Pre-Investor Gold', id: 'preinvestor-gold', isGold: true },
+    { name: 'Pre-Investor Gold', id: 'preinvestor-gold', isGold: true, icon: Award },
     { name: 'Membership', id: 'membership' },
   ];
 
@@ -286,17 +286,21 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
 
         {/* Desktop nav — centered */}
         <div className="hidden md:flex items-center gap-7">
-          {desktopNav.map(item => (
-            <button key={item.id} onClick={() => onModeChange(item.id)}
-              className={cn(
-                "text-[9px] uppercase tracking-[0.45em] font-bold transition-colors duration-200",
-                item.isGold 
-                  ? "text-[#c8a951] hover:text-white" 
-                  : "text-secondary/45 hover:text-primary"
-              )}>
-              {item.name}
-            </button>
-          ))}
+          {desktopNav.map(item => {
+            const NavIcon = item.icon;
+            return (
+              <button key={item.id} onClick={() => onModeChange(item.id)}
+                className={cn(
+                  "flex items-center gap-2 text-[9px] uppercase tracking-[0.45em] font-bold transition-colors duration-200",
+                  item.isGold 
+                    ? "text-[#c8a951] hover:text-white" 
+                    : "text-secondary/45 hover:text-primary"
+                )}>
+                {NavIcon && <NavIcon className={cn("w-4 h-4", item.isGold ? "text-[#c8a951]" : "")} />}
+                {item.name}
+              </button>
+            );
+          })}
         </div>
 
         {/* Right controls */}
@@ -987,20 +991,7 @@ const PreInvestorGold = () => {
           ))}
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mt-24 p-12 rounded-[40px] bg-gradient-to-br from-white/5 to-transparent border border-white/10 flex flex-col md:flex-row items-center justify-between gap-12"
-        >
-          <div className="max-w-xl">
-            <h4 className="text-2xl font-bold mb-4">Ready for the Gold Standard?</h4>
-            <p className="text-white/50">Our Gold tier is currently by invitation only. Members of The Green Team can apply for an upgrade after their first successful acquisition through our platform.</p>
-          </div>
-          <button className="px-10 py-5 bg-[#c8a951] text-[#0a1208] text-[10px] uppercase tracking-[0.4em] font-bold rounded-full hover:bg-white transition-all whitespace-nowrap">
-            Apply for Invitation
-          </button>
-        </motion.div>
+
       </div>
     </section>
   );
