@@ -175,7 +175,7 @@ const SANCTUARIES: Sanctuary[] = [
     commute: '15 mins to Future City Hub',
     valuation: '₹4.0 Cr',
     memberPrice: '₹1.9 Cr',
-    image: 'https://static.wixstatic.com/media/142b26_e9917bb73fc94531948ef638eba5a051~mv2.jpg',
+    image: '/gallery/syl/1776279315359.png',
     tagline: 'Where the jungle lives inside.',
     description: 'SYL is a vertical biophilic villament — a building where the forest isn\'t outside the window, it\'s woven into every floor. Travertine stone corridors open into indoor rock gardens and water features. Co-working and dining spaces sit under canopies of hanging ferns and tropical palms. The rooftop carries a glass-bottomed infinity pool above a full fitness floor, all overlooking open forest canopy. This is the model for how cities should grow — up, with nature.',
     plots: 0,
@@ -193,11 +193,14 @@ const SANCTUARIES: Sanctuary[] = [
       'Near Future City Hub · 15 Min',
     ],
     plotImages: [
-      'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1545486332-9e0999c535b2?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1600210492493-0946911123ea?auto=format&fit=crop&q=80&w=1200',
-      'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=1200',
+      '/gallery/syl/1776279315359.png',
+      '/gallery/syl/1776279320251.png',
+      '/gallery/syl/1776279329483.png',
+      '/gallery/syl/1776279339464.png',
+      '/gallery/syl/1776279343905.png',
+      '/gallery/syl/1776279350036.png',
+      '/gallery/syl/1776279361294.png',
+      '/gallery/syl/1776279377269.png',
     ],
   },
 ];
@@ -248,7 +251,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
 
   const sanctuaryItems = [
     { name: 'MODCON Agartha', id: 'list', sub: 'Narsapur Forest · From ₹64.6 L', img: 'https://images.unsplash.com/photo-1542401886-65d6c61db217?auto=format&fit=crop&q=80&w=400' },
-    { name: 'SYL: Vertical Villament', id: 'syl', sub: 'Tukkuguda · From ₹1.9 Cr', img: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=80&w=400' },
+    { name: 'SYL: Vertical Villament', id: 'syl', sub: 'Tukkuguda · From ₹1.9 Cr', img: '/gallery/syl/1776279315359.png' },
   ];
 
   const avatarLetter = (authUser?.displayName?.[0] || authUser?.email?.[0] || authUser?.phoneNumber?.[1] || '?').toUpperCase();
