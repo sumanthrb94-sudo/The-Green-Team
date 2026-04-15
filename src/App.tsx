@@ -177,13 +177,15 @@ const SANCTUARIES: Sanctuary[] = [
     memberPrice: '₹1.9 Cr',
     image: '/gallery/syl/1776279315359.png',
     tagline: 'A modern address where luxury meets nature.',
-    description: 'MODCON SYL Residences is a 4.5-acre biophilic villament enclave at Tukkuguda, ORR Exit-14 — a hybrid of villa freedom and apartment convenience, built around forest landscape views, natural light, and wellness. Every unit opens to large private balconies overlooking lush forest canopy. The 22,000 sq ft clubhouse is designed as a serene wellness retreat with a chemical-free Natural Bio Pool, Yoga & Meditation Pavilion, and fully landscaped green corridors. Located 10 minutes from the international airport and on the doorstep of Hyderabad\'s fast-expanding Fourth City corridor, SYL is both a lifestyle address and a well-timed investment.',
+    description: 'MODCON SYL Residences is a 4.5-acre integrated biophilic development at Tukkuguda, ORR Exit-14 — offering both luxury villaments and commercial spaces under one address. Residential villaments open to large private balconies with forest and sunrise views. The commercial component, MODCON ONE, spans 1.5 acres of prime mixed-use space — retail, offices, and F&B — starting at 2,500 SFT at ₹4,500/SFT. The 22,000 sq ft clubhouse is a wellness retreat with a chemical-free Natural Bio Pool and Yoga Pavilion. Located 10 minutes from the international airport and at the threshold of Hyderabad\'s Fourth City growth corridor.',
     plots: 0,
-    plotRange: 'Villaments · 2 & 3 BHK',
+    plotRange: 'Villaments (Residential) · Commercial from 2,500 SFT',
     amenityAcres: '22,000 SFT Clubhouse · Health • Wellness • Nature',
     architect: 'MODCON Builders',
     brochureUrl: 'https://www.modconbuilders.com',
     features: [
+      'Commercial Units from 2,500 SFT · ₹4,500/SFT',
+      'MODCON ONE — 1.5 Ac Mixed-Use Commercial',
       'Natural Bio Pool (Chemical-Free)',
       'Yoga & Meditation Pavilion',
       'Large Forest-View Balconies',
@@ -193,9 +195,7 @@ const SANCTUARIES: Sanctuary[] = [
       '100% Power Backup',
       '4 High-Speed Passenger Lifts',
       'Gated Community · 24/7 Security',
-      'Express Mart On-Site',
-      '10 Min to RGI Airport',
-      'ORR Exit-14 Direct Access',
+      'ORR Exit-14 · 10 Min to Airport',
     ],
     plotImages: [
       '/gallery/syl/1776279315359.png',
@@ -4550,6 +4550,8 @@ SECOND PROPERTY: MODCON SYL RESIDENCES
 - Clubhouse: 22,000 sq ft — theme: Health • Wellness • Nature
 - Amenities: Natural Bio Pool (chemical-free), Yoga & Meditation Pavilion, Wellness & Fitness Centre, Landscaped Green Corridors, Express Mart, Dedicated Parking per unit, EV Charging Points, 4 High-Speed Lifts, 100% Power Backup, Gated Community with 24/7 CCTV
 - Commercial Component: MODCON ONE — 1.5 acres mixed-use retail, offices, F&B in same campus
+- Commercial Pricing: Starts at 2,500 SFT · ₹4,500 per SFT (minimum entry ~₹1.125 Cr)
+- Commercial entry price example: 2,500 SFT × ₹4,500 = ₹1.125 Cr
 - Access: Newsletter subscribers only (gated)
 - Growth Corridor: Tukkuguda is in Hyderabad's 4th City expansion corridor — early-stage investment with strong appreciation potential
 - Contact: +91 9534869999 · Modconbuilderpvt.ltd@gmail.com · modconbuilders.com
