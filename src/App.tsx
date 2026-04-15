@@ -1025,8 +1025,8 @@ const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewslet
           TGT Channel Partner
         </span>
         {isSyl && (
-          <span className="px-3 py-1 text-[8px] font-bold rounded-full bg-[#080d06]/75 text-white/70 backdrop-blur-sm border border-white/10 w-fit leading-relaxed">
-            Missed Agartha? Don't miss this.
+          <span className="px-3 py-1 text-[8px] font-bold rounded-full bg-[#c8a951]/20 text-[#c8a951] backdrop-blur-sm border border-[#c8a951]/40 w-fit leading-relaxed">
+            Pre-Investor Gold™
           </span>
         )}
       </div>
