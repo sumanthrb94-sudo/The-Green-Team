@@ -122,7 +122,7 @@ const SANCTUARIES: Sanctuary[] = [
     pricePerSqYd: 7999,
     valuation: '₹1.04 Cr',
     memberPrice: 'From ₹64.6 L',
-    image: 'https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&q=80&w=1200',
+    image: 'https://static.wixstatic.com/media/142b26_e9917bb73fc94531948ef638eba5a051~mv2.jpg',
     tagline: 'Where the forest becomes home.',
     description: 'MODCON Agartha is a 25-acre regenerative permaculture farm estate on the Narsapur forest boundary, near the RRR. 36 unique farm plots — each pre-planted with 100+ tree varieties, drip irrigation, vegetable beds, and a spiral herbal garden — surround a 36,000 sq ft clubhouse with 5 premium amenities: aquatic pool, kayaking lake, gym, farm-to-table dining, and staycation villas. An on-site Goshala with integrated animal husbandry completes the self-sustaining ecosystem. Winner: Best Sustainable Eco-Friendly Project of the Year 2024.',
     plots: 36,
@@ -4668,27 +4668,20 @@ Additional live context (user data): ${JSON.stringify({ user: data.user?.display
 
 const HomeView = ({ isSubscribed, onNewsletterClick, sanctuaries = SANCTUARIES, onModeChange }: { isSubscribed: boolean, onNewsletterClick: () => void, sanctuaries?: Sanctuary[], onModeChange: (mode: string) => void }) => (
   <div className="flex flex-col">
-    {/* 1. Hero — backdrop image + KPI bar */}
+    {/* 1. Hero */}
     <Hero onModeChange={onModeChange} />
 
-    {/* 2. How it works — 3-step simple explainer */}
+    {/* 2. How it works — 3-step explainer */}
     <WhatWeDo />
 
-    {/* 3. Properties — what we currently curate */}
+    {/* 3. Properties */}
     <Sanctuaries isSubscribed={isSubscribed} onNewsletterClick={onNewsletterClick} sanctuaries={sanctuaries} />
 
-    {/* 4. Side-by-side comparison — why nature living is realistic */}
-    <WhyItMatters />
-
-    {/* 5. Our 4-point checklist — what every property must pass */}
+    {/* 4. Our 4-point checklist */}
     <EcosystemPillars />
 
-    {/* 6. Social proof */}
-    <TrustSignals />
-
-    {/* 7. Newsletter + contact */}
+    {/* 5. Newsletter + footer */}
     <NewsletterHighlight onSubscribe={onNewsletterClick} />
-    <ApplicationForm />
     <Footer onModeChange={onModeChange} />
   </div>
 );
