@@ -182,7 +182,7 @@ const SANCTUARIES: Sanctuary[] = [
 
 // --- Components ---
 
-const Logo = ({ className = "w-10 h-10", textClassName = "text-xl md:text-2xl", iconOnly = false }: { className?: string, textClassName?: string, iconOnly?: boolean }) => (
+const Logo = ({ className = "w-10 h-10", textClassName = "text-xl md:text-2xl", iconOnly = false, onDark = false }: { className?: string, textClassName?: string, iconOnly?: boolean, onDark?: boolean }) => (
   <div className={cn("flex items-center gap-4 group cursor-pointer", !iconOnly && "z-50")}>
     <div className={cn("relative flex items-center justify-center transition-all duration-700 group-hover:rotate-12 text-primary", className)}>
       <svg viewBox="0 0 100 100" className="w-full h-full fill-current">
@@ -193,8 +193,8 @@ const Logo = ({ className = "w-10 h-10", textClassName = "text-xl md:text-2xl", 
     </div>
     {!iconOnly && (
       <div className="flex flex-col">
-        <span className={cn("font-headline font-bold tracking-widest text-on-surface uppercase transition-all duration-700", textClassName)}>The Green Team</span>
-        <span className="text-[8px] md:text-[10px] uppercase tracking-[0.4em] md:tracking-[0.6em] text-primary font-bold -mt-0.5 md:-mt-1 hidden sm:block">Independent Sanctuary Curators</span>
+        <span className={cn("font-headline font-bold tracking-widest uppercase transition-all duration-700", onDark ? "text-white/90" : "text-on-surface", textClassName)}>The Green Team</span>
+        <span className={cn("text-[8px] md:text-[10px] uppercase tracking-[0.4em] md:tracking-[0.6em] font-bold -mt-0.5 md:-mt-1 hidden sm:block", onDark ? "text-white/30" : "text-primary")}>Channel Partners · Hyderabad</span>
       </div>
     )}
   </div>
@@ -3348,7 +3348,7 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
               animate={{ scale: [0.95, 1.05, 0.95] }}
               transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
             >
-              <Logo className="w-16 h-16" style={{ opacity: 0.9 }} />
+              <Logo className="w-16 h-16 text-[#a3b18a]" onDark={true} />
             </motion.div>
             <div className="mt-6 flex items-center gap-2">
               <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#4ade80' }} />
@@ -4228,7 +4228,7 @@ const Footer = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
         {/* Top: brand + tagline */}
         <div className="border-b border-white/8 pb-16 mb-16 flex flex-col md:flex-row md:items-end justify-between gap-10">
           <div>
-            <Logo className="w-10 h-10 text-cream mb-6" />
+            <Logo className="w-10 h-10 text-[#a3b18a] mb-6" onDark={true} />
             <p className="text-2xl md:text-3xl font-light text-white/30 max-w-xl leading-relaxed">
               We curate verified forest-adjacent communities for investors seeking intentional, sustainable living with transparent investment fundamentals.
             </p>
