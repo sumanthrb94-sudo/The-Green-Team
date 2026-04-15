@@ -248,7 +248,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
   const desktopNav = [
     { name: 'Map', id: 'map' },
     { name: 'Edge + Nature', id: 'analytics' },
-    { name: 'Pre-Investor Gold', id: 'preinvestor-gold' },
+    { name: 'Pre-Investor Gold', id: 'preinvestor-gold', isGold: true },
     { name: 'Membership', id: 'membership' },
   ];
 
@@ -288,7 +288,12 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
         <div className="hidden md:flex items-center gap-7">
           {desktopNav.map(item => (
             <button key={item.id} onClick={() => onModeChange(item.id)}
-              className="text-[9px] uppercase tracking-[0.45em] font-bold text-secondary/45 hover:text-primary transition-colors duration-200">
+              className={cn(
+                "text-[9px] uppercase tracking-[0.45em] font-bold transition-colors duration-200",
+                item.isGold 
+                  ? "text-[#c8a951] hover:text-white" 
+                  : "text-secondary/45 hover:text-primary"
+              )}>
               {item.name}
             </button>
           ))}
@@ -492,6 +497,7 @@ const BottomTabBar = ({ activeMode, onModeChange }: { activeMode: string; onMode
         {tabs.map(tab => {
           const Icon = tab.icon;
           const isActive = activeMode === tab.id;
+          const isGold = tab.id === 'preinvestor-gold';
           return (
             <button
               key={tab.id}
@@ -501,16 +507,19 @@ const BottomTabBar = ({ activeMode, onModeChange }: { activeMode: string; onMode
               {isActive && (
                 <motion.div
                   layoutId="tab-indicator"
-                  className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 rounded-full bg-primary"
+                  className={cn(
+                    "absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 rounded-full",
+                    isGold ? "bg-[#c8a951]" : "bg-primary"
+                  )}
                 />
               )}
               <Icon className={cn(
                 "w-[18px] h-[18px] transition-all duration-200",
-                isActive ? "text-primary scale-110" : "text-secondary/30"
+                isActive && isGold ? "text-[#c8a951] scale-110" : isActive ? "text-primary scale-110" : "text-secondary/30"
               )} />
               <span className={cn(
                 "text-[7px] uppercase tracking-[0.35em] font-bold transition-all duration-200",
-                isActive ? "text-primary" : "text-secondary/25"
+                isActive && isGold ? "text-[#c8a951]" : isActive ? "text-primary" : "text-secondary/25"
               )}>
                 {tab.label}
               </span>
