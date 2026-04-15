@@ -1,0 +1,27 @@
+{
+  "name": "The Green Team",
+  "short_name": "TGT",
+  "description": "Forest-adjacent homes near Hyderabad — curated channel partners for MODCON Agartha",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#faf9f6",
+  "theme_color": "#2d3a1d",
+  "lang": "en-IN",
+  "categories": ["real estate", "lifestyle", "environment"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/agartha-render.jpg",
+      "type": "image/jpeg",
+      "sizes": "1200x630",
+      "label": "MODCON Agartha — curated forest property near Hyderabad"
+    }
+  ]
+}

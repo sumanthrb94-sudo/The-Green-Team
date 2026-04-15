@@ -4261,10 +4261,10 @@ const Footer = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
         {/* Bottom bar */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           <p className="text-[9px] uppercase tracking-[0.5em] text-white/20 font-bold">
-            © {new Date().getFullYear()} The Green Team · Independent Sanctuary Curators · Hyderabad
+            © {new Date().getFullYear()} The Green Team · Channel Partners · Hyderabad
           </p>
           <div className="flex items-center gap-8">
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-cream/20 hover:text-cream transition-all">
+            <a href="https://instagram.com/the.green.team.in" target="_blank" rel="noopener noreferrer" aria-label="The Green Team on Instagram" className="text-cream/20 hover:text-cream transition-all">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
                 <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
                 <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />

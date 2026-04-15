@@ -1,0 +1,13 @@
+# The Green Team — https://thegreenteam.in
+# robots.txt
+
+User-agent: *
+Allow: /
+
+# Block build artifacts and admin paths
+Disallow: /dist/
+Disallow: /.git/
+Disallow: /node_modules/
+
+# Sitemap location
+Sitemap: https://thegreenteam.in/sitemap.xml

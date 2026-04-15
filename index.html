@@ -1,36 +1,191 @@
 <!doctype html>
-<html lang="en">
+<html lang="en-IN">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
-    <title>The Green Team — Independent Sanctuary Curators</title>
-    <meta name="description" content="A premium collective curating India's most exclusive organic sanctuaries. Featuring MODCON Agartha and The SIL at Tukkuguda, Hyderabad." />
+    <!-- ── Primary SEO ─────────────────────────────────────────────────────── -->
+    <title>The Green Team | Forest Homes Near Hyderabad | Channel Partner MODCON Agartha</title>
+    <meta name="description" content="We curate forest-adjacent homes near Hyderabad — AQI under 25, 45-min city commute. Channel partners for MODCON Agartha (Narsapur). Plots from ₹64.6L. Villas, apartments & plots verified." />
+    <meta name="keywords" content="forest property Hyderabad, eco friendly homes Hyderabad, MODCON Agartha, farm plots near Hyderabad, Narsapur forest plots, low AQI property Hyderabad, channel partner Agartha, green real estate Hyderabad, nature homes Hyderabad, forest adjacent property, permaculture farm Hyderabad, RRR corridor property" />
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <meta name="author" content="The Green Team" />
 
-    <!-- Favicon -->
+    <!-- ── Geo signals ─────────────────────────────────────────────────────── -->
+    <meta name="geo.region" content="IN-TG" />
+    <meta name="geo.placename" content="Hyderabad, Telangana, India" />
+    <meta name="geo.position" content="17.3850;78.4867" />
+    <meta name="ICBM" content="17.3850, 78.4867" />
+
+    <!-- ── Canonical ──────────────────────────────────────────────────────── -->
+    <!-- Update this to your final production domain if different from thegreenteam.in -->
+    <link rel="canonical" href="https://thegreenteam.in/" />
+
+    <!-- ── Favicon / Icons ────────────────────────────────────────────────── -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="apple-mobile-web-app-title" content="The Green Team" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-    <!-- Open Graph (WhatsApp, Facebook, LinkedIn previews) -->
+    <!-- ── Open Graph — WhatsApp, Facebook, LinkedIn ──────────────────────── -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="The Green Team" />
-    <meta property="og:title" content="The Green Team — Independent Sanctuary Curators" />
-    <meta property="og:description" content="Securing self-sustaining sanctuaries in Hyderabad where food, water, and energy are curated for the future." />
-    <meta property="og:url" content="https://the-green-team.vercel.app/" />
-    <meta property="og:image" content="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=1200&h=630" />
+    <meta property="og:title" content="The Green Team | Forest Homes Near Hyderabad | From ₹64.6L" />
+    <meta property="og:description" content="Independent channel partners who curate forest-adjacent homes near Hyderabad. AQI 12, 18 dB noise, under 45-min commute. Plots, villas, apartments — verified before we show you." />
+    <meta property="og:url" content="https://thegreenteam.in/" />
+    <meta property="og:image" content="https://thegreenteam.in/agartha-render.jpg" />
+    <meta property="og:image:secure_url" content="https://thegreenteam.in/agartha-render.jpg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:alt" content="MODCON Agartha — forest farm estate near Hyderabad, curated by The Green Team" />
     <meta property="og:locale" content="en_IN" />
 
-    <!-- Twitter / X card -->
+    <!-- ── Twitter / X card ───────────────────────────────────────────────── -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="The Green Team — Independent Sanctuary Curators" />
-    <meta name="twitter:description" content="Securing self-sustaining sanctuaries in Hyderabad where food, water, and energy are curated for the future." />
-    <meta name="twitter:image" content="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=1200&h=630" />
+    <meta name="twitter:title" content="The Green Team | Forest Homes Near Hyderabad" />
+    <meta name="twitter:description" content="We curate forest-adjacent homes near Hyderabad — AQI 12, 18 dB noise, 45-min commute. Channel partners for MODCON Agartha." />
+    <meta name="twitter:image" content="https://thegreenteam.in/agartha-render.jpg" />
+    <meta name="twitter:image:alt" content="MODCON Agartha forest property curated by The Green Team, Hyderabad" />
 
-    <!-- Theme colour (browser chrome on mobile) -->
+    <!-- ── Theme / PWA ────────────────────────────────────────────────────── -->
     <meta name="theme-color" content="#2d3a1d" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="The Green Team" />
+
+    <!-- ── Performance: preconnect to external origins ───────────────────── -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://static.wixstatic.com" />
+    <link rel="dns-prefetch" href="https://static.wixstatic.com" />
+    <link rel="dns-prefetch" href="https://firestore.googleapis.com" />
+
+    <!-- ── Structured Data: RealEstateAgent / Organization ───────────────── -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": ["RealEstateAgent", "LocalBusiness"],
+          "@id": "https://thegreenteam.in/#organization",
+          "name": "The Green Team",
+          "alternateName": "TGT",
+          "url": "https://thegreenteam.in",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://thegreenteam.in/logo-the-green-team-original.svg",
+            "width": 300,
+            "height": 80
+          },
+          "image": "https://thegreenteam.in/agartha-render.jpg",
+          "description": "Independent channel partners who curate forest-adjacent homes near Hyderabad. We verify AQI readings, noise levels, commute times, and design quality before recommending any property — plots, villas, or apartments.",
+          "email": "hello@thegreenteam.in",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Hyderabad",
+            "addressRegion": "Telangana",
+            "postalCode": "500032",
+            "addressCountry": "IN"
+          },
+          "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": 17.3850,
+            "longitude": 78.4867
+          },
+          "areaServed": [
+            { "@type": "City", "name": "Hyderabad" },
+            { "@type": "State", "name": "Telangana" }
+          ],
+          "knowsAbout": [
+            "Forest-adjacent real estate",
+            "Eco-friendly homes",
+            "Permaculture farm plots",
+            "AQI-verified properties",
+            "MODCON Agartha"
+          ],
+          "sameAs": [
+            "https://linkedin.com/company/the-green-team-india"
+          ],
+          "priceRange": "₹₹₹"
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://thegreenteam.in/#website",
+          "url": "https://thegreenteam.in",
+          "name": "The Green Team",
+          "description": "Forest-adjacent property curation near Hyderabad — channel partners for MODCON Agartha",
+          "inLanguage": "en-IN",
+          "publisher": { "@id": "https://thegreenteam.in/#organization" }
+        },
+        {
+          "@type": "Product",
+          "name": "MODCON Agartha — Forest Farm Plots, Narsapur Hyderabad",
+          "description": "25-acre regenerative permaculture farm estate on the Narsapur forest boundary, near the RRR corridor. 36 curated farm plots (808–4,800 sq yds), 36,000 sq ft clubhouse, AQI 12, ambient noise 18 dB, 40 minutes from Hyderabad Financial District. Winner: Best Sustainable Eco-Friendly Project, Outlook Business 2024.",
+          "brand": {
+            "@type": "Brand",
+            "name": "MODCON Builders"
+          },
+          "image": "https://thegreenteam.in/agartha-render.jpg",
+          "award": "Best Sustainable Eco-Friendly Project — Outlook Business 2024",
+          "offers": {
+            "@type": "Offer",
+            "priceCurrency": "INR",
+            "price": "6460000",
+            "priceValidUntil": "2026-12-31",
+            "availability": "https://schema.org/InStock",
+            "url": "https://thegreenteam.in",
+            "seller": {
+              "@type": "RealEstateAgent",
+              "name": "The Green Team",
+              "url": "https://thegreenteam.in"
+            }
+          },
+          "additionalProperty": [
+            { "@type": "PropertyValue", "name": "AQI", "value": "12" },
+            { "@type": "PropertyValue", "name": "Ambient Noise", "value": "18 dB" },
+            { "@type": "PropertyValue", "name": "Commute to Hyderabad Financial District", "value": "40 minutes" },
+            { "@type": "PropertyValue", "name": "Plot Range", "value": "808 to 4800 sq yds" }
+          ]
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "What is The Green Team?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "The Green Team is an independent channel partner that curates forest-adjacent properties near Hyderabad. We verify AQI levels, noise, commute times, and design quality before recommending any property — apartments, villas, or plots."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What is MODCON Agartha?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "MODCON Agartha is a 25-acre permaculture farm estate on the Narsapur forest boundary, 40 minutes from Hyderabad's Financial District. It won Best Sustainable Eco-Friendly Project at Outlook Business 2024. The Green Team is an authorised channel partner. Plots start from ₹64.6 Lakh."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What AQI standard do you require for curated properties?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Every property The Green Team curates must have an AQI below 25 — compared to typical Hyderabad city air of 100–180. MODCON Agartha currently records AQI 12."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How far are these properties from Hyderabad?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "All properties we recommend are within 45 minutes of Hyderabad's key office corridors (Financial District, HITEC City). MODCON Agartha at Narsapur is 40 minutes from the Financial District via the RRR."
+              }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
   </head>
   <body>
     <!-- Apply dark class before React loads to avoid flash of wrong theme -->
@@ -39,6 +194,19 @@
         document.documentElement.classList.add('dark');
       }
     </script>
+
+    <!-- Fallback for no-JS crawlers (Google, Bing) -->
+    <noscript>
+      <div style="font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 20px;color:#1a1c1a">
+        <h1>The Green Team — Forest-Adjacent Homes Near Hyderabad</h1>
+        <p>We curate forest-adjacent homes near Hyderabad — AQI under 25, under 45-min commute. Channel partners for MODCON Agartha, Narsapur.</p>
+        <h2>Currently Curated: MODCON Agartha</h2>
+        <p>25-acre permaculture farm estate on the Narsapur forest boundary. 36 farm plots (808–4,800 sq yds), AQI 12, ambient noise 18 dB, 40 minutes from Hyderabad Financial District. Plots from ₹64.6 Lakh.</p>
+        <p>Winner: Best Sustainable Eco-Friendly Project — Outlook Business 2024.</p>
+        <p>Contact us: <a href="mailto:hello@thegreenteam.in">hello@thegreenteam.in</a></p>
+      </div>
+    </noscript>
+
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

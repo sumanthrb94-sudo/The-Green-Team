@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml"
+  xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+>
+
+  <!-- Home -->
+  <url>
+    <loc>https://thegreenteam.in/</loc>
+    <lastmod>2026-04-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://thegreenteam.in/agartha-render.jpg</image:loc>
+      <image:title>MODCON Agartha — Forest Farm Estate, Narsapur Hyderabad</image:title>
+      <image:caption>25-acre permaculture farm estate curated by The Green Team. AQI 12, 40 min from Hyderabad Financial District.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://thegreenteam.in/hero-backdrop.jpg</image:loc>
+      <image:title>Forest house at dusk — The Green Team</image:title>
+      <image:caption>Forest-adjacent living curated by The Green Team, Hyderabad</image:caption>
+    </image:image>
+  </url>
+
+</urlset>
