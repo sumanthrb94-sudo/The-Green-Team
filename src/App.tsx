@@ -1968,7 +1968,7 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
       </div>
 
       {/* ── Tab content — scrollable ── */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto pb-24 md:pb-0">
 
         {/* ── GALLERY TAB ── */}
         {pdTab === 'gallery' && (() => {
@@ -4710,7 +4710,7 @@ Additional live context (user data): ${JSON.stringify({ user: data.user?.display
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-24 right-8 md:bottom-8 z-[999] w-12 h-12 bg-olive-900 text-cream border border-olive-800/20 rounded-full shadow-lg flex items-center justify-center hover:bg-primary hover:border-primary/30 transition-all duration-300 group"
+        className="fixed bottom-20 right-6 md:bottom-8 md:right-8 z-[999] w-12 h-12 bg-olive-900 text-cream border border-olive-800/20 rounded-full shadow-lg flex items-center justify-center hover:bg-primary hover:border-primary/30 transition-all duration-300 group"
       >
         <MessageSquare className="w-5 h-5 relative z-10" />
       </button>
@@ -4730,7 +4730,7 @@ Additional live context (user data): ${JSON.stringify({ user: data.user?.display
               initial={{ opacity: 0, y: 50, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 50, scale: 0.95 }}
-              className="fixed bottom-24 right-8 md:bottom-32 z-[9981] w-[340px] max-w-[calc(100vw-3rem)] h-[500px] bg-surface shadow-2xl border border-olive-800/10 flex flex-col overflow-hidden rounded-2xl"
+              className="fixed bottom-20 right-6 md:bottom-32 md:right-8 z-[9981] w-[340px] max-w-[calc(100vw-3rem)] h-[500px] bg-surface shadow-2xl border border-olive-800/10 flex flex-col overflow-hidden rounded-2xl"
             >
               <div className="bg-olive-900 p-6 text-cream flex justify-between items-center">
                 <div className="flex items-center gap-4">
