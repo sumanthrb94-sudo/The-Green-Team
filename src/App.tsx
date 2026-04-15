@@ -247,16 +247,16 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
 
   const desktopNav = [
     { name: 'Map', id: 'map' },
-    { name: 'Advantage', id: 'analytics' },
-    { name: 'Ecosystems', id: 'gallery' },
+    { name: 'Edge + Nature', id: 'analytics' },
+    { name: 'Pre-Investor Gold', id: 'preinvestor-gold' },
     { name: 'Membership', id: 'membership' },
   ];
 
   const allNav = [
     { name: 'Home', id: 'home', icon: Home },
     { name: 'Map', id: 'map', icon: MapPin },
-    { name: 'Advantage', id: 'analytics', icon: TrendingDown },
-    { name: 'Ecosystems', id: 'gallery', icon: Leaf },
+    { name: 'Edge + Nature', id: 'analytics', icon: TrendingDown },
+    { name: 'Pre-Investor Gold', id: 'preinvestor-gold', icon: Award },
     { name: 'Membership', id: 'membership', icon: Shield },
   ];
 
@@ -472,8 +472,8 @@ const BottomTabBar = ({ activeMode, onModeChange }: { activeMode: string; onMode
   const tabs = [
     { id: 'home',       label: 'Home',      icon: Home        },
     { id: 'map',        label: 'Map',        icon: MapPin      },
-    { id: 'analytics',  label: 'Edge',       icon: TrendingDown },
-    { id: 'gallery',    label: 'Nature',     icon: Leaf        },
+    { id: 'preinvestor-gold', label: 'Gold', icon: Award      },
+    { id: 'analytics',  label: 'Edge + Nature', icon: TrendingDown },
     { id: 'membership', label: 'Join',       icon: Shield      },
   ];
 
@@ -822,25 +822,146 @@ const EcosystemPillars = ({ isFullPage = false }: { isFullPage?: boolean }) => {
 };
 
 const Advantage = ({ isFullPage = false }: { isFullPage?: boolean }) => {
-  // Kept for non-home views (AboutView, etc.) — simple version
   return (
     <section id="the-advantage" className={cn(
-      "px-12 md:px-24 bg-surface border-y border-outline/10",
-      isFullPage ? "py-16" : "py-14"
+      "px-6 md:px-24 bg-surface border-y border-outline/10",
+      isFullPage ? "py-20" : "py-14"
     )}>
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mb-10"
+          className="mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-light text-on-surface">
-            We are <span className="italic text-primary">channel partners.</span>
+          <span className="text-primary text-[10px] font-bold uppercase tracking-[0.6em] mb-4 block">The TGT Edge</span>
+          <h2 className="text-4xl md:text-6xl font-light text-on-surface leading-tight">
+            We are <span className="italic text-primary">channel partners.</span><br />
+            Not developers. Not portals.
           </h2>
-          <p className="mt-4 text-lg text-secondary leading-relaxed max-w-2xl">
-            Not developers, not portals. We independently curate properties, verify every claim ourselves, and connect you with the developer directly. No middleman markup — just our honest recommendation.
+          <p className="mt-6 text-lg md:text-xl text-secondary leading-relaxed max-w-3xl">
+            We independently curate properties, verify every claim ourselves, and connect you with the developer directly. No middleman markup — just our honest recommendation. Our edge lies in our rigorous selection process and our commitment to transparency.
           </p>
+        </motion.div>
+
+        <div className="grid md:grid-cols-2 gap-12 mb-20">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            className="space-y-6"
+          >
+            <h3 className="text-2xl font-headline font-bold text-on-surface">What is the Pre-Investor Phase?</h3>
+            <p className="text-secondary leading-relaxed">
+              The Pre-Investor Phase is the most exclusive window in a property's lifecycle. It occurs after land acquisition and initial planning, but before the official public launch.
+            </p>
+            <p className="text-secondary leading-relaxed">
+              During this period, we offer our members the opportunity to secure units at "ground-floor" pricing—often 20-30% below the eventual market rate. This phase is characterized by high capital appreciation potential as the project moves toward official RERA registration and public marketing.
+            </p>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            className="bg-primary/5 p-8 rounded-3xl border border-primary/10"
+          >
+            <h4 className="text-primary text-[10px] font-bold uppercase tracking-widest mb-4">Why it matters</h4>
+            <ul className="space-y-4">
+              {[
+                { title: 'Maximum Appreciation', desc: 'Entry at the lowest possible price point.' },
+                { title: 'Priority Selection', desc: 'First-right-of-refusal on the best plots/units.' },
+                { title: 'Verified Potential', desc: 'We only curate projects with clear growth trajectories.' },
+              ].map((item, i) => (
+                <li key={i} className="flex gap-3">
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 flex-shrink-0" />
+                  <div>
+                    <p className="text-sm font-bold text-on-surface">{item.title}</p>
+                    <p className="text-xs text-secondary">{item.desc}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const PreInvestorGold = () => {
+  return (
+    <section className="py-24 px-6 md:px-24 bg-[#0a1208] text-white overflow-hidden relative">
+      {/* Background Accents */}
+      <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-[#c8a951]/5 to-transparent pointer-events-none" />
+      <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-[#c8a951]/10 rounded-full blur-[120px] pointer-events-none" />
+
+      <div className="max-w-6xl mx-auto relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mb-20"
+        >
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-12 h-px bg-[#c8a951]" />
+            <span className="text-[#c8a951] text-[10px] font-bold uppercase tracking-[0.8em]">Institutional Grade</span>
+          </div>
+          <h2 className="text-5xl md:text-7xl font-light leading-tight mb-8">
+            Pre-Investor <span className="italic font-medium text-[#c8a951]">Gold™</span>
+          </h2>
+          <p className="text-xl md:text-2xl text-white/60 font-light max-w-3xl leading-relaxed">
+            We apply the same rigor and sophistication used by global real estate investment trusts (REITs) to private individual portfolios. This is property management at a billion-dollar scale.
+          </p>
+        </motion.div>
+
+        <div className="grid md:grid-cols-3 gap-12">
+          {[
+            {
+              title: 'Portfolio Optimization',
+              desc: 'We don\'t just find properties; we engineer portfolios. Our team analyzes macro-economic trends, infrastructure corridors, and urban growth patterns to identify high-yield opportunities before they hit the mainstream.',
+              icon: <Layers className="w-6 h-6 text-[#c8a951]" />
+            },
+            {
+              title: 'Asset Management',
+              desc: 'Full-lifecycle management from acquisition to exit. We handle the complexities of legal due diligence, tax structuring, and property maintenance, ensuring your assets remain pristine and profitable.',
+              icon: <Shield className="w-6 h-6 text-[#c8a951]" />
+            },
+            {
+              title: 'Exclusive Access',
+              desc: 'Our "Gold" members receive first-right-of-refusal on all pre-launch opportunities, institutional-grade reporting, and dedicated relationship managers for a seamless experience.',
+              icon: <Award className="w-6 h-6 text-[#c8a951]" />
+            }
+          ].map((item, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1 }}
+              className="group"
+            >
+              <div className="mb-6 p-4 w-fit rounded-2xl bg-white/5 border border-white/10 group-hover:border-[#c8a951]/50 transition-colors">
+                {item.icon}
+              </div>
+              <h3 className="text-xl font-bold mb-4 text-white group-hover:text-[#c8a951] transition-colors">{item.title}</h3>
+              <p className="text-white/50 leading-relaxed text-sm">{item.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mt-24 p-12 rounded-[40px] bg-gradient-to-br from-white/5 to-transparent border border-white/10 flex flex-col md:flex-row items-center justify-between gap-12"
+        >
+          <div className="max-w-xl">
+            <h4 className="text-2xl font-bold mb-4">Ready for the Gold Standard?</h4>
+            <p className="text-white/50">Our Gold tier is currently by invitation only. Members of The Green Team can apply for an upgrade after their first successful acquisition through our platform.</p>
+          </div>
+          <button className="px-10 py-5 bg-[#c8a951] text-[#0a1208] text-[10px] uppercase tracking-[0.4em] font-bold rounded-full hover:bg-white transition-all whitespace-nowrap">
+            Apply for Invitation
+          </button>
         </motion.div>
       </div>
     </section>
@@ -5420,8 +5541,8 @@ const ProfileModal = ({
 // ─── App (main) ──────────────────────────────────────────────────────────────
 
 export default function App() {
-  type ViewMode = 'home' | 'map' | 'list' | 'gallery' | 'analytics' | 'syl' | 'membership';
-  const VIEW_ORDER: ViewMode[] = ['home', 'list', 'gallery', 'analytics', 'syl', 'map'];
+  type ViewMode = 'home' | 'map' | 'list' | 'analytics' | 'syl' | 'membership' | 'preinvestor-gold';
+  const VIEW_ORDER: ViewMode[] = ['home', 'list', 'analytics', 'syl', 'map', 'preinvestor-gold'];
 
   const [authUser, setAuthUser]     = useState<User | null>(null);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -5648,9 +5769,14 @@ export default function App() {
                 </div>
               )}
 
-              {viewMode === 'analytics' && <Advantage isFullPage={true} />}
+              {viewMode === 'analytics' && (
+                <>
+                  <Advantage isFullPage={true} />
+                  <EcosystemPillars isFullPage={true} />
+                </>
+              )}
               
-              {viewMode === 'gallery' && <EcosystemPillars isFullPage={true} />}
+              {viewMode === 'preinvestor-gold' && <PreInvestorGold />}
 
 
 
