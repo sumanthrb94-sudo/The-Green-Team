@@ -42,7 +42,7 @@ import { cn } from './lib/utils';
 
 
 import { MapContainer, TileLayer, Marker, Popup, Circle, Polygon, useMap, ZoomControl, Polyline, Tooltip, useMapEvents } from 'react-leaflet';
-import { AlertTriangle, ZoomIn, LogOut, RefreshCw, Users, Mail as MailIcon, ShieldCheck } from 'lucide-react';
+import { AlertTriangle, ZoomIn, LogOut, RefreshCw, Users, Mail as MailIcon, ShieldCheck, User } from 'lucide-react';
 import L from 'leaflet';
 
 // Firebase
@@ -243,316 +243,285 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
   onAdminClick: () => void;
   onPropertySelect: (id: string) => void;
 }) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [sanctuariesOpen, setSanctuariesOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
 
-  const navItems = [
-    { name: 'Home', id: 'home' },
+  const desktopNav = [
     { name: 'Map', id: 'map' },
     { name: 'Advantage', id: 'analytics' },
     { name: 'Ecosystems', id: 'gallery' },
     { name: 'Membership', id: 'membership' },
   ];
 
+  const allNav = [
+    { name: 'Home', id: 'home', icon: Home },
+    { name: 'Map', id: 'map', icon: MapPin },
+    { name: 'Advantage', id: 'analytics', icon: TrendingDown },
+    { name: 'Ecosystems', id: 'gallery', icon: Leaf },
+    { name: 'Membership', id: 'membership', icon: Shield },
+  ];
+
   const sanctuaryItems = [
-    { name: 'MODCON Agartha', id: 'list', sub: 'Narsapur Forest · From ₹68.7 L', img: 'https://images.unsplash.com/photo-1542401886-65d6c61db217?auto=format&fit=crop&q=80&w=400' },
+    { name: 'MODCON Agartha', id: 'list', sub: 'Narsapur Forest · From ₹68.7 L', img: 'https://static.wixstatic.com/media/142b26_e9917bb73fc94531948ef638eba5a051~mv2.jpg' },
     { name: 'MODCON SYL Residences', id: 'syl', sub: 'Tukkuguda, ORR Exit-14 · Villaments', img: '/gallery/syl/1776279315359.png' },
   ];
 
   const avatarLetter = (authUser?.displayName?.[0] || authUser?.email?.[0] || authUser?.phoneNumber?.[1] || '?').toUpperCase();
 
   return (
-    <nav className="relative z-[9990] px-6 md:px-10 flex items-center justify-between h-16 md:h-20 bg-cream border-b border-outline/10">
-      {/* Left: Brand + dark mode toggle */}
-      <div className="flex items-center gap-3">
-        <button onClick={() => onModeChange('home')} className="flex items-center focus:outline-none hover:opacity-80 transition-opacity" aria-label="Go to home">
-          <Logo className="w-7 h-7" textClassName="text-base md:text-lg" />
-        </button>
-        <button
-          onClick={() => setIsDark(!isDark)}
-          title={isDark ? 'Light mode' : 'Dark mode'}
-          className={cn(
-            "flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border text-[8px] uppercase tracking-widest font-bold transition-all",
-            isDark
-              ? "bg-primary/10 border-primary/20 text-primary"
-              : "bg-outline/8 border-outline/20 text-secondary/60 hover:border-primary/30 hover:text-primary"
-          )}
-        >
-          {isDark ? <Sun className="w-3 h-3" /> : <Moon className="w-3 h-3" />}
-          <span className="hidden sm:inline">{isDark ? 'Light' : 'Dark'}</span>
-        </button>
-      </div>
-
-      {/* Right: admin badge (admin only) + menu/avatar trigger */}
-      <div className="flex items-center gap-2">
-        {isAdmin && (
-          <button onClick={onAdminClick}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary text-[8px] uppercase tracking-widest font-bold rounded-full hover:bg-primary/20 transition-all"
-          >
-            <ShieldCheck className="w-3 h-3" /> Admin
-          </button>
-        )}
-      <button
-        onClick={() => setIsMenuOpen(!isMenuOpen)}
-        aria-label="Open menu"
-        className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-primary/5 transition-colors"
+    <>
+      {/* ── Slim top bar ─────────────────────────────────────────────────────── */}
+      <nav
+        className="h-14 flex items-center justify-between px-4 md:px-6 border-b"
+        style={{
+          background: isDark ? 'rgba(20,26,17,0.97)' : 'rgba(250,249,246,0.97)',
+          borderColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(45,58,29,0.07)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+        }}
       >
-        {authUser ? (
-          authUser.photoURL ? (
-            <img
-              src={authUser.photoURL}
-              referrerPolicy="no-referrer"
-              alt="Profile"
-              className="w-9 h-9 rounded-full object-cover ring-2 ring-primary/20"
-            />
-          ) : (
-            <div className="w-9 h-9 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-sm uppercase select-none">
-              {avatarLetter}
-            </div>
-          )
-        ) : (
-          <div className="space-y-[5px] py-1">
-            <div className={cn("w-6 h-[2px] bg-primary transition-all duration-300", isMenuOpen && "rotate-45 translate-y-[7px]")} />
-            <div className={cn("w-4 h-[2px] bg-primary transition-all duration-300", isMenuOpen && "opacity-0 w-6")} />
-            <div className={cn("w-6 h-[2px] bg-primary transition-all duration-300", isMenuOpen && "-rotate-45 -translate-y-[7px]")} />
-          </div>
-        )}
-      </button>
-      </div>
+        {/* Logo */}
+        <button onClick={() => onModeChange('home')} className="focus:outline-none flex-shrink-0" aria-label="Home">
+          <Logo className="w-7 h-7" textClassName="text-base" />
+        </button>
 
-      {/* Full-screen menu overlay */}
+        {/* Desktop nav — centered */}
+        <div className="hidden md:flex items-center gap-7">
+          {desktopNav.map(item => (
+            <button key={item.id} onClick={() => onModeChange(item.id)}
+              className="text-[9px] uppercase tracking-[0.45em] font-bold text-secondary/45 hover:text-primary transition-colors duration-200">
+              {item.name}
+            </button>
+          ))}
+        </div>
+
+        {/* Right controls */}
+        <div className="flex items-center gap-1.5">
+          {isAdmin && (
+            <button onClick={onAdminClick}
+              className="hidden md:flex items-center gap-1.5 px-3 py-1.5 bg-primary/8 text-primary text-[8px] uppercase tracking-widest font-bold rounded-full hover:bg-primary/15 transition-all">
+              <ShieldCheck className="w-3 h-3" /> Admin
+            </button>
+          )}
+          {/* Dark mode toggle */}
+          <button
+            onClick={() => setIsDark(!isDark)}
+            className="w-9 h-9 rounded-full flex items-center justify-center text-secondary/40 hover:text-primary hover:bg-primary/5 transition-all"
+            title={isDark ? 'Light mode' : 'Dark mode'}
+          >
+            {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </button>
+          {/* Account button */}
+          <button
+            onClick={() => setAccountOpen(true)}
+            className="w-9 h-9 rounded-full flex items-center justify-center overflow-hidden ring-2 ring-transparent hover:ring-primary/20 transition-all"
+          >
+            {authUser ? (
+              authUser.photoURL ? (
+                <img src={authUser.photoURL} referrerPolicy="no-referrer" alt="Profile" className="w-9 h-9 object-cover rounded-full" />
+              ) : (
+                <div className="w-9 h-9 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-sm uppercase select-none">
+                  {avatarLetter}
+                </div>
+              )
+            ) : (
+              <div className="w-9 h-9 rounded-full border border-outline/25 flex items-center justify-center">
+                <User className="w-4 h-4 text-secondary/50" />
+              </div>
+            )}
+          </button>
+        </div>
+      </nav>
+
+      {/* ── Account / Nav drawer — slides from right ─────────────────────────── */}
       <AnimatePresence>
-        {isMenuOpen && (
+        {accountOpen && (
           <>
             <motion.div
-              key="nav-backdrop"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsMenuOpen(false)}
-              className="fixed inset-0 bg-black/60 backdrop-blur-md z-[9999]"
+              key="acct-backdrop"
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setAccountOpen(false)}
+              className="fixed inset-0 z-[9995] bg-black/35 backdrop-blur-[2px]"
             />
-
             <motion.div
-              key="nav-panel"
-              initial={{ opacity: 0, y: '-100%' }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: '-100%' }}
-              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-              className="fixed top-0 left-0 right-0 bg-surface z-[10000] flex flex-col p-8 md:p-16 shadow-2xl rounded-b-[40px] max-h-[95vh] overflow-y-auto"
+              key="acct-panel"
+              initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 32, stiffness: 320 }}
+              className="fixed top-0 right-0 bottom-0 z-[9996] w-[min(340px,100vw)] flex flex-col shadow-2xl"
+              style={{
+                background: isDark ? 'rgba(20,26,17,0.99)' : 'rgba(250,249,246,0.99)',
+                borderLeft: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(45,58,29,0.08)',
+              }}
             >
               {/* Panel header */}
-              <div className="flex items-center justify-between mb-10">
-                <Logo className="w-8 h-8" textClassName="text-lg" />
-                <button onClick={() => setIsMenuOpen(false)} className="p-3 hover:bg-primary/5 rounded-full transition-all">
-                  <X className="w-6 h-6 text-on-surface" />
+              <div className="px-6 h-14 flex items-center justify-between flex-shrink-0"
+                style={{ borderBottom: isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(45,58,29,0.07)' }}>
+                <Logo className="w-6 h-6" textClassName="text-sm" />
+                <button onClick={() => setAccountOpen(false)}
+                  className="w-8 h-8 rounded-full bg-on-surface/5 flex items-center justify-center hover:bg-on-surface/10 transition-all">
+                  <X className="w-4 h-4 text-on-surface/40" />
                 </button>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-10 md:gap-24">
-                {/* Nav links */}
-                <div className="flex flex-col gap-5">
-                  <p className="text-[10px] uppercase tracking-[0.6em] text-secondary font-bold opacity-40">Explore</p>
-                  <div className="flex flex-col gap-5">
-                    {navItems.map((item) => (
-                      <button key={item.id}
-                        onClick={() => { onModeChange(item.id as any); setIsMenuOpen(false); }}
-                        className={cn(
-                          "text-2xl md:text-3xl uppercase tracking-[0.1em] font-headline font-bold transition-all flex items-center justify-between group text-left",
-                          item.id === 'membership'
-                            ? "text-primary"
-                            : "text-on-surface hover:text-primary"
-                        )}
-                      >
-                        <span className="group-hover:translate-x-2 transition-transform duration-500">{item.name}</span>
-                        <ArrowRight className={cn(
-                          "w-5 h-5 transition-all duration-500",
-                          item.id === 'membership'
-                            ? "opacity-100 translate-x-0"
-                            : "opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0"
-                        )} />
-                      </button>
-                    ))}
-
-                    {/* Sanctuaries — expandable dropdown */}
-                    <div>
-                      <button
-                        onClick={() => setSanctuariesOpen(v => !v)}
-                        className="text-2xl md:text-3xl uppercase tracking-[0.1em] font-headline font-bold text-on-surface hover:text-primary transition-all flex items-center justify-between w-full group"
-                      >
-                        <span className="group-hover:translate-x-2 transition-transform duration-500">Sanctuaries</span>
-                        <ChevronDown className={cn("w-5 h-5 text-primary transition-transform duration-300", sanctuariesOpen && "rotate-180")} />
-                      </button>
-
-                      <AnimatePresence>
-                        {sanctuariesOpen && (
-                          <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            exit={{ opacity: 0, height: 0 }}
-                            transition={{ duration: 0.25 }}
-                            className="overflow-hidden mt-4"
-                          >
-                            <div className="flex flex-col gap-3 pl-2 border-l-2 border-primary/20">
-                              {sanctuaryItems.map(s => (
-                                <button key={s.id}
-                                  onClick={() => { onModeChange(s.id as any); setIsMenuOpen(false); setSanctuariesOpen(false); }}
-                                  className="flex items-center gap-4 group/item text-left hover:translate-x-1 transition-transform duration-200"
-                                >
-                                  <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-outline/10">
-                                    <img src={s.img} alt={s.name} referrerPolicy="no-referrer" className="w-full h-full object-cover grayscale group-hover/item:grayscale-0 transition-all duration-500" />
-                                  </div>
-                                  <div>
-                                    <p className="font-headline font-bold text-sm text-on-surface group-hover/item:text-primary transition-colors">{s.name}</p>
-                                    <p className="text-[9px] uppercase tracking-widest text-secondary/50">{s.sub}</p>
-                                  </div>
-                                </button>
-                              ))}
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
+              {/* Scrollable body */}
+              <div className="flex-1 overflow-y-auto">
+                {/* Navigation */}
+                <div className="px-5 pt-6 pb-5"
+                  style={{ borderBottom: isDark ? '1px solid rgba(255,255,255,0.04)' : '1px solid rgba(45,58,29,0.06)' }}>
+                  <p className="text-[7px] uppercase tracking-[0.55em] text-secondary/35 font-bold mb-3 px-1">Navigate</p>
+                  <div className="flex flex-col gap-0.5">
+                    {allNav.map(item => {
+                      const Icon = item.icon;
+                      return (
+                        <button key={item.id}
+                          onClick={() => { onModeChange(item.id); setAccountOpen(false); }}
+                          className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-primary/6 text-left transition-all group">
+                          <Icon className="w-4 h-4 text-primary/50 group-hover:text-primary transition-colors flex-shrink-0" />
+                          <span className="text-[11px] uppercase tracking-[0.35em] font-bold text-on-surface/60 group-hover:text-on-surface transition-colors">{item.name}</span>
+                          <ArrowRight className="w-3.5 h-3.5 text-primary/0 group-hover:text-primary/50 ml-auto transition-all -translate-x-1 group-hover:translate-x-0" />
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
-                {/* CTA / Account section */}
-                <div className="flex flex-col justify-end pt-12 md:pt-0 border-t md:border-t-0 md:border-l border-outline/10 md:pl-24 gap-4">
+                {/* Sanctuaries */}
+                <div className="px-5 pt-5 pb-5"
+                  style={{ borderBottom: isDark ? '1px solid rgba(255,255,255,0.04)' : '1px solid rgba(45,58,29,0.06)' }}>
+                  <p className="text-[7px] uppercase tracking-[0.55em] text-secondary/35 font-bold mb-3 px-1">Sanctuaries</p>
+                  <div className="flex flex-col gap-2">
+                    {sanctuaryItems.map(s => (
+                      <button key={s.id}
+                        onClick={() => { onModeChange(s.id); setAccountOpen(false); }}
+                        className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-primary/5 text-left transition-all group">
+                        <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0">
+                          <img src={s.img} alt={s.name} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-[11px] font-bold text-on-surface truncate group-hover:text-primary transition-colors">{s.name}</p>
+                          <p className="text-[8px] uppercase tracking-widest text-secondary/40 truncate">{s.sub}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Account */}
+                <div className="px-5 pt-5 pb-6">
+                  <p className="text-[7px] uppercase tracking-[0.55em] text-secondary/35 font-bold mb-3 px-1">Account</p>
                   {authUser ? (
-                    /* Logged-in state */
-                    <>
-                      <div className="flex items-center gap-4 mb-6">
+                    <div className="flex flex-col gap-2.5">
+                      <div className="flex items-center gap-3 px-3 py-3 rounded-xl bg-primary/4">
                         {authUser.photoURL ? (
-                          <img src={authUser.photoURL} referrerPolicy="no-referrer" alt="Profile" className="w-12 h-12 rounded-full object-cover ring-2 ring-primary/20" />
+                          <img src={authUser.photoURL} referrerPolicy="no-referrer" alt="Profile" className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
                         ) : (
-                          <div className="w-12 h-12 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-lg uppercase select-none">
+                          <div className="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-sm uppercase flex-shrink-0">
                             {avatarLetter}
                           </div>
                         )}
-                        <div>
-                          <p className="text-sm font-bold text-on-surface truncate max-w-[180px]">{authUser.displayName || authUser.email || authUser.phoneNumber}</p>
-                          <p className="text-[10px] uppercase tracking-widest text-secondary/60 mt-0.5">{isAdmin ? 'Admin' : 'Member'}</p>
+                        <div className="min-w-0">
+                          <p className="text-sm font-bold text-on-surface truncate">{authUser.displayName || authUser.email || authUser.phoneNumber}</p>
+                          <p className="text-[8px] uppercase tracking-widest text-secondary/40 mt-0.5">{isAdmin ? 'Admin' : 'Member'}</p>
                         </div>
                       </div>
                       {isAdmin && (
-                        <button
-                          onClick={() => { setIsMenuOpen(false); onAdminClick(); }}
-                          className="w-full text-[11px] uppercase tracking-[0.5em] font-bold bg-primary/10 text-primary border-2 border-primary/20 px-8 py-4 hover:bg-primary hover:text-on-primary hover:border-primary transition-all rounded-2xl flex items-center justify-center gap-3"
-                        >
-                          <ShieldCheck className="w-4 h-4" /> Admin Dashboard
+                        <button onClick={() => { setAccountOpen(false); onAdminClick(); }}
+                          className="w-full py-3 rounded-xl bg-primary/8 text-primary text-[9px] uppercase tracking-[0.4em] font-bold flex items-center justify-center gap-2 hover:bg-primary/15 transition-all">
+                          <ShieldCheck className="w-3.5 h-3.5" /> Admin Dashboard
                         </button>
                       )}
-                      <button
-                        onClick={() => {
-                          setIsMenuOpen(false);
-                          onModeChange('map');
-                        }}
-                        className="w-full text-[11px] uppercase tracking-[0.5em] font-bold bg-primary text-on-primary px-8 py-5 hover:shadow-xl hover:shadow-primary/20 transition-all rounded-2xl"
-                      >
-                        Explore Sanctuaries
+                      <button onClick={() => { setAccountOpen(false); onModeChange('map'); }}
+                        className="w-full py-3.5 rounded-xl bg-primary text-on-primary text-[9px] uppercase tracking-[0.4em] font-bold hover:shadow-lg hover:shadow-primary/20 transition-all">
+                        Explore Map
                       </button>
-                      <button
-                        onClick={() => {
-                          setIsMenuOpen(false);
-                          onSignOut();
-                        }}
-                        className="w-full text-[11px] uppercase tracking-[0.5em] font-bold text-error border-2 border-error/20 px-8 py-5 hover:bg-error hover:text-white hover:border-error transition-all rounded-2xl flex items-center justify-center gap-3"
-                      >
-                        <LogOut className="w-4 h-4" />
-                        Sign Out
+                      <button onClick={() => { setAccountOpen(false); onSignOut(); }}
+                        className="w-full py-3 rounded-xl border border-error/20 text-error text-[9px] uppercase tracking-[0.4em] font-bold flex items-center justify-center gap-2 hover:bg-error/5 transition-all">
+                        <LogOut className="w-3.5 h-3.5" /> Sign Out
                       </button>
-                    </>
+                    </div>
                   ) : (
-                    /* Logged-out state - conversion CTA */
-                    <>
-                      <p className="text-[10px] uppercase tracking-[0.4em] text-secondary/50 font-bold mb-2">Join The Collective</p>
-                      <button
-                        onClick={() => {
-                          setIsMenuOpen(false);
-                          onSignInClick();
-                        }}
-                        className="w-full text-[11px] uppercase tracking-[0.5em] font-bold bg-primary text-on-primary px-8 py-5 hover:shadow-xl hover:shadow-primary/20 transition-all rounded-2xl"
-                      >
+                    <div className="flex flex-col gap-2.5">
+                      <button onClick={() => { setAccountOpen(false); onSignInClick(); }}
+                        className="w-full py-3.5 rounded-xl bg-primary text-on-primary text-[9px] uppercase tracking-[0.4em] font-bold hover:shadow-lg hover:shadow-primary/20 transition-all">
                         Sign In
                       </button>
-                      <button
-                        onClick={() => {
-                          setIsMenuOpen(false);
-                          onNewsletterClick();
-                        }}
-                        className="w-full text-[11px] uppercase tracking-[0.5em] font-bold text-primary border-2 border-primary/20 px-8 py-5 hover:bg-primary hover:text-on-primary hover:border-primary transition-all rounded-2xl text-center"
-                      >
+                      <button onClick={() => { setAccountOpen(false); onNewsletterClick(); }}
+                        className="w-full py-3.5 rounded-xl border-2 border-primary/20 text-primary text-[9px] uppercase tracking-[0.4em] font-bold hover:bg-primary/5 transition-all">
                         Get Early Access
                       </button>
-                    </>
+                    </div>
                   )}
-
                 </div>
               </div>
 
-              {/* Footer row */}
-              <div className="mt-16 pt-8 border-t border-outline/10 flex flex-col md:flex-row justify-between items-center gap-6">
-                <div className="flex gap-8">
-                  <span className="text-[9px] uppercase tracking-widest text-secondary/50">Privacy Policy</span>
-                  <span className="text-[9px] uppercase tracking-widest text-secondary/50">Terms of Service</span>
-                </div>
-                <p className="text-[9px] uppercase tracking-widest text-secondary/40">© 2026 The Green Team</p>
+              {/* Footer */}
+              <div className="px-6 py-4 flex-shrink-0"
+                style={{ borderTop: isDark ? '1px solid rgba(255,255,255,0.04)' : '1px solid rgba(45,58,29,0.06)' }}>
+                <p className="text-[7px] uppercase tracking-widest text-secondary/25">© 2026 The Green Team · Hyderabad</p>
               </div>
             </motion.div>
           </>
         )}
       </AnimatePresence>
-    </nav>
+    </>
   );
 };
 
-const SideNavBar = ({ activeMode, onModeChange }: { activeMode: string, onModeChange: (mode: any) => void }) => {
-  const items = [
-    { name: 'Map', id: 'map', icon: MapIcon },
-    { name: 'Advantage', id: 'analytics', icon: TrendingDown },
-    { name: 'Ecosystems', id: 'gallery', icon: Leaf },
-    { name: 'Agartha', id: 'list', icon: Layers },
-    { name: 'SYL', id: 'syl', icon: Shield },
+// ── Bottom Tab Bar — mobile persistent navigation ─────────────────────────────
+const BottomTabBar = ({ activeMode, onModeChange }: { activeMode: string; onModeChange: (mode: any) => void }) => {
+  const tabs = [
+    { id: 'home',       label: 'Home',      icon: Home        },
+    { id: 'map',        label: 'Map',        icon: MapPin      },
+    { id: 'analytics',  label: 'Edge',       icon: TrendingDown },
+    { id: 'gallery',    label: 'Nature',     icon: Leaf        },
+    { id: 'membership', label: 'Join',       icon: Shield      },
   ];
 
   return (
-    <aside className="hidden md:flex h-full w-24 flex-col items-center py-8 bg-surface border-r border-outline/10 z-40 shadow-sm">
-      <div className="flex flex-col space-y-8 items-center w-full">
-        {items.map((item) => (
-          <div 
-            key={item.id}
-            onClick={() => onModeChange(item.id)}
-            className={cn(
-              "flex flex-col items-center space-y-2 group cursor-pointer transition-all duration-300 w-full px-2",
-              activeMode === item.id ? "text-primary" : "text-secondary hover:text-primary"
-            )}
-          >
-            <div className={cn(
-              "p-3 rounded-xl transition-all",
-              activeMode === item.id ? "bg-primary/10" : "group-hover:bg-primary/5"
-            )}>
-              <item.icon className="w-5 h-5" />
-            </div>
-            <span className="font-headline uppercase tracking-widest text-[8px] font-bold text-center">{item.name}</span>
-          </div>
-        ))}
+    <div
+      className="md:hidden fixed bottom-0 inset-x-0 z-[9980]"
+      style={{
+        background: 'var(--background)',
+        borderTop: '1px solid rgba(45,58,29,0.08)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+      }}
+    >
+      <div className="flex items-stretch h-16">
+        {tabs.map(tab => {
+          const Icon = tab.icon;
+          const isActive = activeMode === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => onModeChange(tab.id)}
+              className="flex-1 flex flex-col items-center justify-center gap-1 relative transition-all duration-200"
+            >
+              {isActive && (
+                <motion.div
+                  layoutId="tab-indicator"
+                  className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 rounded-full bg-primary"
+                />
+              )}
+              <Icon className={cn(
+                "w-[18px] h-[18px] transition-all duration-200",
+                isActive ? "text-primary scale-110" : "text-secondary/30"
+              )} />
+              <span className={cn(
+                "text-[7px] uppercase tracking-[0.35em] font-bold transition-all duration-200",
+                isActive ? "text-primary" : "text-secondary/25"
+              )}>
+                {tab.label}
+              </span>
+            </button>
+          );
+        })}
       </div>
-      <div className="mt-auto mb-8 flex flex-col items-center space-y-6">
-        <div className="p-3 rounded-xl text-secondary hover:text-primary cursor-pointer transition-all">
-          <Shield className="w-5 h-5" />
-        </div>
-        <div className="w-10 h-10 rounded-full bg-surface-container-highest overflow-hidden border-2 border-primary/10">
-          <img 
-            src="https://picsum.photos/seed/consultant/100/100" 
-            alt="User profile" 
-            className="w-full h-full object-cover"
-            referrerPolicy="no-referrer"
-          />
-        </div>
-      </div>
-    </aside>
+    </div>
   );
 };
+
 
 const Hero = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
   return (
@@ -1981,6 +1950,8 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
   const hotspots  = SANCTUARY_HOTSPOTS[sanctuary.id] ?? null;
   const plotDots  = SANCTUARY_PLOTS[sanctuary.id]    ?? null;
   const [pdTab, setPdTab]             = useState<'gallery' | 'plan' | 'invest'>('gallery');
+  const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
+  const touchStartX = useRef<number | null>(null);
   const [activeSpot, setActiveSpot]   = useState<Hotspot | null>(hotspots?.[0] ?? null);
   const [activePlot, setActivePlot]   = useState<PlotDot | null>(null);
   const [mapMode, setMapMode]         = useState<'plots' | 'features'>(plotDots ? 'plots' : 'features');
@@ -2103,30 +2074,122 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
       <div className="flex-1 overflow-y-auto">
 
         {/* ── GALLERY TAB ── */}
-        {pdTab === 'gallery' && (
-          <div className="py-4">
-            {sanctuary.plotImages && sanctuary.plotImages.length > 0 ? (
+        {pdTab === 'gallery' && (() => {
+          const images = sanctuary.plotImages && sanctuary.plotImages.length > 0
+            ? sanctuary.plotImages
+            : [sanctuary.image];
+          return (
+            <div className="py-2">
+              {/* Masonry-style grid — tap to open lightbox */}
               <div className="grid grid-cols-2 gap-0.5">
-                {sanctuary.plotImages.map((src, i) => (
-                  <img
+                {images.map((src, i) => (
+                  <button
                     key={i}
-                    src={src}
-                    alt={`${sanctuary.title} — photo ${i + 1}`}
+                    onClick={() => setLightboxIdx(i)}
                     className={cn(
-                      "w-full object-cover",
-                      i === 0 ? "col-span-2 h-56" : "h-40"
+                      "relative overflow-hidden focus:outline-none group",
+                      i === 0 ? "col-span-2 h-56" : "h-36"
                     )}
-                    referrerPolicy="no-referrer"
-                    loading="lazy"
-                  />
+                  >
+                    <img
+                      src={src}
+                      alt={`${sanctuary.title} — photo ${i + 1}`}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      referrerPolicy="no-referrer"
+                      loading={i < 4 ? 'eager' : 'lazy'}
+                    />
+                    {/* Tap hint overlay on first image */}
+                    {i === 0 && (
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent flex items-end justify-end p-3">
+                        <span className="text-[8px] uppercase tracking-widest font-bold text-white/60 bg-black/30 px-2 py-1 rounded-full backdrop-blur-sm">
+                          Tap to expand
+                        </span>
+                      </div>
+                    )}
+                    {/* Image counter badge */}
+                    {i === 0 && images.length > 1 && (
+                      <div className="absolute top-3 left-3 px-2 py-1 rounded-full bg-black/50 backdrop-blur-sm">
+                        <span className="text-[8px] font-bold text-white/70">{images.length} photos</span>
+                      </div>
+                    )}
+                  </button>
                 ))}
               </div>
-            ) : (
-              <img src={sanctuary.image} alt={sanctuary.title}
-                className="w-full h-72 object-cover" referrerPolicy="no-referrer" />
-            )}
-          </div>
-        )}
+
+              {/* Lightbox */}
+              {lightboxIdx !== null && createPortal(
+                <motion.div
+                  key="lightbox"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="fixed inset-0 z-[20000] bg-black flex flex-col"
+                  onTouchStart={e => { touchStartX.current = e.touches[0].clientX; }}
+                  onTouchEnd={e => {
+                    if (touchStartX.current === null) return;
+                    const dx = e.changedTouches[0].clientX - touchStartX.current;
+                    touchStartX.current = null;
+                    if (Math.abs(dx) < 40) return;
+                    if (dx < 0) setLightboxIdx(i => i !== null ? Math.min(i + 1, images.length - 1) : null);
+                    else setLightboxIdx(i => i !== null ? Math.max(i - 1, 0) : null);
+                  }}
+                >
+                  {/* Header */}
+                  <div className="flex items-center justify-between px-4 pt-safe pt-4 pb-3 flex-shrink-0">
+                    <span className="text-[9px] uppercase tracking-[0.4em] font-bold text-white/40">
+                      {lightboxIdx + 1} / {images.length}
+                    </span>
+                    <button onClick={() => setLightboxIdx(null)}
+                      className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center">
+                      <X className="w-4 h-4 text-white/70" />
+                    </button>
+                  </div>
+
+                  {/* Main image */}
+                  <div className="flex-1 flex items-center justify-center relative overflow-hidden">
+                    <AnimatePresence mode="wait">
+                      <motion.img
+                        key={lightboxIdx}
+                        src={images[lightboxIdx]}
+                        alt={`${sanctuary.title} — photo ${lightboxIdx + 1}`}
+                        initial={{ opacity: 0, scale: 0.97 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.97 }}
+                        transition={{ duration: 0.2 }}
+                        className="max-w-full max-h-full object-contain"
+                        referrerPolicy="no-referrer"
+                      />
+                    </AnimatePresence>
+
+                    {/* Prev / Next arrows */}
+                    {lightboxIdx > 0 && (
+                      <button onClick={() => setLightboxIdx(i => i !== null ? i - 1 : null)}
+                        className="absolute left-3 w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
+                        <ArrowRight className="w-4 h-4 text-white/70 rotate-180" />
+                      </button>
+                    )}
+                    {lightboxIdx < images.length - 1 && (
+                      <button onClick={() => setLightboxIdx(i => i !== null ? i + 1 : null)}
+                        className="absolute right-3 w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
+                        <ArrowRight className="w-4 h-4 text-white/70" />
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Dot indicators */}
+                  <div className="flex items-center justify-center gap-1.5 py-4 pb-8 flex-shrink-0">
+                    {images.map((_, i) => (
+                      <button key={i} onClick={() => setLightboxIdx(i)}
+                        className={cn("rounded-full transition-all duration-200",
+                          i === lightboxIdx ? "w-4 h-1.5 bg-white" : "w-1.5 h-1.5 bg-white/25")} />
+                    ))}
+                  </div>
+                </motion.div>,
+                document.body
+              )}
+            </div>
+          );
+        })()}
 
         {/* ── LAYOUT PLAN TAB ── */}
         {pdTab === 'plan' && (
@@ -3640,65 +3703,62 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
         )}
 
 
-        {/* ── Unified dark-glass map header bar ─────────────────────────────── */}
-        <motion.div
-          initial={{ opacity: 0, y: -12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.5, ease: 'easeOut' }}
-          className="absolute top-4 left-4 right-4 z-[1000] flex items-center gap-2"
-        >
-          {/* Brand / Live chip */}
-          <div
-            className="flex items-center gap-2 px-3 py-2 rounded-xl flex-shrink-0"
-            style={{ background: 'rgba(13,20,9,0.90)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.07)', boxShadow: '0 4px 24px rgba(0,0,0,0.5)' }}
-          >
-            <div className="flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#4ade80' }} />
-              <span className="text-[8px] uppercase tracking-[0.3em] font-bold" style={{ color: 'rgba(255,255,255,0.7)' }}>Live</span>
+        {/* ── Map controls — top bar ───────────────────────────────────────── */}
+        <div className="absolute top-3 left-3 right-3 z-[1000] flex items-center gap-2 pointer-events-none">
+
+          {/* Live pill + layer toggle */}
+          <div className="flex items-center gap-0 rounded-xl overflow-hidden flex-shrink-0 pointer-events-auto"
+            style={{ background: 'rgba(8,13,6,0.92)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.06)', boxShadow: '0 2px 16px rgba(0,0,0,0.6)' }}>
+            {/* Live indicator */}
+            <div className="flex items-center gap-1.5 px-3 py-2.5" style={{ borderRight: '1px solid rgba(255,255,255,0.05)' }}>
+              <div className="w-1.5 h-1.5 rounded-full animate-pulse flex-shrink-0" style={{ background: '#4ade80' }} />
+              <span className="text-[8px] uppercase tracking-[0.35em] font-bold" style={{ color: 'rgba(255,255,255,0.6)' }}>Live</span>
             </div>
-            <div className="w-px h-3" style={{ background: 'rgba(255,255,255,0.1)' }} />
-            <span className="text-[8px] uppercase tracking-wider font-medium hidden sm:block" style={{ color: 'rgba(255,255,255,0.35)' }}>TGT Intelligence</span>
+            {/* Satellite toggle */}
+            <button onClick={() => setIsSatellite(s => !s)}
+              className="flex items-center gap-1.5 px-3 py-2.5 transition-all duration-200"
+              style={{ color: isSatellite ? '#86efac' : 'rgba(255,255,255,0.3)' }}>
+              <Layers className="w-3.5 h-3.5 flex-shrink-0" />
+              <span className="text-[8px] uppercase tracking-[0.3em] font-bold hidden sm:block">
+                {isSatellite ? 'Satellite' : 'Road'}
+              </span>
+            </button>
           </div>
 
-          {/* Filter pills */}
-          <div className="flex items-center gap-2 overflow-x-auto flex-1 min-w-0 py-0.5">
-            {FILTER_PILLS.map((pill, idx) => {
+          {/* Filter chips — scrollable */}
+          <div className="flex items-center gap-1.5 overflow-x-auto min-w-0 flex-1 pointer-events-auto" style={{ scrollbarWidth: 'none' }}>
+            {FILTER_PILLS.map(pill => {
               const Icon = pill.icon;
               const isActive = activeFilters.has(pill.id);
               return (
-                <motion.button
+                <button
                   key={pill.id}
-                  initial={{ opacity: 0, scale: 0.85 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: idx * 0.04 + 0.15, type: 'spring', stiffness: 300, damping: 24 }}
-                  whileHover={{ scale: 1.04, y: -1 }}
-                  whileTap={{ scale: 0.94 }}
                   onClick={() => toggleFilter(pill.id)}
-                  className="flex-shrink-0 flex items-center gap-1.5 h-9 px-3.5 rounded-xl text-[10px] font-bold uppercase tracking-widest whitespace-nowrap cursor-pointer select-none transition-all duration-200"
+                  className="flex-shrink-0 flex items-center gap-1.5 h-[38px] px-3 rounded-xl text-[9px] font-bold uppercase tracking-widest whitespace-nowrap transition-all duration-200"
                   style={isActive ? {
-                    background: 'rgba(60,90,50,0.92)',
-                    backdropFilter: 'blur(20px)',
-                    border: '1px solid rgba(74,222,128,0.35)',
+                    background: 'rgba(45,58,29,0.95)',
+                    border: '1px solid rgba(74,222,128,0.28)',
                     color: '#86efac',
-                    boxShadow: '0 0 18px rgba(74,222,128,0.15)',
+                    boxShadow: '0 0 12px rgba(74,222,128,0.12)',
+                    backdropFilter: 'blur(16px)',
                   } : {
-                    background: 'rgba(13,20,9,0.82)',
-                    backdropFilter: 'blur(20px)',
-                    border: '1px solid rgba(255,255,255,0.07)',
-                    color: 'rgba(255,255,255,0.45)',
-                    boxShadow: '0 2px 12px rgba(0,0,0,0.4)',
+                    background: 'rgba(8,13,6,0.88)',
+                    border: '1px solid rgba(255,255,255,0.05)',
+                    color: 'rgba(255,255,255,0.38)',
+                    backdropFilter: 'blur(16px)',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.4)',
                   }}
                 >
-                  <Icon className="w-3.5 h-3.5 flex-shrink-0" />
+                  <Icon className="w-3 h-3 flex-shrink-0" />
                   <span>{pill.label}</span>
                   {isActive && pill.id === 'aqi-live' && (
-                    <span className="w-1.5 h-1.5 rounded-full animate-pulse ml-0.5 flex-shrink-0" style={{ background: '#4ade80' }} />
+                    <span className="w-1 h-1 rounded-full animate-pulse ml-0.5 flex-shrink-0" style={{ background: '#4ade80' }} />
                   )}
-                </motion.button>
+                </button>
               );
             })}
           </div>
-        </motion.div>
+        </div>
 
         <MapContainer
           center={[17.49, 78.48]}
@@ -3979,56 +4039,42 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
           })}
         </MapContainer>
 
-        {/* ── Bottom live stats bar ─────────────────────────────────────────── */}
+        {/* ── Bottom data terminal ──────────────────────────────────────────── */}
         <div className="absolute bottom-0 left-0 right-0 z-[1000] pointer-events-none">
-          <div
-            className="flex items-stretch"
-            style={{ background: 'rgba(13,20,9,0.92)', backdropFilter: 'blur(20px)', borderTop: '1px solid rgba(255,255,255,0.05)' }}
-          >
-            {/* Agartha reading */}
-            <div className="flex-1 flex items-center gap-3 px-4 py-3" style={{ borderRight: '1px solid rgba(255,255,255,0.04)' }}>
-              <div className="w-2 h-2 rounded-full animate-pulse flex-shrink-0" style={{ background: '#4ade80' }} />
-              <div>
-                <p className="text-[7px] uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.25)' }}>Agartha · Narsapur Forest</p>
-                <div className="flex items-baseline gap-1.5">
-                  <span className="text-lg font-bold leading-tight" style={{ color: '#4ade80' }}>12</span>
-                  <span className="text-[8px]" style={{ color: 'rgba(255,255,255,0.25)' }}>AQI · Pristine</span>
+          <div className="overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+            <div
+              className="flex items-stretch min-w-max"
+              style={{ background: 'rgba(5,8,4,0.97)', backdropFilter: 'blur(24px)', borderTop: '1px solid rgba(255,255,255,0.04)' }}
+            >
+              {[
+                { label: 'AGARTHA · AQI', value: '12',    sub: 'Pristine',  color: '#4ade80', pulse: true  },
+                { label: 'SYL · AQI',     value: '22',    sub: 'Clean',     color: '#86efac', pulse: true  },
+                { label: 'CITY · AQI',    value: '148',   sub: 'Unhealthy', color: '#f87171', pulse: false },
+                { label: 'AIR EDGE',      value: '12.3×', sub: 'Cleaner',   color: '#fcd34d', pulse: false },
+                { label: 'NOISE · AGARTHA', value: '18 dB', sub: 'Near Silent', color: '#a5f3fc', pulse: false },
+              ].map((item, i) => (
+                <div key={i} className="flex items-center gap-2.5 px-4 py-2.5 flex-shrink-0"
+                  style={{ borderRight: '1px solid rgba(255,255,255,0.03)' }}>
+                  {item.pulse && (
+                    <div className="w-1.5 h-1.5 rounded-full animate-pulse flex-shrink-0" style={{ background: item.color }} />
+                  )}
+                  <div>
+                    <p className="text-[6px] uppercase font-bold" style={{ color: 'rgba(255,255,255,0.18)', letterSpacing: '0.35em' }}>{item.label}</p>
+                    <div className="flex items-baseline gap-1 mt-0.5">
+                      <span className="text-sm font-bold leading-none" style={{ color: item.color, fontVariantNumeric: 'tabular-nums' }}>{item.value}</span>
+                      <span className="text-[8px]" style={{ color: 'rgba(255,255,255,0.18)' }}>{item.sub}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {/* RRR / ORR label */}
+              <div className="flex items-center gap-2 px-4 py-2.5 flex-shrink-0">
+                <div className="w-3 h-0.5 rounded-full flex-shrink-0" style={{ background: '#fcd34d', opacity: 0.6 }} />
+                <div>
+                  <p className="text-[6px] uppercase font-bold" style={{ color: 'rgba(255,255,255,0.18)', letterSpacing: '0.35em' }}>INFRA</p>
+                  <p className="text-[8px] font-bold mt-0.5" style={{ color: 'rgba(252,211,77,0.55)' }}>ORR · RRR</p>
                 </div>
               </div>
-            </div>
-            {/* City reading */}
-            <div className="flex-1 flex items-center gap-3 px-4 py-3" style={{ borderRight: '1px solid rgba(255,255,255,0.04)' }}>
-              <div className="w-2 h-2 rounded-full animate-pulse flex-shrink-0" style={{ background: '#f87171' }} />
-              <div>
-                <p className="text-[7px] uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.25)' }}>City Average · Hyderabad</p>
-                <div className="flex items-baseline gap-1.5">
-                  <span className="text-lg font-bold leading-tight" style={{ color: '#f87171' }}>148</span>
-                  <span className="text-[8px]" style={{ color: 'rgba(255,255,255,0.25)' }}>AQI · Unhealthy</span>
-                </div>
-              </div>
-            </div>
-            {/* Delta */}
-            <div className="flex-shrink-0 flex items-center gap-2 px-4 py-3" style={{ borderRight: '1px solid rgba(255,255,255,0.04)' }}>
-              <div>
-                <p className="text-[7px] uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.25)' }}>Air Advantage</p>
-                <p className="font-bold text-sm" style={{ color: '#fcd34d' }}>12.3× cleaner</p>
-              </div>
-            </div>
-            {/* Satellite toggle */}
-            <div className="flex-shrink-0 flex items-center px-3 py-3 pointer-events-auto">
-              <button
-                onClick={() => setIsSatellite(s => !s)}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-all duration-200"
-                style={{
-                  background: isSatellite ? 'rgba(60,90,50,0.8)' : 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                }}
-              >
-                <Layers className="w-3 h-3" style={{ color: 'rgba(255,255,255,0.4)' }} />
-                <span className="text-[9px] font-bold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                  {isSatellite ? 'Satellite' : 'Map'}
-                </span>
-              </button>
             </div>
           </div>
         </div>
@@ -5771,7 +5817,7 @@ export default function App() {
               )}
 
               {viewMode === 'map' && (
-                <div className="h-[calc(100vh-80px)] w-full">
+                <div className="h-[calc(100vh-120px)] md:h-[calc(100vh-56px)] w-full">
                   <SanctuaryMapLayout isVisible={true} />
                 </div>
               )}
@@ -5813,9 +5859,15 @@ export default function App() {
             </motion.div>
           </AnimatePresence>
 
+          {/* Bottom padding on mobile so content clears the tab bar */}
+          {viewMode !== 'map' && <div className="h-16 md:hidden flex-shrink-0" />}
+
           {/* ChatBot access for all views */}
           <ChatBot data={{ sanctuaries: allSanctuaries, user: authUser }} />
         </main>
+
+        {/* Bottom Tab Bar — mobile persistent navigation */}
+        <BottomTabBar activeMode={viewMode} onModeChange={handleViewChange} />
       </div>
       {/* Admin Dashboard overlay — only for sumanthbolla97@gmail.com */}
       <AnimatePresence>
