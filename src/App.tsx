@@ -1095,63 +1095,7 @@ const PropertyInteractiveLayout: FC<PropertyLayoutConfig & { onClose: () => void
   brochureUrl, intentPrefix, onClose,
 }) => {
   const [active, setActive] = useState<Hotspot>(hotspots[0]);
-  const [leadName, setLeadName] = useState('');
-  // const [leadPhone, setLeadPhone] = useState('');
-  const [leadSubmitted, setLeadSubmitted] = useState(false);
-  const [leadLoading, setLeadLoading] = useState(false);
 
-  const handleLeadSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!leadName.trim()) return;
-    setLeadLoading(true);
-    try {
-      await saveLead({ 
-        name: leadName.trim(), 
-        // phone: leadPhone.trim(), 
-        intent: `${intentPrefix} - ${active.label}`,
-        source: 'site_visit'
-      });
-    } catch {/* fire and forget */} finally {
-      setLeadLoading(false);
-      setLeadSubmitted(true);
-    }
-  };
-
-  const LeadForm = () => leadSubmitted ? (
-    <div className="text-center py-6 space-y-3">
-      <div className="w-12 h-12 rounded-full bg-primary/15 flex items-center justify-center mx-auto">
-        <Check className="w-6 h-6 text-primary" />
-      </div>
-      <p className="text-sm font-bold text-white">We'll be in touch soon.</p>
-      <p className="text-[11px] text-white/40">Our team will reach out via WhatsApp soon.</p>
-      {brochureUrl && (
-        <a href={brochureUrl} target="_blank" rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 text-[9px] uppercase tracking-widest font-bold text-primary/70 hover:text-primary transition-colors mt-2">
-          View full brochure <ArrowRight className="w-3 h-3" />
-        </a>
-      )}
-    </div>
-  ) : (
-    <form onSubmit={handleLeadSubmit} className="space-y-3">
-      <input type="text" placeholder="Your Name" value={leadName}
-        onChange={e => setLeadName(e.target.value)}
-        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-primary/50 transition-colors" />
-      {/* <input type="tel" placeholder="Phone Number" value={leadPhone}
-        onChange={e => setLeadPhone(e.target.value)}
-        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-primary/50 transition-colors" /> */}
-      <button type="submit" disabled={leadLoading || !leadName.trim()}
-        className="w-full py-3.5 bg-primary text-on-primary text-[9px] uppercase tracking-[0.4em] font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-primary/90 transition-all disabled:opacity-50">
-        <ArrowRight className="w-3.5 h-3.5" />
-        {leadLoading ? 'Sending ' : 'Request Site Visit'}
-      </button>
-      {brochureUrl && (
-        <a href={brochureUrl} target="_blank" rel="noopener noreferrer"
-          className="block text-center text-[9px] uppercase tracking-widest font-bold text-white/25 hover:text-white/50 transition-colors pt-1">
-          View Brochure Instead  '
-        </a>
-      )}
-    </form>
-  );
 
   return (
     <motion.div
@@ -1955,55 +1899,8 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
   const [activeSpot, setActiveSpot]   = useState<Hotspot | null>(hotspots?.[0] ?? null);
   const [activePlot, setActivePlot]   = useState<PlotDot | null>(null);
   const [mapMode, setMapMode]         = useState<'plots' | 'features'>(plotDots ? 'plots' : 'features');
-  const [leadName, setLeadName]       = useState('');
-  // const [leadPhone, setLeadPhone]     = useState('');
-  const [leadSubmitted, setLeadSubmitted] = useState(false);
-  const [leadLoading, setLeadLoading]    = useState(false);
-  const [leadError, setLeadError]        = useState<string | null>(null);
-
-  // Timed newsletter prompt — appears after 25s if not already subscribed
-  const [showNewsletterPrompt, setShowNewsletterPrompt] = useState(false);
-  const [nlEmail, setNlEmail]     = useState('');
-  const [nlDone, setNlDone]       = useState(false);
-  const [nlLoading, setNlLoading] = useState(false);
-  useEffect(() => {
-    if (isSubscribed) return;
-    const t = setTimeout(() => setShowNewsletterPrompt(true), 25000);
-    return () => clearTimeout(t);
-  }, [isSubscribed]);
-
-  const handleNlSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!nlEmail.trim()) return;
-    setNlLoading(true);
-    try {
-      await saveNewsletter(nlEmail.trim(), 'modal');
-      await saveLead({ name: nlEmail.trim(), email: nlEmail.trim(), intent: `${sanctuary.title} — Newsletter Prompt` });
-      onNewsletterSignup?.();
-    } catch {/* ignore */} finally {
-      setNlLoading(false);
-      setNlDone(true);
-    }
-  };
-
   const commuteTime = sanctuary.commute.match(/\d+/)?.[0] ?? '—';
   const commuteDest = sanctuary.commute.replace(/^\d+ mins? to /i, '');
-
-  const handleLeadSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!leadName.trim()) return;
-    setLeadLoading(true);
-    setLeadError(null);
-    try {
-      await saveLead({ name: leadName.trim(), intent: `${sanctuary.title} — Site Visit Request` });
-      setLeadSubmitted(true);
-    } catch (err) {
-      console.error('[Lead] Save failed:', err);
-      setLeadError('Could not save your details. Please try again or WhatsApp us directly.');
-    } finally {
-      setLeadLoading(false);
-    }
-  };
 
   const badge = sanctuary.id === 'syl' ? 'Upcoming' : 'Open for Reservation';
 
@@ -2742,94 +2639,13 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
               </div>
             )}
 
-            {/* Lead capture */}
-            <div className="space-y-4 pb-4">
-              <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold">Reserve Your Interest</p>
-              {leadSubmitted ? (
-                <div className="p-6 rounded-2xl bg-primary/5 border border-primary/10 text-center space-y-2">
-                  <div className="w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center mx-auto">
-                    <Check className="w-5 h-5 text-primary" />
-                  </div>
-                  <p className="text-sm font-bold text-on-surface">We'll be in touch soon.</p>
-                  <p className="text-[11px] text-secondary/50">Our team will reach out via WhatsApp soon.</p>
-                </div>
-              ) : (
-                <form onSubmit={handleLeadSubmit} className="space-y-3">
-                  <input type="text" placeholder="Your Name" value={leadName}
-                    onChange={e => setLeadName(e.target.value)}
-                    className="w-full bg-surface-container-low border border-outline/15 rounded-xl px-4 py-3.5 text-sm text-on-surface placeholder-secondary/30 focus:outline-none focus:border-primary/50 transition-colors" />
-                  {/* <input type="tel" placeholder="Phone Number" value={leadPhone}
-                    onChange={e => setLeadPhone(e.target.value)}
-                    className="w-full bg-surface-container-low border border-outline/15 rounded-xl px-4 py-3.5 text-sm text-on-surface placeholder-secondary/30 focus:outline-none focus:border-primary/50 transition-colors" /> */}
-                  <button type="submit" disabled={leadLoading || !leadName.trim()}
-                    className="w-full py-4 bg-primary text-on-primary text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all flex items-center justify-center gap-3 disabled:opacity-50">
-                    <ArrowRight className="w-4 h-4" />
-                    {leadLoading ? 'Sending…' : 'Request Site Visit'}
-                  </button>
-                  {leadError && (
-                    <p className="text-[10px] text-red-500 text-center pt-1">{leadError}</p>
-                  )}
-                </form>
-              )}
-              {sanctuary.brochureUrl && (
-                <a href={sanctuary.brochureUrl} target="_blank" rel="noopener noreferrer"
-                  className="w-full py-3.5 border border-outline/20 text-on-surface text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl hover:bg-primary/5 transition-all flex items-center justify-center gap-3">
-                  <ArrowRight className="w-4 h-4" />
-                  View Full Brochure
-                </a>
-              )}
-            </div>
+
           </div>
         )}
 
       </div>
 
-      {/* ── Timed newsletter prompt (slides up after 25s) ── */}
-      <AnimatePresence>
-        {showNewsletterPrompt && !nlDone && (
-          <motion.div
-            initial={{ y: '100%', opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: '100%', opacity: 0 }}
-            transition={{ type: 'spring', damping: 28, stiffness: 220 }}
-            className="absolute bottom-0 left-0 right-0 bg-[#0a0f07] border-t border-primary/20 px-6 py-5 z-10"
-          >
-            <button onClick={() => setShowNewsletterPrompt(false)}
-              className="absolute top-3 right-4 p-1 text-white/30 hover:text-white/60 transition-colors">
-              <X className="w-4 h-4" />
-            </button>
-            <p className="text-[8px] uppercase tracking-[0.5em] text-primary/60 font-bold mb-1">Still exploring?</p>
-            <p className="text-sm font-headline font-bold text-white mb-3">
-              Get exclusive {sanctuary.title} updates — pricing alerts, site visit slots &amp; VIP access.
-            </p>
-            <form onSubmit={handleNlSubmit} className="flex gap-2">
-              <input
-                type="email" placeholder="your@email.com" value={nlEmail}
-                onChange={e => setNlEmail(e.target.value)}
-                className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-primary/50 transition-colors"
-              />
-              <button type="submit" disabled={nlLoading || !nlEmail.trim()}
-                className="px-4 py-2.5 bg-primary text-on-primary text-[9px] uppercase tracking-widest font-bold rounded-xl hover:bg-primary/90 transition-all disabled:opacity-50 flex-shrink-0">
-                {nlLoading ? '…' : 'Notify Me'}
-              </button>
-            </form>
-          </motion.div>
-        )}
-        {nlDone && showNewsletterPrompt && (
-          <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
-            transition={{ type: 'spring', damping: 28, stiffness: 220 }}
-            className="absolute bottom-0 left-0 right-0 bg-[#0a0f07] border-t border-primary/20 px-6 py-5 z-10 flex items-center gap-3">
-            <Check className="w-5 h-5 text-primary flex-shrink-0" />
-            <div>
-              <p className="text-sm font-bold text-white">You're on the list.</p>
-              <p className="text-[10px] text-white/40">We'll reach out within 24 hours.</p>
-            </div>
-            <button onClick={() => setShowNewsletterPrompt(false)} className="ml-auto text-white/30 hover:text-white/60">
-              <X className="w-4 h-4" />
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+
     </motion.div>
   );
 };
