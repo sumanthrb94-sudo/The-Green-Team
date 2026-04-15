@@ -931,11 +931,9 @@ const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewslet
         )}>
           {isSyl ? 'Pre-Investor Phase' : 'Open Reservation'}
         </span>
-        {!isSyl && (
-          <span className="px-3 py-1 text-[7px] uppercase tracking-[0.35em] font-bold rounded-full bg-[#080d06]/70 text-cream/60 backdrop-blur-sm border border-cream/10 w-fit">
-            TGT Channel Partner
-          </span>
-        )}
+        <span className="px-3 py-1 text-[7px] uppercase tracking-[0.35em] font-bold rounded-full bg-[#080d06]/70 text-cream/60 backdrop-blur-sm border border-cream/10 w-fit">
+          TGT Channel Partner
+        </span>
         {isSyl && (
           <span className="px-3 py-1 text-[8px] font-bold rounded-full bg-[#080d06]/75 text-white/70 backdrop-blur-sm border border-white/10 w-fit leading-relaxed">
             Missed Agartha? Don't miss this.
@@ -947,7 +945,7 @@ const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewslet
       <div className={cn("absolute bottom-0 left-0 right-0 px-6 pb-6 pt-10 z-20", isGated && "opacity-0")}>
         <div className="flex items-end justify-between gap-3 mb-4">
           <div className="min-w-0">
-            <p className="text-[8px] uppercase tracking-[0.4em] text-primary/80 font-bold mb-1 truncate">{sanctuary.commute}</p>
+            <p className="text-[8px] uppercase tracking-[0.4em] text-white/60 font-bold mb-1 truncate">{sanctuary.commute}</p>
             <h3 className="text-2xl font-headline font-bold text-white leading-tight">{sanctuary.title}</h3>
           </div>
           <div className="text-right flex-shrink-0">
