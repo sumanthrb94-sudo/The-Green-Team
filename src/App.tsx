@@ -2508,7 +2508,7 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
                 </div>
 
                 {/* Negotiation CTA */}
-                <div className="rounded-2xl border border-[#25D366]/30 bg-[#25D366]/5 p-5 space-y-3">
+                <div className="rounded-2xl border border-primary/20 bg-primary/5 p-5 space-y-3">
                   <p className="text-xs text-secondary leading-relaxed">
                     Prices above are indicative. <span className="font-semibold text-on-surface">Better pricing is available for in-person visits.</span> Message us on WhatsApp to enquire or book your office visit.
                   </p>
@@ -2518,8 +2518,7 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
                       href="https://wa.me/919700144003?text=Hi%2C%20I%27m%20interested%20in%20MODCON%20SYL%20Residences%20(Tukkuguda%2C%20ORR%20Exit-14).%20Could%20you%20share%20the%20best%20pricing%20available%3F"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-2.5 w-full py-3.5 rounded-xl text-[10px] uppercase tracking-[0.4em] font-bold text-white transition-all"
-                      style={{ background: '#25D366' }}
+                      className="flex items-center justify-center gap-2.5 w-full py-3.5 rounded-xl text-[10px] uppercase tracking-[0.4em] font-bold text-cream transition-all bg-olive-900 hover:bg-primary"
                     >
                       <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current flex-shrink-0">
                         <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
@@ -2532,7 +2531,7 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
                       href="https://wa.me/919700144003?text=Hi%2C%20I%27d%20like%20to%20book%20an%20office%20visit%20%2F%20site%20visit%20for%20MODCON%20SYL%20Residences.%20Please%20share%20available%20slots.%20(Financial%20District%20Office)"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-2 w-full py-3.5 border-2 border-[#25D366]/40 text-[#25D366] text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl transition-all hover:bg-[#25D366]/10"
+                      className="flex items-center justify-center gap-2 w-full py-3.5 border-2 border-olive-900/40 text-olive-900 text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl transition-all hover:bg-olive-900/10"
                     >
                       <MapPin className="w-3.5 h-3.5" />
                       Book Office Visit · WhatsApp
@@ -2605,7 +2604,7 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
                 </div>
 
                 {/* WhatsApp CTAs */}
-                <div className="rounded-2xl border border-[#25D366]/30 bg-[#25D366]/5 p-5 space-y-3">
+                <div className="rounded-2xl border border-primary/20 bg-primary/5 p-5 space-y-3">
                   <p className="text-xs text-secondary leading-relaxed">
                     Rate is ₹8,500/sq yd. <span className="font-semibold text-on-surface">Better pricing available for in-person visits — we negotiate on your behalf.</span> Message us on WhatsApp to enquire or book a site visit.
                   </p>
@@ -2615,8 +2614,7 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
                       href="https://wa.me/919700144003?text=Hi%2C%20I%27m%20interested%20in%20MODCON%20Agartha%20(Narsapur%2C%20Hyderabad).%20Could%20you%20share%20the%20best%20available%20plots%20and%20pricing%3F"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-2.5 w-full py-3.5 rounded-xl text-[10px] uppercase tracking-[0.4em] font-bold text-white transition-all"
-                      style={{ background: '#25D366' }}
+                      className="flex items-center justify-center gap-2.5 w-full py-3.5 rounded-xl text-[10px] uppercase tracking-[0.4em] font-bold text-cream transition-all bg-olive-900 hover:bg-primary"
                     >
                       <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current flex-shrink-0">
                         <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
@@ -2629,7 +2627,7 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
                       href="https://wa.me/919700144003?text=Hi%2C%20I%27d%20like%20to%20book%20a%20site%20visit%20for%20MODCON%20Agartha%20(Narsapur).%20Please%20share%20available%20slots."
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-2 w-full py-3.5 border-2 border-[#25D366]/40 text-[#25D366] text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl transition-all hover:bg-[#25D366]/10"
+                      className="flex items-center justify-center gap-2 w-full py-3.5 border-2 border-olive-900/40 text-olive-900 text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl transition-all hover:bg-olive-900/10"
                     >
                       <MapPin className="w-3.5 h-3.5" />
                       Book Site Visit · WhatsApp
