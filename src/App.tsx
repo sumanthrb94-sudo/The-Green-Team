@@ -168,29 +168,34 @@ const SANCTUARIES: Sanctuary[] = [
   },
   {
     id: 'syl',
-    title: 'SYL: Vertical Villament',
-    location: 'Tukkuguda · Future City Corridor',
+    title: 'MODCON SYL Residences',
+    location: 'Tukkuguda, ORR Exit-14 · Hyderabad',
     aqi: 22,
     noise: 24,
-    commute: '15 mins to Future City Hub',
+    commute: '10 mins to Airport · 30-45 mins to Financial District',
     valuation: '₹4.0 Cr',
     memberPrice: '₹1.9 Cr',
     image: '/gallery/syl/1776279315359.png',
-    tagline: 'Where the jungle lives inside.',
-    description: 'SYL is a vertical biophilic villament — a building where the forest isn\'t outside the window, it\'s woven into every floor. Travertine stone corridors open into indoor rock gardens and water features. Co-working and dining spaces sit under canopies of hanging ferns and tropical palms. The rooftop carries a glass-bottomed infinity pool above a full fitness floor, all overlooking open forest canopy. This is the model for how cities should grow — up, with nature.',
+    tagline: 'A modern address where luxury meets nature.',
+    description: 'MODCON SYL Residences is a 4.5-acre biophilic villament enclave at Tukkuguda, ORR Exit-14 — a hybrid of villa freedom and apartment convenience, built around forest landscape views, natural light, and wellness. Every unit opens to large private balconies overlooking lush forest canopy. The 22,000 sq ft clubhouse is designed as a serene wellness retreat with a chemical-free Natural Bio Pool, Yoga & Meditation Pavilion, and fully landscaped green corridors. Located 10 minutes from the international airport and on the doorstep of Hyderabad\'s fast-expanding Fourth City corridor, SYL is both a lifestyle address and a well-timed investment.',
     plots: 0,
-    plotRange: 'Villaments from 2,200 sq ft',
-    amenityAcres: 'Full-floor biophilic clubhouse',
-    architect: 'SYL Design Studio',
+    plotRange: 'Villaments · 2 & 3 BHK',
+    amenityAcres: '22,000 SFT Clubhouse · Health • Wellness • Nature',
+    architect: 'MODCON Builders',
+    brochureUrl: 'https://www.modconbuilders.com',
     features: [
-      'Indoor Rock Garden & Water Feature',
-      'Hanging Garden Corridors',
-      'Rooftop Infinity Pool (Glass Bottom)',
-      'Biophilic Co-working Floors',
-      'Travertine Stone Architecture',
-      'Forest-View Gym Floor',
-      'Farm-to-Table Restaurant',
-      'Near Future City Hub · 15 Min',
+      'Natural Bio Pool (Chemical-Free)',
+      'Yoga & Meditation Pavilion',
+      'Large Forest-View Balconies',
+      'Biophilic Green Corridors',
+      'Wellness & Fitness Spaces',
+      'EV Charging Points',
+      '100% Power Backup',
+      '4 High-Speed Passenger Lifts',
+      'Gated Community · 24/7 Security',
+      'Express Mart On-Site',
+      '10 Min to RGI Airport',
+      'ORR Exit-14 Direct Access',
     ],
     plotImages: [
       '/gallery/syl/1776279315359.png',
@@ -251,7 +256,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
 
   const sanctuaryItems = [
     { name: 'MODCON Agartha', id: 'list', sub: 'Narsapur Forest · From ₹64.6 L', img: 'https://images.unsplash.com/photo-1542401886-65d6c61db217?auto=format&fit=crop&q=80&w=400' },
-    { name: 'SYL: Vertical Villament', id: 'syl', sub: 'Tukkuguda · From ₹1.9 Cr', img: '/gallery/syl/1776279315359.png' },
+    { name: 'MODCON SYL Residences', id: 'syl', sub: 'Tukkuguda, ORR Exit-14 · Villaments', img: '/gallery/syl/1776279315359.png' },
   ];
 
   const avatarLetter = (authUser?.displayName?.[0] || authUser?.email?.[0] || authUser?.phoneNumber?.[1] || '?').toUpperCase();
@@ -907,7 +912,7 @@ const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewslet
           </div>
           <h4 className="text-xl font-headline font-bold text-white mb-2">Newsletter Access Required</h4>
           <p className="text-xs text-white/50 mb-6 max-w-[200px] leading-relaxed">
-            SYL: Vertical Villament is reserved for our intelligence network subscribers.
+            MODCON SYL Residences is reserved for our newsletter subscribers.
           </p>
           <button onClick={e => { e.stopPropagation(); onNewsletterClick(); }}
             className="px-6 py-3 bg-[#c8a951] text-[#1a1a0a] text-[9px] uppercase tracking-widest font-bold rounded-xl hover:bg-white transition-all">
@@ -4242,7 +4247,7 @@ const Footer = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
     { label: 'Living Ecosystems', sub: 'Nature-first design philosophy', mode: 'gallery' },
     { label: 'Sanctuary Map', sub: 'Environmental heatmap · AQI · Noise', mode: 'map' },
     { label: 'MODCON Agartha', sub: 'Narsapur Forest · Open access', mode: 'list' },
-    { label: 'SYL Villament', sub: 'Tukkuguda · Newsletter only', mode: 'syl' },
+    { label: 'MODCON SYL Residences', sub: 'Tukkuguda, ORR Exit-14 · Newsletter access', mode: 'syl' },
     { label: 'Adviser Membership', sub: 'Reserved investor circle · By invitation', mode: 'membership' },
   ];
 
@@ -4530,8 +4535,28 @@ WHY CONSCIOUS FOREST COMMUNITIES (the TGT thesis):
 - You're not buying a plot — you're buying into a community of people who chose to live differently
 - Near RRR (infrastructure play) + forest boundary (scarcity play) + permaculture (lifestyle play) = triple moat
 
+SECOND PROPERTY: MODCON SYL RESIDENCES
+- Full Name: MODCON SYL Residences
+- Developer: MODCON Builders
+- Location: Tukkuguda, ORR Exit-14, Hyderabad, Telangana
+- Total Area: 4.5 Acres
+- Type: Villaments — a hybrid of villa freedom and apartment living
+- Design: Biophilic architecture with forest landscape views, large balconies, sunrise views
+- AQI: ~22 (clean — city is 85–180)
+- Commute: 10 mins to RGI Airport · 30–45 mins to Financial District / Gachibowli / Kondapur
+- Nearby in 2–5 min: ORR Exit-14, Fab City, Pedda Golconda
+- Nearby in 10–15 min: RGI Airport, Aga Khan Academy, Manchester Global School, Wonderla, Statue of Equality
+- Nearby in 30–45 min: Apollo Hospital, Kamineni Hospital, Gachibowli, Financial District, Jubilee Hills, LB Nagar, Ramaoji Film City
+- Clubhouse: 22,000 sq ft — theme: Health • Wellness • Nature
+- Amenities: Natural Bio Pool (chemical-free), Yoga & Meditation Pavilion, Wellness & Fitness Centre, Landscaped Green Corridors, Express Mart, Dedicated Parking per unit, EV Charging Points, 4 High-Speed Lifts, 100% Power Backup, Gated Community with 24/7 CCTV
+- Commercial Component: MODCON ONE — 1.5 acres mixed-use retail, offices, F&B in same campus
+- Access: Newsletter subscribers only (gated)
+- Growth Corridor: Tukkuguda is in Hyderabad's 4th City expansion corridor — early-stage investment with strong appreciation potential
+- Contact: +91 9534869999 · Modconbuilderpvt.ltd@gmail.com · modconbuilders.com
+- TGT Role: Channel partner — we introduce interested buyers directly to MODCON Builders
+
 WHAT GROOT SHOULD DO:
-- Answer questions about Agartha, investment, environment, commute, amenities, lifestyle
+- Answer questions about Agartha, SYL Residences, investment, environment, commute, amenities, lifestyle
 - Guide users toward action: "Apply for Adviser Access" or "Join Newsletter"
 - Never invent data you don't have — say "I am Groot. (I'll connect you with our adviser for that detail.)"
 - Be concise, warm, exclusive — maximum 3-4 sentences per response
