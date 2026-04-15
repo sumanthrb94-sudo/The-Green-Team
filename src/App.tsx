@@ -173,8 +173,8 @@ const SANCTUARIES: Sanctuary[] = [
     aqi: 22,
     noise: 24,
     commute: '10 mins to Airport · 30-45 mins to Financial District',
-    valuation: '₹4.0 Cr',
-    memberPrice: '₹1.9 Cr',
+    valuation: '',
+    memberPrice: 'Price on Request',
     image: '/gallery/syl/1776279315359.png',
     tagline: 'A modern address where luxury meets nature.',
     description: 'MODCON SYL Residences is a 4.5-acre biophilic development at Tukkuguda, ORR Exit-14 — offering luxury villaments from 2,500 to 4,500 SFT with large forest-view balconies, natural light, and sunrise views. The 22,000 sq ft clubhouse is a wellness retreat with a chemical-free Natural Bio Pool and Yoga Pavilion. Commercial spaces are also available at exclusive one-time investor prices — contact us for details. Located 10 minutes from the international airport and at the threshold of Hyderabad\'s Fourth City growth corridor.',
@@ -953,7 +953,7 @@ const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewslet
               </>
             ) : (
               <>
-                <p className="text-sm text-white/40 line-through">{sanctuary.valuation}</p>
+                {sanctuary.valuation && <p className="text-sm text-white/40 line-through">{sanctuary.valuation}</p>}
                 <p className="text-xl font-headline font-bold text-white">{sanctuary.memberPrice}</p>
               </>
             )}
