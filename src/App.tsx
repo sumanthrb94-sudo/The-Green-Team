@@ -1096,18 +1096,18 @@ const PropertyInteractiveLayout: FC<PropertyLayoutConfig & { onClose: () => void
 }) => {
   const [active, setActive] = useState<Hotspot>(hotspots[0]);
   const [leadName, setLeadName] = useState('');
-  const [leadPhone, setLeadPhone] = useState('');
+  // const [leadPhone, setLeadPhone] = useState('');
   const [leadSubmitted, setLeadSubmitted] = useState(false);
   const [leadLoading, setLeadLoading] = useState(false);
 
   const handleLeadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!leadName.trim() || !leadPhone.trim()) return;
+    if (!leadName.trim()) return;
     setLeadLoading(true);
     try {
       await saveLead({ 
         name: leadName.trim(), 
-        phone: leadPhone.trim(), 
+        // phone: leadPhone.trim(), 
         intent: `${intentPrefix} - ${active.label}`,
         source: 'site_visit'
       });
@@ -1123,7 +1123,7 @@ const PropertyInteractiveLayout: FC<PropertyLayoutConfig & { onClose: () => void
         <Check className="w-6 h-6 text-primary" />
       </div>
       <p className="text-sm font-bold text-white">We'll be in touch soon.</p>
-      <p className="text-[11px] text-white/40">Our team will call you within 24 hours.</p>
+      <p className="text-[11px] text-white/40">Our team will reach out via WhatsApp soon.</p>
       {brochureUrl && (
         <a href={brochureUrl} target="_blank" rel="noopener noreferrer"
           className="inline-flex items-center gap-1.5 text-[9px] uppercase tracking-widest font-bold text-primary/70 hover:text-primary transition-colors mt-2">
@@ -1136,10 +1136,10 @@ const PropertyInteractiveLayout: FC<PropertyLayoutConfig & { onClose: () => void
       <input type="text" placeholder="Your Name" value={leadName}
         onChange={e => setLeadName(e.target.value)}
         className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-primary/50 transition-colors" />
-      <input type="tel" placeholder="Phone Number" value={leadPhone}
+      {/* <input type="tel" placeholder="Phone Number" value={leadPhone}
         onChange={e => setLeadPhone(e.target.value)}
-        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-primary/50 transition-colors" />
-      <button type="submit" disabled={leadLoading || !leadName.trim() || !leadPhone.trim()}
+        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-primary/50 transition-colors" /> */}
+      <button type="submit" disabled={leadLoading || !leadName.trim()}
         className="w-full py-3.5 bg-primary text-on-primary text-[9px] uppercase tracking-[0.4em] font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-primary/90 transition-all disabled:opacity-50">
         <ArrowRight className="w-3.5 h-3.5" />
         {leadLoading ? 'Sending ' : 'Request Site Visit'}
@@ -1956,7 +1956,7 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
   const [activePlot, setActivePlot]   = useState<PlotDot | null>(null);
   const [mapMode, setMapMode]         = useState<'plots' | 'features'>(plotDots ? 'plots' : 'features');
   const [leadName, setLeadName]       = useState('');
-  const [leadPhone, setLeadPhone]     = useState('');
+  // const [leadPhone, setLeadPhone]     = useState('');
   const [leadSubmitted, setLeadSubmitted] = useState(false);
   const [leadLoading, setLeadLoading]    = useState(false);
   const [leadError, setLeadError]        = useState<string | null>(null);
@@ -1991,11 +1991,11 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
 
   const handleLeadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!leadName.trim() || !leadPhone.trim()) return;
+    if (!leadName.trim()) return;
     setLeadLoading(true);
     setLeadError(null);
     try {
-      await saveLead({ name: leadName.trim(), email: leadPhone.trim(), intent: `${sanctuary.title} — Site Visit Request` });
+      await saveLead({ name: leadName.trim(), intent: `${sanctuary.title} — Site Visit Request` });
       setLeadSubmitted(true);
     } catch (err) {
       console.error('[Lead] Save failed:', err);
@@ -2751,17 +2751,17 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
                     <Check className="w-5 h-5 text-primary" />
                   </div>
                   <p className="text-sm font-bold text-on-surface">We'll be in touch soon.</p>
-                  <p className="text-[11px] text-secondary/50">Our team will reach out within 24 hours.</p>
+                  <p className="text-[11px] text-secondary/50">Our team will reach out via WhatsApp soon.</p>
                 </div>
               ) : (
                 <form onSubmit={handleLeadSubmit} className="space-y-3">
                   <input type="text" placeholder="Your Name" value={leadName}
                     onChange={e => setLeadName(e.target.value)}
                     className="w-full bg-surface-container-low border border-outline/15 rounded-xl px-4 py-3.5 text-sm text-on-surface placeholder-secondary/30 focus:outline-none focus:border-primary/50 transition-colors" />
-                  <input type="tel" placeholder="Phone Number" value={leadPhone}
+                  {/* <input type="tel" placeholder="Phone Number" value={leadPhone}
                     onChange={e => setLeadPhone(e.target.value)}
-                    className="w-full bg-surface-container-low border border-outline/15 rounded-xl px-4 py-3.5 text-sm text-on-surface placeholder-secondary/30 focus:outline-none focus:border-primary/50 transition-colors" />
-                  <button type="submit" disabled={leadLoading || !leadName.trim() || !leadPhone.trim()}
+                    className="w-full bg-surface-container-low border border-outline/15 rounded-xl px-4 py-3.5 text-sm text-on-surface placeholder-secondary/30 focus:outline-none focus:border-primary/50 transition-colors" /> */}
+                  <button type="submit" disabled={leadLoading || !leadName.trim()}
                     className="w-full py-4 bg-primary text-on-primary text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all flex items-center justify-center gap-3 disabled:opacity-50">
                     <ArrowRight className="w-4 h-4" />
                     {leadLoading ? 'Sending…' : 'Request Site Visit'}
