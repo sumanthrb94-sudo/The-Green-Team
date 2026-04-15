@@ -261,7 +261,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
   ];
 
   const sanctuaryItems = [
-    { name: 'MODCON Agartha', id: 'list', sub: 'Narsapur Forest · From ₹68.7 L', img: 'https://static.wixstatic.com/media/142b26_e9917bb73fc94531948ef638eba5a051~mv2.jpg' },
+    { name: 'MODCON Agartha', id: 'agartha', sub: 'Narsapur Forest · From ₹68.7 L', img: 'https://static.wixstatic.com/media/142b26_e9917bb73fc94531948ef638eba5a051~mv2.jpg' },
     { name: 'MODCON SYL Residences', id: 'syl', sub: 'Tukkuguda, ORR Exit-14 · Villaments', img: '/gallery/syl/1776279315359.png' },
   ];
 
@@ -392,7 +392,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
                   <div className="flex flex-col gap-2">
                     {sanctuaryItems.map(s => (
                       <button key={s.id}
-                        onClick={() => { onModeChange(s.id); setAccountOpen(false); }}
+                        onClick={() => { onPropertySelect(s.id); setAccountOpen(false); }}
                         className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-primary/5 text-left transition-all group">
                         <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0">
                           <img src={s.img} alt={s.name} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
@@ -756,7 +756,7 @@ const EcosystemPillars = ({ isFullPage = false }: { isFullPage?: boolean }) => {
   const checks = [
     {
       icon: '🌿',
-      title: 'Forest or nature nearby',
+      title: 'Forest & Nature',
       desc: 'The property must sit within or right next to forest, hills, or open green land — not just a park. If it\'s a drive away, it doesn\'t qualify.',
       proof: 'Agartha (live): surrounded by forest reserve',
     },
@@ -4320,12 +4320,12 @@ const ApplicationForm = () => {
   );
 };
 
-const Footer = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
+const Footer = ({ onModeChange, onPropertySelect }: { onModeChange: (mode: string) => void, onPropertySelect?: (id: string) => void }) => {
   const agenda = [
     { label: 'The Intelligence Gap', sub: 'Why early entry wins', mode: 'analytics' },
     { label: 'Living Ecosystems', sub: 'Nature-first design philosophy', mode: 'gallery' },
     { label: 'Sanctuary Map', sub: 'Environmental heatmap · AQI · Noise', mode: 'map' },
-    { label: 'MODCON Agartha', sub: 'Narsapur Forest · Open access', mode: 'list' },
+    { label: 'MODCON Agartha', sub: 'Narsapur Forest · Open access', mode: 'agartha' },
     { label: 'MODCON SYL Residences', sub: 'Tukkuguda, ORR Exit-14 · Newsletter access', mode: 'syl' },
     { label: 'Adviser Membership', sub: 'Reserved investor circle · By invitation', mode: 'membership' },
   ];
@@ -4355,7 +4355,13 @@ const Footer = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
           {agenda.map(item => (
             <button
               key={item.mode}
-              onClick={() => onModeChange(item.mode)}
+              onClick={() => {
+                if ((item.mode === 'agartha' || item.mode === 'syl') && onPropertySelect) {
+                  onPropertySelect(item.mode);
+                } else {
+                  onModeChange(item.mode);
+                }
+              }}
               className="group text-left p-8 bg-forest-section hover:bg-white/5 transition-all"
             >
               <p className="text-[8px] uppercase tracking-[0.5em] text-white/25 font-bold mb-2 group-hover:text-[#8aab78]/70 transition-colors">{item.sub}</p>
@@ -4801,7 +4807,7 @@ Additional live context (user data): ${JSON.stringify({ user: data.user?.display
   );
 };
 
-const HomeView = ({ isSubscribed, onNewsletterClick, sanctuaries = SANCTUARIES, onModeChange }: { isSubscribed: boolean, onNewsletterClick: () => void, sanctuaries?: Sanctuary[], onModeChange: (mode: string) => void }) => (
+const HomeView = ({ isSubscribed, onNewsletterClick, sanctuaries = SANCTUARIES, onModeChange, onPropertySelect }: { isSubscribed: boolean, onNewsletterClick: () => void, sanctuaries?: Sanctuary[], onModeChange: (mode: string) => void, onPropertySelect?: (id: string) => void }) => (
   <div className="flex flex-col">
     {/* 1. Hero */}
     <Hero onModeChange={onModeChange} />
@@ -4817,7 +4823,7 @@ const HomeView = ({ isSubscribed, onNewsletterClick, sanctuaries = SANCTUARIES, 
 
     {/* 5. Newsletter + footer */}
     <NewsletterHighlight onSubscribe={onNewsletterClick} />
-    <Footer onModeChange={onModeChange} />
+    <Footer onModeChange={onModeChange} onPropertySelect={onPropertySelect} />
   </div>
 );
 
@@ -5629,6 +5635,10 @@ export default function App() {
                   onNewsletterClick={() => setIsNewsletterOpen(true)}
                   sanctuaries={allSanctuaries}
                   onModeChange={handleViewChange}
+                  onPropertySelect={(id) => {
+                    const sanctuary = allSanctuaries.find(s => s.id === id);
+                    if (sanctuary) setSelectedProperty(sanctuary);
+                  }}
                 />
               )}
 
@@ -5669,7 +5679,10 @@ export default function App() {
               {viewMode === 'membership' && (
                 <div className="flex flex-col">
                   <ApplicationForm />
-                  <Footer onModeChange={handleViewChange} />
+                  <Footer onModeChange={handleViewChange} onPropertySelect={(id) => {
+                    const sanctuary = allSanctuaries.find(s => s.id === id);
+                    if (sanctuary) setSelectedProperty(sanctuary);
+                  }} />
                 </div>
               )}
             </motion.div>
