@@ -42,13 +42,15 @@ import { cn } from './lib/utils';
 
 
 import { MapContainer, TileLayer, Marker, Popup, Circle, Polygon, useMap, ZoomControl, Polyline, Tooltip, useMapEvents } from 'react-leaflet';
-import { AlertTriangle, ZoomIn, LogOut, RefreshCw, Users, Mail as MailIcon, ShieldCheck, User } from 'lucide-react';
+import { AlertTriangle, ZoomIn, LogOut, RefreshCw, Users, Mail as MailIcon, ShieldCheck, User as UserIcon } from 'lucide-react';
 import L from 'leaflet';
 
 // Firebase
 import {
   onAuthStateChanged,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   signOut,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -334,7 +336,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
               )
             ) : (
               <div className="w-9 h-9 rounded-full border border-outline/25 flex items-center justify-center">
-                <User className="w-4 h-4 text-secondary/50" />
+                <UserIcon className="w-4 h-4 text-secondary/50" />
               </div>
             )}
           </button>
@@ -2071,7 +2073,19 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
               <p className="text-[8px] uppercase tracking-[0.5em] text-primary font-bold mb-0.5 truncate">{sanctuary.tagline}</p>
             )}
             <h2 className="text-lg font-headline font-bold text-on-surface leading-tight">{sanctuary.title}</h2>
-            <div className="flex items-center gap-1.5 text-secondary text-[11px] mt-1">
+            
+            {sanctuary.id === 'syl' && (
+              <div className="flex items-center gap-2 mt-2">
+                <span className="px-2 py-0.5 bg-[#c8a951] text-[#1a1a0a] text-[7px] uppercase tracking-[0.3em] font-bold rounded-md shadow-sm">
+                  Pre-Investor Gold™
+                </span>
+                <span className="px-2 py-0.5 border border-[#c8a951]/40 text-[#c8a951] text-[7px] uppercase tracking-[0.3em] font-bold rounded-md">
+                  Pre-Investment Phase
+                </span>
+              </div>
+            )}
+
+            <div className="flex items-center gap-1.5 text-secondary text-[11px] mt-1.5">
               <MapPin className="w-3 h-3 flex-shrink-0" />
               <span className="truncate">{sanctuary.location}</span>
             </div>
@@ -2127,6 +2141,40 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
             : [sanctuary.image];
           return (
             <div className="py-2">
+              {/* SYL Pre-Investor Gold Opportunity Section */}
+              {sanctuary.id === 'syl' && (
+                <div className="px-5 mb-6">
+                  <div 
+                    className="rounded-2xl p-5 border border-[#c8a951]/30 relative overflow-hidden"
+                    style={{ background: 'linear-gradient(135deg, rgba(200,169,81,0.08) 0%, rgba(200,169,81,0.03) 100%)' }}
+                  >
+                    <div className="relative z-10">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Award className="w-4 h-4 text-[#c8a951]" />
+                        <span className="text-[#c8a951] text-[9px] font-bold uppercase tracking-[0.4em]">Pre-Investor Gold™ Opportunity</span>
+                      </div>
+                      <h3 className="text-lg font-headline font-bold text-on-surface mb-2 leading-tight">
+                        Exclusive Partner Advantage
+                      </h3>
+                      <p className="text-[11px] text-secondary/80 leading-relaxed mb-4">
+                        In partnership with **MODCON Builders**, The Green Team members gain exclusive first-right access at ground-floor pricing during this Pre-Investment Phase.
+                      </p>
+                      <div className="flex items-center gap-4">
+                        <div className="px-4 py-2 bg-[#c8a951]/10 rounded-xl border border-[#c8a951]/20">
+                          <p className="text-[8px] uppercase tracking-widest text-[#c8a951] font-bold mb-0.5">Early Entry Rate</p>
+                          <p className="text-lg font-headline font-bold text-[#c8a951]">₹4,499 / SFT</p>
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-[9px] text-on-surface/60 font-medium">Securing early appreciation before the public launch.</p>
+                        </div>
+                      </div>
+                    </div>
+                    {/* Background decoration */}
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#c8a951]/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
+                  </div>
+                </div>
+              )}
+
               {/* Masonry-style grid — tap to open lightbox */}
               <div className="grid grid-cols-2 gap-0.5">
                 {images.map((src, i) => (
@@ -2578,9 +2626,9 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
                         <div className="px-3 py-2.5">
                           <div className="flex items-center gap-1 mb-1">
                             <div className="w-1.5 h-1.5 rounded-full bg-[#c8a951] animate-pulse" />
-                            <p className="text-[8px] font-bold text-[#c8a951] uppercase tracking-widest">Now</p>
+                            <p className="text-[8px] font-bold text-[#c8a951] uppercase tracking-widest">TGT Member Benefit</p>
                           </div>
-                          <p className="text-[10px] font-bold text-on-surface">Pre-Investor</p>
+                          <p className="text-[10px] font-bold text-on-surface">Pre-Investor Phase</p>
                           <p className="text-base font-headline font-bold text-[#c8a951] mt-0.5">₹4,499</p>
                           <p className="text-[8px] text-secondary/50">per SFT</p>
                         </div>
@@ -5056,14 +5104,19 @@ const AuthModal = ({
     try {
       initializeRecaptcha();
       
-      // Format phone number with country code if not present
+      // Format phone number with country code if not present (E.164)
       let formattedPhone = phone.trim().replace(/\s/g, '');
+      
+      // If no +, assume +91 (India) if it's a 10-digit number or starts with 91
       if (!formattedPhone.startsWith('+')) {
-        // If it starts with 91 but no +, add +
-        if (formattedPhone.startsWith('91') && formattedPhone.length > 10) {
-          formattedPhone = '+' + formattedPhone;
-        } else {
-          formattedPhone = '+91' + formattedPhone.replace(/\D/g, '');
+        const digitsOnly = formattedPhone.replace(/\D/g, '');
+        if (digitsOnly.length === 10) {
+          formattedPhone = '+91' + digitsOnly;
+        } else if (digitsOnly.startsWith('91') && digitsOnly.length > 10) {
+          formattedPhone = '+' + digitsOnly;
+        } else if (digitsOnly.length > 0) {
+          // If it's something else, try prepending +
+          formattedPhone = '+' + digitsOnly;
         }
       }
       
@@ -5074,7 +5127,13 @@ const AuthModal = ({
         setOtp('');
       }
     } catch (err: any) {
-      setError(friendlyAuthError(err.code));
+      console.error('Phone Auth Send Error:', err);
+      // Special check for 400 Bad Request which often means Phone Auth is disabled in Firebase Console
+      if (err.message?.includes('400') || err.code === 'auth/operation-not-allowed') {
+        setError('Phone Authentication might be disabled in your Firebase Settings. Please enable it in the Firebase Console.');
+      } else {
+        setError(friendlyAuthError(err.code));
+      }
     } finally {
       setLoading(null);
     }
@@ -5114,17 +5173,28 @@ const AuthModal = ({
   const handleGoogle = async () => {
     setError(''); setLoading('google');
     try {
-      const { user, operationType } = await signInWithPopup(auth, googleProvider);
-      // isNew if it's a sign-up operation (first time)
-      const isNew = operationType === 'signIn' && !user.metadata.creationTime
-        ? false
-        : user.metadata.creationTime === user.metadata.lastSignInTime;
-      onSuccess(user, isNew);
-      onClose();
+      if (!auth) throw new Error('Auth not initialized');
+      
+      // Detect mobile device to choose reliable auth method
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      
+      if (isMobile) {
+        // Redirect is much more reliable on mobile Safari and embedded browsers
+        await signInWithRedirect(auth, googleProvider);
+      } else {
+        const { user, operationType } = await signInWithPopup(auth, googleProvider);
+        const isNew = operationType === 'signIn' && !user.metadata.creationTime
+          ? false
+          : user.metadata.creationTime === user.metadata.lastSignInTime;
+        onSuccess(user, isNew);
+        onClose();
+      }
     } catch (err: any) {
       setError(friendlyAuthError(err.code));
     } finally {
-      setLoading(null);
+      // Don't set loading null if we are redirecting
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      if (!isMobile) setLoading(null);
     }
   };
 
@@ -5433,8 +5503,8 @@ const AuthModal = ({
               {error && !emailOpen && !phoneOpen && <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-red-500 text-xs text-center">{error}</motion.p>}
               {error && phoneOpen && <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-red-500 text-xs text-center">{error}</motion.p>}
 
-              {/* reCAPTCHA container */}
-              <div id="recaptcha-container" className="hidden" />
+              {/* reCAPTCHA container — must be in DOM and not 'display: none' for stable initialization */}
+              <div id="recaptcha-container" className="absolute opacity-0 pointer-events-none" />
 
               <motion.p
                 initial={{ opacity: 0 }}
@@ -5624,6 +5694,22 @@ export default function App() {
   // Global auth state listener (handles page reload / session restore)
   useEffect(() => {
     if (!auth) return;
+    
+    // 1. Handle redirect result (for mobile Google sign-in)
+    getRedirectResult(auth)
+      .then((result) => {
+        if (result && result.user) {
+          const isNew = result.operationType === 'signIn' && !result.user.metadata.creationTime
+            ? false
+            : result.user.metadata.creationTime === result.user.metadata.lastSignInTime;
+          handleAuthSuccess(result.user, isNew);
+        }
+      })
+      .catch((err) => {
+        console.error('Redirect auth error:', err);
+      });
+
+    // 2. Regular auth state observer
     const unsub = onAuthStateChanged(auth, u => {
       setAuthUser(u);
       if (u?.email === ADMIN_EMAIL) setShowAdmin(true);
@@ -5631,7 +5717,7 @@ export default function App() {
       if (u) setTimeout(() => captureLocation(u.uid), 2000);
     });
     return unsub;
-  }, [captureLocation]);
+  }, [captureLocation, handleAuthSuccess]);
 
   const handleSignOut = async () => {
     try {
