@@ -124,7 +124,7 @@ const SANCTUARIES: Sanctuary[] = [
     pricePerSqYd: 8500,
     valuation: '',
     memberPrice: 'From ₹68.7 L',
-    image: 'https://static.wixstatic.com/media/142b26_e9917bb73fc94531948ef638eba5a051~mv2.jpg',
+    image: '/agartha-official-render.png',
     tagline: 'Where the forest becomes home.',
     description: 'MODCON Agartha is a 25-acre regenerative permaculture farm estate on the Narsapur forest boundary, near the RRR. 36 unique farm plots — each pre-planted with 100+ tree varieties, drip irrigation, vegetable beds, and a spiral herbal garden — surround a 36,000 sq ft clubhouse with 5 premium amenities: aquatic pool, kayaking lake, gym, farm-to-table dining, and staycation villas. An on-site Goshala with integrated animal husbandry completes the self-sustaining ecosystem. Winner: Best Sustainable Eco-Friendly Project of the Year 2024.',
     plots: 36,
@@ -263,7 +263,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
   ];
 
   const sanctuaryItems = [
-    { name: 'MODCON Agartha', id: 'agartha', sub: 'Narsapur Forest · From ₹68.7 L', img: 'https://static.wixstatic.com/media/142b26_e9917bb73fc94531948ef638eba5a051~mv2.jpg' },
+    { name: 'MODCON Agartha', id: 'agartha', sub: 'Narsapur Forest · From ₹68.7 L', img: '/agartha-official-render.png' },
     { name: 'MODCON SYL Residences', id: 'syl', sub: 'Tukkuguda, ORR Exit-14 · Villaments', img: '/gallery/syl/1776279315359.png' },
   ];
 
@@ -1106,71 +1106,181 @@ const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewslet
   );
 };
 
-const SanctuaryPopupContent = ({ loc }: { loc: any }) => (
-  <div className="w-72" style={{ background: 'rgba(13,20,9,0.96)', backdropFilter: 'blur(20px)', borderRadius: '14px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.07)', boxShadow: '0 24px 48px rgba(0,0,0,0.7)' }}>
-    {/* Image */}
-    <div className="relative h-36 overflow-hidden">
-      {loc.image ? (
-        <img src={loc.image} alt={loc.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-      ) : (
-        <div className="w-full h-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.03)' }}>
-          <MapPin className="w-8 h-8" style={{ color: 'rgba(255,255,255,0.1)' }} />
-        </div>
-      )}
-      <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(13,20,9,0.9) 0%, transparent 60%)' }} />
-      {/* Live AQI badge on image */}
-      {loc.aqi != null && (
-        <div className="absolute bottom-3 left-3 flex items-center gap-1.5">
-          <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: loc.aqi > 50 ? '#f87171' : '#4ade80' }} />
-          <span className="text-[9px] font-bold uppercase tracking-widest" style={{ color: loc.aqi > 50 ? '#f87171' : '#4ade80' }}>
-            AQI {loc.aqi} · {loc.aqi > 50 ? 'Compromised' : 'Pristine'}
-          </span>
-        </div>
-      )}
-      {/* Type badge */}
-      {loc.type === 'sanctuary' && (
-        <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full text-[7px] uppercase tracking-widest font-bold" style={{ background: 'rgba(100,80,30,0.85)', color: '#fcd34d', border: '1px solid rgba(252,211,77,0.25)' }}>
-          TGT Curated
-        </div>
-      )}
-    </div>
-    {/* Content */}
-    <div className="p-4">
-      <h4 className="font-bold text-lg uppercase tracking-wider mb-0.5 leading-tight" style={{ color: 'rgba(255,255,255,0.92)' }}>{loc.title}</h4>
-      <p className="text-[9px] uppercase tracking-widest font-medium mb-4" style={{ color: 'rgba(255,255,255,0.35)' }}>{loc.location}</p>
-      {/* Stats */}
-      {loc.aqi != null && (
-        <div className="grid grid-cols-2 gap-2 mb-4">
-          <div className="rounded-lg p-2.5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}>
-            <p className="text-[7px] uppercase tracking-widest mb-1" style={{ color: 'rgba(255,255,255,0.25)' }}>Air Quality</p>
-            <p className="text-base font-bold leading-tight" style={{ color: loc.aqi > 50 ? '#f87171' : '#4ade80' }}>{loc.aqi}</p>
-            <p className="text-[7px]" style={{ color: 'rgba(255,255,255,0.3)' }}>{loc.aqi > 50 ? 'Unhealthy' : 'Pristine'}</p>
-          </div>
-          {loc.noise != null && (
-            <div className="rounded-lg p-2.5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}>
-              <p className="text-[7px] uppercase tracking-widest mb-1" style={{ color: 'rgba(255,255,255,0.25)' }}>Noise Level</p>
-              <p className="text-base font-bold leading-tight" style={{ color: loc.noise > 50 ? '#fb923c' : '#4ade80' }}>{loc.noise}<span className="text-[9px] font-normal" style={{ color: 'rgba(255,255,255,0.25)' }}> dB</span></p>
-              <p className="text-[7px]" style={{ color: 'rgba(255,255,255,0.3)' }}>{loc.noise > 50 ? 'Chaotic' : 'Silent'}</p>
+const SanctuaryPopupContent = ({ loc }: { loc: any }) => {
+  const sanctuary = loc.type === 'sanctuary' ? SANCTUARIES.find(s => s.id === loc.id) : null;
+  const heroImage = sanctuary?.image || loc.image;
+  const isSyl = sanctuary?.id === 'syl';
+  const title = sanctuary?.title || loc.title;
+  const subtitle = sanctuary?.commute || loc.location;
+  const price = sanctuary?.memberPrice;
+  const pricePerSqYd = sanctuary?.pricePerSqYd;
+  const aqiPristine = loc.aqi != null && loc.aqi <= 50;
+  const noiseCalm = loc.noise != null && loc.noise <= 50;
+
+  // Non-sanctuary (exits, zones) keep a condensed variant.
+  if (!sanctuary) {
+    return (
+      <div className="w-72 overflow-hidden rounded-2xl border border-white/5" style={{ background: 'rgba(13,20,9,0.96)', backdropFilter: 'blur(20px)', boxShadow: '0 24px 48px rgba(0,0,0,0.7)' }}>
+        <div className="relative h-28 overflow-hidden">
+          {loc.image ? (
+            <img src={loc.image} alt={loc.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-white/[0.03]">
+              <MapPin className="w-8 h-8 text-white/10" />
+            </div>
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0d1409] via-transparent to-transparent" />
+          {loc.aqi != null && (
+            <div className="absolute bottom-2.5 left-3 flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: aqiPristine ? '#4ade80' : '#f87171' }} />
+              <span className="text-[9px] font-bold uppercase tracking-widest" style={{ color: aqiPristine ? '#4ade80' : '#f87171' }}>
+                AQI {loc.aqi} · {aqiPristine ? 'Pristine' : 'Compromised'}
+              </span>
             </div>
           )}
         </div>
-      )}
-      {loc.description && (
-        <p className="text-[10px] leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.4)' }}>
-          {loc.type === 'traffic-zone' ? `Disadvantage: ${loc.description}` : loc.type === 'exit' ? 'Strategic access via Outer Ring Road — fast connectivity, urban-level pollution.' : loc.description}
-        </p>
-      )}
-      {loc.type === 'sanctuary' && (
-        <div className="flex items-center justify-between pt-3" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-          <span className="text-[8px] uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.2)' }}>Click marker to explore</span>
-          <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: 'rgba(100,80,30,0.5)', border: '1px solid rgba(252,211,77,0.25)' }}>
-            <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 4h5M4 1.5l2.5 2.5L4 6.5" stroke="#fcd34d" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        <div className="p-4">
+          <h4 className="font-headline font-bold text-base uppercase tracking-wider leading-tight text-white/90">{loc.title}</h4>
+          <p className="text-[9px] uppercase tracking-widest text-white/35 mt-0.5">{loc.location}</p>
+          {loc.description && (
+            <p className="text-[10px] leading-relaxed text-white/45 mt-3">
+              {loc.type === 'exit' ? 'Strategic access via Outer Ring Road — fast connectivity, urban-level pollution.' : loc.description}
+            </p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Sanctuary variant — mirrors the website's SanctuaryCard aesthetic.
+  return (
+    <div
+      className="w-[320px] overflow-hidden rounded-3xl"
+      style={{
+        background: '#0c1208',
+        border: '1px solid rgba(255,255,255,0.06)',
+        boxShadow: '0 32px 72px rgba(0,0,0,0.75)',
+      }}
+    >
+      {/* Hero image */}
+      <div className="relative h-44 overflow-hidden bg-[#0c1208]">
+        <img
+          src={heroImage}
+          alt={title}
+          className="absolute inset-0 w-full h-full object-cover"
+          referrerPolicy="no-referrer"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a0a]/95 via-[#1a1a0a]/25 to-transparent" />
+
+        {/* Top-left badge stack */}
+        <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+          <span
+            className={cn(
+              'px-2.5 py-1 text-[8px] uppercase tracking-[0.35em] font-bold rounded-full w-fit',
+              isSyl ? 'bg-[#c8a951] text-[#1a1a0a]' : 'bg-primary/95 text-on-primary backdrop-blur-sm'
+            )}
+          >
+            {isSyl ? 'Pre-Investor Phase' : 'Open Reservation'}
+          </span>
+          <span className="px-2.5 py-0.5 text-[7px] uppercase tracking-[0.3em] font-bold rounded-full bg-[#080d06]/75 text-white/55 border border-white/10 w-fit">
+            TGT Channel Partner
+          </span>
+          {isSyl && (
+            <span className="px-2.5 py-0.5 text-[8px] font-bold rounded-full bg-[#c8a951]/20 text-[#c8a951] border border-[#c8a951]/40 w-fit">
+              Pre-Investor Gold™
+            </span>
+          )}
+        </div>
+
+        {/* Top-right live AQI pill */}
+        {loc.aqi != null && (
+          <div
+            className="absolute top-3 right-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full"
+            style={{ background: 'rgba(5,8,4,0.75)', border: '1px solid rgba(255,255,255,0.08)' }}
+          >
+            <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: aqiPristine ? '#4ade80' : '#f87171' }} />
+            <span className="text-[8px] font-bold uppercase tracking-widest" style={{ color: aqiPristine ? '#4ade80' : '#f87171' }}>
+              AQI {loc.aqi}
+            </span>
+          </div>
+        )}
+
+        {/* Bottom hero overlay: title + price */}
+        <div className="absolute bottom-0 left-0 right-0 px-4 pb-3 pt-8">
+          <p className="text-[8px] uppercase tracking-[0.35em] text-white/65 font-bold mb-1 truncate">
+            {subtitle}
+          </p>
+          <div className="flex items-end justify-between gap-2">
+            <h4 className="font-headline font-bold text-white leading-tight text-lg truncate">
+              {title}
+            </h4>
+            {price && (
+              <div className="text-right flex-shrink-0">
+                {pricePerSqYd && (
+                  <p className="text-[8px] text-white/45">₹{pricePerSqYd.toLocaleString('en-IN')}/sq yd</p>
+                )}
+                <p className="font-headline font-bold text-white text-sm leading-tight">{price}</p>
+              </div>
+            )}
           </div>
         </div>
+      </div>
+
+      {/* Stats row */}
+      <div className="px-4 pt-3 pb-2 flex items-center gap-4 border-b border-white/5">
+        <div className="flex items-center gap-1.5">
+          <Wind className="w-3.5 h-3.5" style={{ color: aqiPristine ? '#4ade80' : '#f87171' }} />
+          <div className="leading-tight">
+            <p className="text-[7px] uppercase tracking-widest text-white/35 font-bold">Air</p>
+            <p className="text-[10px] font-bold text-white/90">{loc.aqi} · {aqiPristine ? 'Pristine' : 'Urban'}</p>
+          </div>
+        </div>
+        <div className="w-px h-6 bg-white/10" />
+        <div className="flex items-center gap-1.5">
+          <VolumeX className="w-3.5 h-3.5" style={{ color: noiseCalm ? '#4ade80' : '#fb923c' }} />
+          <div className="leading-tight">
+            <p className="text-[7px] uppercase tracking-widest text-white/35 font-bold">Noise</p>
+            <p className="text-[10px] font-bold text-white/90">{loc.noise} dB · {noiseCalm ? 'Silent' : 'Chaotic'}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Feature pills */}
+      {sanctuary.features && sanctuary.features.length > 0 && (
+        <div className="px-4 pt-3 pb-1 flex flex-wrap gap-1.5">
+          {sanctuary.features.slice(0, 3).map((f) => (
+            <span
+              key={f}
+              className="px-2 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-widest bg-white/[0.04] border border-white/10 text-white/55"
+            >
+              {f}
+            </span>
+          ))}
+        </div>
       )}
+
+      {/* CTA footer */}
+      <div className="px-4 py-3 flex items-center justify-between gap-2">
+        <span className="text-[8px] uppercase tracking-[0.35em] font-bold text-white/40">
+          Click marker to explore
+        </span>
+        <div
+          className={cn(
+            'flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[8px] uppercase tracking-widest font-bold transition-colors',
+            isSyl
+              ? 'bg-[#c8a951] text-[#1a1a0a]'
+              : 'bg-primary text-on-primary'
+          )}
+        >
+          View Details
+          <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+            <path d="M1.5 4h5M4 1.5l2.5 2.5L4 6.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </div>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const MapController = ({ targetView }: { targetView: { center: [number, number], zoom: number } | null }) => {
   const map = useMap();
@@ -3589,7 +3699,7 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
         [17.76, 78.25], [17.78, 78.27], [17.77, 78.31], 
         [17.73, 78.32], [17.71, 78.29], [17.72, 78.26]
       ] as [number, number][],
-      image: "https://images.unsplash.com/photo-1449156001935-d2863fb72690?auto=format&fit=crop&q=80&w=800",
+      image: "/agartha-official-render.png",
       description: "A forest-peripheral sanctuary nestled within the dense Narsapur reserve forest canopy."
     },
     {
@@ -3605,7 +3715,7 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
         [17.26, 78.46], [17.27, 78.49], [17.25, 78.51], 
         [17.22, 78.50], [17.21, 78.47], [17.23, 78.45]
       ] as [number, number][],
-      image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=800",
+      image: "/gallery/syl/1776279315359.png",
       description: "Vertical villaments strategically positioned near the protected green belts of the Future City."
     },
     { id: "exit-1",  type: 'exit', title: "ORR Exit 1",  location: "Gachibowli",      coords: [17.4218, 78.3412] as [number, number], aqi: 142 },
@@ -3966,8 +4076,14 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
             return (
               <React.Fragment key={loc.id}>
 
-                {isPremium && (
-                  <Marker 
+                {isPremium && (() => {
+                  const sanctuary = SANCTUARIES.find(s => s.id === loc.id);
+                  const isSyl = loc.id === 'syl';
+                  const accent = isSyl ? '200,169,81' : '126,184,90';     // gold vs forest green
+                  const label = isSyl ? 'SYL' : 'AGR';
+                  const thumb = sanctuary?.image || loc.image;
+                  return (
+                  <Marker
                     position={loc.coords}
                     eventHandlers={{
                       click: () => {
@@ -3977,24 +4093,29 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
                     }}
                     icon={L.divIcon({
                       className: 'custom-div-icon',
-                      html: `<div style="display:flex;flex-direction:column;align-items:center;filter:drop-shadow(0 8px 24px rgba(0,0,0,0.65));">
-                              <div style="width:50px;height:50px;border-radius:50%;background:rgba(13,20,9,0.94);backdrop-filter:blur(16px);border:2px solid rgba(252,211,77,0.55);box-shadow:0 0 0 5px rgba(252,211,77,0.07),0 14px 32px rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;">
-                                <div style="position:absolute;inset:0;background:radial-gradient(circle at 32% 28%, rgba(252,211,77,0.18), transparent 62%);"></div>
-                                <div style="width:18px;height:18px;border-radius:4px;background:rgba(252,211,77,0.14);border:1.5px solid rgba(252,211,77,0.65);transform:rotate(45deg);flex-shrink:0;"></div>
+                      html: `<div style="display:flex;flex-direction:column;align-items:center;filter:drop-shadow(0 10px 28px rgba(0,0,0,0.7));">
+                              <div style="position:relative;width:62px;height:62px;border-radius:50%;padding:3px;background:linear-gradient(135deg,rgba(${accent},0.9),rgba(${accent},0.25));box-shadow:0 0 0 6px rgba(${accent},0.08),0 18px 36px rgba(0,0,0,0.6);">
+                                <div style="position:absolute;inset:-6px;border-radius:50%;background:rgba(${accent},0.18);animation:tgt-pulse 2.4s ease-in-out infinite;z-index:-1;"></div>
+                                <div style="width:100%;height:100%;border-radius:50%;background:#0c1208;overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative;">
+                                  ${thumb ? `<img src="${thumb}" alt="${loc.title}" style="width:100%;height:100%;object-fit:cover;" referrerpolicy="no-referrer" />` : ''}
+                                  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.55),transparent 55%);"></div>
+                                  <span style="position:absolute;bottom:4px;left:0;right:0;text-align:center;font-size:8px;font-weight:800;letter-spacing:0.18em;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,0.8);">${label}</span>
+                                </div>
                               </div>
-                              <div style="width:2px;height:10px;background:linear-gradient(to bottom,rgba(252,211,77,0.55),transparent);margin-top:-1px;"></div>
-                              <div style="width:5px;height:2px;border-radius:50%;background:rgba(0,0,0,0.4);"></div>
+                              <div style="width:2px;height:12px;background:linear-gradient(to bottom,rgba(${accent},0.75),transparent);margin-top:-1px;"></div>
+                              <div style="width:6px;height:2px;border-radius:50%;background:rgba(0,0,0,0.45);"></div>
                             </div>`,
-                      iconSize: [50, 64],
-                      iconAnchor: [25, 64],
-                      popupAnchor: [0, -66]
+                      iconSize: [62, 78],
+                      iconAnchor: [31, 78],
+                      popupAnchor: [0, -80]
                     })}
                   >
                     <Popup className="custom-popup">
                       <SanctuaryPopupContent loc={loc} />
                     </Popup>
                   </Marker>
-                )}
+                  );
+                })()}
               </React.Fragment>
             );
           })}

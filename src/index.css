@@ -144,15 +144,42 @@
 /* ── Leaflet overrides ────────────────────────────────────────────────────── */
 
 .custom-popup .leaflet-popup-content-wrapper {
-  @apply rounded-none bg-surface border border-olive-800/10 p-0 overflow-hidden shadow-xl;
+  background: transparent;
+  border: none;
+  padding: 0;
+  box-shadow: none;
+  border-radius: 24px;
+  overflow: visible;
 }
 
 .custom-popup .leaflet-popup-tip {
-  @apply bg-surface;
+  background: #0c1208;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.5);
 }
 
 .custom-popup .leaflet-popup-content {
-  @apply m-0;
+  margin: 0;
+  width: auto !important;
+}
+
+.custom-popup .leaflet-popup-close-button {
+  color: rgba(255, 255, 255, 0.7) !important;
+  font-size: 22px !important;
+  padding: 6px 10px !important;
+  top: 6px !important;
+  right: 6px !important;
+  background: rgba(5, 8, 4, 0.75) !important;
+  border-radius: 999px !important;
+  width: 26px;
+  height: 26px;
+  line-height: 14px !important;
+  z-index: 10;
+}
+
+.custom-popup .leaflet-popup-close-button:hover {
+  color: #fff !important;
+  background: rgba(5, 8, 4, 0.95) !important;
 }
 
 .olive-gradient {
@@ -212,6 +239,12 @@
   0%   { fill-opacity: 0.15; filter: drop-shadow(0 0 5px rgba(34,197,94,0.4)); }
   50%  { fill-opacity: 0.45; filter: drop-shadow(0 0 15px rgba(34,197,94,0.8)); }
   100% { fill-opacity: 0.15; filter: drop-shadow(0 0 5px rgba(34,197,94,0.4)); }
+}
+
+@keyframes tgt-pulse {
+  0%   { transform: scale(0.85); opacity: 0.55; }
+  70%  { transform: scale(1.25); opacity: 0; }
+  100% { transform: scale(0.85); opacity: 0; }
 }
 
 .animated-forest {
