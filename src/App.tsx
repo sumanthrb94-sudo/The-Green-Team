@@ -4026,23 +4026,23 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
                 <Popup className="custom-popup">
                   <div className="p-4 bg-surface text-on-surface">
                     <div className="flex items-center justify-between mb-3">
-                      <h4 className="font-headline font-bold text-base">${zone.name}</h4>
-                      <span className="px-2 py-0.5 bg-error/10 text-error text-[8px] uppercase font-bold rounded-full">${zone.tag}</span>
+                      <h4 className="font-headline font-bold text-base">{zone.name}</h4>
+                      <span className="px-2 py-0.5 bg-error/10 text-error text-[8px] uppercase font-bold rounded-full">{zone.tag}</span>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <p className="text-[8px] uppercase tracking-widest text-secondary opacity-50 mb-1">AQI Status</p>
-                        <p className="text-xl font-headline font-bold">${zone.aqi}</p>
-                        <p className="text-[10px] text-error font-medium">${aqiBand}</p>
+                        <p className="text-xl font-headline font-bold">{zone.aqi}</p>
+                        <p className="text-[10px] text-error font-medium">{aqiBand}</p>
                       </div>
                       <div>
                         <p className="text-[8px] uppercase tracking-widest text-secondary opacity-50 mb-1">Noise Level</p>
-                        <p className="text-xl font-headline font-bold">${zone.noise} dB</p>
+                        <p className="text-xl font-headline font-bold">{zone.noise} dB</p>
                       </div>
                     </div>
                     <div className="mt-4 pt-4 border-t border-outline/10 text-[10px] leading-relaxed">
                       <span className="text-error font-bold uppercase tracking-wider">Health Risk: </span>
-                      ${zone.hazard} - Significant cardiovascular and respiratory risk.
+                      {zone.hazard} - Significant cardiovascular and respiratory risk.
                     </div>
                   </div>
                 </Popup>
