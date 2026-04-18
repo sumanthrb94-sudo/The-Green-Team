@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback, useRef, FC } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef, FC, startTransition } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
@@ -1106,7 +1106,7 @@ const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewslet
   );
 };
 
-const SanctuaryPopupContent = ({ loc }: { loc: any }) => {
+const SanctuaryPopupContent = ({ loc, onViewDetails }: { loc: any; onViewDetails?: () => void }) => {
   const sanctuary = loc.type === 'sanctuary' ? SANCTUARIES.find(s => s.id === loc.id) : null;
   const heroImage = sanctuary?.image || loc.image;
   const isSyl = sanctuary?.id === 'syl';
@@ -1262,11 +1262,16 @@ const SanctuaryPopupContent = ({ loc }: { loc: any }) => {
       {/* CTA footer */}
       <div className="px-4 py-3 flex items-center justify-between gap-2">
         <span className="text-[8px] uppercase tracking-[0.35em] font-bold text-white/40">
-          Click marker to explore
+          Tap to explore
         </span>
-        <div
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (onViewDetails) onViewDetails();
+          }}
           className={cn(
-            'flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[8px] uppercase tracking-widest font-bold transition-colors',
+            'flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[8px] uppercase tracking-widest font-bold transition-all hover:brightness-110 active:scale-95 cursor-pointer',
             isSyl
               ? 'bg-[#c8a951] text-[#1a1a0a]'
               : 'bg-primary text-on-primary'
@@ -1276,7 +1281,7 @@ const SanctuaryPopupContent = ({ loc }: { loc: any }) => {
           <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
             <path d="M1.5 4h5M4 1.5l2.5 2.5L4 6.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-        </div>
+        </button>
       </div>
     </div>
   );
@@ -3029,7 +3034,7 @@ const RRRBlurOverlay: FC<{ rrrPath: [number, number][] }> = ({ rrrPath }) => {
   return null;
 };
 
-const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
+const SanctuaryMapLayout = ({ isVisible, onPropertySelect }: { isVisible?: boolean; onPropertySelect?: (id: string) => void }) => {
   const [isMapReady, setIsMapReady] = useState(false);
   const [isSatellite, setIsSatellite] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -3107,10 +3112,6 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
     const shimmer = Math.sin(point.lat * 100 + point.lng * 100 + livePulse * 0.1) * 0.03;
     return Math.max(-0.5, Math.min(net + shimmer, 1.0));
   };
-
-  const selectedSanctuary = useMemo(() => 
-    selectedId ? SANCTUARIES.find(s => s.id === selectedId || s.title.toLowerCase().includes(selectedId.toLowerCase())) : null,
-  [selectedId]);
 
   // Handle View Changes
   useEffect(() => {
@@ -3803,28 +3804,6 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
       </AnimatePresence>
 
       <div className="flex-1 relative">
-        {createPortal(
-          <AnimatePresence>
-            {selectedSanctuary && (
-              <div key="property-overlay" className="fixed inset-0 z-[10000] overflow-hidden">
-                <motion.div 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  onClick={() => setSelectedId(null)}
-                  className="absolute inset-0 bg-black/20 backdrop-blur-[2px]"
-                />
-                <PropertyDetailOverlay 
-                  sanctuary={selectedSanctuary} 
-                  onClose={() => setSelectedId(null)} 
-                />
-              </div>
-            )}
-          </AnimatePresence>,
-          document.body
-        )}
-
-
         {/* ── Map controls — top bar ───────────────────────────────────────── */}
         <div className="absolute top-3 left-3 right-3 z-[1000] flex items-center gap-2 pointer-events-none">
 
@@ -4087,7 +4066,7 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
                     position={loc.coords}
                     eventHandlers={{
                       click: () => {
-                        setSelectedId(loc.id);
+                        // Gentle pan/zoom only; popup opens via Leaflet's default behavior.
                         setTargetView({ center: loc.coords, zoom: 14 });
                       }
                     }}
@@ -4111,7 +4090,13 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
                     })}
                   >
                     <Popup className="custom-popup">
-                      <SanctuaryPopupContent loc={loc} />
+                      <SanctuaryPopupContent
+                        loc={loc}
+                        onViewDetails={onPropertySelect ? () => {
+                          const id = loc.id;
+                          startTransition(() => onPropertySelect(id));
+                        } : undefined}
+                      />
                     </Popup>
                   </Marker>
                   );
@@ -6001,7 +5986,13 @@ export default function App() {
 
               {viewMode === 'map' && (
                 <div className="h-[calc(100vh-120px)] md:h-[calc(100vh-56px)] w-full">
-                  <SanctuaryMapLayout isVisible={true} />
+                  <SanctuaryMapLayout
+                    isVisible={true}
+                    onPropertySelect={(id) => {
+                      const sanctuary = allSanctuaries.find(s => s.id === id);
+                      if (sanctuary) setSelectedProperty(sanctuary);
+                    }}
+                  />
                 </div>
               )}
 
