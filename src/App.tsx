@@ -3589,7 +3589,7 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
         [17.76, 78.25], [17.78, 78.27], [17.77, 78.31], 
         [17.73, 78.32], [17.71, 78.29], [17.72, 78.26]
       ] as [number, number][],
-      image: "https://images.unsplash.com/photo-1449156001935-d2863fb72690?auto=format&fit=crop&q=80&w=800",
+      image: 'https://static.wixstatic.com/media/142b26_e9917bb73fc94531948ef638eba5a051~mv2.jpg',
       description: "A forest-peripheral sanctuary nestled within the dense Narsapur reserve forest canopy."
     },
     {
@@ -3605,7 +3605,7 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
         [17.26, 78.46], [17.27, 78.49], [17.25, 78.51], 
         [17.22, 78.50], [17.21, 78.47], [17.23, 78.45]
       ] as [number, number][],
-      image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=800",
+      image: '/gallery/syl/1776279315359.png',
       description: "Vertical villaments strategically positioned near the protected green belts of the Future City."
     },
     { id: "exit-1",  type: 'exit', title: "ORR Exit 1",  location: "Gachibowli",      coords: [17.4218, 78.3412] as [number, number], aqi: 142 },
@@ -3979,8 +3979,8 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
                       className: 'custom-div-icon',
                       html: `<div style="display:flex;flex-direction:column;align-items:center;filter:drop-shadow(0 8px 24px rgba(0,0,0,0.65));">
                               <div style="width:50px;height:50px;border-radius:50%;background:rgba(13,20,9,0.94);backdrop-filter:blur(16px);border:2px solid rgba(252,211,77,0.55);box-shadow:0 0 0 5px rgba(252,211,77,0.07),0 14px 32px rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;">
+                                <img src="${loc.image}" style="width:100%;height:100%;object-cover:cover;" />
                                 <div style="position:absolute;inset:0;background:radial-gradient(circle at 32% 28%, rgba(252,211,77,0.18), transparent 62%);"></div>
-                                <div style="width:18px;height:18px;border-radius:4px;background:rgba(252,211,77,0.14);border:1.5px solid rgba(252,211,77,0.65);transform:rotate(45deg);flex-shrink:0;"></div>
                               </div>
                               <div style="width:2px;height:10px;background:linear-gradient(to bottom,rgba(252,211,77,0.55),transparent);margin-top:-1px;"></div>
                               <div style="width:5px;height:2px;border-radius:50%;background:rgba(0,0,0,0.4);"></div>
