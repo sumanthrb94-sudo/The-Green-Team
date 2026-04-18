@@ -3041,7 +3041,7 @@ const SanctuaryMapLayout = ({ isVisible }: { isVisible?: boolean }) => {
   const [targetView, setTargetView] = useState<{ center: [number, number], zoom: number } | null>(null);
   const [currentZoom, setCurrentZoom] = useState(10);
   const [livePulse, setLivePulse] = useState(0);
-  const [activeFilters, setActiveFilters] = useState<Set<string>>(new Set(['aqi-live']));
+  const [activeFilters, setActiveFilters] = useState<Set<string>>(new Set(['aqi-live', 'sanctuaries']));
 
   // ── 3 focused filters only ──────────────────────────────────────────────
   const FILTER_PILLS = [
