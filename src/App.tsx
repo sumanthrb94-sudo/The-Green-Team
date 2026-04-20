@@ -217,14 +217,14 @@ const SANCTUARIES: Sanctuary[] = [
     aqi: 18,
     noise: 22,
     commute: '15 mins to Airport · 15 mins to ORR Exit-14',
-    pricePerSqYd: 10000,
+    pricePerSqYd: 18000,
     valuation: '',
-    memberPrice: 'From ₹20 L',
-    image: '/gallery/dates-county/hero.jpg',
+    memberPrice: '₹90 L',
+    image: '/gallery/dates-county/temple.jpg',
     tagline: 'Eco-luxury villa plots at the edge of a 4,000-acre forest.',
     description: 'Dates County by Planet Green is a 300+ acre eco-luxury villa-plot community in Kandukur — the epicentre of Hyderabad\'s emerging Future City on Srisailam Highway. Adjacent to a 4,000-acre reserve forest, the township reserves 40% of its land for open and recreational spaces, woven through with date palm plantations, themed parks, sports courts and natural fishing ponds. 15 minutes to the Hyderabad International Airport and 15 minutes to ORR Exit-14 (Tukkuguda). RERA P02400002648 · P02400003813.',
     plots: 0,
-    plotRange: 'Villa Plots 200 – 600 sq yds',
+    plotRange: '500 sq yds · ₹18,000/sq yd',
     amenityAcres: '300+ Acres · 40% Open Space',
     architect: 'Planet Green Infra',
     brochureUrl: 'https://www.thedatescounty.in',
@@ -238,7 +238,15 @@ const SANCTUARIES: Sanctuary[] = [
       '24/7 Security · Gated Community',
       '15 Min to Airport · ORR Exit-14',
     ],
-    plotImages: [],
+    plotImages: [
+      '/gallery/dates-county/temple.jpg',
+      '/gallery/dates-county/project-highlight.jpg',
+      '/gallery/dates-county/field.jpg',
+      '/gallery/dates-county/amenities.jpg',
+      '/gallery/dates-county/water.jpg',
+      '/gallery/dates-county/forest.jpg',
+      '/gallery/dates-county/sustainability.png',
+    ],
   },
 ];
 
@@ -295,7 +303,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
   const sanctuaryItems = [
     { name: 'MODCON Agartha', id: 'agartha', sub: 'Narsapur Forest · From ₹68.7 L', img: '/gallery/agartha/11.png' },
     { name: 'MODCON SYL Residences', id: 'syl', sub: 'Tukkuguda, ORR Exit-14 · Villaments', img: '/gallery/syl/1776279315359.png' },
-    { name: 'Dates County by Planet Green', id: 'dates-county', sub: 'Kandukur · From ₹20 L', img: '/gallery/dates-county/hero.jpg' },
+    { name: 'Dates County by Planet Green', id: 'dates-county', sub: 'Kandukur · ₹18,000/sq yd', img: '/gallery/dates-county/temple.jpg' },
   ];
 
   const avatarLetter = (authUser?.displayName?.[0] || authUser?.email?.[0] || authUser?.phoneNumber?.[1] || '?').toUpperCase();
@@ -2718,9 +2726,29 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
             {/* Developer credit */}
             {sanctuary.architect && (
               <div className="flex items-center gap-3 p-4 border border-outline/10 rounded-2xl">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <Award className="w-5 h-5 text-primary" />
-                </div>
+                {sanctuary.id === 'dates-county' ? (
+                  <div className="h-10 flex items-center">
+                    <img
+                      src="/gallery/dates-county/logo-planet-green.svg"
+                      alt="Planet Green Infra"
+                      className="h-9 w-auto object-contain"
+                      onError={e => { (e.target as HTMLImageElement).style.display='none'; }}
+                    />
+                  </div>
+                ) : (sanctuary.id === 'agartha' || sanctuary.id === 'syl') ? (
+                  <div className="h-10 flex items-center">
+                    <img
+                      src="/logos/modcon-logo.svg"
+                      alt="MODCON Builders"
+                      className="h-8 w-auto object-contain"
+                      onError={e => { (e.target as HTMLImageElement).style.display='none'; }}
+                    />
+                  </div>
+                ) : (
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <Award className="w-5 h-5 text-primary" />
+                  </div>
+                )}
                 <div>
                   <p className="text-[8px] uppercase tracking-widest text-secondary/50">Developed by</p>
                   <p className="text-sm font-bold text-on-surface">{sanctuary.architect}</p>
@@ -2996,6 +3024,95 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
               </div>
             )}
 
+            {/* Dates County Price breakdown + WhatsApp CTAs */}
+            {sanctuary.id === 'dates-county' && (
+              <div className="space-y-4">
+
+                {/* Price highlight */}
+                <div className="rounded-2xl overflow-hidden border border-[#3a7d44]/30" style={{ background: 'linear-gradient(135deg, rgba(58,125,68,0.07) 0%, rgba(58,125,68,0.03) 100%)' }}>
+                  <div className="px-4 py-2.5 flex items-center gap-2" style={{ background: 'rgba(58,125,68,0.14)' }}>
+                    <Leaf className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+                    <p className="text-[9px] uppercase tracking-[0.4em] font-bold text-primary">Eco-Luxury Villa Plots · Kandukur</p>
+                  </div>
+                  <div className="px-4 pt-4 pb-3 space-y-3">
+                    <div className="rounded-xl bg-primary/10 border border-primary/20 px-3 py-2.5">
+                      <p className="text-[11px] font-semibold text-on-surface leading-snug">
+                        Adjacent to a <span className="text-primary">4,000-acre reserve forest.</span>
+                      </p>
+                      <p className="text-[10px] text-secondary/60 mt-0.5">
+                        300+ acres · 40% open recreational space · RERA approved
+                      </p>
+                    </div>
+                    <div className="flex items-start gap-2.5">
+                      <img src="/gallery/dates-county/logo-planet-green.svg" alt="Planet Green" className="h-7 w-auto mt-0.5 flex-shrink-0" onError={e => { (e.target as HTMLImageElement).style.display='none'; }} />
+                      <p className="text-[9px] text-secondary/50 leading-relaxed">
+                        Developed by <span className="font-semibold text-on-surface">Planet Green Infra</span> · RERA P02400002648 · P02400003813
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Price breakdown */}
+                <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold">
+                  Price Estimate — ₹18,000 / sq yd
+                </p>
+                <div className="rounded-2xl overflow-hidden border border-outline/10">
+                  {[
+                    { label: 'Standard Plot', sqYds: 200 },
+                    { label: 'Popular Plot', sqYds: 300 },
+                    { label: 'Prime Plot', sqYds: 500 },
+                    { label: 'Large Plot', sqYds: 600 },
+                  ].map((row, i) => {
+                    const totalRs = row.sqYds * 18000;
+                    const display = totalRs >= 1e7 ? `₹${(totalRs / 1e7).toFixed(2)} Cr` : `₹${(totalRs / 1e5).toFixed(0)} L`;
+                    const highlight = row.sqYds === 500;
+                    return (
+                      <div key={i} className={cn(
+                        'grid grid-cols-3 px-4 py-3 text-[10px]',
+                        highlight ? 'bg-primary/8 border-l-2 border-primary' : i % 2 === 0 ? 'bg-primary/3' : 'bg-transparent'
+                      )}>
+                        <span className={cn('font-medium', highlight ? 'text-primary font-bold' : 'text-secondary/60')}>
+                          {row.label}{highlight && ' ⭐'}
+                        </span>
+                        <span className="text-center font-bold text-on-surface">{row.sqYds.toLocaleString('en-IN')} sq yds</span>
+                        <span className={cn('text-right font-bold', highlight ? 'text-primary' : 'text-primary')}>{display}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+                <p className="text-[8px] text-secondary/40">Rate: ₹18,000/sq yd · Villa plots from 200 to 600 sq yds · Highlighted: 500 sq yd = ₹90 L</p>
+
+                {/* CTA */}
+                <div className="rounded-2xl border border-primary/20 bg-primary/5 p-5 space-y-3">
+                  <p className="text-xs text-secondary leading-relaxed">
+                    Pricing is as listed. <span className="font-semibold text-on-surface">Site visits available — we'll accompany you and negotiate on your behalf.</span> WhatsApp us to enquire or book a visit.
+                  </p>
+                  <div className="flex flex-col gap-2">
+                    <a
+                      href="https://wa.me/919700144003?text=Hi%2C%20I%27m%20interested%20in%20Dates%20County%20by%20Planet%20Green%20(Kandukur%2C%20Hyderabad).%20Could%20you%20share%20available%20plots%20and%20best%20pricing%3F%20(500%20sq%20yd%20%40%20%E2%82%B918%2C000)"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2.5 w-full py-3.5 rounded-xl text-[10px] uppercase tracking-[0.4em] font-bold text-cream transition-all bg-olive-900 hover:bg-primary"
+                    >
+                      <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current flex-shrink-0">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                        <path d="M12 0C5.373 0 0 5.373 0 12c0 2.128.558 4.121 1.533 5.851L.057 23.882l6.198-1.625A11.953 11.953 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.002-1.37l-.359-.214-3.68.965.981-3.595-.234-.371A9.818 9.818 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/>
+                      </svg>
+                      WhatsApp · Enquire Now
+                    </a>
+                    <a
+                      href="https://wa.me/919700144003?text=Hi%2C%20I%27d%20like%20to%20book%20a%20site%20visit%20for%20Dates%20County%20by%20Planet%20Green%20(Kandukur).%20Please%20share%20available%20slots."
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 w-full py-3.5 border-2 border-olive-900/40 text-olive-900 text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl transition-all hover:bg-olive-900/10"
+                    >
+                      <MapPin className="w-3.5 h-3.5" />
+                      Book Site Visit · WhatsApp
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )}
 
           </div>
         )}
