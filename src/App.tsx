@@ -210,6 +210,36 @@ const SANCTUARIES: Sanctuary[] = [
       '/gallery/syl/1776279377269.png',
     ],
   },
+  {
+    id: 'dates-county',
+    title: 'Dates County by Planet Green',
+    location: 'Kandukur, Srisailam Highway · Hyderabad',
+    aqi: 18,
+    noise: 22,
+    commute: '15 mins to Airport · 15 mins to ORR Exit-14',
+    pricePerSqYd: 10000,
+    valuation: '',
+    memberPrice: 'From ₹20 L',
+    image: '/gallery/dates-county/hero.jpg',
+    tagline: 'Eco-luxury villa plots at the edge of a 4,000-acre forest.',
+    description: 'Dates County by Planet Green is a 300+ acre eco-luxury villa-plot community in Kandukur — the epicentre of Hyderabad\'s emerging Future City on Srisailam Highway. Adjacent to a 4,000-acre reserve forest, the township reserves 40% of its land for open and recreational spaces, woven through with date palm plantations, themed parks, sports courts and natural fishing ponds. 15 minutes to the Hyderabad International Airport and 15 minutes to ORR Exit-14 (Tukkuguda). RERA P02400002648 · P02400003813.',
+    plots: 0,
+    plotRange: 'Villa Plots 200 – 600 sq yds',
+    amenityAcres: '300+ Acres · 40% Open Space',
+    architect: 'Planet Green Infra',
+    brochureUrl: 'https://www.thedatescounty.in',
+    features: [
+      'Adjacent to 4,000-Acre Reserve Forest',
+      '40% Open & Recreational Space',
+      'Date Palm Plantations (Vedic Farming)',
+      'Clubhouse · Swimming Pool · Gym',
+      'Themed Parks · Natural Fishing Ponds',
+      'Landscaped Gardens · Senior Citizen Park',
+      '24/7 Security · Gated Community',
+      '15 Min to Airport · ORR Exit-14',
+    ],
+    plotImages: [],
+  },
 ];
 
 // --- Components ---
@@ -265,6 +295,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
   const sanctuaryItems = [
     { name: 'MODCON Agartha', id: 'agartha', sub: 'Narsapur Forest · From ₹68.7 L', img: '/gallery/agartha/11.png' },
     { name: 'MODCON SYL Residences', id: 'syl', sub: 'Tukkuguda, ORR Exit-14 · Villaments', img: '/gallery/syl/1776279315359.png' },
+    { name: 'Dates County by Planet Green', id: 'dates-county', sub: 'Kandukur · From ₹20 L', img: '/gallery/dates-county/hero.jpg' },
   ];
 
   const avatarLetter = (authUser?.displayName?.[0] || authUser?.email?.[0] || authUser?.phoneNumber?.[1] || '?').toUpperCase();
@@ -1001,6 +1032,7 @@ const PreInvestorGold = () => {
 
 const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewsletterClick: () => void, onOpen: () => void }> = ({ sanctuary, isSubscribed, onNewsletterClick, onOpen }) => {
   const isSyl = sanctuary.id === 'syl';
+  const isDatesCounty = sanctuary.id === 'dates-county';
   const isGated = isSyl && !isSubscribed;
 
   return (
@@ -1048,16 +1080,23 @@ const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewslet
           "px-3 py-1 text-[8px] uppercase tracking-[0.4em] font-bold rounded-full",
           isSyl
             ? "bg-[#c8a951] text-[#1a1a0a]"
-            : "bg-primary/90 text-on-primary backdrop-blur-sm"
+            : isDatesCounty
+              ? "bg-[#c07a3d] text-[#1a1a0a]"
+              : "bg-primary/90 text-on-primary backdrop-blur-sm"
         )}>
-          {isSyl ? 'Pre-Investor Phase' : 'Open Reservation'}
+          {isSyl ? 'Pre-Investor Phase' : isDatesCounty ? 'Now Booking' : 'Open Reservation'}
         </span>
         <span className="px-3 py-1 text-[7px] uppercase tracking-[0.35em] font-bold rounded-full bg-[#080d06]/70 text-cream/60 backdrop-blur-sm border border-cream/10 w-fit">
-          TGT Channel Partner
+          {isDatesCounty ? 'TGT × Planet Green' : 'TGT Channel Partner'}
         </span>
         {isSyl && (
           <span className="px-3 py-1 text-[8px] font-bold rounded-full bg-[#c8a951]/20 text-[#c8a951] backdrop-blur-sm border border-[#c8a951]/40 w-fit leading-relaxed">
             Pre-Investor Gold™
+          </span>
+        )}
+        {isDatesCounty && (
+          <span className="px-3 py-1 text-[8px] font-bold rounded-full bg-[#c07a3d]/20 text-[#c07a3d] backdrop-blur-sm border border-[#c07a3d]/40 w-fit leading-relaxed">
+            4,000-Acre Reserve
           </span>
         )}
       </div>
@@ -1110,6 +1149,7 @@ const SanctuaryPopupContent = ({ loc, onViewDetails }: { loc: any; onViewDetails
   const sanctuary = loc.type === 'sanctuary' ? SANCTUARIES.find(s => s.id === loc.id) : null;
   const heroImage = sanctuary?.image || loc.image;
   const isSyl = sanctuary?.id === 'syl';
+  const isDatesCounty = sanctuary?.id === 'dates-county';
   const title = sanctuary?.title || loc.title;
   const subtitle = sanctuary?.commute || loc.location;
   const price = sanctuary?.memberPrice;
@@ -1177,13 +1217,17 @@ const SanctuaryPopupContent = ({ loc, onViewDetails }: { loc: any; onViewDetails
           <span
             className={cn(
               'px-2.5 py-1 text-[8px] uppercase tracking-[0.35em] font-bold rounded-full w-fit',
-              isSyl ? 'bg-[#c8a951] text-[#1a1a0a]' : 'bg-primary/95 text-on-primary backdrop-blur-sm'
+              isSyl
+                ? 'bg-[#c8a951] text-[#1a1a0a]'
+                : isDatesCounty
+                  ? 'bg-[#c07a3d] text-[#1a1a0a]'
+                  : 'bg-primary/95 text-on-primary backdrop-blur-sm'
             )}
           >
-            {isSyl ? 'Pre-Investor Phase' : 'Open Reservation'}
+            {isSyl ? 'Pre-Investor Phase' : isDatesCounty ? 'Now Booking' : 'Open Reservation'}
           </span>
           <span className="px-2.5 py-0.5 text-[7px] uppercase tracking-[0.3em] font-bold rounded-full bg-[#080d06]/75 text-white/55 border border-white/10 w-fit">
-            TGT Channel Partner
+            {isDatesCounty ? 'TGT × Planet Green' : 'TGT Channel Partner'}
           </span>
           {isSyl && (
             <span className="px-2.5 py-0.5 text-[8px] font-bold rounded-full bg-[#c8a951]/20 text-[#c8a951] border border-[#c8a951]/40 w-fit">
@@ -1274,7 +1318,9 @@ const SanctuaryPopupContent = ({ loc, onViewDetails }: { loc: any; onViewDetails
             'flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[8px] uppercase tracking-widest font-bold transition-all hover:brightness-110 active:scale-95 cursor-pointer',
             isSyl
               ? 'bg-[#c8a951] text-[#1a1a0a]'
-              : 'bg-primary text-on-primary'
+              : isDatesCounty
+                ? 'bg-[#c07a3d] text-[#1a1a0a]'
+                : 'bg-primary text-on-primary'
           )}
         >
           View Details
@@ -3719,6 +3765,22 @@ const SanctuaryMapLayout = ({ isVisible, onPropertySelect }: { isVisible?: boole
       image: "/gallery/syl/1776279315359.png",
       description: "Vertical villaments strategically positioned near the protected green belts of the Future City."
     },
+    {
+      id: "dates-county",
+      type: 'sanctuary',
+      title: "Dates County",
+      location: "Kandukur · Srisailam Highway",
+      coords: [17.118, 78.588] as [number, number],
+      aqi: 18,
+      noise: 22,
+      forestRadius: 4500,
+      boundary: [
+        [17.135, 78.570], [17.145, 78.595], [17.130, 78.615],
+        [17.100, 78.610], [17.090, 78.585], [17.105, 78.565]
+      ] as [number, number][],
+      image: "/gallery/dates-county/hero.jpg",
+      description: "A 300+ acre eco-luxury villa-plot community adjacent to a 4,000-acre reserve forest on Hyderabad's Future City axis."
+    },
     { id: "exit-1",  type: 'exit', title: "ORR Exit 1",  location: "Gachibowli",      coords: [17.4218, 78.3412] as [number, number], aqi: 142 },
     { id: "exit-3",  type: 'exit', title: "ORR Exit 3",  location: "Patancheru",       coords: [17.4880, 78.3120] as [number, number], aqi: 156 },
     { id: "exit-4",  type: 'exit', title: "ORR Exit 4",  location: "Sultanpur",        coords: [17.5380, 78.3090] as [number, number], aqi: 128 },
@@ -4057,9 +4119,13 @@ const SanctuaryMapLayout = ({ isVisible, onPropertySelect }: { isVisible?: boole
 
                 {isPremium && (() => {
                   const sanctuary = SANCTUARIES.find(s => s.id === loc.id);
-                  const isSyl = loc.id === 'syl';
-                  const accent = isSyl ? '200,169,81' : '126,184,90';     // gold vs forest green
-                  const label = isSyl ? 'SYL' : 'AGR';
+                  // Property-specific accent (rgb) + 3-letter tag for the marker badge.
+                  const ACCENTS: Record<string, { rgb: string; label: string }> = {
+                    'agartha':       { rgb: '126,184,90',  label: 'AGR' },  // forest green
+                    'syl':           { rgb: '200,169,81',  label: 'SYL' },  // gold
+                    'dates-county':  { rgb: '192,122,61',  label: 'DTC' },  // terracotta
+                  };
+                  const { rgb: accent, label } = ACCENTS[loc.id] ?? { rgb: '126,184,90', label: (loc.id || '').slice(0, 3).toUpperCase() };
                   const thumb = sanctuary?.image || loc.image;
                   return (
                   <Marker
@@ -4221,7 +4287,7 @@ const Sanctuaries = ({ isSubscribed, onNewsletterClick, isFullPage = false, sanc
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {sanctuaries.map(s => (
             <SanctuaryCard
               key={s.id}
@@ -4631,6 +4697,7 @@ const Footer = ({ onModeChange, onPropertySelect }: { onModeChange: (mode: strin
     { label: 'Sanctuary Map', sub: 'Environmental heatmap · AQI · Noise', mode: 'map' },
     { label: 'MODCON Agartha', sub: 'Narsapur Forest · Open access', mode: 'agartha' },
     { label: 'MODCON SYL Residences', sub: 'Tukkuguda, ORR Exit-14 · Newsletter access', mode: 'syl' },
+    { label: 'Dates County by Planet Green', sub: 'Kandukur · 4,000-acre reserve · Channel partner', mode: 'dates-county' },
     { label: 'Adviser Membership', sub: 'Reserved investor circle · By invitation', mode: 'membership' },
   ];
 
@@ -4660,7 +4727,7 @@ const Footer = ({ onModeChange, onPropertySelect }: { onModeChange: (mode: strin
             <button
               key={item.mode}
               onClick={() => {
-                if ((item.mode === 'agartha' || item.mode === 'syl') && onPropertySelect) {
+                if ((item.mode === 'agartha' || item.mode === 'syl' || item.mode === 'dates-county') && onPropertySelect) {
                   onPropertySelect(item.mode);
                 } else {
                   onModeChange(item.mode);
