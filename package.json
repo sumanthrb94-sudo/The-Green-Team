@@ -8,6 +8,7 @@
     "optimize-images": "node scripts/optimize-images.mjs",
     "prebuild": "node scripts/optimize-images.mjs",
     "build": "vite build",
+    "postbuild": "node scripts/generate-routes.mjs",
     "preview": "vite preview",
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit"

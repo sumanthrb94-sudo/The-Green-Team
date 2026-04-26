@@ -41,17 +41,26 @@ import { useForm } from 'react-hook-form';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { cn } from './lib/utils';
 
-// Serves WebP for local /public images with the original as fallback.
+// Serves WebP + srcset for local /public images; originals as fallback.
 // picture { display: contents } keeps the img's CSS positioning intact.
 function toWebp(src: string): string {
   return src.replace(/\.(jpg|jpeg|png)(\?.*)?$/i, '.webp$2');
 }
-const Pic: FC<React.ImgHTMLAttributes<HTMLImageElement> & { src: string }> = ({ src, ...rest }) => {
+function to800w(src: string): string {
+  return src.replace(/\.(jpg|jpeg|png)(\?.*)?$/i, '-800w.webp');
+}
+const Pic: FC<React.ImgHTMLAttributes<HTMLImageElement> & { src: string; sizes?: string }> = ({ src, sizes, ...rest }) => {
   const isLocal = src.startsWith('/') && /\.(jpg|jpeg|png)(\?.*)?$/i.test(src);
   if (!isLocal) return <img src={src} {...rest} />;
+  const webpFull = toWebp(src);
+  const webp800  = to800w(src);
   return (
     <picture style={{ display: 'contents' }}>
-      <source srcSet={toWebp(src)} type="image/webp" />
+      <source
+        srcSet={`${webp800} 800w, ${webpFull}`}
+        sizes={sizes ?? '(max-width: 800px) 800px, 100vw'}
+        type="image/webp"
+      />
       <img src={src} {...rest} />
     </picture>
   );
@@ -6057,6 +6066,16 @@ export default function App() {
   const [showAdmin, setShowAdmin] = useState(false);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<typeof SANCTUARIES[0] | null>(null);
+
+  // Open the matching property when the page was loaded from a pre-rendered
+  // property URL (e.g. /agartha). The postbuild script injects
+  // window.__INITIAL_PROPERTY__ into each property's static index.html.
+  useEffect(() => {
+    const id = (window as unknown as Record<string, string>).__INITIAL_PROPERTY__;
+    if (!id) return;
+    const match = SANCTUARIES.find(s => s.id === id);
+    if (match) setSelectedProperty(match);
+  }, []);
 
   const handleSubscribe = useCallback(() => {
     setIsSubscribed(true);

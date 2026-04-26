@@ -3,14 +3,13 @@
  * Generates optimised WebP and compressed originals for every raster image
  * under /public that does NOT already have a matching .webp sibling.
  *
- * Run via:  node scripts/optimize-images.mjs
- * Or as:   npm run optimize-images   (called automatically on prebuild)
+ * Also generates 800w WebP variants ({name}-800w.webp) for images wider than
+ * 800 px — used by the Pic component's srcset for responsive delivery.
  *
  * Strategy:
  *   - PNG  → lossless WebP  + re-compressed PNG  (quality 85)
  *   - JPG  → lossy WebP    + re-compressed JPEG (quality 82)
- *   - JPEG → same as JPG
- *   Skips SVGs and files that already have a .webp twin.
+ *   Skips SVGs, logos, and files that already have all variants.
  */
 
 import sharp from 'sharp';
@@ -21,9 +20,10 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PUBLIC_DIR = join(__dirname, '..', 'public');
 
-const JPEG_QUALITY = 82;
-const PNG_QUALITY  = 85;
-const WEBP_QUALITY = 80; // lossy WebP; lossless used for PNGs
+const JPEG_QUALITY  = 82;
+const PNG_QUALITY   = 85;
+const WEBP_QUALITY  = 80;
+const SRCSET_WIDTH  = 800;
 
 let optimized = 0;
 let skipped   = 0;
@@ -43,43 +43,57 @@ async function walk(dir) {
   return paths;
 }
 
+async function exists(p) {
+  try { await stat(p); return true; } catch { return false; }
+}
+
 async function processImage(filePath) {
   const ext = extname(filePath).toLowerCase();
   if (!['.jpg', '.jpeg', '.png'].includes(ext)) return;
 
-  const webpPath = filePath.replace(/\.(jpg|jpeg|png)$/i, '.webp');
+  // Skip already-generated srcset variants
+  if (/-800w\.webp$/.test(filePath)) return;
 
-  // Check if WebP twin already exists
+  const webpPath  = filePath.replace(/\.(jpg|jpeg|png)$/i, '.webp');
+  const webp800   = filePath.replace(/\.(jpg|jpeg|png)$/i, '-800w.webp');
+  const isPNG     = ext === '.png';
+
+  const webpExists  = await exists(webpPath);
+  const webp800Exists = await exists(webp800);
+
+  if (webpExists && webp800Exists) { skipped++; return; }
+
   try {
-    await stat(webpPath);
-    skipped++;
-    return; // already done
-  } catch {
-    // doesn't exist — continue
-  }
+    const src  = sharp(filePath);
+    const meta = await src.metadata();
+    const needsFull = !webpExists;
+    const needs800  = !webp800Exists && (meta.width ?? 0) > SRCSET_WIDTH;
 
-  const isPNG = ext === '.png';
+    if (!needsFull && !needs800) { skipped++; return; }
 
-  try {
-    const src = sharp(filePath);
+    if (needsFull) {
+      await src.clone()
+        .webp(isPNG ? { lossless: true } : { quality: WEBP_QUALITY, effort: 4 })
+        .toFile(webpPath);
 
-    // Generate WebP
-    await src
-      .clone()
-      .webp(isPNG
-        ? { lossless: true }
-        : { quality: WEBP_QUALITY, effort: 4 })
-      .toFile(webpPath);
+      // Re-compress original in-place
+      const buf = isPNG
+        ? await src.clone().png({ quality: PNG_QUALITY, compressionLevel: 8 }).toBuffer()
+        : await src.clone().jpeg({ quality: JPEG_QUALITY, mozjpeg: true }).toBuffer();
+      await sharp(buf).toFile(filePath);
+    }
 
-    // Re-compress the original in-place
-    const originalBuffer = isPNG
-      ? await src.clone().png({ quality: PNG_QUALITY, compressionLevel: 8 }).toBuffer()
-      : await src.clone().jpeg({ quality: JPEG_QUALITY, mozjpeg: true }).toBuffer();
-
-    await sharp(originalBuffer).toFile(filePath);
+    if (needs800) {
+      await src.clone()
+        .resize({ width: SRCSET_WIDTH, withoutEnlargement: true })
+        .webp({ quality: WEBP_QUALITY, effort: 4 })
+        .toFile(webp800);
+    }
 
     const rel = filePath.replace(PUBLIC_DIR, '');
-    console.log(`✓  ${rel}  →  ${basename(webpPath)}`);
+    const tags = [needsFull && basename(webpPath), needs800 && basename(webp800)]
+      .filter(Boolean).join(', ');
+    console.log(`✓  ${rel}  →  ${tags}`);
     optimized++;
   } catch (err) {
     console.error(`✗  ${filePath}: ${err.message}`);

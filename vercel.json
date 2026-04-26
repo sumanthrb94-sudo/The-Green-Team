@@ -1,6 +1,9 @@
 {
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/agartha",      "destination": "/agartha/index.html" },
+    { "source": "/syl",          "destination": "/syl/index.html" },
+    { "source": "/dates-county", "destination": "/dates-county/index.html" },
+    { "source": "/(.*)",         "destination": "/index.html" }
   ],
   "headers": [
     {
