@@ -187,6 +187,46 @@
       ]
     }
     </script>
+
+    <!-- ── Structured Data: BreadcrumbList ──────────────────────────────── -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://thegreenteam.in/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Curated Properties",
+          "item": "https://thegreenteam.in/#sanctuaries"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "MODCON Agartha",
+          "item": "https://thegreenteam.in/#agartha"
+        },
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "name": "MODCON SYL Residences",
+          "item": "https://thegreenteam.in/#syl"
+        },
+        {
+          "@type": "ListItem",
+          "position": 5,
+          "name": "Dates County by Planet Green",
+          "item": "https://thegreenteam.in/#dates-county"
+        }
+      ]
+    }
+    </script>
   </head>
   <body>
     <!-- Apply dark class before React loads to avoid flash of wrong theme -->

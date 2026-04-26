@@ -38,8 +38,24 @@ import {
   RotateCcw
 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { cn } from './lib/utils';
 
+// Serves WebP for local /public images with the original as fallback.
+// picture { display: contents } keeps the img's CSS positioning intact.
+function toWebp(src: string): string {
+  return src.replace(/\.(jpg|jpeg|png)(\?.*)?$/i, '.webp$2');
+}
+const Pic: FC<React.ImgHTMLAttributes<HTMLImageElement> & { src: string }> = ({ src, ...rest }) => {
+  const isLocal = src.startsWith('/') && /\.(jpg|jpeg|png)(\?.*)?$/i.test(src);
+  if (!isLocal) return <img src={src} {...rest} />;
+  return (
+    <picture style={{ display: 'contents' }}>
+      <source srcSet={toWebp(src)} type="image/webp" />
+      <img src={src} {...rest} />
+    </picture>
+  );
+};
 
 import { MapContainer, TileLayer, Marker, Popup, Circle, Polygon, useMap, ZoomControl, Polyline, Tooltip, useMapEvents } from 'react-leaflet';
 import { AlertTriangle, ZoomIn, LogOut, RefreshCw, Users, Mail as MailIcon, ShieldCheck, User as UserIcon } from 'lucide-react';
@@ -445,7 +461,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
                         onClick={() => { onPropertySelect(s.id); setAccountOpen(false); }}
                         className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-primary/5 text-left transition-all group">
                         <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0">
-                          <img src={s.img} alt={s.name} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+                          <Pic src={s.img} alt={s.name} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
                         </div>
                         <div className="min-w-0">
                           <p className="text-[11px] font-bold text-on-surface truncate group-hover:text-primary transition-colors">{s.name}</p>
@@ -582,9 +598,9 @@ const Hero = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
     <section className="relative min-h-screen flex flex-col overflow-hidden">
       {/* Full-bleed backdrop */}
       <div className="absolute inset-0 z-0">
-        <img
+        <Pic
           src="/hero-backdrop.jpg"
-          alt=""
+          alt="Forest house at dusk — The Green Team"
           className="w-full h-full object-cover object-center"
         />
         {/* Layered gradient — bottom-heavy for text legibility, preserves the forest house glow */}
@@ -1050,7 +1066,7 @@ const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewslet
       onClick={() => { if (!isGated) onOpen(); }}
     >
       {/* Full-bleed image — always full color */}
-      <img
+      <Pic
         src={sanctuary.image}
         alt={sanctuary.title}
         className={cn(
@@ -1171,7 +1187,7 @@ const SanctuaryPopupContent = ({ loc, onViewDetails }: { loc: any; onViewDetails
       <div className="w-72 overflow-hidden rounded-2xl border border-white/5" style={{ background: 'rgba(13,20,9,0.96)', backdropFilter: 'blur(20px)', boxShadow: '0 24px 48px rgba(0,0,0,0.7)' }}>
         <div className="relative h-28 overflow-hidden">
           {loc.image ? (
-            <img src={loc.image} alt={loc.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+            <Pic src={loc.image} alt={loc.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-white/[0.03]">
               <MapPin className="w-8 h-8 text-white/10" />
@@ -1212,7 +1228,7 @@ const SanctuaryPopupContent = ({ loc, onViewDetails }: { loc: any; onViewDetails
     >
       {/* Hero image */}
       <div className="relative h-44 overflow-hidden bg-[#0c1208]">
-        <img
+        <Pic
           src={heroImage}
           alt={title}
           className="absolute inset-0 w-full h-full object-cover"
@@ -2155,7 +2171,7 @@ const AdminDashboard: FC<{
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-3">
                       {u.photoURL
-                        ? <img src={u.photoURL} referrerPolicy="no-referrer" alt="" className="w-9 h-9 rounded-full object-cover flex-shrink-0" />
+                        ? <img src={u.photoURL} referrerPolicy="no-referrer" alt={`${u.displayName || u.name || 'User'} profile photo`} className="w-9 h-9 rounded-full object-cover flex-shrink-0" />
                         : <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 text-primary font-bold text-sm">
                             {(u.displayName?.[0] || u.email?.[0] || '?').toUpperCase()}
                           </div>
@@ -2355,7 +2371,7 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
                       i === 0 ? "col-span-2 h-56" : "h-36"
                     )}
                   >
-                    <img
+                    <Pic
                       src={src}
                       alt={`${sanctuary.title} — photo ${i + 1}`}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -6120,10 +6136,40 @@ export default function App() {
     }, 0);
   }, []);
 
+  // ── Dynamic meta tags ────────────────────────────────────────────────────
+  const activeProp = selectedProperty;
+  const BASE_TITLE = 'The Green Team | Forest Homes Near Hyderabad | Channel Partner MODCON Agartha';
+  const BASE_DESC  = 'We curate forest-adjacent homes near Hyderabad — AQI under 25, 45-min city commute. Channel partners for MODCON Agartha (Narsapur). Plots from ₹64.6L.';
+  const BASE_IMG   = 'https://thegreenteam.in/agartha-render.jpg';
+
+  const metaTitle = activeProp
+    ? `${activeProp.title} — ${activeProp.memberPrice} | The Green Team`
+    : BASE_TITLE;
+  const metaDesc = activeProp
+    ? `${activeProp.location}. AQI ${activeProp.aqi}, ${activeProp.commute}. ${activeProp.memberPrice}. Curated by The Green Team.`
+    : BASE_DESC;
+  const metaImg = activeProp
+    ? `https://thegreenteam.in${activeProp.image}`
+    : BASE_IMG;
+
   return (
+    <>
+      <Helmet>
+        <title>{metaTitle}</title>
+        <meta name="description" content={metaDesc} />
+        <meta property="og:title" content={metaTitle} />
+        <meta property="og:description" content={metaDesc} />
+        <meta property="og:image" content={metaImg} />
+        <meta property="og:image:secure_url" content={metaImg} />
+        <meta property="og:image:alt" content={metaTitle} />
+        <meta name="twitter:title" content={metaTitle} />
+        <meta name="twitter:description" content={metaDesc} />
+        <meta name="twitter:image" content={metaImg} />
+        <meta name="twitter:image:alt" content={metaTitle} />
+      </Helmet>
     <div className={cn("min-h-screen font-sans transition-colors duration-700", isDark ? "dark" : "")}>
       <div className="bg-surface text-on-surface flex h-screen overflow-hidden">
-        
+
         {/* Navigation Sidebar (Desktop) */}
          { /* SideNavBar removed */ }
 
@@ -6296,5 +6342,6 @@ export default function App() {
         onDone={() => setShowProfile(false)}
       />
     </div>
+    </>
   );
 }

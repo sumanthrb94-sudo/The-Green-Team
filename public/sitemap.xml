@@ -8,7 +8,7 @@
   <!-- Home -->
   <url>
     <loc>https://thegreenteam.in/</loc>
-    <lastmod>2026-04-15</lastmod>
+    <lastmod>2026-04-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <image:image>
@@ -20,6 +20,60 @@
       <image:loc>https://thegreenteam.in/hero-backdrop.jpg</image:loc>
       <image:title>Forest house at dusk — The Green Team</image:title>
       <image:caption>Forest-adjacent living curated by The Green Team, Hyderabad</image:caption>
+    </image:image>
+  </url>
+
+  <!-- MODCON Agartha -->
+  <url>
+    <loc>https://thegreenteam.in/#agartha</loc>
+    <lastmod>2026-04-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://thegreenteam.in/gallery/agartha/11.png</image:loc>
+      <image:title>MODCON Agartha — Forest Farm Plots, Narsapur</image:title>
+      <image:caption>36 curated farm plots on the Narsapur forest boundary. From ₹68.7 L. AQI 12.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://thegreenteam.in/agartha-official-render.png</image:loc>
+      <image:title>MODCON Agartha official render — The Green Team</image:title>
+      <image:caption>Winner: Best Sustainable Eco-Friendly Project, Outlook Business 2024.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://thegreenteam.in/FINAL-LAYOUT.jpeg</image:loc>
+      <image:title>MODCON Agartha site plan layout</image:title>
+      <image:caption>Master plan of MODCON Agartha — 36 farm plots, 36,000 sq ft clubhouse, Narsapur, Hyderabad.</image:caption>
+    </image:image>
+  </url>
+
+  <!-- MODCON SYL Residences -->
+  <url>
+    <loc>https://thegreenteam.in/#syl</loc>
+    <lastmod>2026-04-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+    <image:image>
+      <image:loc>https://thegreenteam.in/gallery/syl/1776279315359.png</image:loc>
+      <image:title>MODCON SYL Residences — Villaments, Tukkuguda Hyderabad</image:title>
+      <image:caption>Forest-adjacent villaments at ORR Exit-14 Tukkuguda. 10 min to airport. Curated by The Green Team.</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Dates County by Planet Green -->
+  <url>
+    <loc>https://thegreenteam.in/#dates-county</loc>
+    <lastmod>2026-04-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+    <image:image>
+      <image:loc>https://thegreenteam.in/gallery/dates-county/temple.jpg</image:loc>
+      <image:title>Dates County by Planet Green — Kandukur, Hyderabad</image:title>
+      <image:caption>Date farm plots at Kandukur. ₹18,000/sq yd. Curated by The Green Team.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://thegreenteam.in/gallery/dates-county/forest.jpg</image:loc>
+      <image:title>Dates County natural forest surroundings</image:title>
+      <image:caption>Natural green surroundings at Dates County, Kandukur.</image:caption>
     </image:image>
   </url>
 
