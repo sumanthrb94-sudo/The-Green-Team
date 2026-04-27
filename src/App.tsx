@@ -250,6 +250,271 @@ const SANCTUARIES: Sanctuary[] = [
   },
 ];
 
+interface JournalPost {
+  id: string;
+  title: string;
+  category: string;
+  date: string;
+  readTime: string;
+  excerpt: string;
+  image: string;
+  body: string[];
+  takeaways: string[];
+}
+
+const JOURNAL_POSTS_OLD: JournalPost[] = [
+  {
+    id: 'forest-bound-premium',
+    title: 'Why forest-bound communities retain pricing power',
+    category: 'Market note',
+    date: 'April 2026',
+    readTime: '4 min read',
+    excerpt: 'Scarcity comes from boundary, access, and the cost of recreating calm once development reaches a corridor.',
+    image: '/gallery/agartha/11.png',
+    body: [
+      'Forest-adjacent land is not only about the view. It combines limited supply, cleaner air, lower ambient noise, and a lifestyle premium that cannot be reproduced once density closes in.',
+      'Buyers tend to price the nearest future constraints: infrastructure, commute, and the cost of obtaining comparable green space. That is why corridor projects with a hard ecological edge often outperform generic plotted developments.',
+      'In our curation model, the real question is not whether a development is beautiful. It is whether it has a defensible moat that can still be explained five years later.',
+    ],
+    takeaways: [
+      'Boundary creates scarcity.',
+      'Commute improves liquidity.',
+      'Recreated calm is expensive, so it compounds.',
+    ],
+  },
+  {
+    id: 'reading-the-land',
+    title: 'How to read AQI, noise, and commute together',
+    category: 'Decision framework',
+    date: 'April 2026',
+    readTime: '5 min read',
+    excerpt: 'The strongest sites rarely win on a single metric. The edge appears when environmental quality and access align.',
+    image: '/gallery/syl/1776279315359.png',
+    body: [
+      'AQI tells you whether the air is consistently pleasant. Noise tells you whether the experience feels restorative once you arrive. Commute tells you how often the premium location will actually be used.',
+      'A site with strong AQI but weak access can feel isolated. A site with strong access but poor environment can lose its premium over time. The best projects sit in the narrow band where all three variables support one another.',
+      'That is why we compare properties as complete ecosystems, not as isolated brochures.',
+    ],
+    takeaways: [
+      'AQI measures comfort.',
+      'Noise measures livability.',
+      'Commute measures repeat usage.',
+    ],
+  },
+  {
+    id: 'preinvestor-pricing',
+    title: 'What pre-investor pricing actually buys you',
+    category: 'Private access',
+    date: 'April 2026',
+    readTime: '4 min read',
+    excerpt: 'The earliest phase is usually where flexibility, inventory choice, and upside are the most asymmetric.',
+    image: '/gallery/dates-county/temple.jpg',
+    body: [
+      'Pre-investor pricing is not just a lower number. It often means better unit selection, more negotiation room, and the ability to enter before public distribution compresses the upside.',
+      'Once booking targets are hit, the pricing ladder usually moves up in stages. That is why the earliest phase matters: the same inventory becomes harder to access, and the premium is paid in both price and choice.',
+      'Our role is to make that trade-off legible so buyers can decide with clarity rather than urgency alone.',
+    ],
+    takeaways: [
+      'Earlier entry means more choice.',
+      'Later phases usually cost more.',
+      'Clarity matters more than urgency.',
+    ],
+  },
+];
+
+const JOURNAL_POSTS: JournalPost[] = [
+  {
+    id: 'what-the-green-team-does',
+    title: 'What The Green Team is and what we do',
+    category: 'About us',
+    date: 'April 2026',
+    readTime: '5 min read',
+    excerpt: 'We curate Hyderabad properties with a clear lens: location quality, environmental comfort, access, and long-term holding strength.',
+    image: '/hero-backdrop.jpg',
+    body: [
+      'The Green Team is a curation house, not a listing portal. We study projects through a practical lens: where they are, who they serve, how they feel to live in, and whether the site can preserve value over time.',
+      'Our focus is on properties that combine strong fundamentals with a better daily experience. That means cleaner surroundings, quieter streets, sensible access, and developers who can deliver what the brochure promises.',
+      'We help buyers look past generic marketing and compare the real lived experience of a home, plot, or community before they commit.',
+    ],
+    takeaways: [
+      'We curate, we do not list.',
+      'We look at value plus lifestyle.',
+      'We focus on Hyderabad growth corridors.',
+    ],
+  },
+  {
+    id: 'choosing-hyderabad-location',
+    title: 'How to select a location in Hyderabad for investment returns',
+    category: 'Location guide',
+    date: 'April 2026',
+    readTime: '4 min read',
+    excerpt: 'Strong returns usually come from locations where infrastructure growth, scarcity, and livability move in the same direction.',
+    image: '/gallery/agartha/11.png',
+    body: [
+      'In Hyderabad, location is a combination of corridor, connectivity, and future demand. Areas near airport growth, ORR access, and emerging employment zones often attract more attention than isolated pockets.',
+      'You should compare not just today’s address, but tomorrow’s access. Travel time to the airport, the financial district, and major highways affects both end-user demand and resale strength.',
+      'The right location is usually the one that feels practical now and still feels scarce later.',
+    ],
+    takeaways: [
+      'Corridor growth matters.',
+      'Commute is part of valuation.',
+      'Scarcity beats hype.',
+    ],
+  },
+  {
+    id: 'aqi-as-an-investment-signal',
+    title: 'Why AQI matters when buying a home or plot',
+    category: 'Lifestyle signal',
+    date: 'April 2026',
+    readTime: '4 min read',
+    excerpt: 'AQI is not a vanity metric. It is one of the fastest ways to understand whether a location will feel good to live in every day.',
+    image: '/gallery/syl/1776279315359.png',
+    body: [
+      'AQI is a daily-use measure. If the air is cleaner, the home feels more usable, the outdoors become more inviting, and the neighborhood is more likely to command a premium.',
+      'For end users, AQI affects comfort and health. For investors, it affects how easy it is to sell or rent the property to people who care about quality of life.',
+      'A strong AQI profile rarely works alone, but it can dramatically strengthen a location that already has access and scarcity.',
+    ],
+    takeaways: [
+      'AQI supports livability.',
+      'Better air helps resale appeal.',
+      'Environmental quality compounds value.',
+    ],
+  },
+  {
+    id: 'noise-pollution-city-heart',
+    title: 'Noise pollution in the heart of the city changes the lifestyle equation',
+    category: 'Urban comfort',
+    date: 'April 2026',
+    readTime: '4 min read',
+    excerpt: 'Noise is one of the most underrated reasons a well-located home still feels exhausting after a long day.',
+    image: '/gallery/agartha-render.jpg',
+    body: [
+      'Two homes can be equally central but feel completely different once you close the door. Continuous traffic, sirens, commercial activity, and construction noise slowly change how restful a place feels.',
+      'When we evaluate locations, we pay attention to how a site behaves at different times of day. A good address should not only be accessible; it should also allow you to recover when you return home.',
+      'Lower noise often means the property can support a more premium lifestyle narrative, even in dense parts of the city.',
+    ],
+    takeaways: [
+      'Noise affects recovery.',
+      'Central does not always mean comfortable.',
+      'Quiet environments feel more premium.',
+    ],
+  },
+  {
+    id: 'curated-properties-lifestyle',
+    title: 'What curated properties change in daily living',
+    category: 'Lifestyle value',
+    date: 'April 2026',
+    readTime: '5 min read',
+    excerpt: 'A curated property changes more than the address. It changes how the day starts, ends, and feels in between.',
+    image: '/gallery/dates-county/temple.jpg',
+    body: [
+      'Curated properties are chosen for the experience they create, not just the brochure they sell. That means better planning, more coherent surroundings, and a clearer sense of identity.',
+      'A strong curation lens also improves decision quality for buyers. Instead of comparing dozens of generic options, they compare a shorter list of projects with a clear reason to exist.',
+      'The result is a better lifestyle fit and a lower chance of buyer regret.',
+    ],
+    takeaways: [
+      'Curation reduces decision noise.',
+      'The right environment shapes routines.',
+      'Better fit lowers regret.',
+    ],
+  },
+  {
+    id: 'home-vs-plot',
+    title: 'Buying a home vs buying a plot in Hyderabad',
+    category: 'Buyer guide',
+    date: 'April 2026',
+    readTime: '4 min read',
+    excerpt: 'The choice depends on whether you want immediate usability, future flexibility, or the strongest balance of both.',
+    image: '/gallery/syl/1776279315359.png',
+    body: [
+      'A home gives immediate use and often a more predictable living experience. A plot gives flexibility, but it also asks more of the buyer in terms of planning and execution.',
+      'In Hyderabad, the right answer depends on the corridor, the developer, and the quality of the surrounding ecosystem. Some buyers want a ready lifestyle. Others want land with long-term appreciation potential.',
+      'Our job is to make those trade-offs visible so the buyer can choose based on intent rather than impulse.',
+    ],
+    takeaways: [
+      'Homes are ready now.',
+      'Plots offer flexibility.',
+      'The best choice depends on your time horizon.',
+    ],
+  },
+  {
+    id: 'corridor-thinking-hyderabad',
+    title: 'Why corridor thinking matters more than isolated landmarks',
+    category: 'Strategy',
+    date: 'April 2026',
+    readTime: '4 min read',
+    excerpt: 'A good project is rarely just a dot on the map. It is part of a wider growth story that keeps extending around it.',
+    image: '/gallery/agartha-official-render.png',
+    body: [
+      'Corridors connect infrastructure, employment, and housing demand. When these pieces align, the surrounding land tends to benefit from steady attention and better price discovery.',
+      'Isolated landmarks can look attractive but fail to create enduring demand if the wider area does not grow with them. Corridor logic helps buyers distinguish between a one-off story and a durable thesis.',
+      'This is especially relevant in Hyderabad, where airport access, ORR connectivity, and suburban expansion keep reshaping the market map.',
+    ],
+    takeaways: [
+      'Corridors create demand tails.',
+      'Infrastructure changes desirability.',
+      'Durable growth is usually regional.',
+    ],
+  },
+  {
+    id: 'a-better-commute-premium',
+    title: 'How commute time affects real estate returns',
+    category: 'Returns',
+    date: 'April 2026',
+    readTime: '4 min read',
+    excerpt: 'Commute is not just convenience. It shapes the pool of buyers who will seriously consider a property.',
+    image: '/gallery/dates-county/field.jpg',
+    body: [
+      'A shorter, more practical commute makes a property relevant to more people. That tends to support liquidity, rental interest, and resale confidence.',
+      'In premium residential markets, buyers often pay more for time saved, especially when the location also offers cleaner surroundings and better planning.',
+      'When commute, access, and environment line up, the property becomes easier to explain and easier to exit.',
+    ],
+    takeaways: [
+      'Time saved is value created.',
+      'Better access widens demand.',
+      'Liquidity improves with usability.',
+    ],
+  },
+  {
+    id: 'what-quality-curation-means',
+    title: 'What quality curation means in a city like Hyderabad',
+    category: 'Curation',
+    date: 'April 2026',
+    readTime: '5 min read',
+    excerpt: 'In a fast-growing city, curation filters out the clutter and leaves only projects that make sense as places to live.',
+    image: '/gallery/agartha-official-layout.png',
+    body: [
+      'Curation is a quality filter. It narrows the field to projects with stronger fundamentals, better execution, and more coherent surroundings.',
+      'That matters in Hyderabad because the market has a lot of noise. Buyers can easily be distracted by visuals, but the real premium comes from land quality, access, and how a place feels over time.',
+      'A curated shortlist helps buyers move from browsing to evaluating with more confidence.',
+    ],
+    takeaways: [
+      'Curation is a filter, not a slogan.',
+      'Strong fundamentals beat marketing.',
+      'Better shortlists lead to better decisions.',
+    ],
+  },
+  {
+    id: 'buying-checklist',
+    title: 'A simple checklist before you book a property',
+    category: 'Buyer checklist',
+    date: 'April 2026',
+    readTime: '3 min read',
+    excerpt: 'Before you book, ask whether the project still makes sense if you remove the brochure and look only at the location.',
+    image: '/FINAL-LAYOUT.jpeg',
+    body: [
+      'Start with the map, not the marketing. Check access, surrounding land use, road quality, and how the location behaves in real life.',
+      'Then ask about AQI, noise, and commute. These three measures tell you whether the project will feel good to use over time.',
+      'Finally, compare the location against your own time horizon: immediate living, medium-term holding, or long-term appreciation.',
+    ],
+    takeaways: [
+      'Use the map first.',
+      'Measure lived experience.',
+      'Match the asset to your horizon.',
+    ],
+  },
+];
+
 // --- Components ---
 
 const Logo = ({ className = "w-10 h-10", textClassName = "text-xl md:text-2xl", iconOnly = false, onDark = false }: { className?: string, textClassName?: string, iconOnly?: boolean, onDark?: boolean }) => (
@@ -4436,6 +4701,162 @@ const Sanctuaries = ({ isSubscribed, onNewsletterClick, isFullPage = false, sanc
   );
 };
 
+const Journal = () => {
+  const [selectedPost, setSelectedPost] = useState<JournalPost | null>(null);
+  const [featured, ...secondaryPosts] = JOURNAL_POSTS;
+
+  const PostCard: FC<{ post: JournalPost; featuredCard?: boolean }> = ({ post, featuredCard = false }) => (
+    <button
+      type="button"
+      onClick={() => setSelectedPost(post)}
+      className={cn(
+        "group relative overflow-hidden text-left border border-outline/10 bg-surface transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl",
+        featuredCard ? "min-h-[34rem]" : "min-h-[15rem]"
+      )}
+    >
+      <div className="absolute inset-0">
+        <img src={post.image} alt="" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0a1208]/92 via-[#0a1208]/42 to-[#0a1208]/8" />
+      </div>
+
+      <div className="relative z-10 flex h-full flex-col justify-between p-7 md:p-10 text-left text-white">
+        <div className="flex items-center justify-between gap-4">
+          <span className="text-[9px] uppercase tracking-[0.55em] font-bold text-white/55">{post.category}</span>
+          <span className="text-[8px] uppercase tracking-[0.45em] text-white/35">{post.date}</span>
+        </div>
+
+        <div className="mt-auto">
+          <div className={cn("max-w-xl", featuredCard ? "space-y-5" : "space-y-4")}>
+            <h3 className={cn(
+              "font-medium leading-tight",
+              featuredCard ? "text-3xl md:text-5xl" : "text-2xl md:text-3xl"
+            )}>
+              {post.title}
+            </h3>
+            <p className={cn(
+              "text-white/65 leading-relaxed",
+              featuredCard ? "text-base md:text-lg max-w-2xl" : "text-sm md:text-base"
+            )}>
+              {post.excerpt}
+            </p>
+          </div>
+
+          <div className="mt-8 flex items-center gap-5 text-[9px] uppercase tracking-[0.45em] font-bold text-white/45">
+            <span className="flex items-center gap-2">
+              <Clock className="w-3.5 h-3.5" />
+              {post.readTime}
+            </span>
+            <span className="flex items-center gap-2 text-white/75 group-hover:text-white transition-colors">
+              Read post
+              <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+            </span>
+          </div>
+        </div>
+      </div>
+    </button>
+  );
+
+  return (
+    <section id="journal" className="px-6 md:px-24 py-20 bg-surface border-y border-outline/10">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex flex-col lg:flex-row justify-between items-end gap-8 mb-10">
+          <div className="max-w-3xl">
+            <span className="text-primary text-[10px] font-bold uppercase tracking-[0.6em] mb-6 block">The Journal</span>
+            <h2 className="text-6xl md:text-8xl font-medium text-on-surface">
+              Notes from the <span className="italic text-primary">curation desk.</span>
+            </h2>
+            <p className="text-xl md:text-2xl font-light text-secondary leading-relaxed mt-8">
+              Short editorial posts on land, access, scarcity, and the signals we use when evaluating a sanctuary.
+            </p>
+          </div>
+        </div>
+
+        <div className="grid lg:grid-cols-[1.35fr_0.85fr] gap-6">
+          <PostCard post={featured} featuredCard />
+          <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-6">
+            {secondaryPosts.map(post => (
+              <PostCard key={post.id} post={post} />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <AnimatePresence>
+        {selectedPost && (
+          <div className="fixed inset-0 z-[85] overflow-hidden flex items-center justify-center p-4 md:p-8">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedPost(null)}
+              className="absolute inset-0 bg-black/70 backdrop-blur-md"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96, y: 14 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: 14 }}
+              transition={{ duration: 0.35, ease: 'easeOut' }}
+              className="relative w-full max-w-4xl max-h-[88vh] overflow-y-auto bg-surface border border-outline/10 shadow-2xl"
+            >
+              <div className="relative h-64 md:h-96">
+                <img src={selectedPost.image} alt="" className="w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0a1208]/95 via-[#0a1208]/35 to-transparent" />
+                <button
+                  type="button"
+                  onClick={() => setSelectedPost(null)}
+                  className="absolute top-5 right-5 w-10 h-10 rounded-full bg-black/35 text-white flex items-center justify-center backdrop-blur-md border border-white/10 hover:bg-black/55 transition-colors"
+                  aria-label="Close blog post"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+                <div className="absolute left-6 bottom-6 right-6 text-white">
+                  <p className="text-[9px] uppercase tracking-[0.55em] text-white/55 font-bold">{selectedPost.category}</p>
+                  <h3 className="text-3xl md:text-5xl font-medium mt-4 max-w-3xl">{selectedPost.title}</h3>
+                  <div className="mt-5 flex flex-wrap items-center gap-4 text-[9px] uppercase tracking-[0.45em] font-bold text-white/45">
+                    <span>{selectedPost.date}</span>
+                    <span className="flex items-center gap-2">
+                      <Clock className="w-3.5 h-3.5" />
+                      {selectedPost.readTime}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="px-6 md:px-10 py-8 md:py-10">
+                <p className="text-lg md:text-xl font-light text-secondary leading-relaxed max-w-3xl">
+                  {selectedPost.excerpt}
+                </p>
+
+                <div className="grid md:grid-cols-[1.35fr_0.65fr] gap-10 mt-10">
+                  <div className="space-y-6 text-on-surface/85 leading-relaxed">
+                    {selectedPost.body.map((paragraph, index) => (
+                      <p key={index} className="text-base md:text-lg font-light">
+                        {paragraph}
+                      </p>
+                    ))}
+                  </div>
+
+                  <aside className="border border-outline/10 bg-surface-container/60 p-6 md:p-8">
+                    <p className="text-[9px] uppercase tracking-[0.55em] text-primary font-bold mb-4">Key takeaways</p>
+                    <ul className="space-y-4">
+                      {selectedPost.takeaways.map(item => (
+                        <li key={item} className="text-sm md:text-base text-secondary leading-relaxed flex gap-3">
+                          <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </aside>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </section>
+  );
+};
+
 const Membership = () => {
   const benefits = [
     {
@@ -5306,10 +5727,13 @@ const HomeView = ({ isSubscribed, onNewsletterClick, sanctuaries = SANCTUARIES, 
     {/* 3. Properties */}
     <Sanctuaries isSubscribed={isSubscribed} onNewsletterClick={onNewsletterClick} sanctuaries={sanctuaries} />
 
-    {/* 4. Our 4-point checklist */}
+    {/* 4. Blog / journal */}
+    <Journal />
+
+    {/* 5. Our 4-point checklist */}
     <EcosystemPillars />
 
-    {/* 5. Newsletter + footer */}
+    {/* 6. Newsletter + footer */}
     <NewsletterHighlight onSubscribe={onNewsletterClick} />
     <Footer onModeChange={onModeChange} onPropertySelect={onPropertySelect} />
   </div>
