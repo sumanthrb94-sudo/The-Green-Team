@@ -6394,8 +6394,24 @@ const ProfileModal = ({
 // ─── App (main) ──────────────────────────────────────────────────────────────
 
 export default function App() {
-  type ViewMode = 'home' | 'map' | 'list' | 'analytics' | 'syl' | 'membership' | 'preinvestor-gold';
-  const VIEW_ORDER: ViewMode[] = ['home', 'list', 'analytics', 'syl', 'map', 'preinvestor-gold'];
+  type ViewMode = 'home' | 'map' | 'list' | 'analytics' | 'syl' | 'membership' | 'preinvestor-gold' | 'blog';
+  const VIEW_ORDER: ViewMode[] = ['home', 'list', 'analytics', 'syl', 'map', 'preinvestor-gold', 'blog'];
+
+  const getViewModeFromPath = useCallback((pathname: string): ViewMode => {
+    if (pathname === '/blog' || pathname.startsWith('/blog/')) return 'blog';
+    if (pathname === '/map') return 'map';
+    if (pathname === '/list') return 'list';
+    if (pathname === '/analytics') return 'analytics';
+    if (pathname === '/syl') return 'syl';
+    if (pathname === '/membership') return 'membership';
+    if (pathname === '/preinvestor-gold') return 'preinvestor-gold';
+    return 'home';
+  }, []);
+
+  const getPathForView = useCallback((mode: ViewMode) => {
+    if (mode === 'home') return '/';
+    return `/${mode}`;
+  }, []);
 
   const [authUser, setAuthUser]     = useState<User | null>(null);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -6480,6 +6496,7 @@ export default function App() {
       setAuthUser(null);
       setShowAdmin(false);
       setShowAdminPanel(false);
+      window.history.pushState({}, '', '/');
       setViewMode('home');
     } catch (error) {
       console.error('Error signing out:', error);
@@ -6492,7 +6509,7 @@ export default function App() {
   // A logged-in user is always treated as a subscriber - no gates shown
   const effectivelySubscribed = isSubscribed || !!authUser;
   const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
-  const [viewMode, setViewMode] = useState<ViewMode>('home');
+  const [viewMode, setViewMode] = useState<ViewMode>(() => getViewModeFromPath(window.location.pathname));
   const [isDark, setIsDark] = useState(() => {
     return localStorage.getItem('gt_dark') === 'true';
   });
@@ -6502,6 +6519,39 @@ export default function App() {
     localStorage.setItem('gt_dark', String(isDark));
     document.documentElement.classList.toggle('dark', isDark);
   }, [isDark]);
+
+  useEffect(() => {
+    const pathname = window.location.pathname;
+    const route = getViewModeFromPath(pathname);
+    const canonicalPath = route === 'blog' ? '/blog' : route === 'home' ? '/' : getPathForView(route);
+    const canonicalHref = `https://thegreenteam.in${canonicalPath}`;
+
+    const setMeta = (selector: string, attr: 'content' | 'href', value: string) => {
+      const el = document.querySelector(selector) as HTMLMetaElement | HTMLLinkElement | null;
+      if (el) el.setAttribute(attr, value);
+    };
+
+    if (route === 'blog') {
+      document.title = 'Blog | The Green Team | Hyderabad Property Insights';
+      setMeta('meta[name="description"]', 'content', 'Editorial blog posts from The Green Team on Hyderabad locations, returns, AQI, noise pollution, and curated property decisions.');
+      setMeta('meta[property="og:title"]', 'content', 'Blog | The Green Team | Hyderabad Property Insights');
+      setMeta('meta[property="og:description"]', 'content', 'Long-form posts on Hyderabad real estate decisions, environmental quality, and curated property selection.');
+      setMeta('meta[property="og:url"]', 'content', canonicalHref);
+      setMeta('meta[name="twitter:title"]', 'content', 'Blog | The Green Team | Hyderabad Property Insights');
+      setMeta('meta[name="twitter:description"]', 'content', 'Long-form posts on Hyderabad real estate decisions, environmental quality, and curated property selection.');
+    } else {
+      document.title = 'The Green Team | Forest Homes Near Hyderabad | Channel Partner MODCON Agartha';
+      setMeta('meta[name="description"]', 'content', 'We curate forest-adjacent homes near Hyderabad — AQI under 25, 45-min city commute. Channel partners for MODCON Agartha (Narsapur). Plots from ₹64.6L. Villas, apartments & plots verified.');
+      setMeta('meta[property="og:title"]', 'content', 'The Green Team | Forest Homes Near Hyderabad | From ₹64.6L');
+      setMeta('meta[property="og:description"]', 'content', 'Independent channel partners who curate forest-adjacent homes near Hyderabad. AQI 12, 18 dB noise, under 45-min commute. Plots, villas, apartments — verified before we show you.');
+      setMeta('meta[property="og:url"]', 'content', canonicalHref);
+      setMeta('meta[name="twitter:title"]', 'content', 'The Green Team | Forest Homes Near Hyderabad');
+      setMeta('meta[name="twitter:description"]', 'content', 'We curate forest-adjacent homes near Hyderabad — AQI 12, 18 dB noise, 45-min commute. Channel partners for MODCON Agartha.');
+    }
+
+    setMeta('link[rel="canonical"]', 'href', canonicalHref);
+  }, [getPathForView, getViewModeFromPath]);
+
   const [showAdmin, setShowAdmin] = useState(false);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<typeof SANCTUARIES[0] | null>(null);
@@ -6571,6 +6621,7 @@ export default function App() {
 
   const handleViewChange = useCallback((next: ViewMode) => {
     // We always want to load from the top when switching views/menu items
+    window.history.pushState({}, '', getPathForView(next));
     setViewMode(next);
     
     // Reset scroll position to top for the next view
@@ -6585,16 +6636,23 @@ export default function App() {
   }, []);
 
   const handleBlogClick = useCallback(() => {
-    if (viewMode !== 'home') {
-      handleViewChange('home');
-      setTimeout(() => {
-        document.getElementById('journal')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 120);
-      return;
-    }
+    window.history.pushState({}, '', '/blog');
+    setViewMode('blog');
+    setTimeout(() => {
+      document.getElementById('journal')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 80);
+  }, []);
 
-    document.getElementById('journal')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, [handleViewChange, viewMode]);
+  useEffect(() => {
+    const syncFromPath = () => {
+      const next = getViewModeFromPath(window.location.pathname);
+      setViewMode(next);
+    };
+
+    window.addEventListener('popstate', syncFromPath);
+    syncFromPath();
+    return () => window.removeEventListener('popstate', syncFromPath);
+  }, [getViewModeFromPath]);
 
   return (
     <div className={cn("min-h-screen font-sans transition-colors duration-700", isDark ? "dark" : "")}>
@@ -6643,6 +6701,28 @@ export default function App() {
                     if (sanctuary) setSelectedProperty(sanctuary);
                   }}
                 />
+              )}
+
+              {viewMode === 'blog' && (
+                <div className="flex flex-col">
+                  <div className="px-6 md:px-24 pt-14 md:pt-20 pb-8 md:pb-12 border-b border-outline/10 bg-surface">
+                    <div className="max-w-5xl mx-auto">
+                      <span className="text-primary text-[10px] font-bold uppercase tracking-[0.6em] mb-6 block">Blog</span>
+                      <h1 className="text-5xl md:text-8xl font-medium text-on-surface">
+                        Notes from the <span className="italic text-primary">curation desk.</span>
+                      </h1>
+                      <p className="text-xl md:text-2xl font-light text-secondary leading-relaxed mt-8 max-w-3xl">
+                        Long-form writing on Hyderabad locations, return signals, environmental comfort, and how curated properties change the quality of daily life.
+                      </p>
+                    </div>
+                  </div>
+                  <Journal />
+                  <NewsletterHighlight onSubscribe={() => setIsNewsletterOpen(true)} />
+                  <Footer onModeChange={handleViewChange} onPropertySelect={(id) => {
+                    const sanctuary = allSanctuaries.find(s => s.id === id);
+                    if (sanctuary) setSelectedProperty(sanctuary);
+                  }} />
+                </div>
               )}
 
               {viewMode === 'map' && (

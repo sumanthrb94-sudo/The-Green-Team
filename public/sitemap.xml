@@ -8,7 +8,7 @@
   <!-- Home -->
   <url>
     <loc>https://thegreenteam.in/</loc>
-    <lastmod>2026-04-15</lastmod>
+    <lastmod>2026-04-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <image:image>
@@ -21,6 +21,13 @@
       <image:title>Forest house at dusk — The Green Team</image:title>
       <image:caption>Forest-adjacent living curated by The Green Team, Hyderabad</image:caption>
     </image:image>
+  </url>
+
+  <url>
+    <loc>https://thegreenteam.in/blog</loc>
+    <lastmod>2026-04-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
 
 </urlset>
