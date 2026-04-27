@@ -535,10 +535,11 @@ const Logo = ({ className = "w-10 h-10", textClassName = "text-xl md:text-2xl", 
   </div>
 );
 
-const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDark, onSignInClick, authUser, onSignOut, isAdmin, onAdminClick, onPropertySelect }: {
+const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, onBlogClick, isDark, setIsDark, onSignInClick, authUser, onSignOut, isAdmin, onAdminClick, onPropertySelect }: {
   isSubscribed: boolean;
   onNewsletterClick: () => void;
   onModeChange: (mode: any) => void;
+  onBlogClick: () => void;
   isDark: boolean;
   setIsDark: (v: boolean) => void;
   onSignInClick: () => void;
@@ -553,6 +554,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
   const desktopNav = [
     { name: 'Map', id: 'map' },
     { name: 'Edge + Nature', id: 'analytics' },
+    { name: 'Blog', id: 'blog' },
     { name: 'Pre-Investor Gold', id: 'preinvestor-gold', isGold: true, icon: Award },
     { name: 'Membership', id: 'membership' },
   ];
@@ -561,6 +563,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
     { name: 'Home', id: 'home', icon: Home },
     { name: 'Map', id: 'map', icon: MapPin },
     { name: 'Edge + Nature', id: 'analytics', icon: TrendingDown },
+    { name: 'Blog', id: 'blog', icon: MessageSquare },
     { name: 'Pre-Investor Gold', id: 'preinvestor-gold', icon: Award },
     { name: 'Membership', id: 'membership', icon: Shield },
   ];
@@ -595,7 +598,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
           {desktopNav.map(item => {
             const NavIcon = item.icon;
             return (
-              <button key={item.id} onClick={() => onModeChange(item.id)}
+              <button key={item.id} onClick={() => item.id === 'blog' ? onBlogClick() : onModeChange(item.id)}
                 className={cn(
                   "flex items-center gap-2 text-[9px] uppercase tracking-[0.45em] font-bold transition-colors duration-200",
                   item.isGold 
@@ -689,7 +692,14 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
                       const Icon = item.icon;
                       return (
                         <button key={item.id}
-                          onClick={() => { onModeChange(item.id); setAccountOpen(false); }}
+                          onClick={() => {
+                            if (item.id === 'blog') {
+                              onBlogClick();
+                            } else {
+                              onModeChange(item.id);
+                            }
+                            setAccountOpen(false);
+                          }}
                           className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-primary/6 text-left transition-all group">
                           <Icon className="w-4 h-4 text-primary/50 group-hover:text-primary transition-colors flex-shrink-0" />
                           <span className="text-[11px] uppercase tracking-[0.35em] font-bold text-on-surface/60 group-hover:text-on-surface transition-colors">{item.name}</span>
@@ -6544,6 +6554,18 @@ export default function App() {
     }, 0);
   }, []);
 
+  const handleBlogClick = useCallback(() => {
+    if (viewMode !== 'home') {
+      handleViewChange('home');
+      setTimeout(() => {
+        document.getElementById('journal')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 120);
+      return;
+    }
+
+    document.getElementById('journal')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [handleViewChange, viewMode]);
+
   return (
     <div className={cn("min-h-screen font-sans transition-colors duration-700", isDark ? "dark" : "")}>
       <div className="bg-surface text-on-surface flex h-screen overflow-hidden">
@@ -6558,6 +6580,7 @@ export default function App() {
             isSubscribed={effectivelySubscribed}
             onNewsletterClick={() => setIsNewsletterOpen(true)}
             onModeChange={handleViewChange}
+            onBlogClick={handleBlogClick}
             isDark={isDark}
             setIsDark={setIsDark}
             onSignInClick={() => setIsAuthOpen(true)}
