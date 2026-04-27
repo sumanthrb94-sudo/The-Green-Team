@@ -1369,7 +1369,7 @@ const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewslet
         )}>
           {isSyl ? 'Pre-Investor Phase' : isDatesCounty ? 'Now Booking' : 'Open Reservation'}
         </span>
-        <span className="px-3 py-1 text-[7px] uppercase tracking-[0.35em] font-bold rounded-full bg-[#080d06]/70 text-cream/60 backdrop-blur-sm border border-cream/10 w-fit">
+        <span className="px-3 py-1 text-[7px] uppercase tracking-[0.35em] font-bold rounded-full bg-black/75 text-white/90 backdrop-blur-md border border-white/20 shadow-lg w-fit">
           {isDatesCounty ? 'TGT × Planet Green' : 'TGT Channel Partner'}
         </span>
         {isSyl && (
@@ -1509,7 +1509,7 @@ const SanctuaryPopupContent = ({ loc, onViewDetails }: { loc: any; onViewDetails
           >
             {isSyl ? 'Pre-Investor Phase' : isDatesCounty ? 'Now Booking' : 'Open Reservation'}
           </span>
-          <span className="px-2.5 py-0.5 text-[7px] uppercase tracking-[0.3em] font-bold rounded-full bg-[#080d06]/75 text-white/55 border border-white/10 w-fit">
+          <span className="px-2.5 py-0.5 text-[7px] uppercase tracking-[0.3em] font-bold rounded-full bg-black/75 text-white/90 border border-white/20 shadow-lg w-fit">
             {isDatesCounty ? 'TGT × Planet Green' : 'TGT Channel Partner'}
           </span>
           {isSyl && (
