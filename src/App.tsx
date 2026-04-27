@@ -257,7 +257,7 @@ interface JournalPost {
   date: string;
   readTime: string;
   excerpt: string;
-  image: string;
+  image?: string;
   body: string[];
   takeaways: string[];
 }
@@ -4715,6 +4715,21 @@ const Journal = () => {
   const [selectedPost, setSelectedPost] = useState<JournalPost | null>(null);
   const [featured, ...secondaryPosts] = JOURNAL_POSTS;
 
+  const buildLongFormBody = (post: JournalPost) => {
+    const firstTakeaway = post.takeaways[0] || 'Better decisions come from better context.';
+    const secondTakeaway = post.takeaways[1] || 'Read the location before you read the brochure.';
+    const thirdTakeaway = post.takeaways[2] || 'The most durable value is usually the least noisy.';
+
+    return [
+      `${post.title} deserves to be read as a working framework rather than a quick opinion. In a market like Hyderabad, where growth is uneven and the quality of a location can change from one road to the next, the difference between a good and a weak decision often lives in the details. The point of this note is to slow the decision down just enough to see the shape of the opportunity clearly: what the site is, what it is not, and why the surrounding context changes the outcome for both end users and investors.`,
+      `${post.body[0]} The practical side of that idea is simple. When a buyer asks whether a place will hold value, the answer rarely comes from a single headline number. It comes from the way the site behaves in real life: how much time it saves, how much noise it absorbs, how much air you breathe, how naturally the neighborhood supports everyday routines, and how easy it is to explain the value to someone else later. That is why we treat location as a bundle of signals rather than a single story.`,
+      `${post.body[1]} In Hyderabad, this matters because the city does not grow in a perfect ring. It grows along corridors, around anchors, and toward infrastructure that reduces friction for people who move often. A good investment location is therefore less about being famous and more about being useful. If a home, plot, or community sits in the path of demand, has access to work, school, airport, or highway connections, and still feels calm enough to be lived in comfortably, it has a stronger chance of sustaining attention over time.`,
+      `${post.body[2]} That is also where discipline matters. Buyers often overpay for marketing language and underweight the parts of the property that are hardest to retrofit later: ambience, access, planning quality, and environmental comfort. Once those elements are gone, they are expensive to recover. Once they are present, they quietly keep working for years. This is why a curated reading of the market is valuable. It helps people separate short-term excitement from long-term livability, which is a better basis for a decision that may be held for many years.`,
+      `For us, the takeaway is not only about ${firstTakeaway.toLowerCase()} It is also about ${secondTakeaway.toLowerCase()} and ${thirdTakeaway.toLowerCase()} Together, these ideas create a checklist that is practical enough for real buyers and sober enough for real capital. If a property cannot survive that checklist, the brochure is not the problem; the property is. If it can survive that checklist, the buyer has a much better chance of ending up with something that feels good to own, easy to explain, and easier to hold with confidence.`,
+      `Viewed this way, ${post.category.toLowerCase()} is not a label. It is a discipline. It asks the buyer to compare alternatives with a sharper lens, to ask what kind of life the property supports, and to think in years rather than in posts. That is the kind of framework we want readers to leave with: not just a reaction to a blog, but a more reliable way to judge a location in the city.`,
+    ];
+  };
+
   const PostCard: FC<{ post: JournalPost; featuredCard?: boolean }> = ({ post, featuredCard = false }) => (
     <button
       type="button"
@@ -4724,9 +4739,20 @@ const Journal = () => {
         featuredCard ? "min-h-[34rem]" : "min-h-[15rem]"
       )}
     >
-      <div className="absolute inset-0">
-        <img src={post.image} alt="" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0a1208]/92 via-[#0a1208]/42 to-[#0a1208]/8" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.14),transparent_42%),linear-gradient(135deg,#1a2410_0%,#2d3a1d_42%,#0f150c_100%)]">
+        <div className="absolute inset-0 opacity-35 mix-blend-screen">
+          <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full">
+            <defs>
+              <linearGradient id="journalGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="rgba(242,244,242,0.16)" />
+                <stop offset="100%" stopColor="rgba(242,244,242,0)" />
+              </linearGradient>
+            </defs>
+            <circle cx="74" cy="26" r="18" fill="url(#journalGlow)" />
+            <circle cx="18" cy="82" r="26" fill="url(#journalGlow)" />
+            <path d="M0 100 L100 0" stroke="rgba(255,255,255,0.08)" strokeWidth="0.8" />
+          </svg>
+        </div>
       </div>
 
       <div className="relative z-10 flex h-full flex-col justify-between p-7 md:p-10 text-left text-white">
@@ -4801,16 +4827,20 @@ const Journal = () => {
               onClick={() => setSelectedPost(null)}
               className="absolute inset-0 bg-black/70 backdrop-blur-md"
             />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.96, y: 14 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.96, y: 14 }}
-              transition={{ duration: 0.35, ease: 'easeOut' }}
-              className="relative w-full max-w-4xl max-h-[88vh] overflow-y-auto bg-surface border border-outline/10 shadow-2xl"
-            >
-              <div className="relative h-64 md:h-96">
-                <img src={selectedPost.image} alt="" className="w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0a1208]/95 via-[#0a1208]/35 to-transparent" />
+              <motion.div
+                initial={{ opacity: 0, scale: 0.96, y: 14 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.96, y: 14 }}
+                transition={{ duration: 0.35, ease: 'easeOut' }}
+                className="relative w-full max-w-4xl max-h-[88vh] overflow-y-auto bg-surface border border-outline/10 shadow-2xl"
+              >
+              <div className="relative h-64 md:h-96 overflow-hidden bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.16),transparent_42%),linear-gradient(135deg,#1a2410_0%,#2d3a1d_42%,#0f150c_100%)]">
+                <div className="absolute inset-0 opacity-40">
+                  <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full">
+                    <path d="M0 100 C15 74 29 57 44 46 C59 35 74 25 100 0" fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
+                    <path d="M0 78 C24 64 42 53 61 43 C77 34 88 26 100 17" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="0.8" />
+                  </svg>
+                </div>
                 <button
                   type="button"
                   onClick={() => setSelectedPost(null)}
@@ -4839,7 +4869,7 @@ const Journal = () => {
 
                 <div className="grid md:grid-cols-[1.35fr_0.65fr] gap-10 mt-10">
                   <div className="space-y-6 text-on-surface/85 leading-relaxed">
-                    {selectedPost.body.map((paragraph, index) => (
+                    {buildLongFormBody(selectedPost).map((paragraph, index) => (
                       <p key={index} className="text-base md:text-lg font-light">
                         {paragraph}
                       </p>
