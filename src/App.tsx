@@ -217,14 +217,14 @@ const SANCTUARIES: Sanctuary[] = [
     aqi: 18,
     noise: 22,
     commute: '15 mins to Airport · 15 mins to ORR Exit-14',
-    pricePerSqYd: 10000,
+    pricePerSqYd: 18000,
     valuation: '',
-    memberPrice: 'From ₹20 L',
-    image: '/gallery/dates-county/hero.jpg',
+    memberPrice: '₹90 L',
+    image: '/gallery/dates-county/temple.jpg',
     tagline: 'Eco-luxury villa plots at the edge of a 4,000-acre forest.',
     description: 'Dates County by Planet Green is a 300+ acre eco-luxury villa-plot community in Kandukur — the epicentre of Hyderabad\'s emerging Future City on Srisailam Highway. Adjacent to a 4,000-acre reserve forest, the township reserves 40% of its land for open and recreational spaces, woven through with date palm plantations, themed parks, sports courts and natural fishing ponds. 15 minutes to the Hyderabad International Airport and 15 minutes to ORR Exit-14 (Tukkuguda). RERA P02400002648 · P02400003813.',
     plots: 0,
-    plotRange: 'Villa Plots 200 – 600 sq yds',
+    plotRange: '500 sq yds · ₹18,000/sq yd',
     amenityAcres: '300+ Acres · 40% Open Space',
     architect: 'Planet Green Infra',
     brochureUrl: 'https://www.thedatescounty.in',
@@ -238,7 +238,280 @@ const SANCTUARIES: Sanctuary[] = [
       '24/7 Security · Gated Community',
       '15 Min to Airport · ORR Exit-14',
     ],
-    plotImages: [],
+    plotImages: [
+      '/gallery/dates-county/temple.jpg',
+      '/gallery/dates-county/project-highlight.jpg',
+      '/gallery/dates-county/field.jpg',
+      '/gallery/dates-county/amenities.jpg',
+      '/gallery/dates-county/water.jpg',
+      '/gallery/dates-county/forest.jpg',
+      '/gallery/dates-county/sustainability.png',
+    ],
+  },
+];
+
+interface JournalPost {
+  id: string;
+  title: string;
+  category: string;
+  date: string;
+  readTime: string;
+  excerpt: string;
+  image?: string;
+  body: string[];
+  takeaways: string[];
+}
+
+const JOURNAL_POSTS_OLD: JournalPost[] = [
+  {
+    id: 'forest-bound-premium',
+    title: 'Why forest-bound communities retain pricing power',
+    category: 'Market note',
+    date: 'April 2026',
+    readTime: '4 min read',
+    excerpt: 'Scarcity comes from boundary, access, and the cost of recreating calm once development reaches a corridor.',
+    image: '/gallery/agartha/11.webp',
+    body: [
+      'Forest-adjacent land is not only about the view. It combines limited supply, cleaner air, lower ambient noise, and a lifestyle premium that cannot be reproduced once density closes in.',
+      'Buyers tend to price the nearest future constraints: infrastructure, commute, and the cost of obtaining comparable green space. That is why corridor projects with a hard ecological edge often outperform generic plotted developments.',
+      'In our curation model, the real question is not whether a development is beautiful. It is whether it has a defensible moat that can still be explained five years later.',
+    ],
+    takeaways: [
+      'Boundary creates scarcity.',
+      'Commute improves liquidity.',
+      'Recreated calm is expensive, so it compounds.',
+    ],
+  },
+  {
+    id: 'reading-the-land',
+    title: 'How to read AQI, noise, and commute together',
+    category: 'Decision framework',
+    date: 'April 2026',
+    readTime: '5 min read',
+    excerpt: 'The strongest sites rarely win on a single metric. The edge appears when environmental quality and access align.',
+    image: '/gallery/syl/1776279315359.webp',
+    body: [
+      'AQI tells you whether the air is consistently pleasant. Noise tells you whether the experience feels restorative once you arrive. Commute tells you how often the premium location will actually be used.',
+      'A site with strong AQI but weak access can feel isolated. A site with strong access but poor environment can lose its premium over time. The best projects sit in the narrow band where all three variables support one another.',
+      'That is why we compare properties as complete ecosystems, not as isolated brochures.',
+    ],
+    takeaways: [
+      'AQI measures comfort.',
+      'Noise measures livability.',
+      'Commute measures repeat usage.',
+    ],
+  },
+  {
+    id: 'preinvestor-pricing',
+    title: 'What pre-investor pricing actually buys you',
+    category: 'Private access',
+    date: 'April 2026',
+    readTime: '4 min read',
+    excerpt: 'The earliest phase is usually where flexibility, inventory choice, and upside are the most asymmetric.',
+    image: '/gallery/dates-county/temple.jpg',
+    body: [
+      'Pre-investor pricing is not just a lower number. It often means better unit selection, more negotiation room, and the ability to enter before public distribution compresses the upside.',
+      'Once booking targets are hit, the pricing ladder usually moves up in stages. That is why the earliest phase matters: the same inventory becomes harder to access, and the premium is paid in both price and choice.',
+      'Our role is to make that trade-off legible so buyers can decide with clarity rather than urgency alone.',
+    ],
+    takeaways: [
+      'Earlier entry means more choice.',
+      'Later phases usually cost more.',
+      'Clarity matters more than urgency.',
+    ],
+  },
+];
+
+const JOURNAL_POSTS: JournalPost[] = [
+  {
+    id: 'what-the-green-team-does',
+    title: 'What The Green Team is and what we do',
+    category: 'About us',
+    date: 'April 2026',
+    readTime: '5 min read',
+    excerpt: 'We curate Hyderabad properties with a clear lens: location quality, environmental comfort, access, and long-term holding strength.',
+    image: '/hero-backdrop.jpg',
+    body: [
+      'The Green Team is a curation house, not a listing portal. We study projects through a practical lens: where they are, who they serve, how they feel to live in, and whether the site can preserve value over time.',
+      'Our focus is on properties that combine strong fundamentals with a better daily experience. That means cleaner surroundings, quieter streets, sensible access, and developers who can deliver what the brochure promises.',
+      'We help buyers look past generic marketing and compare the real lived experience of a home, plot, or community before they commit.',
+    ],
+    takeaways: [
+      'We curate, we do not list.',
+      'We look at value plus lifestyle.',
+      'We focus on Hyderabad growth corridors.',
+    ],
+  },
+  {
+    id: 'choosing-hyderabad-location',
+    title: 'How to select a location in Hyderabad for investment returns',
+    category: 'Location guide',
+    date: 'April 2026',
+    readTime: '4 min read',
+    excerpt: 'Strong returns usually come from locations where infrastructure growth, scarcity, and livability move in the same direction.',
+    image: '/gallery/agartha/11.webp',
+    body: [
+      'In Hyderabad, location is a combination of corridor, connectivity, and future demand. Areas near airport growth, ORR access, and emerging employment zones often attract more attention than isolated pockets.',
+      'You should compare not just today’s address, but tomorrow’s access. Travel time to the airport, the financial district, and major highways affects both end-user demand and resale strength.',
+      'The right location is usually the one that feels practical now and still feels scarce later.',
+    ],
+    takeaways: [
+      'Corridor growth matters.',
+      'Commute is part of valuation.',
+      'Scarcity beats hype.',
+    ],
+  },
+  {
+    id: 'aqi-as-an-investment-signal',
+    title: 'Why AQI matters when buying a home or plot',
+    category: 'Lifestyle signal',
+    date: 'April 2026',
+    readTime: '4 min read',
+    excerpt: 'AQI is not a vanity metric. It is one of the fastest ways to understand whether a location will feel good to live in every day.',
+    image: '/gallery/syl/1776279315359.webp',
+    body: [
+      'AQI is a daily-use measure. If the air is cleaner, the home feels more usable, the outdoors become more inviting, and the neighborhood is more likely to command a premium.',
+      'For end users, AQI affects comfort and health. For investors, it affects how easy it is to sell or rent the property to people who care about quality of life.',
+      'A strong AQI profile rarely works alone, but it can dramatically strengthen a location that already has access and scarcity.',
+    ],
+    takeaways: [
+      'AQI supports livability.',
+      'Better air helps resale appeal.',
+      'Environmental quality compounds value.',
+    ],
+  },
+  {
+    id: 'noise-pollution-city-heart',
+    title: 'Noise pollution in the heart of the city changes the lifestyle equation',
+    category: 'Urban comfort',
+    date: 'April 2026',
+    readTime: '4 min read',
+    excerpt: 'Noise is one of the most underrated reasons a well-located home still feels exhausting after a long day.',
+    image: '/gallery/agartha-render.jpg',
+    body: [
+      'Two homes can be equally central but feel completely different once you close the door. Continuous traffic, sirens, commercial activity, and construction noise slowly change how restful a place feels.',
+      'When we evaluate locations, we pay attention to how a site behaves at different times of day. A good address should not only be accessible; it should also allow you to recover when you return home.',
+      'Lower noise often means the property can support a more premium lifestyle narrative, even in dense parts of the city.',
+    ],
+    takeaways: [
+      'Noise affects recovery.',
+      'Central does not always mean comfortable.',
+      'Quiet environments feel more premium.',
+    ],
+  },
+  {
+    id: 'curated-properties-lifestyle',
+    title: 'What curated properties change in daily living',
+    category: 'Lifestyle value',
+    date: 'April 2026',
+    readTime: '5 min read',
+    excerpt: 'A curated property changes more than the address. It changes how the day starts, ends, and feels in between.',
+    image: '/gallery/dates-county/temple.jpg',
+    body: [
+      'Curated properties are chosen for the experience they create, not just the brochure they sell. That means better planning, more coherent surroundings, and a clearer sense of identity.',
+      'A strong curation lens also improves decision quality for buyers. Instead of comparing dozens of generic options, they compare a shorter list of projects with a clear reason to exist.',
+      'The result is a better lifestyle fit and a lower chance of buyer regret.',
+    ],
+    takeaways: [
+      'Curation reduces decision noise.',
+      'The right environment shapes routines.',
+      'Better fit lowers regret.',
+    ],
+  },
+  {
+    id: 'home-vs-plot',
+    title: 'Buying a home vs buying a plot in Hyderabad',
+    category: 'Buyer guide',
+    date: 'April 2026',
+    readTime: '4 min read',
+    excerpt: 'The choice depends on whether you want immediate usability, future flexibility, or the strongest balance of both.',
+    image: '/gallery/syl/1776279315359.webp',
+    body: [
+      'A home gives immediate use and often a more predictable living experience. A plot gives flexibility, but it also asks more of the buyer in terms of planning and execution.',
+      'In Hyderabad, the right answer depends on the corridor, the developer, and the quality of the surrounding ecosystem. Some buyers want a ready lifestyle. Others want land with long-term appreciation potential.',
+      'Our job is to make those trade-offs visible so the buyer can choose based on intent rather than impulse.',
+    ],
+    takeaways: [
+      'Homes are ready now.',
+      'Plots offer flexibility.',
+      'The best choice depends on your time horizon.',
+    ],
+  },
+  {
+    id: 'corridor-thinking-hyderabad',
+    title: 'Why corridor thinking matters more than isolated landmarks',
+    category: 'Strategy',
+    date: 'April 2026',
+    readTime: '4 min read',
+    excerpt: 'A good project is rarely just a dot on the map. It is part of a wider growth story that keeps extending around it.',
+    image: '/gallery/agartha-official-render.png',
+    body: [
+      'Corridors connect infrastructure, employment, and housing demand. When these pieces align, the surrounding land tends to benefit from steady attention and better price discovery.',
+      'Isolated landmarks can look attractive but fail to create enduring demand if the wider area does not grow with them. Corridor logic helps buyers distinguish between a one-off story and a durable thesis.',
+      'This is especially relevant in Hyderabad, where airport access, ORR connectivity, and suburban expansion keep reshaping the market map.',
+    ],
+    takeaways: [
+      'Corridors create demand tails.',
+      'Infrastructure changes desirability.',
+      'Durable growth is usually regional.',
+    ],
+  },
+  {
+    id: 'a-better-commute-premium',
+    title: 'How commute time affects real estate returns',
+    category: 'Returns',
+    date: 'April 2026',
+    readTime: '4 min read',
+    excerpt: 'Commute is not just convenience. It shapes the pool of buyers who will seriously consider a property.',
+    image: '/gallery/dates-county/field.jpg',
+    body: [
+      'A shorter, more practical commute makes a property relevant to more people. That tends to support liquidity, rental interest, and resale confidence.',
+      'In premium residential markets, buyers often pay more for time saved, especially when the location also offers cleaner surroundings and better planning.',
+      'When commute, access, and environment line up, the property becomes easier to explain and easier to exit.',
+    ],
+    takeaways: [
+      'Time saved is value created.',
+      'Better access widens demand.',
+      'Liquidity improves with usability.',
+    ],
+  },
+  {
+    id: 'what-quality-curation-means',
+    title: 'What quality curation means in a city like Hyderabad',
+    category: 'Curation',
+    date: 'April 2026',
+    readTime: '5 min read',
+    excerpt: 'In a fast-growing city, curation filters out the clutter and leaves only projects that make sense as places to live.',
+    image: '/gallery/agartha-official-layout.png',
+    body: [
+      'Curation is a quality filter. It narrows the field to projects with stronger fundamentals, better execution, and more coherent surroundings.',
+      'That matters in Hyderabad because the market has a lot of noise. Buyers can easily be distracted by visuals, but the real premium comes from land quality, access, and how a place feels over time.',
+      'A curated shortlist helps buyers move from browsing to evaluating with more confidence.',
+    ],
+    takeaways: [
+      'Curation is a filter, not a slogan.',
+      'Strong fundamentals beat marketing.',
+      'Better shortlists lead to better decisions.',
+    ],
+  },
+  {
+    id: 'buying-checklist',
+    title: 'A simple checklist before you book a property',
+    category: 'Buyer checklist',
+    date: 'April 2026',
+    readTime: '3 min read',
+    excerpt: 'Before you book, ask whether the project still makes sense if you remove the brochure and look only at the location.',
+    image: '/FINAL-LAYOUT.jpeg',
+    body: [
+      'Start with the map, not the marketing. Check access, surrounding land use, road quality, and how the location behaves in real life.',
+      'Then ask about AQI, noise, and commute. These three measures tell you whether the project will feel good to use over time.',
+      'Finally, compare the location against your own time horizon: immediate living, medium-term holding, or long-term appreciation.',
+    ],
+    takeaways: [
+      'Use the map first.',
+      'Measure lived experience.',
+      'Match the asset to your horizon.',
+    ],
   },
 ];
 
@@ -262,10 +535,11 @@ const Logo = ({ className = "w-10 h-10", textClassName = "text-xl md:text-2xl", 
   </div>
 );
 
-const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDark, onSignInClick, authUser, onSignOut, isAdmin, onAdminClick, onPropertySelect }: {
+const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, onBlogClick, isDark, setIsDark, onSignInClick, authUser, onSignOut, isAdmin, onAdminClick, onPropertySelect }: {
   isSubscribed: boolean;
   onNewsletterClick: () => void;
   onModeChange: (mode: any) => void;
+  onBlogClick: () => void;
   isDark: boolean;
   setIsDark: (v: boolean) => void;
   onSignInClick: () => void;
@@ -280,6 +554,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
   const desktopNav = [
     { name: 'Map', id: 'map' },
     { name: 'Edge + Nature', id: 'analytics' },
+    { name: 'Blog', id: 'blog' },
     { name: 'Pre-Investor Gold', id: 'preinvestor-gold', isGold: true, icon: Award },
     { name: 'Membership', id: 'membership' },
   ];
@@ -288,6 +563,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
     { name: 'Home', id: 'home', icon: Home },
     { name: 'Map', id: 'map', icon: MapPin },
     { name: 'Edge + Nature', id: 'analytics', icon: TrendingDown },
+    { name: 'Blog', id: 'blog', icon: MessageSquare },
     { name: 'Pre-Investor Gold', id: 'preinvestor-gold', icon: Award },
     { name: 'Membership', id: 'membership', icon: Shield },
   ];
@@ -295,7 +571,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
   const sanctuaryItems = [
     { name: 'MODCON Agartha', id: 'agartha', sub: 'Narsapur Forest · From ₹68.7 L', img: '/gallery/agartha/11.webp' },
     { name: 'MODCON SYL Residences', id: 'syl', sub: 'Tukkuguda, ORR Exit-14 · Villaments', img: '/gallery/syl/1776279315359.webp' },
-    { name: 'Dates County by Planet Green', id: 'dates-county', sub: 'Kandukur · From ₹20 L', img: '/gallery/dates-county/hero.jpg' },
+    { name: 'Dates County by Planet Green', id: 'dates-county', sub: 'Kandukur · ₹18,000/sq yd', img: '/gallery/dates-county/temple.jpg' },
   ];
 
   const avatarLetter = (authUser?.displayName?.[0] || authUser?.email?.[0] || authUser?.phoneNumber?.[1] || '?').toUpperCase();
@@ -322,7 +598,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
           {desktopNav.map(item => {
             const NavIcon = item.icon;
             return (
-              <button key={item.id} onClick={() => onModeChange(item.id)}
+              <button key={item.id} onClick={() => item.id === 'blog' ? onBlogClick() : onModeChange(item.id)}
                 className={cn(
                   "flex items-center gap-2 text-[9px] uppercase tracking-[0.45em] font-bold transition-colors duration-200",
                   item.isGold 
@@ -416,7 +692,14 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
                       const Icon = item.icon;
                       return (
                         <button key={item.id}
-                          onClick={() => { onModeChange(item.id); setAccountOpen(false); }}
+                          onClick={() => {
+                            if (item.id === 'blog') {
+                              onBlogClick();
+                            } else {
+                              onModeChange(item.id);
+                            }
+                            setAccountOpen(false);
+                          }}
                           className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-primary/6 text-left transition-all group">
                           <Icon className="w-4 h-4 text-primary/50 group-hover:text-primary transition-colors flex-shrink-0" />
                           <span className="text-[11px] uppercase tracking-[0.35em] font-bold text-on-surface/60 group-hover:text-on-surface transition-colors">{item.name}</span>
@@ -1090,7 +1373,7 @@ const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewslet
         )}>
           {isSyl ? 'Pre-Investor Phase' : isDatesCounty ? 'Now Booking' : 'Open Reservation'}
         </span>
-        <span className="px-3 py-1 text-[7px] uppercase tracking-[0.35em] font-bold rounded-full bg-[#080d06]/70 text-cream/60 backdrop-blur-sm border border-cream/10 w-fit">
+        <span className="px-3 py-1 text-[7px] uppercase tracking-[0.35em] font-bold rounded-full bg-black/75 text-white/90 backdrop-blur-md border border-white/20 shadow-lg w-fit">
           {isDatesCounty ? 'TGT × Planet Green' : 'TGT Channel Partner'}
         </span>
         {isSyl && (
@@ -1232,7 +1515,7 @@ const SanctuaryPopupContent = ({ loc, onViewDetails }: { loc: any; onViewDetails
           >
             {isSyl ? 'Pre-Investor Phase' : isDatesCounty ? 'Now Booking' : 'Open Reservation'}
           </span>
-          <span className="px-2.5 py-0.5 text-[7px] uppercase tracking-[0.3em] font-bold rounded-full bg-[#080d06]/75 text-white/55 border border-white/10 w-fit">
+          <span className="px-2.5 py-0.5 text-[7px] uppercase tracking-[0.3em] font-bold rounded-full bg-black/75 text-white/90 border border-white/20 shadow-lg w-fit">
             {isDatesCounty ? 'TGT × Planet Green' : 'TGT Channel Partner'}
           </span>
           {isSyl && (
@@ -2726,9 +3009,29 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
             {/* Developer credit */}
             {sanctuary.architect && (
               <div className="flex items-center gap-3 p-4 border border-outline/10 rounded-2xl">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <Award className="w-5 h-5 text-primary" />
-                </div>
+                {sanctuary.id === 'dates-county' ? (
+                  <div className="h-10 flex items-center">
+                    <img
+                      src="/gallery/dates-county/logo-planet-green.svg"
+                      alt="Planet Green Infra"
+                      className="h-9 w-auto object-contain"
+                      onError={e => { (e.target as HTMLImageElement).style.display='none'; }}
+                    />
+                  </div>
+                ) : (sanctuary.id === 'agartha' || sanctuary.id === 'syl') ? (
+                  <div className="h-10 flex items-center">
+                    <img
+                      src="/logos/modcon-logo.svg"
+                      alt="MODCON Builders"
+                      className="h-8 w-auto object-contain"
+                      onError={e => { (e.target as HTMLImageElement).style.display='none'; }}
+                    />
+                  </div>
+                ) : (
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <Award className="w-5 h-5 text-primary" />
+                  </div>
+                )}
                 <div>
                   <p className="text-[8px] uppercase tracking-widest text-secondary/50">Developed by</p>
                   <p className="text-sm font-bold text-on-surface">{sanctuary.architect}</p>
@@ -3004,6 +3307,95 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
               </div>
             )}
 
+            {/* Dates County Price breakdown + WhatsApp CTAs */}
+            {sanctuary.id === 'dates-county' && (
+              <div className="space-y-4">
+
+                {/* Price highlight */}
+                <div className="rounded-2xl overflow-hidden border border-[#3a7d44]/30" style={{ background: 'linear-gradient(135deg, rgba(58,125,68,0.07) 0%, rgba(58,125,68,0.03) 100%)' }}>
+                  <div className="px-4 py-2.5 flex items-center gap-2" style={{ background: 'rgba(58,125,68,0.14)' }}>
+                    <Leaf className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+                    <p className="text-[9px] uppercase tracking-[0.4em] font-bold text-primary">Eco-Luxury Villa Plots · Kandukur</p>
+                  </div>
+                  <div className="px-4 pt-4 pb-3 space-y-3">
+                    <div className="rounded-xl bg-primary/10 border border-primary/20 px-3 py-2.5">
+                      <p className="text-[11px] font-semibold text-on-surface leading-snug">
+                        Adjacent to a <span className="text-primary">4,000-acre reserve forest.</span>
+                      </p>
+                      <p className="text-[10px] text-secondary/60 mt-0.5">
+                        300+ acres · 40% open recreational space · RERA approved
+                      </p>
+                    </div>
+                    <div className="flex items-start gap-2.5">
+                      <img src="/gallery/dates-county/logo-planet-green.svg" alt="Planet Green" className="h-7 w-auto mt-0.5 flex-shrink-0" onError={e => { (e.target as HTMLImageElement).style.display='none'; }} />
+                      <p className="text-[9px] text-secondary/50 leading-relaxed">
+                        Developed by <span className="font-semibold text-on-surface">Planet Green Infra</span> · RERA P02400002648 · P02400003813
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Price breakdown */}
+                <p className="text-[9px] uppercase tracking-[0.4em] text-secondary font-bold">
+                  Price Estimate — ₹18,000 / sq yd
+                </p>
+                <div className="rounded-2xl overflow-hidden border border-outline/10">
+                  {[
+                    { label: 'Standard Plot', sqYds: 200 },
+                    { label: 'Popular Plot', sqYds: 300 },
+                    { label: 'Prime Plot', sqYds: 500 },
+                    { label: 'Large Plot', sqYds: 600 },
+                  ].map((row, i) => {
+                    const totalRs = row.sqYds * 18000;
+                    const display = totalRs >= 1e7 ? `₹${(totalRs / 1e7).toFixed(2)} Cr` : `₹${(totalRs / 1e5).toFixed(0)} L`;
+                    const highlight = row.sqYds === 500;
+                    return (
+                      <div key={i} className={cn(
+                        'grid grid-cols-3 px-4 py-3 text-[10px]',
+                        highlight ? 'bg-primary/8 border-l-2 border-primary' : i % 2 === 0 ? 'bg-primary/3' : 'bg-transparent'
+                      )}>
+                        <span className={cn('font-medium', highlight ? 'text-primary font-bold' : 'text-secondary/60')}>
+                          {row.label}{highlight && ' ⭐'}
+                        </span>
+                        <span className="text-center font-bold text-on-surface">{row.sqYds.toLocaleString('en-IN')} sq yds</span>
+                        <span className={cn('text-right font-bold', highlight ? 'text-primary' : 'text-primary')}>{display}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+                <p className="text-[8px] text-secondary/40">Rate: ₹18,000/sq yd · Villa plots from 200 to 600 sq yds · Highlighted: 500 sq yd = ₹90 L</p>
+
+                {/* CTA */}
+                <div className="rounded-2xl border border-primary/20 bg-primary/5 p-5 space-y-3">
+                  <p className="text-xs text-secondary leading-relaxed">
+                    Pricing is as listed. <span className="font-semibold text-on-surface">Site visits available — we'll accompany you and negotiate on your behalf.</span> WhatsApp us to enquire or book a visit.
+                  </p>
+                  <div className="flex flex-col gap-2">
+                    <a
+                      href="https://wa.me/919700144003?text=Hi%2C%20I%27m%20interested%20in%20Dates%20County%20by%20Planet%20Green%20(Kandukur%2C%20Hyderabad).%20Could%20you%20share%20available%20plots%20and%20best%20pricing%3F%20(500%20sq%20yd%20%40%20%E2%82%B918%2C000)"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2.5 w-full py-3.5 rounded-xl text-[10px] uppercase tracking-[0.4em] font-bold text-cream transition-all bg-olive-900 hover:bg-primary"
+                    >
+                      <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current flex-shrink-0">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                        <path d="M12 0C5.373 0 0 5.373 0 12c0 2.128.558 4.121 1.533 5.851L.057 23.882l6.198-1.625A11.953 11.953 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.002-1.37l-.359-.214-3.68.965.981-3.595-.234-.371A9.818 9.818 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/>
+                      </svg>
+                      WhatsApp · Enquire Now
+                    </a>
+                    <a
+                      href="https://wa.me/919700144003?text=Hi%2C%20I%27d%20like%20to%20book%20a%20site%20visit%20for%20Dates%20County%20by%20Planet%20Green%20(Kandukur).%20Please%20share%20available%20slots."
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 w-full py-3.5 border-2 border-olive-900/40 text-olive-900 text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl transition-all hover:bg-olive-900/10"
+                    >
+                      <MapPin className="w-3.5 h-3.5" />
+                      Book Site Visit · WhatsApp
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )}
 
           </div>
         )}
@@ -3786,7 +4178,7 @@ const SanctuaryMapLayout = ({ isVisible, onPropertySelect }: { isVisible?: boole
         [17.135, 78.570], [17.145, 78.595], [17.130, 78.615],
         [17.100, 78.610], [17.090, 78.585], [17.105, 78.565]
       ] as [number, number][],
-      image: "/gallery/dates-county/hero.jpg",
+      image: "/gallery/dates-county/temple.jpg",
       description: "A 300+ acre eco-luxury villa-plot community adjacent to a 4,000-acre reserve forest on Hyderabad's Future City axis."
     },
     { id: "exit-1",  type: 'exit', title: "ORR Exit 1",  location: "Gachibowli",      coords: [17.4218, 78.3412] as [number, number], aqi: 142 },
@@ -4320,6 +4712,192 @@ const Sanctuaries = ({ isSubscribed, onNewsletterClick, isFullPage = false, sanc
               className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             />
             <PropertyDetailOverlay sanctuary={selectedSanctuary} onClose={() => setSelectedSanctuary(null)} isSubscribed={isSubscribed} onNewsletterSignup={onNewsletterClick} />
+          </div>
+        )}
+      </AnimatePresence>
+    </section>
+  );
+};
+
+const Journal = () => {
+  const [selectedPost, setSelectedPost] = useState<JournalPost | null>(null);
+  const [featured, ...secondaryPosts] = JOURNAL_POSTS;
+
+  const buildLongFormBody = (post: JournalPost) => {
+    const firstTakeaway = post.takeaways[0] || 'Better decisions come from better context.';
+    const secondTakeaway = post.takeaways[1] || 'Read the location before you read the brochure.';
+    const thirdTakeaway = post.takeaways[2] || 'The most durable value is usually the least noisy.';
+
+    return [
+      `${post.title} deserves to be read as a working framework rather than a quick opinion. In a market like Hyderabad, where growth is uneven and the quality of a location can change from one road to the next, the difference between a good and a weak decision often lives in the details. The point of this note is to slow the decision down just enough to see the shape of the opportunity clearly: what the site is, what it is not, and why the surrounding context changes the outcome for both end users and investors.`,
+      `${post.body[0]} The practical side of that idea is simple. When a buyer asks whether a place will hold value, the answer rarely comes from a single headline number. It comes from the way the site behaves in real life: how much time it saves, how much noise it absorbs, how much air you breathe, how naturally the neighborhood supports everyday routines, and how easy it is to explain the value to someone else later. That is why we treat location as a bundle of signals rather than a single story.`,
+      `${post.body[1]} In Hyderabad, this matters because the city does not grow in a perfect ring. It grows along corridors, around anchors, and toward infrastructure that reduces friction for people who move often. A good investment location is therefore less about being famous and more about being useful. If a home, plot, or community sits in the path of demand, has access to work, school, airport, or highway connections, and still feels calm enough to be lived in comfortably, it has a stronger chance of sustaining attention over time.`,
+      `${post.body[2]} That is also where discipline matters. Buyers often overpay for marketing language and underweight the parts of the property that are hardest to retrofit later: ambience, access, planning quality, and environmental comfort. Once those elements are gone, they are expensive to recover. Once they are present, they quietly keep working for years. This is why a curated reading of the market is valuable. It helps people separate short-term excitement from long-term livability, which is a better basis for a decision that may be held for many years.`,
+      `For us, the takeaway is not only about ${firstTakeaway.toLowerCase()} It is also about ${secondTakeaway.toLowerCase()} and ${thirdTakeaway.toLowerCase()} Together, these ideas create a checklist that is practical enough for real buyers and sober enough for real capital. If a property cannot survive that checklist, the brochure is not the problem; the property is. If it can survive that checklist, the buyer has a much better chance of ending up with something that feels good to own, easy to explain, and easier to hold with confidence.`,
+      `Viewed this way, ${post.category.toLowerCase()} is not a label. It is a discipline. It asks the buyer to compare alternatives with a sharper lens, to ask what kind of life the property supports, and to think in years rather than in posts. That is the kind of framework we want readers to leave with: not just a reaction to a blog, but a more reliable way to judge a location in the city.`,
+    ];
+  };
+
+  const PostCard: FC<{ post: JournalPost; featuredCard?: boolean }> = ({ post, featuredCard = false }) => (
+    <button
+      type="button"
+      onClick={() => setSelectedPost(post)}
+      className={cn(
+        "group relative overflow-hidden text-left border border-outline/10 bg-surface transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl",
+        featuredCard ? "min-h-[34rem]" : "min-h-[15rem]"
+      )}
+    >
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.14),transparent_42%),linear-gradient(135deg,#1a2410_0%,#2d3a1d_42%,#0f150c_100%)]">
+        <div className="absolute inset-0 opacity-35 mix-blend-screen">
+          <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full">
+            <defs>
+              <linearGradient id="journalGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="rgba(242,244,242,0.16)" />
+                <stop offset="100%" stopColor="rgba(242,244,242,0)" />
+              </linearGradient>
+            </defs>
+            <circle cx="74" cy="26" r="18" fill="url(#journalGlow)" />
+            <circle cx="18" cy="82" r="26" fill="url(#journalGlow)" />
+            <path d="M0 100 L100 0" stroke="rgba(255,255,255,0.08)" strokeWidth="0.8" />
+          </svg>
+        </div>
+      </div>
+
+      <div className="relative z-10 flex h-full flex-col justify-between p-7 md:p-10 text-left text-white">
+        <div className="flex items-center justify-between gap-4">
+          <span className="text-[9px] uppercase tracking-[0.55em] font-bold text-white/55">{post.category}</span>
+          <span className="text-[8px] uppercase tracking-[0.45em] text-white/35">{post.date}</span>
+        </div>
+
+        <div className="mt-auto">
+          <div className={cn("max-w-xl", featuredCard ? "space-y-5" : "space-y-4")}>
+            <h3 className={cn(
+              "font-medium leading-tight",
+              featuredCard ? "text-3xl md:text-5xl" : "text-2xl md:text-3xl"
+            )}>
+              {post.title}
+            </h3>
+            <p className={cn(
+              "text-white/65 leading-relaxed",
+              featuredCard ? "text-base md:text-lg max-w-2xl" : "text-sm md:text-base"
+            )}>
+              {post.excerpt}
+            </p>
+          </div>
+
+          <div className="mt-8 flex items-center gap-5 text-[9px] uppercase tracking-[0.45em] font-bold text-white/45">
+            <span className="flex items-center gap-2">
+              <Clock className="w-3.5 h-3.5" />
+              {post.readTime}
+            </span>
+            <span className="flex items-center gap-2 text-white/75 group-hover:text-white transition-colors">
+              Read post
+              <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+            </span>
+          </div>
+        </div>
+      </div>
+    </button>
+  );
+
+  return (
+    <section id="journal" className="px-6 md:px-24 py-20 bg-surface border-y border-outline/10">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex flex-col lg:flex-row justify-between items-end gap-8 mb-10">
+          <div className="max-w-3xl">
+            <span className="text-primary text-[10px] font-bold uppercase tracking-[0.6em] mb-6 block">The Journal</span>
+            <h2 className="text-6xl md:text-8xl font-medium text-on-surface">
+              Notes from the <span className="italic text-primary">curation desk.</span>
+            </h2>
+            <p className="text-xl md:text-2xl font-light text-secondary leading-relaxed mt-8">
+              Short editorial posts on land, access, scarcity, and the signals we use when evaluating a sanctuary.
+            </p>
+          </div>
+        </div>
+
+        <div className="grid lg:grid-cols-[1.35fr_0.85fr] gap-6">
+          <PostCard post={featured} featuredCard />
+          <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-6">
+            {secondaryPosts.map(post => (
+              <PostCard key={post.id} post={post} />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <AnimatePresence>
+        {selectedPost && (
+          <div className="fixed inset-0 z-[85] overflow-hidden flex items-center justify-center p-4 md:p-8">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedPost(null)}
+              className="absolute inset-0 bg-black/70 backdrop-blur-md"
+            />
+              <motion.div
+                initial={{ opacity: 0, scale: 0.96, y: 14 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.96, y: 14 }}
+                transition={{ duration: 0.35, ease: 'easeOut' }}
+                className="relative w-full max-w-4xl max-h-[88vh] overflow-y-auto bg-surface border border-outline/10 shadow-2xl"
+              >
+              <div className="relative h-64 md:h-96 overflow-hidden bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.16),transparent_42%),linear-gradient(135deg,#1a2410_0%,#2d3a1d_42%,#0f150c_100%)]">
+                <div className="absolute inset-0 opacity-40">
+                  <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full">
+                    <path d="M0 100 C15 74 29 57 44 46 C59 35 74 25 100 0" fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
+                    <path d="M0 78 C24 64 42 53 61 43 C77 34 88 26 100 17" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="0.8" />
+                  </svg>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSelectedPost(null)}
+                  className="absolute top-5 right-5 w-10 h-10 rounded-full bg-black/35 text-white flex items-center justify-center backdrop-blur-md border border-white/10 hover:bg-black/55 transition-colors"
+                  aria-label="Close blog post"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+                <div className="absolute left-6 bottom-6 right-6 text-white">
+                  <p className="text-[9px] uppercase tracking-[0.55em] text-white/55 font-bold">{selectedPost.category}</p>
+                  <h3 className="text-3xl md:text-5xl font-medium mt-4 max-w-3xl">{selectedPost.title}</h3>
+                  <div className="mt-5 flex flex-wrap items-center gap-4 text-[9px] uppercase tracking-[0.45em] font-bold text-white/45">
+                    <span>{selectedPost.date}</span>
+                    <span className="flex items-center gap-2">
+                      <Clock className="w-3.5 h-3.5" />
+                      {selectedPost.readTime}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="px-6 md:px-10 py-8 md:py-10">
+                <p className="text-lg md:text-xl font-light text-secondary leading-relaxed max-w-3xl">
+                  {selectedPost.excerpt}
+                </p>
+
+                <div className="grid md:grid-cols-[1.35fr_0.65fr] gap-10 mt-10">
+                  <div className="space-y-6 text-on-surface/85 leading-relaxed">
+                    {buildLongFormBody(selectedPost).map((paragraph, index) => (
+                      <p key={index} className="text-base md:text-lg font-light">
+                        {paragraph}
+                      </p>
+                    ))}
+                  </div>
+
+                  <aside className="border border-outline/10 bg-surface-container/60 p-6 md:p-8">
+                    <p className="text-[9px] uppercase tracking-[0.55em] text-primary font-bold mb-4">Key takeaways</p>
+                    <ul className="space-y-4">
+                      {selectedPost.takeaways.map(item => (
+                        <li key={item} className="text-sm md:text-base text-secondary leading-relaxed flex gap-3">
+                          <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </aside>
+                </div>
+              </div>
+            </motion.div>
           </div>
         )}
       </AnimatePresence>
@@ -5197,10 +5775,13 @@ const HomeView = ({ isSubscribed, onNewsletterClick, sanctuaries = SANCTUARIES, 
     {/* 3. Properties */}
     <Sanctuaries isSubscribed={isSubscribed} onNewsletterClick={onNewsletterClick} sanctuaries={sanctuaries} />
 
-    {/* 4. Our 4-point checklist */}
+    {/* 4. Blog / journal */}
+    <Journal />
+
+    {/* 5. Our 4-point checklist */}
     <EcosystemPillars />
 
-    {/* 5. Newsletter + footer */}
+    {/* 6. Newsletter + footer */}
     <NewsletterHighlight onSubscribe={onNewsletterClick} />
     <Footer onModeChange={onModeChange} onPropertySelect={onPropertySelect} />
   </div>
@@ -5823,8 +6404,24 @@ const ProfileModal = ({
 // ─── App (main) ──────────────────────────────────────────────────────────────
 
 export default function App() {
-  type ViewMode = 'home' | 'map' | 'list' | 'analytics' | 'syl' | 'membership' | 'preinvestor-gold';
-  const VIEW_ORDER: ViewMode[] = ['home', 'list', 'analytics', 'syl', 'map', 'preinvestor-gold'];
+  type ViewMode = 'home' | 'map' | 'list' | 'analytics' | 'syl' | 'membership' | 'preinvestor-gold' | 'blog';
+  const VIEW_ORDER: ViewMode[] = ['home', 'list', 'analytics', 'syl', 'map', 'preinvestor-gold', 'blog'];
+
+  const getViewModeFromPath = useCallback((pathname: string): ViewMode => {
+    if (pathname === '/blog' || pathname.startsWith('/blog/')) return 'blog';
+    if (pathname === '/map') return 'map';
+    if (pathname === '/list') return 'list';
+    if (pathname === '/analytics') return 'analytics';
+    if (pathname === '/syl') return 'syl';
+    if (pathname === '/membership') return 'membership';
+    if (pathname === '/preinvestor-gold') return 'preinvestor-gold';
+    return 'home';
+  }, []);
+
+  const getPathForView = useCallback((mode: ViewMode) => {
+    if (mode === 'home') return '/';
+    return `/${mode}`;
+  }, []);
 
   const [authUser, setAuthUser]     = useState<User | null>(null);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -5909,6 +6506,7 @@ export default function App() {
       setAuthUser(null);
       setShowAdmin(false);
       setShowAdminPanel(false);
+      window.history.pushState({}, '', '/');
       setViewMode('home');
     } catch (error) {
       console.error('Error signing out:', error);
@@ -5921,7 +6519,7 @@ export default function App() {
   // A logged-in user is always treated as a subscriber - no gates shown
   const effectivelySubscribed = isSubscribed || !!authUser;
   const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
-  const [viewMode, setViewMode] = useState<ViewMode>('home');
+  const [viewMode, setViewMode] = useState<ViewMode>(() => getViewModeFromPath(window.location.pathname));
   const [isDark, setIsDark] = useState(() => {
     return localStorage.getItem('gt_dark') === 'true';
   });
@@ -5931,6 +6529,39 @@ export default function App() {
     localStorage.setItem('gt_dark', String(isDark));
     document.documentElement.classList.toggle('dark', isDark);
   }, [isDark]);
+
+  useEffect(() => {
+    const pathname = window.location.pathname;
+    const route = getViewModeFromPath(pathname);
+    const canonicalPath = route === 'blog' ? '/blog' : route === 'home' ? '/' : getPathForView(route);
+    const canonicalHref = `https://thegreenteam.in${canonicalPath}`;
+
+    const setMeta = (selector: string, attr: 'content' | 'href', value: string) => {
+      const el = document.querySelector(selector) as HTMLMetaElement | HTMLLinkElement | null;
+      if (el) el.setAttribute(attr, value);
+    };
+
+    if (route === 'blog') {
+      document.title = 'Blog | The Green Team | Hyderabad Property Insights';
+      setMeta('meta[name="description"]', 'content', 'Editorial blog posts from The Green Team on Hyderabad locations, returns, AQI, noise pollution, and curated property decisions.');
+      setMeta('meta[property="og:title"]', 'content', 'Blog | The Green Team | Hyderabad Property Insights');
+      setMeta('meta[property="og:description"]', 'content', 'Long-form posts on Hyderabad real estate decisions, environmental quality, and curated property selection.');
+      setMeta('meta[property="og:url"]', 'content', canonicalHref);
+      setMeta('meta[name="twitter:title"]', 'content', 'Blog | The Green Team | Hyderabad Property Insights');
+      setMeta('meta[name="twitter:description"]', 'content', 'Long-form posts on Hyderabad real estate decisions, environmental quality, and curated property selection.');
+    } else {
+      document.title = 'The Green Team | Forest Homes Near Hyderabad | Channel Partner MODCON Agartha';
+      setMeta('meta[name="description"]', 'content', 'We curate forest-adjacent homes near Hyderabad — AQI under 25, 45-min city commute. Channel partners for MODCON Agartha (Narsapur). Plots from ₹64.6L. Villas, apartments & plots verified.');
+      setMeta('meta[property="og:title"]', 'content', 'The Green Team | Forest Homes Near Hyderabad | From ₹64.6L');
+      setMeta('meta[property="og:description"]', 'content', 'Independent channel partners who curate forest-adjacent homes near Hyderabad. AQI 12, 18 dB noise, under 45-min commute. Plots, villas, apartments — verified before we show you.');
+      setMeta('meta[property="og:url"]', 'content', canonicalHref);
+      setMeta('meta[name="twitter:title"]', 'content', 'The Green Team | Forest Homes Near Hyderabad');
+      setMeta('meta[name="twitter:description"]', 'content', 'We curate forest-adjacent homes near Hyderabad — AQI 12, 18 dB noise, 45-min commute. Channel partners for MODCON Agartha.');
+    }
+
+    setMeta('link[rel="canonical"]', 'href', canonicalHref);
+  }, [getPathForView, getViewModeFromPath]);
+
   const [showAdmin, setShowAdmin] = useState(false);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<typeof SANCTUARIES[0] | null>(null);
@@ -6000,6 +6631,7 @@ export default function App() {
 
   const handleViewChange = useCallback((next: ViewMode) => {
     // We always want to load from the top when switching views/menu items
+    window.history.pushState({}, '', getPathForView(next));
     setViewMode(next);
     
     // Reset scroll position to top for the next view
@@ -6012,6 +6644,25 @@ export default function App() {
       }
     }, 0);
   }, []);
+
+  const handleBlogClick = useCallback(() => {
+    window.history.pushState({}, '', '/blog');
+    setViewMode('blog');
+    setTimeout(() => {
+      document.getElementById('journal')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 80);
+  }, []);
+
+  useEffect(() => {
+    const syncFromPath = () => {
+      const next = getViewModeFromPath(window.location.pathname);
+      setViewMode(next);
+    };
+
+    window.addEventListener('popstate', syncFromPath);
+    syncFromPath();
+    return () => window.removeEventListener('popstate', syncFromPath);
+  }, [getViewModeFromPath]);
 
   return (
     <div className={cn("min-h-screen font-sans transition-colors duration-700", isDark ? "dark" : "")}>
@@ -6027,6 +6678,7 @@ export default function App() {
             isSubscribed={effectivelySubscribed}
             onNewsletterClick={() => setIsNewsletterOpen(true)}
             onModeChange={handleViewChange}
+            onBlogClick={handleBlogClick}
             isDark={isDark}
             setIsDark={setIsDark}
             onSignInClick={() => setIsAuthOpen(true)}
@@ -6059,6 +6711,28 @@ export default function App() {
                     if (sanctuary) setSelectedProperty(sanctuary);
                   }}
                 />
+              )}
+
+              {viewMode === 'blog' && (
+                <div className="flex flex-col">
+                  <div className="px-6 md:px-24 pt-14 md:pt-20 pb-8 md:pb-12 border-b border-outline/10 bg-surface">
+                    <div className="max-w-5xl mx-auto">
+                      <span className="text-primary text-[10px] font-bold uppercase tracking-[0.6em] mb-6 block">Blog</span>
+                      <h1 className="text-5xl md:text-8xl font-medium text-on-surface">
+                        Notes from the <span className="italic text-primary">curation desk.</span>
+                      </h1>
+                      <p className="text-xl md:text-2xl font-light text-secondary leading-relaxed mt-8 max-w-3xl">
+                        Long-form writing on Hyderabad locations, return signals, environmental comfort, and how curated properties change the quality of daily life.
+                      </p>
+                    </div>
+                  </div>
+                  <Journal />
+                  <NewsletterHighlight onSubscribe={() => setIsNewsletterOpen(true)} />
+                  <Footer onModeChange={handleViewChange} onPropertySelect={(id) => {
+                    const sanctuary = allSanctuaries.find(s => s.id === id);
+                    if (sanctuary) setSelectedProperty(sanctuary);
+                  }} />
+                </div>
               )}
 
               {viewMode === 'map' && (
