@@ -124,7 +124,7 @@ const SANCTUARIES: Sanctuary[] = [
     pricePerSqYd: 8500,
     valuation: '',
     memberPrice: 'From ₹68.7 L',
-    image: '/gallery/agartha/11.png',
+    image: '/gallery/agartha/11.webp',
     tagline: 'Where the forest becomes home.',
     description: 'MODCON Agartha is a 25-acre regenerative permaculture farm estate on the Narsapur forest boundary, near the RRR. 36 unique farm plots — each pre-planted with 100+ tree varieties, drip irrigation, vegetable beds, and a spiral herbal garden — surround a 36,000 sq ft clubhouse with 5 premium amenities: aquatic pool, kayaking lake, gym, farm-to-table dining, and staycation villas. An on-site Goshala with integrated animal husbandry completes the self-sustaining ecosystem. Winner: Best Sustainable Eco-Friendly Project of the Year 2024.',
     plots: 36,
@@ -177,7 +177,7 @@ const SANCTUARIES: Sanctuary[] = [
     commute: '10 mins to Airport · 30-45 mins to Financial District',
     valuation: '',
     memberPrice: '₹4,499 / SFT',
-    image: '/gallery/syl/1776279315359.png',
+    image: '/gallery/syl/1776279315359.webp',
     tagline: 'A modern address where luxury meets nature.',
     description: 'MODCON SYL Residences is a 4.5-acre biophilic development at Tukkuguda, ORR Exit-14 — offering luxury villaments from 2,500 to 4,500 SFT with large forest-view balconies, natural light, and sunrise views. The 22,000 sq ft clubhouse is a wellness retreat with a chemical-free Natural Bio Pool and Yoga Pavilion. Commercial spaces are also available at exclusive one-time investor prices — contact us for details. Located 10 minutes from the international airport and at the threshold of Hyderabad\'s Fourth City growth corridor.',
     plots: 0,
@@ -200,14 +200,14 @@ const SANCTUARIES: Sanctuary[] = [
       'ORR Exit-14 · 10 Min to Airport',
     ],
     plotImages: [
-      '/gallery/syl/1776279315359.png',
-      '/gallery/syl/1776279320251.png',
-      '/gallery/syl/1776279329483.png',
-      '/gallery/syl/1776279339464.png',
-      '/gallery/syl/1776279343905.png',
-      '/gallery/syl/1776279350036.png',
-      '/gallery/syl/1776279361294.png',
-      '/gallery/syl/1776279377269.png',
+      '/gallery/syl/1776279315359.webp',
+      '/gallery/syl/1776279320251.webp',
+      '/gallery/syl/1776279329483.webp',
+      '/gallery/syl/1776279339464.webp',
+      '/gallery/syl/1776279343905.webp',
+      '/gallery/syl/1776279350036.webp',
+      '/gallery/syl/1776279361294.webp',
+      '/gallery/syl/1776279377269.webp',
     ],
   },
   {
@@ -293,8 +293,8 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
   ];
 
   const sanctuaryItems = [
-    { name: 'MODCON Agartha', id: 'agartha', sub: 'Narsapur Forest · From ₹68.7 L', img: '/gallery/agartha/11.png' },
-    { name: 'MODCON SYL Residences', id: 'syl', sub: 'Tukkuguda, ORR Exit-14 · Villaments', img: '/gallery/syl/1776279315359.png' },
+    { name: 'MODCON Agartha', id: 'agartha', sub: 'Narsapur Forest · From ₹68.7 L', img: '/gallery/agartha/11.webp' },
+    { name: 'MODCON SYL Residences', id: 'syl', sub: 'Tukkuguda, ORR Exit-14 · Villaments', img: '/gallery/syl/1776279315359.webp' },
     { name: 'Dates County by Planet Green', id: 'dates-county', sub: 'Kandukur · From ₹20 L', img: '/gallery/dates-county/hero.jpg' },
   ];
 
@@ -359,7 +359,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
           >
             {authUser ? (
               authUser.photoURL ? (
-                <img src={authUser.photoURL} referrerPolicy="no-referrer" alt="Profile" className="w-9 h-9 object-cover rounded-full" />
+                <img src={authUser.photoURL} referrerPolicy="no-referrer" loading="lazy" decoding="async" alt="Profile" className="w-9 h-9 object-cover rounded-full" />
               ) : (
                 <div className="w-9 h-9 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-sm uppercase select-none">
                   {avatarLetter}
@@ -437,7 +437,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
                         onClick={() => { onPropertySelect(s.id); setAccountOpen(false); }}
                         className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-primary/5 text-left transition-all group">
                         <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0">
-                          <img src={s.img} alt={s.name} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+                          <img src={s.img} alt={s.name} referrerPolicy="no-referrer" loading="lazy" decoding="async" className="w-full h-full object-cover" />
                         </div>
                         <div className="min-w-0">
                           <p className="text-[11px] font-bold text-on-surface truncate group-hover:text-primary transition-colors">{s.name}</p>
@@ -455,7 +455,7 @@ const Navbar = ({ isSubscribed, onNewsletterClick, onModeChange, isDark, setIsDa
                     <div className="flex flex-col gap-2.5">
                       <div className="flex items-center gap-3 px-3 py-3 rounded-xl bg-primary/4">
                         {authUser.photoURL ? (
-                          <img src={authUser.photoURL} referrerPolicy="no-referrer" alt="Profile" className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
+                          <img src={authUser.photoURL} referrerPolicy="no-referrer" loading="lazy" decoding="async" alt="Profile" className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
                         ) : (
                           <div className="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-sm uppercase flex-shrink-0">
                             {avatarLetter}
@@ -577,6 +577,8 @@ const Hero = ({ onModeChange }: { onModeChange: (mode: string) => void }) => {
         <img
           src="/hero-backdrop.jpg"
           alt=""
+          fetchPriority="high"
+          decoding="async"
           className="w-full h-full object-cover object-center"
         />
         {/* Layered gradient — bottom-heavy for text legibility, preserves the forest house glow */}
@@ -1045,6 +1047,8 @@ const SanctuaryCard: FC<{ sanctuary: Sanctuary, isSubscribed: boolean, onNewslet
       <img
         src={sanctuary.image}
         alt={sanctuary.title}
+        loading="lazy"
+        decoding="async"
         className={cn(
           "absolute inset-0 w-full h-full object-cover transition-all duration-700",
           isGated
@@ -1163,7 +1167,7 @@ const SanctuaryPopupContent = ({ loc, onViewDetails }: { loc: any; onViewDetails
       <div className="w-72 overflow-hidden rounded-2xl border border-white/5" style={{ background: 'rgba(13,20,9,0.96)', backdropFilter: 'blur(20px)', boxShadow: '0 24px 48px rgba(0,0,0,0.7)' }}>
         <div className="relative h-28 overflow-hidden">
           {loc.image ? (
-            <img src={loc.image} alt={loc.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+            <img src={loc.image} alt={loc.title} loading="lazy" decoding="async" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-white/[0.03]">
               <MapPin className="w-8 h-8 text-white/10" />
@@ -1207,6 +1211,8 @@ const SanctuaryPopupContent = ({ loc, onViewDetails }: { loc: any; onViewDetails
         <img
           src={heroImage}
           alt={title}
+          loading="lazy"
+          decoding="async"
           className="absolute inset-0 w-full h-full object-cover"
           referrerPolicy="no-referrer"
         />
@@ -1436,6 +1442,8 @@ const PropertyInteractiveLayout: FC<PropertyLayoutConfig & { onClose: () => void
           <img
             src={sitePlanSrc}
             alt={`${projectName} site plan`}
+            loading="lazy"
+            decoding="async"
             className="w-full h-auto md:max-h-full md:w-auto md:max-w-full object-contain"
             onError={(e) => {
               if (sitePlanFallback) (e.target as HTMLImageElement).src = sitePlanFallback;
@@ -1839,7 +1847,7 @@ const AdminDashboard: FC<{
                 <div key={p.id} className="flex gap-4 p-4 border border-outline/10 rounded-2xl bg-surface-container-low/30 hover:border-outline/20 transition-all">
                   {/* Thumbnail */}
                   <div className="w-20 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-outline/10">
-                    {p.image && <img src={p.image} alt={p.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" />}
+                    {p.image && <img src={p.image} alt={p.title} loading="lazy" decoding="async" className="w-full h-full object-cover" referrerPolicy="no-referrer" />}
                   </div>
                   {/* Info */}
                   <div className="flex-1 min-w-0">
@@ -1931,7 +1939,7 @@ const AdminDashboard: FC<{
                   <input id="adm-image" name="image" className={inputCls} placeholder="https://..." value={form.image}
                     onChange={e => set('image', e.target.value)} />
                   {form.image && (
-                    <img src={form.image} alt="preview" referrerPolicy="no-referrer"
+                    <img src={form.image} alt="preview" loading="lazy" decoding="async" referrerPolicy="no-referrer"
                       className="mt-2 w-full h-28 object-cover rounded-xl border border-outline/10" />
                   )}
                 </div>
@@ -2147,7 +2155,7 @@ const AdminDashboard: FC<{
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-3">
                       {u.photoURL
-                        ? <img src={u.photoURL} referrerPolicy="no-referrer" alt="" className="w-9 h-9 rounded-full object-cover flex-shrink-0" />
+                        ? <img src={u.photoURL} referrerPolicy="no-referrer" loading="lazy" decoding="async" alt={u.displayName || u.email || 'User avatar'} className="w-9 h-9 rounded-full object-cover flex-shrink-0" />
                         : <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 text-primary font-bold text-sm">
                             {(u.displayName?.[0] || u.email?.[0] || '?').toUpperCase()}
                           </div>
@@ -2481,7 +2489,7 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
                 {mapMode === 'plots' && plotDots && (
                   <>
                     <div className="relative">
-                      <img src={sanctuary.sitePlanSrc} alt="Site plan"
+                      <img src={sanctuary.sitePlanSrc} alt="Site plan" loading="lazy" decoding="async"
                         className="w-full h-auto object-contain" referrerPolicy="no-referrer" />
                       <div className="absolute top-2 left-2 right-2 flex items-center gap-2 flex-wrap">
                         <span className="bg-black/60 backdrop-blur-sm text-[7px] uppercase tracking-widest font-bold text-white/70 px-2 py-1 rounded-full">
@@ -2602,7 +2610,7 @@ const PropertyDetailOverlay = ({ sanctuary, onClose, isSubscribed = false, onNew
                 {mapMode === 'features' && hotspots && (
                   <>
                     <div className="relative">
-                      <img src={sanctuary.sitePlanSrc} alt="Site plan"
+                      <img src={sanctuary.sitePlanSrc} alt="Site plan" loading="lazy" decoding="async"
                         className="w-full h-auto object-contain" referrerPolicy="no-referrer" />
                       {hotspots.map(h => {
                         const isActive = activeSpot?.id === h.id;
@@ -3746,7 +3754,7 @@ const SanctuaryMapLayout = ({ isVisible, onPropertySelect }: { isVisible?: boole
         [17.76, 78.25], [17.78, 78.27], [17.77, 78.31], 
         [17.73, 78.32], [17.71, 78.29], [17.72, 78.26]
       ] as [number, number][],
-      image: "/gallery/agartha/11.png",
+      image: "/gallery/agartha/11.webp",
       description: "A forest-peripheral sanctuary nestled within the dense Narsapur reserve forest canopy."
     },
     {
@@ -3762,7 +3770,7 @@ const SanctuaryMapLayout = ({ isVisible, onPropertySelect }: { isVisible?: boole
         [17.26, 78.46], [17.27, 78.49], [17.25, 78.51], 
         [17.22, 78.50], [17.21, 78.47], [17.23, 78.45]
       ] as [number, number][],
-      image: "/gallery/syl/1776279315359.png",
+      image: "/gallery/syl/1776279315359.webp",
       description: "Vertical villaments strategically positioned near the protected green belts of the Future City."
     },
     {
@@ -4142,7 +4150,7 @@ const SanctuaryMapLayout = ({ isVisible, onPropertySelect }: { isVisible?: boole
                               <div style="position:relative;width:62px;height:62px;border-radius:50%;padding:3px;background:linear-gradient(135deg,rgba(${accent},0.9),rgba(${accent},0.25));box-shadow:0 0 0 6px rgba(${accent},0.08),0 18px 36px rgba(0,0,0,0.6);">
                                 <div style="position:absolute;inset:-6px;border-radius:50%;background:rgba(${accent},0.18);animation:tgt-pulse 2.4s ease-in-out infinite;z-index:-1;"></div>
                                 <div style="width:100%;height:100%;border-radius:50%;background:#0c1208;overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative;">
-                                  ${thumb ? `<img src="${thumb}" alt="${loc.title}" style="width:100%;height:100%;object-fit:cover;" referrerpolicy="no-referrer" />` : ''}
+                                  ${thumb ? `<img src="${thumb}" alt="${loc.title}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;" referrerpolicy="no-referrer" />` : ''}
                                   <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.55),transparent 55%);"></div>
                                   <span style="position:absolute;bottom:4px;left:0;right:0;text-align:center;font-size:8px;font-weight:800;letter-spacing:0.18em;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,0.8);">${label}</span>
                                 </div>
@@ -5446,9 +5454,11 @@ const AuthModal = ({
           >
             {/* Left: Image (Hidden on mobile) */}
             <div className="hidden md:block md:w-1/2 relative overflow-hidden">
-              <img 
-                src="https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&q=80&w=1200" 
-                alt="Sanctuary" 
+              <img
+                src="https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&q=80&w=1200"
+                alt="Sanctuary"
+                loading="lazy"
+                decoding="async"
                 className="absolute inset-0 w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-olive-900/40 backdrop-blur-[2px]" />
@@ -5749,7 +5759,7 @@ const ProfileModal = ({
             <div className="flex items-center justify-between px-8 pt-8 pb-4">
               <div className="flex items-center gap-3">
                 {user.photoURL
-                  ? <img src={user.photoURL} referrerPolicy="no-referrer" alt="You" className="w-11 h-11 rounded-full object-cover ring-2 ring-primary/20" />
+                  ? <img src={user.photoURL} referrerPolicy="no-referrer" loading="lazy" decoding="async" alt="You" className="w-11 h-11 rounded-full object-cover ring-2 ring-primary/20" />
                   : <div className="w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-lg">
                       {(user.displayName?.[0] || user.email?.[0] || '?').toUpperCase()}
                     </div>

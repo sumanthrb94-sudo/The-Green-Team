@@ -7,3 +7,6 @@ coverage/
 .env*
 !.env.example
 *.psd
+
+# Internal docs (security audits, deploy notes) — not committed
+docs/internal/
