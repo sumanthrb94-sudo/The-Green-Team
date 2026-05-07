@@ -5801,6 +5801,9 @@ const friendlyAuthError = (code: string) => {
     'auth/popup-blocked':             'Popup blocked by browser. Please allow popups for this site.',
     'auth/too-many-requests':         'Too many attempts. Try again later.',
     'auth/network-request-failed':    'Network error. Check your connection.',
+    'auth/unauthorized-domain':       'This domain is not authorized for sign-in. Contact support.',
+    'auth/operation-not-supported-in-this-environment': 'Sign-in not supported in this browser. Open in Chrome or Safari.',
+    'auth/web-storage-unsupported':   'Enable cookies / site data for this site, then try again.',
   };
   return map[code] || 'Something went wrong. Please try again.';
 };
@@ -5936,27 +5939,43 @@ const AuthModal = ({
     setError(''); setLoading('google');
     try {
       if (!auth) throw new Error('Auth not initialized');
-      
-      // Detect mobile device to choose reliable auth method
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      
-      if (isMobile) {
-        // Redirect is much more reliable on mobile Safari and embedded browsers
-        await signInWithRedirect(auth, googleProvider);
-      } else {
+
+      const ua = navigator.userAgent;
+      // In-app browsers (Instagram, Facebook, LinkedIn, TikTok, WeChat) block OAuth.
+      const isInAppBrowser = /Instagram|FBAN|FBAV|LinkedInApp|TikTok|MicroMessenger|Line\//i.test(ua);
+      if (isInAppBrowser) {
+        setError('Please open this page in your browser (Chrome / Safari) to sign in with Google.');
+        setLoading(null);
+        return;
+      }
+
+      // Popup works reliably on modern mobile browsers (Chrome/Safari 16+).
+      // We fall back to redirect only if the popup is explicitly blocked.
+      try {
         const { user, operationType } = await signInWithPopup(auth, googleProvider);
         const isNew = operationType === 'signIn' && !user.metadata.creationTime
           ? false
           : user.metadata.creationTime === user.metadata.lastSignInTime;
         onSuccess(user, isNew);
         onClose();
+      } catch (popupErr: any) {
+        const code = popupErr?.code || '';
+        // Popup blocked or closed by browser — fall back to full-page redirect.
+        if (code === 'auth/popup-blocked' || code === 'auth/operation-not-supported-in-this-environment') {
+          await signInWithRedirect(auth, googleProvider);
+          return; // Page will navigate; getRedirectResult handles the return.
+        }
+        // User dismissed the popup — bail silently.
+        if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') {
+          setLoading(null);
+          return;
+        }
+        throw popupErr;
       }
     } catch (err: any) {
       setError(friendlyAuthError(err.code));
     } finally {
-      // Don't set loading null if we are redirecting
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      if (!isMobile) setLoading(null);
+      setLoading(null);
     }
   };
 
