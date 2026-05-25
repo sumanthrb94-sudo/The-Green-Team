@@ -6,10 +6,15 @@ Sub-brand: **The Green Team** — independent forest-real-estate curator, Hydera
 Parent system: **Brand Mint Studios** (`AI-VIDEO-GENERATION-BRIEF.md`).
 
 ## Output spec
-- **1080 × 1920 · 60fps · H.264 · CRF 18** (MP4, faststart, AAC stereo)
-- **120 BPM canonical**, parameterizable via `--bpm`
-- Voiceless — music + on-screen type only (per brief Section 11)
-- Each episode renders to ~2.4 MB (well under the 3 MB Reels comfort limit)
+- **1080 × 1920 · 60fps · H.264 · CRF 22** (MP4, faststart)
+- **120 BPM source grid**, slowed **15% at playback** so on-screen copy is
+  easier to read (final playback ≈ 17.8 / 18.4 / 17.8 s for EP01/EP02/EP03)
+- **Silent** — voice-over and music are dropped on top of the silent MP4 in
+  CapCut / Premiere. The click track is no longer muxed by default.
+- **No beat-boundary white flash** — removed for photosensitivity safety and
+  general visual restraint. Retention is preserved by camera shake on
+  impact beats, hand-drawn arrows + circles, stat-chip slam-ins, Ken Burns
+  photo zooms, stroked headlines, and velocity escalation.
 
 ## Files
 

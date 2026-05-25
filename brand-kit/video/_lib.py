@@ -132,11 +132,14 @@ def shake_offset(t: float, beats: list[Beat], window_s: float = 0.08,
 
 
 def flash_alpha(t: float, beats: list[Beat], window_s: float = 0.05) -> float:
-    """White-flash overlay alpha — 1-2 frames of pure white at every beat boundary."""
-    for b in beats:
-        dt = t - b.t
-        if 0.0 <= dt <= window_s:
-            return 1.0 - (dt / window_s)
+    """White-flash overlay alpha.
+
+    DISABLED — the brief's "white flash at every beat boundary" mechanic was
+    visually jarring (2 flashes/sec at 120 BPM) and a photosensitivity risk.
+    Retention is preserved by the other v21-beast mechanics (camera shake on
+    impact beats, hand-drawn arrows + circles, stat-chip slam-ins, Ken Burns
+    photo zooms, stroked headlines, velocity escalation).
+    """
     return 0.0
 
 
@@ -468,11 +471,19 @@ class RenderSpec:
 
 
 def render_video(spec: RenderSpec, frame_fn: Callable[[float, float], str],
-                 impact_beats: Iterable[int] = ()) -> None:
-    """Render all frames + audio + mux.
+                 impact_beats: Iterable[int] = (),
+                 slow: float = 1.15,
+                 with_audio: bool = False) -> None:
+    """Render all frames + mux.
 
     frame_fn(t_norm, t_sec) -> body SVG (without the <svg> wrapper).
     impact_beats: indices of beats that trigger camera shake.
+    slow: time-stretch factor applied at mux (1.15 = 15% slower playback, easier
+          for the viewer to read on-screen copy). 1.0 = no stretch.
+    with_audio: if True, also synth the 120 BPM click track and mux a second MP4
+                with it. Default False — the brand reels are voiceless and the
+                operator drops their own track (music or VO) on the silent video
+                in post.
     """
     spec.frames_dir.mkdir(parents=True, exist_ok=True)
     beats = beat_grid(spec.bpm, spec.length_s)
@@ -481,7 +492,8 @@ def render_video(spec: RenderSpec, frame_fn: Callable[[float, float], str],
         b.is_impact = i in impact_set
 
     print(f"[render] {spec.slug} — {spec.total_frames} frames @ {spec.fps}fps "
-          f"({spec.length_s}s, {spec.bpm} BPM, {len(beats)} beats)")
+          f"({spec.length_s}s @ {spec.bpm} BPM source · "
+          f"playback {spec.length_s * slow:.1f}s @ {slow:.2f}x)")
 
     for i in range(spec.total_frames):
         t_sec = i / spec.fps
@@ -498,8 +510,9 @@ def render_video(spec: RenderSpec, frame_fn: Callable[[float, float], str],
             print(f"  frame {i}/{spec.total_frames}")
 
     print(f"[render] frames done -> {spec.frames_dir}")
-    render_audio(spec)
-    mux(spec)
+    if with_audio:
+        render_audio(spec)
+    mux(spec, slow=slow, with_audio=with_audio)
 
 
 def render_audio(spec: RenderSpec) -> None:
@@ -550,14 +563,26 @@ def render_audio(spec: RenderSpec) -> None:
     print(f"[audio] {spec.audio_path}")
 
 
-def mux(spec: RenderSpec, crf: int = 22) -> None:
-    """ffmpeg H.264 + AAC mux. CRF 22 keeps files comfortably under the
-    Reels upload limit (<3 MB) even with full-bleed photographic content,
-    while staying visually indistinguishable from CRF 18 on a phone.
+def mux(spec: RenderSpec, crf: int = 22, slow: float = 1.15,
+        with_audio: bool = False) -> None:
+    """ffmpeg H.264 mux. Silent by default; voice-over goes on top in post.
+
+    - crf 22 keeps file size under Reels comfort even with photo content
+    - slow > 1.0 applies setpts time-stretch at the video filter stage
+      (1.15 = 15% slower playback so on-screen copy is easier to read)
+    - with_audio=True also writes a -120bpm.mp4 with the click track muxed in
+      (atempo-stretched to match the video slowdown)
     """
     frames_glob = str(spec.frames_dir / "f%05d.png")
+    vf = f"setpts=PTS*{slow:.3f}" if abs(slow - 1.0) > 1e-3 else None
+
     cmd_silent = [
         "ffmpeg", "-y", "-framerate", str(spec.fps), "-i", frames_glob,
+    ]
+    if vf:
+        cmd_silent += ["-vf", vf]
+    cmd_silent += [
+        "-an",
         "-c:v", "libx264", "-preset", "slow", "-crf", str(crf),
         "-pix_fmt", "yuv420p", "-movflags", "+faststart",
         str(spec.silent_video_path),
@@ -565,9 +590,19 @@ def mux(spec: RenderSpec, crf: int = 22) -> None:
     subprocess.run(cmd_silent, check=True, capture_output=True)
     print(f"[mux] silent -> {spec.silent_video_path}")
 
+    if not with_audio:
+        return
+
+    audio_tempo = 1.0 / slow if abs(slow - 1.0) > 1e-3 else None
     cmd_final = [
         "ffmpeg", "-y", "-framerate", str(spec.fps), "-i", frames_glob,
         "-i", str(spec.audio_path),
+    ]
+    if vf:
+        cmd_final += ["-vf", vf]
+    if audio_tempo:
+        cmd_final += ["-af", f"atempo={audio_tempo:.4f}"]
+    cmd_final += [
         "-c:v", "libx264", "-preset", "slow", "-crf", str(crf),
         "-pix_fmt", "yuv420p",
         "-c:a", "aac", "-b:a", "192k",
