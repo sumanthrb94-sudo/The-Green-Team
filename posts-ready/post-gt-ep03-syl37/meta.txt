@@ -1,7 +1,7 @@
-EPISODE     gt-ep03-syl37
+EPISODE     gt-ep03-syl37  (v2 — photo-led, real SYL Residences photography)
 PILLAR      Editorial · Pre-Investor Window (SYL Residences)
-FORMAT      Spotlight Reel (Brand Mint v21-beast)
-LENGTH      15.5s @ 120 BPM · 1080×1920 · 60fps · H.264
+FORMAT      Spotlight Reel (Brand Mint v21-beast, in GT brand language)
+LENGTH      15.5s @ 120 BPM · 1080×1920 · 60fps · H.264 CRF 24
 FILE        out/brandmint-gt-ep03-syl37-120bpm.mp4
 KEYWORD     SYL
 DM ASSET    Next 18-months pre-investor brief (gated by newsletter signup)
@@ -13,5 +13,11 @@ PROVENANCE  thegreenteam.in site copy
 NOTE        +37% is sourced from site copy. If this number needs an
             independent reference, swap the hook for "Pre-investor
             phase = 20-30% below eventual market rate" before posting.
+ASSETS      public/agartha-render.jpg                         (HOOK aerial)
+            public/gallery/syl/1776279320251.webp             (THE NEXT, wide)
+            public/gallery/syl/1776279315359.webp             (STATS, interior)
+            brand-kit/logo/the-green-team-monogram.svg        (CTA)
+DESIGN      Fonts: Inter Display + Inter + Caladea italic
+            Colors: olive #2d3a1d / cream / sage / gold / terracotta
 RENDER      python3 brand-kit/video/build_gt_ep03_syl37.py [--bpm 120]
 AUDIO       Silent video + 120 BPM click track

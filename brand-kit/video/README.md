@@ -58,14 +58,38 @@ python3 brand-kit/video/build_gt_ep01_aqi.py --bpm 128 --length 14.5
 ```
 Adjust `--length` to keep ~32 beats total (`length_s = 32 * 60 / bpm`).
 
-## Fonts
+## Design system
 
-Canonical: **Plus Jakarta Sans ExtraBold + Bold** (display/body), **JetBrains Mono Bold** (kickers, stats).
+Lifted directly from `src/index.css`:
 
-If those aren't installed in `/usr/local/share/fonts/brandmint/`, the renderer
-falls back to **DejaVu Sans Bold + DejaVu Sans Mono Bold** (system bold sans +
-mono). Never falls back to a serif. For production, drop the canonical
-families in and run `fc-cache -f`.
+**Colors (Green Team tokens):**
+- `GT_OLIVE_800` `#2d3a1d` — primary olive (brand)
+- `GT_OLIVE_900` `#1a2410` — deep olive (forest section, reveal stage)
+- `GT_CREAM` `#faf9f6` — paper / light background
+- `GT_SAGE` `#a3b18a` — accent (dark theme primary)
+- `GT_GOLD` / `GT_GOLD_LIGHT` `#b8860b` / `#c8a951` — premium accents
+- `GT_TERRACOTTA` `#8a3d36` — warm contrast / annotations
+
+**Fonts:**
+- Display: **Inter Display** (≈ site's Manrope, fallback `Inter`, then `DejaVu Sans`)
+- Body: **Inter**
+- Serif (editorial pull quotes): **Caladea** (≈ site's Cormorant Garamond)
+- Mono: **JetBrains Mono** → `DejaVu Sans Mono`
+
+Install on the render host:
+```bash
+apt-get install -y fonts-inter fonts-crosextra-caladea
+fc-cache -f
+```
+
+**Photography (lifted from `public/`):**
+- `public/hero-backdrop.jpg` — forest backdrop (HOOK)
+- `public/agartha-render.jpg` — aerial render (AWARD)
+- `public/gallery/agartha/11.webp` — biophilic house (STATS)
+- `public/gallery/agartha/22.webp` — villa render (WINNER REVEAL)
+- `public/gallery/syl/1776279315359.webp` + `1776279320251.webp` — SYL biophilic interiors
+- `public/gallery/dates-county/temple.jpg` + `forest.jpg` — Dates County
+- `brand-kit/logo/the-green-team-monogram.svg` — sub-brand monogram (CTA)
 
 ## Brand Mint canon — hard constraints honored
 

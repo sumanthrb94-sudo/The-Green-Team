@@ -1,21 +1,24 @@
 """
 Brand Mint Studios — Green Team sub-brand video render library.
 
-Implements the v21-empires-beast system per AI-VIDEO-GENERATION-BRIEF.md:
-  - 1080x1920 @ 60fps, 15-17s @ 120 BPM (canonical)
-  - MrBeast retention mechanics (flashes, shake, arrows, circles, fast cuts)
-  - Brand Mint editorial palette (mints + ink + paper)
-  - Voiceless. Music + on-screen type only.
+Implements the v21-empires-beast retention system, but rendered in the
+sub-brand's own design system (not flat Brand Mint canon):
+
+  - Color tokens lifted from src/index.css (olive #2d3a1d primary,
+    cream #faf9f6, gold #b8860b, sage #a3b18a, terracotta #8a3d36)
+  - Fonts lifted from src/index.css (Inter / Inter Display for display,
+    Caladea for serif editorial pull quotes)
+  - Real product photography from public/ as the visual backbone
+    (agartha-render.jpg, agartha-official-render.png, gallery webps for
+    Agartha / SYL / Dates County)
 
 Output is per-frame SVG -> cairosvg PNG -> ffmpeg H.264 mux.
-
-Fonts: Plus Jakarta Sans ExtraBold / Bold, JetBrains Mono Bold.
-  If the canonical fonts are not present on the render host, the renderer
-  falls back to DejaVu Sans / DejaVu Sans Mono (system bold sans + mono).
-  NEVER falls back to a serif family.
+1080x1920 @ 60fps · ~15-17s @ 120 BPM · voiceless.
 """
 from __future__ import annotations
 
+import base64
+import io
 import math
 import os
 import random
@@ -27,6 +30,7 @@ from typing import Callable, Iterable
 
 import cairosvg
 import numpy as np
+from PIL import Image
 
 # ─── Canvas ──────────────────────────────────────────────────────────────
 W = 1080
@@ -38,20 +42,37 @@ SAFE_BOTTOM = 480
 CX = W // 2
 CY = H // 2
 
-# ─── Brand Mint palette (hard-coded canon) ───────────────────────────────
-BEAST_BLACK = "#070A09"
-BEAST_WHITE = "#F5F1EA"
-BEAST_YELLOW = "#7CF6C8"   # mint-2 — accent
-BEAST_RED = "#10B981"      # mint-3 — primary brand mint
-BEAST_GREEN = "#047857"    # mint-4 — deep accent, winner reveal
+# ─── Green Team palette (lifted from src/index.css :root) ────────────────
+GT_OLIVE_900   = "#1a2410"  # deep olive — forest-section bg, reveal stage
+GT_OLIVE_800   = "#2d3a1d"  # PRIMARY — olive, used for buttons and accents
+GT_OLIVE_700   = "#4a5c3d"  # mid olive — secondary accent
+GT_SAGE        = "#a3b18a"  # sage — dark-mode primary, soft accent
+GT_CREAM       = "#faf9f6"  # cream — light-mode background, paper
+GT_CASHEW      = "#f2f4f2"  # cashew — surface container
+GT_CHARCOAL    = "#1a1c1a"  # ink — on-surface text
+GT_GOLD        = "#b8860b"  # gold — pricing + premium accent
+GT_GOLD_LIGHT  = "#c8a951"  # softer gold (used inline in App.tsx)
+GT_TERRACOTTA  = "#8a3d36"  # tertiary — warm contrast, alert
+GT_TERRACOTTA_LIGHT = "#f5b8b0"  # soft terracotta (dark theme)
 
-# ─── Fonts ───────────────────────────────────────────────────────────────
-# cairosvg uses the system font resolver. We declare canonical first; if
-# the system lacks them, fontconfig substitutes a sans family (never serif
-# because we never name a serif). DejaVu is the documented fallback.
-FONT_DISPLAY = "'Plus Jakarta Sans', 'DejaVu Sans', sans-serif"
-FONT_BODY = "'Plus Jakarta Sans', 'DejaVu Sans', sans-serif"
-FONT_MONO = "'JetBrains Mono', 'DejaVu Sans Mono', monospace"
+# ─── Legacy aliases ─────────────────────────────────────────────────────
+# Kept so any script written against the old v1 names still works.
+# Updated to point at Green Team equivalents (no more raw mint hex).
+BEAST_BLACK   = GT_CHARCOAL
+BEAST_WHITE   = GT_CREAM
+BEAST_YELLOW  = GT_SAGE          # was mint-2; now sage (still light accent)
+BEAST_RED     = GT_TERRACOTTA    # was mint-3; now warm terracotta (annotation)
+BEAST_GREEN   = GT_OLIVE_800     # was mint-4; now primary olive
+
+# ─── Fonts (lifted from src/index.css) ───────────────────────────────────
+# Site uses: Inter (body, var(--font-sans)) and Manrope (display, var(--font-headline)).
+# Manrope isn't packaged in most Linux distros — fall back to Inter Display
+# (humanist sans, closest available substitute).
+# Serif: Cormorant Garamond on the site → Caladea here (Cambria-metric serif).
+FONT_DISPLAY = "'Inter Display', 'Manrope', 'Inter', 'DejaVu Sans', sans-serif"
+FONT_BODY    = "'Inter', 'DejaVu Sans', sans-serif"
+FONT_SERIF   = "'Caladea', 'Cormorant Garamond', 'Liberation Serif', serif"
+FONT_MONO    = "'JetBrains Mono', 'DejaVu Sans Mono', monospace"
 
 
 # ─── Easing ──────────────────────────────────────────────────────────────
@@ -263,13 +284,131 @@ def kicker(text: str, y: float = SAFE_TOP + 20, color: str = BEAST_BLACK) -> str
 def embed_logo(svg_path: Path, x: float, y: float, size: float,
                opacity: float = 1.0) -> str:
     """Embed canonical brand monogram via <image> with base64 data URI."""
-    import base64
     data = svg_path.read_bytes()
     b64 = base64.b64encode(data).decode("ascii")
     return (
         f'<image x="{x:.1f}" y="{y:.1f}" width="{size}" height="{size}" '
         f'opacity="{opacity:.3f}" '
         f'href="data:image/svg+xml;base64,{b64}"/>'
+    )
+
+
+# ─── Photo embed (real product photography) ─────────────────────────────
+# We cache the base64-encoded version of each image — embedding the same
+# 200KB photo 900 times per render is fine if the encode happens once.
+_IMG_CACHE: dict[str, str] = {}
+
+
+def _encode_image(path: str | Path, max_w: int = 1600, quality: int = 82) -> str:
+    """Pre-resize then base64-encode an image. Cached by absolute path.
+
+    Returns: data URI string (data:image/jpeg;base64,...).
+    """
+    key = str(Path(path).resolve())
+    if key in _IMG_CACHE:
+        return _IMG_CACHE[key]
+
+    im = Image.open(key)
+    if im.mode in ("RGBA", "P"):
+        bg = Image.new("RGB", im.size, (250, 249, 246))  # cream
+        bg.paste(im, mask=im.convert("RGBA").split()[-1] if im.mode == "RGBA" else None)
+        im = bg
+    elif im.mode != "RGB":
+        im = im.convert("RGB")
+
+    if im.size[0] > max_w:
+        h = int(im.size[1] * max_w / im.size[0])
+        im = im.resize((max_w, h), Image.LANCZOS)
+
+    buf = io.BytesIO()
+    im.save(buf, format="JPEG", quality=quality, optimize=True)
+    b64 = base64.b64encode(buf.getvalue()).decode("ascii")
+    uri = f"data:image/jpeg;base64,{b64}"
+    _IMG_CACHE[key] = uri
+    return uri
+
+
+def embed_image(path: str | Path, x: float, y: float, w: float, h: float,
+                opacity: float = 1.0, preserve_aspect: str = "xMidYMid slice") -> str:
+    """Place a photo at (x,y) sized w×h. Default preserveAspectRatio='slice'
+    (crop to fill, like CSS object-fit: cover)."""
+    uri = _encode_image(path)
+    return (
+        f'<image x="{x:.1f}" y="{y:.1f}" width="{w:.1f}" height="{h:.1f}" '
+        f'preserveAspectRatio="{preserve_aspect}" '
+        f'opacity="{opacity:.3f}" href="{uri}"/>'
+    )
+
+
+def hero_layer(path: str | Path, t_local: float, duration: float, *,
+               scale_from: float = 1.0, scale_to: float = 1.12,
+               pan_x: float = 0, pan_y: float = -40,
+               opacity: float = 1.0) -> str:
+    """Full-canvas hero photo with slow Ken Burns zoom + pan.
+
+    t_local: time since the hero entered the frame (s).
+    duration: how long this hero stays on (s).
+    """
+    u = clamp(t_local / max(duration, 1e-6))
+    sc = scale_from + (scale_to - scale_from) * ease_in_out_cubic(u)
+    px = pan_x * u
+    py = pan_y * u
+    # Render image scaled around the center of the canvas.
+    # Image extends beyond W/H by the scale factor to avoid edge gaps.
+    extra_w = W * (sc - 1) / 2
+    extra_h = H * (sc - 1) / 2
+    img_x = -extra_w + px
+    img_y = -extra_h + py
+    img_w = W * sc
+    img_h = H * sc
+    return embed_image(path, img_x, img_y, img_w, img_h, opacity=opacity)
+
+
+def gradient_overlay(stops: list[tuple[float, str, float]],
+                     orient: str = "vertical", grad_id: str = "g") -> str:
+    """Linear gradient overlay over the full canvas.
+
+    stops: list of (offset, color, alpha) tuples, e.g.
+           [(0.0, "#1a2410", 0.0), (0.6, "#1a2410", 0.6), (1.0, "#1a2410", 0.95)]
+    orient: 'vertical' (top→bottom) or 'horizontal' (left→right).
+    """
+    if orient == "vertical":
+        attrs = 'x1="0" y1="0" x2="0" y2="1"'
+    else:
+        attrs = 'x1="0" y1="0" x2="1" y2="0"'
+    stop_svg = "".join(
+        f'<stop offset="{o:.3f}" stop-color="{c}" stop-opacity="{a:.3f}"/>'
+        for (o, c, a) in stops
+    )
+    return (
+        f'<defs><linearGradient id="{grad_id}" {attrs}>{stop_svg}</linearGradient></defs>'
+        f'<rect x="0" y="0" width="{W}" height="{H}" fill="url(#{grad_id})"/>'
+    )
+
+
+def cinematic_bars(alpha: float = 1.0, h: int = 140) -> str:
+    """Top + bottom letterbox bars — pulls the eye to the middle band.
+    Editorial cinematography accent. Use sparingly.
+    """
+    return (
+        f'<rect x="0" y="0" width="{W}" height="{h}" fill="{GT_OLIVE_900}" opacity="{alpha:.3f}"/>'
+        f'<rect x="0" y="{H-h}" width="{W}" height="{h}" fill="{GT_OLIVE_900}" opacity="{alpha:.3f}"/>'
+    )
+
+
+def serif_pullquote(text: str, x: float, y: float, size: float = 56,
+                    color: str = None, italic: bool = True) -> str:
+    """Editorial Caladea italic pull quote (substitute for Cormorant Garamond).
+
+    Used for the brand's tonal serif accents — never for retention text.
+    """
+    style = 'font-style="italic"' if italic else ""
+    fill = color or GT_CREAM
+    return (
+        f'<text x="{x}" y="{y}" text-anchor="middle" '
+        f'font-family="{FONT_SERIF}" font-weight="400" {style} '
+        f'font-size="{size}" fill="{fill}" letter-spacing="-0.5">'
+        f'{escape(text)}</text>'
     )
 
 
@@ -411,12 +550,15 @@ def render_audio(spec: RenderSpec) -> None:
     print(f"[audio] {spec.audio_path}")
 
 
-def mux(spec: RenderSpec) -> None:
-    """ffmpeg H.264 + AAC mux per brief Section 8."""
+def mux(spec: RenderSpec, crf: int = 22) -> None:
+    """ffmpeg H.264 + AAC mux. CRF 22 keeps files comfortably under the
+    Reels upload limit (<3 MB) even with full-bleed photographic content,
+    while staying visually indistinguishable from CRF 18 on a phone.
+    """
     frames_glob = str(spec.frames_dir / "f%05d.png")
     cmd_silent = [
         "ffmpeg", "-y", "-framerate", str(spec.fps), "-i", frames_glob,
-        "-c:v", "libx264", "-preset", "slow", "-crf", "18",
+        "-c:v", "libx264", "-preset", "slow", "-crf", str(crf),
         "-pix_fmt", "yuv420p", "-movflags", "+faststart",
         str(spec.silent_video_path),
     ]
@@ -426,7 +568,7 @@ def mux(spec: RenderSpec) -> None:
     cmd_final = [
         "ffmpeg", "-y", "-framerate", str(spec.fps), "-i", frames_glob,
         "-i", str(spec.audio_path),
-        "-c:v", "libx264", "-preset", "slow", "-crf", "18",
+        "-c:v", "libx264", "-preset", "slow", "-crf", str(crf),
         "-pix_fmt", "yuv420p",
         "-c:a", "aac", "-b:a", "192k",
         "-movflags", "+faststart", "-shortest",
