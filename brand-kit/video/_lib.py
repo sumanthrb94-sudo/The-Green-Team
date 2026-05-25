@@ -37,7 +37,7 @@ W = 1080
 H = 1920
 FPS = 60
 SAFE_TEXT_W = 960   # 60px left/right margin
-SAFE_TOP = 240
+SAFE_TOP = 270      # Meta March 2026 unified safe zone: top 14% reserved
 SAFE_BOTTOM = 480
 CX = W // 2
 CY = H // 2
@@ -254,6 +254,41 @@ def hand_circle(cx: float, cy: float, rx: float, ry: float, *,
             f'stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>'
         )
     return "".join(out)
+
+
+def number_scramble(target: str, t_local: float, duration: float, *,
+                    x: float = CX, y: float = 0, size: float = 100,
+                    fill: str = None, font: str = None,
+                    settle_at: float = 0.75,
+                    letter_spacing: float = -2,
+                    weight: int = 900,
+                    seed: int = 0) -> str:
+    """Slot-machine number reveal: random digits scramble until `settle_at`,
+    then snap to the target value for the remainder of the section.
+
+    `target` may include non-digit characters (e.g. '4.5 ACRES', '₹4,499', '+37%').
+    Only digit characters are scrambled; everything else stays put.
+    The scrambled frame changes every ~50ms (3 frames at 60fps) so the eye
+    reads it as a slot machine, not noise.
+
+    Use this in NUMBERS beats to give the stat reveals the kinetic feel
+    that real-estate competitors lean on.
+    """
+    if fill is None:
+        fill = GT_OLIVE_900
+    if font is None:
+        font = FONT_DISPLAY
+    settle_t = duration * settle_at
+    if t_local >= settle_t:
+        text = target
+    else:
+        # Change scramble every ~50ms; same digit count as target
+        bucket = int(t_local / 0.05)
+        rng = random.Random(seed * 100000 + bucket)
+        text = "".join(rng.choice("0123456789") if ch.isdigit() else ch
+                       for ch in target)
+    return svg_text(text, x, y, size, fill=fill, font=font,
+                    weight=weight, letter_spacing=letter_spacing)
 
 
 def stat_chip(x: float, y: float, number: str, unit: str, *,

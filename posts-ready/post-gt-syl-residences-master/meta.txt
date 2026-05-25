@@ -1,0 +1,50 @@
+EPISODE     gt-syl-residences-master (long-form spotlight · MODCON SYL Residences)
+PILLAR      Editorial · Forest Real Estate · Cornerstone Reel
+FORMAT      Master Spotlight (8-section narrative arc)
+LENGTH      33s source @ 120 BPM × 1.32 slowdown ≈ 43.6s playback
+            (1080×1920 · 60fps · H.264 CRF 22 · silent · no audio)
+FILE        out/brandmint-gt-syl-residences-master-silent.mp4
+KEYWORD     SYL
+DM ASSET    Full pre-investor brief (SYL Residences)
+POST SLOT   Cornerstone post — pin to profile
+
+HOOK        "BEFORE YOU GO LOOKING ELSEWHERE — LOOK HERE FIRST."
+
+STRATEGIES APPLIED (vs Hyderabad real-estate competitor synthesis)
+  ✓ Drone-style opener     : photo holds for ~0.9s before text fades in
+  ✓ Number scramble        : NUMBERS chips + +37% rev animate slot-machine
+  ✓ SAFE_TOP=270           : Meta March 2026 unified safe-zone compliance
+  ✓ Speed-ramped slams     : chip stagger tightened 0.45 → 0.35s
+  ✓ Hand-drawn scribble    : scribble oval around RESIDENCES (no clean ellipse)
+  ✓ Non-legal urgency      : "pre-investor window" framing only — no RERA terms
+  ✗ NO price on screen     : brief C4 + RERA prudence; ₹/SFT only in DM
+
+NARRATIVE
+  1. HOOK         (3.5s · infinity pool with sunset · drone-style)
+  2. REVEAL       (4.0s · biophilic plaza · "MODCON SYL · RESIDENCES")
+  3. CONTEXT     (3.0s · solid olive · location diagram)
+  4. NUMBERS      (5.0s · 3-panel section · 4 scrambling stat chips)
+                  4.5 ACRES · 22,000 SQ FT CLUBHOUSE · 2,500-4,500 SFT · 10 MIN AIRPORT
+  5. AMENITIES    (3.5s · lobby · 5 chips: bio pool, yoga, biophilic, etc.)
+  6. OPPORTUNITY  (4.0s · sunset balcony · +37% scramble + Agartha reference)
+  7. LIFESTYLE    (3.5s · forest-view bedroom · "the view is the amenity")
+  8. PHILOSOPHY   (2.5s · infinity pool · "where luxury meets nature")
+  9. CTA          (4.0s · cream paper · COMMENT 'SYL')
+
+PROVENANCE  thegreenteam.in MODCON SYL Residences listing
+            (Tukkuguda, ORR Exit-14, 4.5 acres biophilic, 22,000 sq ft clubhouse,
+            Natural Bio Pool, Yoga Pavilion, 2500-4500 SFT, 10 min airport)
+            Agartha +37% — public site copy
+
+HI-RES ONLY public/gallery/syl/1776279315359.webp  lobby
+            public/gallery/syl/1776279320251.webp  biophilic plaza
+            public/gallery/syl/1776279339464.webp  3-panel pool/gym
+            public/gallery/syl/1776279350036.webp  infinity pool sunset
+            public/gallery/syl/1776279361294.webp  balcony soaking tub
+            public/gallery/syl/1776279377269.webp  forest-view bedroom
+            brand-kit/logo/the-green-team-monogram.svg
+
+DESIGN      Fonts: Inter Display + Inter + Caladea italic
+            Colors: olive #2d3a1d / cream / sage / gold / terracotta
+RENDER      python3 brand-kit/video/build_gt_syl_residences_master.py
+AUDIO       Silent · drop your voice-over straight on top in CapCut

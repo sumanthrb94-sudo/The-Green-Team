@@ -45,7 +45,8 @@ from _lib import (  # noqa: E402
     H, SAFE_TEXT_W, SAFE_TOP, W, FPS,
     Beat, beat_grid, clamp, clean_oval, ease_in_out_cubic, ease_out_back,
     ease_out_cubic, embed_logo, escape, fit_to_width, hand_arrow,
-    hand_circle, kicker, serif_pullquote, shake_offset, svg_text,
+    hand_circle, kicker, number_scramble, serif_pullquote, shake_offset,
+    svg_text,
 )
 
 LOGO = ROOT.parent / "logo" / "the-green-team-monogram.svg"
@@ -198,30 +199,49 @@ def text_for_section(section_name: str, t_local: float, dur: float) -> str:
     parts: list[str] = []
 
     if section_name == "HOOK":
-        parts.append(serif_pullquote("the green team — editorial",
-                                     CX, SAFE_TOP + 50, size=32, color=GT_SAGE))
-        parts.append(svg_text("WHEN WE SAY", CX, 540, 64,
-                              fill=GT_CREAM, font=FONT_DISPLAY))
+        # STRATEGY: drone-style opener — first 0.9s is the aerial photo alone,
+        # no on-screen text. Stops the scroll, matches competitor hook pattern.
+        # Eyebrow + headline fade in once the visual has landed.
+        eyebrow_a = clamp((t_local - 0.6) / 0.4)
+        if eyebrow_a > 0:
+            parts.append(
+                f'<g opacity="{eyebrow_a:.3f}">'
+                f'{serif_pullquote("the green team — editorial", CX, SAFE_TOP + 50, size=32, color=GT_SAGE)}'
+                f'</g>'
+            )
+        hl_a = clamp((t_local - 0.9) / 0.35)
+        if hl_a > 0:
+            parts.append(
+                f'<g opacity="{hl_a:.3f}">'
+                f'{svg_text("WHEN WE SAY", CX, 540, 64, fill=GT_CREAM, font=FONT_DISPLAY)}'
+                f'</g>'
+            )
+        # Sage chip slams in slightly after the headline
         chip_y = 760
-        sc = ease_out_back(clamp(t_local / 0.4))
-        parts.append(
-            f'<g transform="translate({CX},{chip_y}) rotate(-3.5) scale({sc:.3f}) translate({-CX},{-chip_y})">'
-            f'<rect x="{CX-380}" y="{chip_y-120}" width="760" height="240" '
-            f'rx="20" fill="{GT_SAGE}" stroke="{GT_OLIVE_900}" stroke-width="6"/>'
-            f'{svg_text("CURATED", CX, chip_y+50, 130, fill=GT_OLIVE_900, font=FONT_DISPLAY, letter_spacing=-3)}'
-            f'</g>'
-        )
-        parts.append(svg_text("THIS IS WHAT WE MEAN.", CX, 1100, 50,
-                              fill=GT_CREAM, font=FONT_DISPLAY))
-        parts.append(svg_text("(25 ACRES · NARSAPUR FOREST)", CX, 1160, 28,
-                              fill=GT_GOLD_LIGHT, font=FONT_MONO, letter_spacing=8))
-        if t_local > 1.0:
-            a = clamp((t_local - 1.0) / 0.4)
+        chip_t = clamp((t_local - 1.1) / 0.4)
+        sc = ease_out_back(chip_t)
+        if chip_t > 0:
+            parts.append(
+                f'<g opacity="{clamp(chip_t * 1.2):.3f}" '
+                f'transform="translate({CX},{chip_y}) rotate(-3.5) scale({sc:.3f}) translate({-CX},{-chip_y})">'
+                f'<rect x="{CX-380}" y="{chip_y-120}" width="760" height="240" '
+                f'rx="20" fill="{GT_SAGE}" stroke="{GT_OLIVE_900}" stroke-width="6"/>'
+                f'{svg_text("CURATED", CX, chip_y+50, 130, fill=GT_OLIVE_900, font=FONT_DISPLAY, letter_spacing=-3)}'
+                f'</g>'
+            )
+        sub_a = clamp((t_local - 1.5) / 0.35)
+        if sub_a > 0:
+            parts.append(
+                f'<g opacity="{sub_a:.3f}">'
+                f'{svg_text("THIS IS WHAT WE MEAN.", CX, 1100, 50, fill=GT_CREAM, font=FONT_DISPLAY)}'
+                f'{svg_text("(25 ACRES · NARSAPUR FOREST)", CX, 1160, 28, fill=GT_GOLD_LIGHT, font=FONT_MONO, letter_spacing=8)}'
+                f'</g>'
+            )
+        if t_local > 1.9:
+            a = clamp((t_local - 1.9) / 0.4)
             parts.append(f'<g opacity="{a:.3f}">'
                         f'{hand_circle(CX, chip_y, 410, 140, stroke_w=10, seed=7, color=GT_TERRACOTTA_LIGHT)}'
                         f'</g>')
-        # Arrow removed — was crossing through the "(25 ACRES · NARSAPUR FOREST)"
-        # caption line. The hand-drawn circle around CURATED is enough emphasis.
 
     elif section_name == "REVEAL":
         parts.append(serif_pullquote("the 1 in 100", CX, 540, size=44, color=GT_GOLD_LIGHT))
@@ -294,22 +314,35 @@ def text_for_section(section_name: str, t_local: float, dur: float) -> str:
         parts.append(kicker("VERIFIED AT THE SITE", y=SAFE_TOP + 60, color=GT_CREAM))
         parts.append(serif_pullquote("the numbers we measured.",
                                      CX, SAFE_TOP + 140, size=34, color=GT_SAGE))
+        # STRATEGY: 4 stat chips with slot-machine number scramble on the
+        # primary numbers (AQI, dB, acres, trees). Each chip slams in then
+        # scrambles for ~0.55s before settling — the kinetic feel competitors
+        # use. Tighter stagger (0.35s vs 0.45s) for higher hit-rate per beat.
         chips = [
-            (0.0,  "AQI 12",              GT_SAGE,       GT_OLIVE_900, 600,  -4),
-            (0.4,  "18 dB NOISE",         GT_GOLD_LIGHT, GT_OLIVE_900, 830,   3),
-            (0.85, "25 ACRES · 36 PLOTS", GT_CREAM,      GT_OLIVE_900, 1060, -3),
-            (1.3,  "100+ TREE VARIETIES", GT_SAGE,       GT_OLIVE_900, 1290,  2),
+            # (start_t, target, scramble_target, fill,        ink,          y, rot)
+            (0.0,  "AQI 12",              "00",          GT_SAGE,       GT_OLIVE_900, 600,  -4),
+            (0.35, "18 dB NOISE",         "00",          GT_GOLD_LIGHT, GT_OLIVE_900, 830,   3),
+            (0.75, "25 ACRES · 36 PLOTS", "00 · 00",     GT_CREAM,      GT_OLIVE_900, 1060, -3),
+            (1.15, "100+ TREE VARIETIES", "000",         GT_SAGE,       GT_OLIVE_900, 1290,  2),
         ]
-        for start, label, fill, ink, y, rot in chips:
+        for idx, (start, label, _, fill, ink, y, rot) in enumerate(chips):
             if t_local < start:
                 continue
-            sc = ease_out_back(clamp((t_local - start) / 0.35))
+            local = t_local - start
+            sc = ease_out_back(clamp(local / 0.3))
             pt = fit_to_width(label, 720, start_pt=90, floor_pt=42)
+            # Use number_scramble on the label (digits scramble; words stay)
+            text_el = number_scramble(
+                label, t_local=local, duration=0.55,
+                x=CX, y=y + 30, size=pt,
+                fill=ink, font=FONT_DISPLAY, letter_spacing=-2,
+                seed=10 + idx,
+            )
             parts.append(
                 f'<g transform="translate({CX},{y}) rotate({rot}) scale({sc:.3f}) translate({-CX},{-y})">'
                 f'<rect x="{CX-400}" y="{y-95}" width="800" height="190" '
                 f'rx="18" fill="{fill}" stroke="{GT_OLIVE_900}" stroke-width="5"/>'
-                f'{svg_text(label, CX, y+30, pt, fill=ink, font=FONT_DISPLAY, letter_spacing=-2)}'
+                f'{text_el}'
                 f'</g>'
             )
 
