@@ -88,8 +88,8 @@ SLOW = 1.0
 IMPACT_BEATS = [0, 7, 15, 21, 31, 38, 46, 53, 58]
 
 OUT_ROOT = REPO / "out"
-FRAMES_DIR = OUT_ROOT / "frames_gt-syl-residences-master"
-SILENT_MP4 = OUT_ROOT / "brandmint-gt-syl-residences-master-silent.mp4"
+FRAMES_DIR = OUT_ROOT / "frames_gt-syl-residences-master-b"
+SILENT_MP4 = OUT_ROOT / "brandmint-gt-syl-residences-master-b-silent.mp4"
 
 MAX_ZOOM = 1.20
 
@@ -401,21 +401,24 @@ def text_for_section(name: str, t_local: float, dur: float) -> str:
             )
 
     elif name == "CTA":
-        parts.append(serif_pullquote("for the full brief:",
+        # VARIANT B — lifestyle-led CTA (A/B test against the 'SYL' /
+        # 'pre-investor brief' control in build_gt_syl_residences_master.py).
+        # Information-led ask: floor plans + brochure, no investor language.
+        parts.append(serif_pullquote("for the floor plans:",
                                      CX, 460, size=42, color=GT_OLIVE_800))
         parts.append(kicker("COMMENT THE KEYWORD", y=540, color=GT_OLIVE_700))
         chip_y = 760
         pulse = 1.0 + 0.03 * (1 if int(t_local * 4) % 2 == 0 else -1)
         parts.append(
             f'<g transform="translate({CX},{chip_y}) rotate(-2) scale({pulse:.3f}) translate({-CX},{-chip_y})">'
-            f'<rect x="{CX-280}" y="{chip_y-110}" width="560" height="220" '
+            f'<rect x="{CX-360}" y="{chip_y-110}" width="720" height="220" '
             f'rx="22" fill="{GT_OLIVE_800}" stroke="{GT_OLIVE_900}" stroke-width="6"/>'
-            f'{svg_text("‘SYL’", CX, chip_y+50, 160, fill=GT_GOLD_LIGHT, font=FONT_DISPLAY, letter_spacing=-2)}'
+            f'{svg_text("‘FOREST’", CX, chip_y+50, 150, fill=GT_GOLD_LIGHT, font=FONT_DISPLAY, letter_spacing=-2)}'
             f'</g>'
         )
-        parts.append(svg_text("WE DM THE FULL", CX, 1000, 60,
+        parts.append(svg_text("WE DM THE FLOOR PLANS", CX, 1000, 54,
                               fill=GT_OLIVE_800, font=FONT_DISPLAY, letter_spacing=-2))
-        parts.append(svg_text("PRE-INVESTOR BRIEF.", CX, 1075, 66,
+        parts.append(svg_text("+ FULL BROCHURE.", CX, 1075, 60,
                               fill=GT_TERRACOTTA, font=FONT_DISPLAY, letter_spacing=-2))
         logo_size = 160
         logo_y = 1280

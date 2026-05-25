@@ -1,0 +1,39 @@
+EPISODE     gt-syl-residences-master-b  (A/B test pair to the SYL residences master)
+PILLAR      Editorial · Forest Real Estate · Cornerstone Reel (A/B Variant)
+FORMAT      Master Spotlight (8-section narrative arc)
+LENGTH      ~32.2s playback @ 123 BPM beat-sync (Ben Böhmer melodic house)
+            (1080×1920 · 60fps · H.264 CRF 22 · silent · no audio)
+FILE        out/brandmint-gt-syl-residences-master-b-silent.mp4
+
+A/B TEST PAIRING
+  A (control): brandmint-gt-syl-residences-master-silent.mp4
+               CTA on screen: COMMENT 'SYL' → WE DM THE PRE-INVESTOR BRIEF
+               Investor-led, higher-intent qualification
+  B (variant): this file
+               CTA on screen: COMMENT 'FOREST' → WE DM THE FLOOR PLANS + BROCHURE
+               Lifestyle/information-led, lower-intent funnel top
+               Eyebrow changes from 'for the full brief:' → 'for the floor plans:'
+
+HYPOTHESIS  A pure information ask ('floor plans + brochure') will lift
+            DM volume from cold viewers who aren't yet investor-mode but
+            are house-hunting. The investor CTA (variant A) qualifies
+            harder — fewer DMs, higher quality. The test isolates which
+            funnel top works better for SYL specifically.
+
+KEYWORD     FOREST  (Variant B) · SYL (Variant A)
+DM ASSET    Floor plans + full brochure PDF (B) · Pre-investor brief (A)
+
+META A/B TEST PARAMETERS (when activated)
+  Ad account     : 816550177930882 (The Green Team) — needs payment + page link
+  Page           : 461698807026212 (Thegreenteam)
+  Campaign       : 1 campaign, OUTCOME_ENGAGEMENT, ₹500/day, 7 days
+  Ad sets        : 2 (A and B), ₹250/day each, ABO
+  Targeting      : Hyderabad + Telangana, age 30-55, broad
+                   (real estate, sustainable living, biophilic design)
+  Placement      : Reels + Feed + Stories (Advantage+ placement)
+  Optimization   : POST_ENGAGEMENT
+  Total budget   : ₹3,500 (matching the Agartha A/B test)
+  Win criterion  : Lower cost per DM keyword response
+
+RENDER      python3 brand-kit/video/build_gt_syl_residences_master_b.py
+AUDIO       Silent · matches Ben Böhmer 123 BPM beat grid
