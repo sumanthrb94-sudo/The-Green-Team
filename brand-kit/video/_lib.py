@@ -211,6 +211,25 @@ def hand_arrow(x1: float, y1: float, x2: float, y2: float,
     )
 
 
+def clean_oval(cx: float, cy: float, rx: float, ry: float, *,
+               color: str = "#c8a951", stroke_w: float = 9,
+               rotate_deg: float = -2.0) -> str:
+    """A symmetrical ellipse annotation — clean stroke, no hand-drawn wobble.
+
+    Use this when the hand-drawn imperfection of hand_circle() collides
+    visually with the underlying text (the wobble dips into letterforms).
+    Optional slight rotation keeps the stroke from feeling rigidly geometric.
+    """
+    return (
+        f'<g transform="translate({cx:.1f},{cy:.1f}) rotate({rotate_deg:.1f}) '
+        f'translate({-cx:.1f},{-cy:.1f})">'
+        f'<ellipse cx="{cx:.1f}" cy="{cy:.1f}" rx="{rx:.1f}" ry="{ry:.1f}" '
+        f'fill="none" stroke="{color}" stroke-width="{stroke_w}" '
+        f'stroke-linecap="round"/>'
+        f'</g>'
+    )
+
+
 def hand_circle(cx: float, cy: float, rx: float, ry: float, *,
                 color: str = BEAST_RED, stroke_w: float = 10, seed: int = 0,
                 passes: int = 2) -> str:

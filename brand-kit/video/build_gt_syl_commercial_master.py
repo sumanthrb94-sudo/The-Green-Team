@@ -47,9 +47,9 @@ from _lib import (  # noqa: E402
     GT_CREAM, GT_GOLD_LIGHT, GT_OLIVE_700, GT_OLIVE_800, GT_OLIVE_900,
     GT_SAGE, GT_TERRACOTTA, GT_TERRACOTTA_LIGHT,
     H, SAFE_TEXT_W, SAFE_TOP, W, FPS,
-    Beat, beat_grid, clamp, ease_in_out_cubic, ease_out_back, ease_out_cubic,
-    embed_logo, escape, fit_to_width, hand_arrow, hand_circle, kicker,
-    serif_pullquote, shake_offset, svg_text,
+    Beat, beat_grid, clamp, clean_oval, ease_in_out_cubic, ease_out_back,
+    ease_out_cubic, embed_logo, escape, fit_to_width, hand_arrow,
+    hand_circle, kicker, serif_pullquote, shake_offset, svg_text,
 )
 
 LOGO = ROOT.parent / "logo" / "the-green-team-monogram.svg"
@@ -272,20 +272,23 @@ def text_for_section(name: str, t_local: float, dur: float) -> str:
         )
         if t_local > 1.0:
             a = clamp((t_local - 1.0) / 0.4)
-            # Bigger ellipse — clears the 130pt COMMERCIAL line + wobble
+            # Symmetrical clean ellipse — no wobble dipping into letterforms.
+            # Sized to enclose COMMERCIAL (130pt) with ≥25px breathing room.
             parts.append(f'<g opacity="{a:.3f}">'
-                        f'{hand_circle(CX, 960, 560, 130, stroke_w=11, seed=44, color=GT_GOLD_LIGHT)}'
+                        f'{clean_oval(CX, 965, 540, 115, stroke_w=9, color=GT_GOLD_LIGHT, rotate_deg=-2)}'
                         f'</g>')
+        # Tagline pushed lower (was y=1140) so there's a clear gap between
+        # the oval bottom (~1080) and the italic baseline.
         if t_local > 1.5:
             a = clamp((t_local - 1.5) / 0.4)
             parts.append(f'<g opacity="{a:.3f}">'
-                        f'{serif_pullquote("premium high-street, quietly placed.", CX, 1140, size=36, color=GT_GOLD_LIGHT)}'
+                        f'{serif_pullquote("premium high-street, quietly placed.", CX, 1175, size=36, color=GT_GOLD_LIGHT)}'
                         f'</g>')
         if t_local > 2.0:
             a = clamp((t_local - 2.0) / 0.4)
             parts.append(
                 f'<g opacity="{a:.3f}">'
-                f'{svg_text("200 FT FRONTAGE · 1.2 ACRES · G+4", CX, 1260, 32, fill=GT_CREAM, font=FONT_MONO, letter_spacing=6)}'
+                f'{svg_text("200 FT FRONTAGE · 1.2 ACRES · G+4", CX, 1290, 32, fill=GT_CREAM, font=FONT_MONO, letter_spacing=6)}'
                 f'</g>'
             )
 
