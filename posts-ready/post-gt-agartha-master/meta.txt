@@ -1,0 +1,35 @@
+EPISODE     gt-agartha-master  (long-form spotlight · MODCON Agartha)
+PILLAR      Editorial · Forest Real Estate · Cornerstone Reel
+FORMAT      Master Spotlight (9-section narrative arc)
+LENGTH      33s source @ 120 BPM × 1.32 slowdown ≈ 43.6s playback
+            (1080×1920 · 60fps · H.264 CRF 22 · silent · no audio)
+FILE        out/brandmint-gt-agartha-master-silent.mp4
+KEYWORD     AGARTHA
+DM ASSET    Full 13-titan forest-homes research doc (PDF)
+POST SLOT   Cornerstone post — pin to profile · use on landing page
+HOOK        "WHEN WE SAY CURATED, THIS IS WHAT WE MEAN — MODCON AGARTHA."
+NARRATIVE   1. HOOK         (3.5s · aerial clubhouse render)
+            2. REVEAL       (4.0s · biophilic round-house, name lockup)
+            3. AWARD        (3.5s · Outlook Business Eco Award 2024)
+            4. NUMBERS      (5.0s · 4 stat chips: AQI/dB/Acres/Trees)
+            5. ARCHITECTURE (3.5s · spiral herbal gardens)
+            6. AMENITIES    (3.5s · 5-chip amenity list)
+            7. RETURNS      (3.5s · +37% in 18 months)
+            8. PHILOSOPHY   (2.5s · "where the forest becomes home")
+            9. CTA          (4.0s · keyword AGARTHA + brand row)
+PROVENANCE  thegreenteam.in site copy · Outlook Business 2024 · MODCON
+            Agartha listing (25 acres, 36 plots, AQI 12, 18 dB, 40 min to FD)
+HI-RES ONLY public/gallery/agartha/2.webp     2400×1350  aerial cluster
+            public/gallery/agartha/4.webp     2400×1690  round biophilic house
+            public/gallery/agartha/11.webp    2400×1691  biophilic earthen
+            public/gallery/agartha/7.webp     2304×1623  trefoil + mandala aerial
+            public/gallery/agartha/8.webp     2400×1691  spiral herbal garden
+            public/gallery/agartha/13.webp    2400×1350  modern thatch villa
+            public/gallery/agartha/17.webp    2400×1350  villa cluster
+            public/gallery/agartha/5.webp     2400×1691  bamboo grove path
+            brand-kit/logo/the-green-team-monogram.svg  (CTA)
+DESIGN      Fonts: Inter Display + Inter + Caladea italic
+            Colors: olive #2d3a1d / cream / sage / gold / terracotta
+RENDER      python3 brand-kit/video/build_gt_agartha_master.py
+            [--slow 1.32 (default) · --length 33 · --bpm 120]
+AUDIO       Silent · drop your voice-over straight on top in CapCut
