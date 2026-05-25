@@ -41,7 +41,7 @@ sys.path.insert(0, str(ROOT))
 from _lib import (  # noqa: E402
     CX, FONT_DISPLAY, FONT_MONO, FONT_SERIF,
     GT_CREAM, GT_GOLD_LIGHT, GT_OLIVE_700, GT_OLIVE_800, GT_OLIVE_900,
-    GT_SAGE, GT_TERRACOTTA_LIGHT,
+    GT_SAGE, GT_TERRACOTTA, GT_TERRACOTTA_LIGHT,
     H, SAFE_TEXT_W, SAFE_TOP, W, FPS,
     Beat, beat_grid, clamp, ease_in_out_cubic, ease_out_back, ease_out_cubic,
     embed_logo, escape, fit_to_width, hand_arrow, hand_circle, kicker,
@@ -237,8 +237,10 @@ def text_for_section(section_name: str, t_local: float, dur: float) -> str:
         )
         if t_local > 1.0:
             a = clamp((t_local - 1.0) / 0.4)
+            # Big enough to clear AGARTHA at 160pt — letters span ~120px tall,
+            # circle ry=145 leaves comfortable margin above + below.
             parts.append(f'<g opacity="{a:.3f}">'
-                        f'{hand_circle(CX, 970, 480, 100, stroke_w=11, seed=44, color=GT_GOLD_LIGHT)}'
+                        f'{hand_circle(CX, 970, 530, 145, stroke_w=11, seed=44, color=GT_GOLD_LIGHT)}'
                         f'</g>')
         if t_local > 1.4:
             a = clamp((t_local - 1.4) / 0.4)
@@ -274,8 +276,9 @@ def text_for_section(section_name: str, t_local: float, dur: float) -> str:
         )
         if t_local > 1.0:
             a = clamp((t_local - 1.0) / 0.4)
+            # Big enough to clear AWARD 2024 at 100pt + wobble margin
             parts.append(f'<g opacity="{a:.3f}">'
-                        f'{hand_circle(CX, by + 380, 350, 80, stroke_w=10, seed=99, color=GT_GOLD_LIGHT)}'
+                        f'{hand_circle(CX, by + 380, 420, 115, stroke_w=10, seed=99, color=GT_GOLD_LIGHT)}'
                         f'</g>')
         if t_local > 1.7:
             a = clamp((t_local - 1.7) / 0.4)
@@ -387,10 +390,11 @@ def text_for_section(section_name: str, t_local: float, dur: float) -> str:
             f'{svg_text("‘AGARTHA’", CX, chip_y+45, 140, fill=GT_GOLD_LIGHT, font=FONT_DISPLAY, letter_spacing=-2)}'
             f'</g>'
         )
-        parts.append(svg_text("WE DM THE 13-TITAN", CX, 1010, 42,
-                              fill=GT_OLIVE_800, font=FONT_DISPLAY))
-        parts.append(svg_text("FOREST-HOMES RESEARCH.", CX, 1064, 42,
-                              fill=GT_OLIVE_800, font=FONT_DISPLAY))
+        parts.append(svg_text("DM TO KNOW", CX, 1000, 64,
+                              fill=GT_OLIVE_800, font=FONT_DISPLAY, letter_spacing=-2))
+        parts.append(svg_text("THE PRICES NOW.", CX, 1078, 70,
+                              fill=GT_TERRACOTTA, font=FONT_DISPLAY,
+                              letter_spacing=-2))
         logo_size = 160
         logo_y = 1280
         logo_x = W - 60 - logo_size
