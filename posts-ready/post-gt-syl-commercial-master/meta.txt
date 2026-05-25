@@ -1,0 +1,44 @@
+EPISODE     gt-syl-commercial-master (long-form spotlight · MODCON SYL Commercial)
+PILLAR      Editorial · Commercial Real Estate · Cornerstone Reel
+FORMAT      Master Spotlight (9-section narrative arc)
+LENGTH      33s source @ 120 BPM × 1.32 slowdown ≈ 43.6s playback
+            (1080×1920 · 60fps · H.264 CRF 22 · silent · no audio)
+FILE        out/brandmint-gt-syl-commercial-master-silent.mp4
+KEYWORD     COMMERCIAL
+DM ASSET    Early Access Brief — SYL Commercial (PDF, pre-RERA)
+POST SLOT   Cornerstone post — pin to profile · paste into DM lead replies
+HOOK        "BEFORE THE HIGHWAY GETS BUSY — TUKKUGUDA · 200 FT SRISAILAM HWY"
+
+NARRATIVE
+  1. HOOK         (3.5s · lobby with palms · "before the highway gets busy")
+  2. REVEAL       (4.0s · biophilic plaza · "MODCON SYL · COMMERCIAL")
+  3. LOCATION     (3.5s · animated diagram · ORR Exit-14 · Airport · 4th City)
+  4. NUMBERS      (5.0s · workspace render · 4 verifiable specs)
+                  1.2 ACRES · G+4 FLOORS · 530 SFT UNITS · 200 FT FRONTAGE
+  5. THE SPACE    (3.5s · commercial workspace · biophilic plug-and-play)
+  6. NEIGHBORHOOD (3.5s · biophilic plaza · premium villa belt + airport)
+  7. WHY NOW      (3.5s · lobby · PRE-RERA · ahead of public launch)
+  8. PHILOSOPHY   (2.5s · workspace · "the address before the address arrives")
+  9. CTA          (4.0s · cream paper · COMMENT 'COMMERCIAL')
+
+PROVENANCE  Operator-provided spec sheet (200 ft Srisailam Hwy, 1.2 ac,
+            G+4, 530 SFT) · thegreenteam.in SYL listing · public maps
+
+RERA SAFETY (intentional omissions, per pre-RERA status + brief C2/C4):
+  - NO purchase price shown anywhere on screen or in caption
+  - NO "all-inclusive" pricing
+  - NO assured rental returns (₹15k/30k/40k/50k per month all stripped)
+  - NO "Early Bird Offer" language (could be construed as advertising
+    a deal before RERA approval)
+  - Future positioning kept to factual location/corridor framing only
+
+HI-RES ONLY public/gallery/syl/1776279315359.webp  2400×1371  lobby
+            public/gallery/syl/1776279320251.webp  2400×1751  biophilic plaza
+            public/gallery/syl/1776279329483.webp  2400×1866  commercial workspace
+            public/gallery/syl/1776279343905.webp  2400×1866  open-plan desks
+            brand-kit/logo/the-green-team-monogram.svg        CTA monogram
+
+DESIGN      Fonts: Inter Display + Inter + Caladea italic
+            Colors: olive #2d3a1d / cream / sage / gold / terracotta
+RENDER      python3 brand-kit/video/build_gt_syl_commercial_master.py
+AUDIO       Silent · drop your voice-over straight on top in CapCut
