@@ -1,8 +1,8 @@
 EPISODE     gt-ep01-aqi  (v2 — photo-led, Green Team design system)
 PILLAR      Editorial · Forest Real Estate · Proof-Of-Filter
 FORMAT      Spotlight Reel (Brand Mint v21-beast, in GT brand language)
-LENGTH      17.8s @ 120 BPM source × 1.15 slowdown · 1080×1920 · 60fps · CRF 22
-            (slowed 15% from canonical 15.5s so on-screen text is readable)
+LENGTH      20.5s @ 120 BPM source × 1.3225 slowdown · 1080×1920 · 60fps · CRF 22
+            (slowed ~32% from canonical 15.5s so on-screen text is genuinely readable)
 FILE        out/brandmint-gt-ep01-aqi-silent.mp4  (silent · add VO in post)
 KEYWORD     GREEN
 DM ASSET    Full AQI + ambient-noise verification doc (PDF)

@@ -472,7 +472,7 @@ class RenderSpec:
 
 def render_video(spec: RenderSpec, frame_fn: Callable[[float, float], str],
                  impact_beats: Iterable[int] = (),
-                 slow: float = 1.15,
+                 slow: float = 1.3225,
                  with_audio: bool = False) -> None:
     """Render all frames + mux.
 
@@ -563,7 +563,7 @@ def render_audio(spec: RenderSpec) -> None:
     print(f"[audio] {spec.audio_path}")
 
 
-def mux(spec: RenderSpec, crf: int = 22, slow: float = 1.15,
+def mux(spec: RenderSpec, crf: int = 22, slow: float = 1.3225,
         with_audio: bool = False) -> None:
     """ffmpeg H.264 mux. Silent by default; voice-over goes on top in post.
 

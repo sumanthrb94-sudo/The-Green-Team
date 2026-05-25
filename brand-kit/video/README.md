@@ -7,8 +7,9 @@ Parent system: **Brand Mint Studios** (`AI-VIDEO-GENERATION-BRIEF.md`).
 
 ## Output spec
 - **1080 × 1920 · 60fps · H.264 · CRF 22** (MP4, faststart)
-- **120 BPM source grid**, slowed **15% at playback** so on-screen copy is
-  easier to read (final playback ≈ 17.8 / 18.4 / 17.8 s for EP01/EP02/EP03)
+- **120 BPM source grid**, slowed **~32% at playback** (1.15 × 1.15) so
+  on-screen copy is genuinely readable (final playback ≈ 20.5 / 21.2 / 20.5 s
+  for EP01/EP02/EP03)
 - **Silent** — voice-over and music are dropped on top of the silent MP4 in
   CapCut / Premiere. The click track is no longer muxed by default.
 - **No beat-boundary white flash** — removed for photosensitivity safety and
