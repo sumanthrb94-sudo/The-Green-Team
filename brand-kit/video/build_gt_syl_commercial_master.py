@@ -254,11 +254,8 @@ def text_for_section(name: str, t_local: float, dur: float) -> str:
                               fill=GT_GOLD_LIGHT, font=FONT_MONO, letter_spacing=8))
         parts.append(svg_text("200 FT MAIN ROAD FRONTAGE", CX, 1160, 26,
                               fill=GT_CREAM, font=FONT_MONO, letter_spacing=6))
-        if t_local > 1.4:
-            a = clamp((t_local - 1.4) / 0.3)
-            parts.append(f'<g opacity="{a:.3f}">'
-                        f'{hand_arrow(CX+460, 1280, CX+220, 1150, stroke_w=10, seed=41, color=GT_TERRACOTTA_LIGHT)}'
-                        f'</g>')
+        # Arrow removed — was crossing through "200 FT MAIN ROAD FRONTAGE" text.
+        # The chip + subtext below carry the message cleanly without it.
 
     elif name == "REVEAL":
         parts.append(serif_pullquote("introducing",
@@ -272,23 +269,26 @@ def text_for_section(name: str, t_local: float, dur: float) -> str:
         )
         if t_local > 1.0:
             a = clamp((t_local - 1.0) / 0.4)
-            # Symmetrical clean ellipse — no wobble dipping into letterforms.
-            # Sized to enclose COMMERCIAL (130pt) with ≥25px breathing room.
+            # SCRIBBLE hand-drawn oval around COMMERCIAL.
+            # Text measured: top=861, bot=964, width=860 (at 130pt + 5px stroke).
+            # 30px margin + 12px wobble safety →
+            #   center y = (819 + 1006)/2 = 912
+            #   ry = 100 (covers 802..1022 worst case with wobble ±10)
+            #   rx = 860/2 + 55 = 485
             parts.append(f'<g opacity="{a:.3f}">'
-                        f'{clean_oval(CX, 965, 540, 115, stroke_w=9, color=GT_GOLD_LIGHT, rotate_deg=-2)}'
+                        f'{hand_circle(CX, 912, 490, 100, stroke_w=10, seed=44, color=GT_GOLD_LIGHT)}'
                         f'</g>')
-        # Tagline pushed lower (was y=1140) so there's a clear gap between
-        # the oval bottom (~1080) and the italic baseline.
+        # Tagline at y=1100 — 80px below oval worst-case bottom (1022)
         if t_local > 1.5:
             a = clamp((t_local - 1.5) / 0.4)
             parts.append(f'<g opacity="{a:.3f}">'
-                        f'{serif_pullquote("premium high-street, quietly placed.", CX, 1175, size=36, color=GT_GOLD_LIGHT)}'
+                        f'{serif_pullquote("premium high-street, quietly placed.", CX, 1110, size=36, color=GT_GOLD_LIGHT)}'
                         f'</g>')
         if t_local > 2.0:
             a = clamp((t_local - 2.0) / 0.4)
             parts.append(
                 f'<g opacity="{a:.3f}">'
-                f'{svg_text("200 FT FRONTAGE · 1.2 ACRES · G+4", CX, 1290, 32, fill=GT_CREAM, font=FONT_MONO, letter_spacing=6)}'
+                f'{svg_text("200 FT FRONTAGE · 1.2 ACRES · G+4", CX, 1215, 32, fill=GT_CREAM, font=FONT_MONO, letter_spacing=6)}'
                 f'</g>'
             )
 
@@ -355,7 +355,8 @@ def text_for_section(name: str, t_local: float, dur: float) -> str:
             )
 
     elif name == "WHY_NOW":
-        # Pre-RERA framing — NO returns, NO prices, NO promises
+        # Non-legal access framing — replaces the PRE-RERA board.
+        # NO legal terminology, NO promises, NO returns — just access framing.
         parts.append(serif_pullquote("for early enquiries:",
                                      CX, 540, size=42, color=GT_GOLD_LIGHT))
         chip_y = 820
@@ -364,13 +365,13 @@ def text_for_section(name: str, t_local: float, dur: float) -> str:
             f'<g transform="translate({CX},{chip_y}) rotate(-2) scale({sc:.3f}) translate({-CX},{-chip_y})">'
             f'<rect x="{CX-440}" y="{chip_y-150}" width="880" height="300" '
             f'rx="22" fill="{GT_SAGE}" stroke="{GT_OLIVE_900}" stroke-width="6"/>'
-            f'{svg_text("PRE-RERA", CX, chip_y+30, 140, fill=GT_OLIVE_900, font=FONT_DISPLAY, letter_spacing=-4)}'
-            f'{svg_text("AHEAD OF PUBLIC LAUNCH", CX, chip_y+100, 28, fill=GT_OLIVE_900, font=FONT_MONO, letter_spacing=6)}'
+            f'{svg_text("FIRST PICK", CX, chip_y+30, 140, fill=GT_OLIVE_900, font=FONT_DISPLAY, letter_spacing=-4)}'
+            f'{svg_text("AHEAD OF THE WAITLIST", CX, chip_y+100, 28, fill=GT_OLIVE_900, font=FONT_MONO, letter_spacing=6)}'
             f'</g>'
         )
         if t_local > 0.8:
             a = clamp((t_local - 0.8) / 0.4)
-            inv = svg_text("INVENTORY LIMITED. RESERVED FOR ENQUIRIES.",
+            inv = svg_text("BY INVITATION. RESERVED FOR INSIDERS.",
                           CX, 1240, 26, fill=GT_CREAM,
                           font=FONT_MONO, letter_spacing=4)
             parts.append(f'<g opacity="{a:.3f}">{inv}</g>')

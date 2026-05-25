@@ -220,11 +220,8 @@ def text_for_section(section_name: str, t_local: float, dur: float) -> str:
             parts.append(f'<g opacity="{a:.3f}">'
                         f'{hand_circle(CX, chip_y, 410, 140, stroke_w=10, seed=7, color=GT_TERRACOTTA_LIGHT)}'
                         f'</g>')
-        if t_local > 1.4:
-            a = clamp((t_local - 1.4) / 0.3)
-            parts.append(f'<g opacity="{a:.3f}">'
-                        f'{hand_arrow(CX+460, 1260, CX+220, 1110, stroke_w=10, seed=41, color=GT_TERRACOTTA_LIGHT)}'
-                        f'</g>')
+        # Arrow removed — was crossing through the "(25 ACRES · NARSAPUR FOREST)"
+        # caption line. The hand-drawn circle around CURATED is enough emphasis.
 
     elif section_name == "REVEAL":
         parts.append(serif_pullquote("the 1 in 100", CX, 540, size=44, color=GT_GOLD_LIGHT))
@@ -237,24 +234,27 @@ def text_for_section(section_name: str, t_local: float, dur: float) -> str:
         )
         if t_local > 1.0:
             a = clamp((t_local - 1.0) / 0.4)
-            # Symmetrical clean ellipse — no wobble dipping into letterforms.
-            # Sized to enclose AGARTHA (160pt) with ≥30px breathing room.
+            # SCRIBBLE hand-drawn oval around AGARTHA.
+            # Text measured: top=849, bot=974, width=773 (at 160pt + 6px stroke).
+            # Sized for 30px margin + 12px wobble safety on every side:
+            #   center y = (807 + 1016)/2 = 911
+            #   ry = 110 (covers 801..1021 worst case with wobble ±10)
+            #   rx = 770/2 + 55 = 440
             parts.append(f'<g opacity="{a:.3f}">'
-                        f'{clean_oval(CX, 975, 520, 130, stroke_w=9, color=GT_GOLD_LIGHT, rotate_deg=-2)}'
+                        f'{hand_circle(CX, 911, 450, 110, stroke_w=10, seed=44, color=GT_GOLD_LIGHT)}'
                         f'</g>')
-        # Tagline pushed lower (was y=1140) so there is a clear gap between
-        # the oval bottom (~1105) and the italic baseline.
+        # Tagline at y=1100 — clear of oval bottom (1021 worst case) by ~80px.
         if t_local > 1.4:
             a = clamp((t_local - 1.4) / 0.4)
             parts.append(f'<g opacity="{a:.3f}">'
-                        f'{serif_pullquote("roots of earth", CX, 1185, size=44, color=GT_GOLD_LIGHT)}'
+                        f'{serif_pullquote("roots of earth", CX, 1110, size=44, color=GT_GOLD_LIGHT)}'
                         f'</g>')
         if t_local > 2.0:
             a = clamp((t_local - 2.0) / 0.4)
             parts.append(
                 f'<g opacity="{a:.3f}">'
-                f'{svg_text("NARSAPUR FOREST · NEAR THE RRR", CX, 1295, 36, fill=GT_CREAM, font=FONT_MONO, letter_spacing=8)}'
-                f'{svg_text("40 MIN TO HYDERABAD FINANCIAL DISTRICT", CX, 1351, 26, fill=GT_SAGE, font=FONT_MONO, letter_spacing=6)}'
+                f'{svg_text("NARSAPUR FOREST · NEAR THE RRR", CX, 1220, 36, fill=GT_CREAM, font=FONT_MONO, letter_spacing=8)}'
+                f'{svg_text("40 MIN TO HYDERABAD FINANCIAL DISTRICT", CX, 1276, 26, fill=GT_SAGE, font=FONT_MONO, letter_spacing=6)}'
                 f'</g>'
             )
 
@@ -278,9 +278,11 @@ def text_for_section(section_name: str, t_local: float, dur: float) -> str:
         )
         if t_local > 1.0:
             a = clamp((t_local - 1.0) / 0.4)
-            # Symmetrical clean ellipse — matches REVEAL annotation style.
+            # SCRIBBLE hand-drawn oval around AWARD 2024.
+            # Text measured: top=1006, bot=1080, width=627.
+            # 30px margin + 12px wobble safety → center y=1043, ry=85, rx=380
             parts.append(f'<g opacity="{a:.3f}">'
-                        f'{clean_oval(CX, by + 385, 400, 95, stroke_w=9, color=GT_GOLD_LIGHT, rotate_deg=-2)}'
+                        f'{hand_circle(CX, by + 343, 380, 85, stroke_w=10, seed=99, color=GT_GOLD_LIGHT)}'
                         f'</g>')
         if t_local > 1.7:
             a = clamp((t_local - 1.7) / 0.4)
