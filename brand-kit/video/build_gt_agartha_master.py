@@ -61,12 +61,12 @@ PHOTO_HERBAL_GARDEN    = GAL / "8.webp"
 PHOTO_MODERN_VILLA     = GAL / "13.webp"
 PHOTO_VILLA_CLUSTER    = GAL / "17.webp"
 
-# ─── La Samba beat-sync (126 BPM, Tech House) ─────────────────────────
-# Every section boundary lands on a 126 BPM beat (0.476s/beat). The video
-# tightens from 43.5s playback to ~31.4s, but every cut sits on a beat
-# of the track. Drop La Samba on top in CapCut and the rhythm is locked.
-BPM = 126
-SCALE = 120.0 / BPM  # 0.9524 — converts old 120-BPM-grid times to 126-BPM-grid
+# ─── Ben Böhmer beat-sync (123 BPM, melodic house) ─────────────────────
+# librosa autocorrelation on the user's uploaded track gave a strong
+# 123.05 BPM peak (with the half-tempo 61.5 BPM as the snare alias).
+# 123 BPM matches Ben Böhmer's typical Anjunadeep tempo range.
+BPM = 123
+SCALE = 120.0 / BPM  # 0.9756
 SECTIONS = {
     "HOOK":         (0.0  * SCALE, 3.5  * SCALE, PHOTO_AERIAL_CLUBHOUSE),
     "REVEAL":       (3.5  * SCALE, 7.5  * SCALE, PHOTO_ROUND_HOUSE),
@@ -79,7 +79,7 @@ SECTIONS = {
     "CTA":          (29.0 * SCALE, 33.0 * SCALE, None),
 }
 SOURCE_LENGTH = 33.0 * SCALE
-SLOW = 1.0  # beat-synced — any slowdown breaks the cut-to-beat alignment
+SLOW = 1.0  # beat-synced — no slowdown allowed
 IMPACT_BEATS = [0, 7, 15, 22, 32, 39, 46, 53, 58]
 
 OUT_ROOT = REPO / "out"
