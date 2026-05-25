@@ -1,7 +1,7 @@
 EPISODE     gt-ep02-sanctuaries  (v2 — photo-led, real product photography)
 PILLAR      Editorial · Forest Real Estate · Ranking (Countdown)
 FORMAT      Countdown Reel (Brand Mint v21-beast, 3-rank variant)
-LENGTH      21.2s @ 120 BPM source × 1.3225 slowdown · 1080×1920 · 60fps · CRF 22
+LENGTH      24.3s @ 120 BPM source × 1.521 slowdown · 1080×1920 · 60fps · CRF 22
 FILE        out/brandmint-gt-ep02-sanctuaries-silent.mp4  (silent · add VO in post)
 KEYWORD     SANCTUARY
 DM ASSET    Full 3-way comparison doc (Agartha · SYL · Dates County)

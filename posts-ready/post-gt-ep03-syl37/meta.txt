@@ -1,7 +1,7 @@
 EPISODE     gt-ep03-syl37  (v2 — photo-led, real SYL Residences photography)
 PILLAR      Editorial · Pre-Investor Window (SYL Residences)
 FORMAT      Spotlight Reel (Brand Mint v21-beast, in GT brand language)
-LENGTH      20.5s @ 120 BPM source × 1.3225 slowdown · 1080×1920 · 60fps · CRF 22
+LENGTH      23.6s @ 120 BPM source × 1.521 slowdown · 1080×1920 · 60fps · CRF 22
 FILE        out/brandmint-gt-ep03-syl37-silent.mp4  (silent · add VO in post)
 KEYWORD     SYL
 DM ASSET    Next 18-months pre-investor brief (gated by newsletter signup)
