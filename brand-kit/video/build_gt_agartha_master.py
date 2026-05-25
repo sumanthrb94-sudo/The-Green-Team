@@ -61,19 +61,25 @@ PHOTO_HERBAL_GARDEN    = GAL / "8.webp"
 PHOTO_MODERN_VILLA     = GAL / "13.webp"
 PHOTO_VILLA_CLUSTER    = GAL / "17.webp"
 
+# ─── La Samba beat-sync (126 BPM, Tech House) ─────────────────────────
+# Every section boundary lands on a 126 BPM beat (0.476s/beat). The video
+# tightens from 43.5s playback to ~31.4s, but every cut sits on a beat
+# of the track. Drop La Samba on top in CapCut and the rhythm is locked.
+BPM = 126
+SCALE = 120.0 / BPM  # 0.9524 — converts old 120-BPM-grid times to 126-BPM-grid
 SECTIONS = {
-    "HOOK":         (0.0,  3.5,  PHOTO_AERIAL_CLUBHOUSE),
-    "REVEAL":       (3.5,  7.5,  PHOTO_ROUND_HOUSE),
-    "AWARD":        (7.5, 11.0,  PHOTO_BIOPHILIC_HOUSE),
-    "NUMBERS":      (11.0, 16.0, PHOTO_TREFOIL_AERIAL),
-    "ARCHITECTURE": (16.0, 19.5, PHOTO_HERBAL_GARDEN),
-    "AMENITIES":    (19.5, 23.0, PHOTO_MODERN_VILLA),
-    "RETURNS":      (23.0, 26.5, PHOTO_VILLA_CLUSTER),
-    "PHILOSOPHY":   (26.5, 29.0, PHOTO_BAMBOO_PATH),
-    "CTA":          (29.0, 33.0, None),  # cream paper
+    "HOOK":         (0.0  * SCALE, 3.5  * SCALE, PHOTO_AERIAL_CLUBHOUSE),
+    "REVEAL":       (3.5  * SCALE, 7.5  * SCALE, PHOTO_ROUND_HOUSE),
+    "AWARD":        (7.5  * SCALE, 11.0 * SCALE, PHOTO_BIOPHILIC_HOUSE),
+    "NUMBERS":      (11.0 * SCALE, 16.0 * SCALE, PHOTO_TREFOIL_AERIAL),
+    "ARCHITECTURE": (16.0 * SCALE, 19.5 * SCALE, PHOTO_HERBAL_GARDEN),
+    "AMENITIES":    (19.5 * SCALE, 23.0 * SCALE, PHOTO_MODERN_VILLA),
+    "RETURNS":      (23.0 * SCALE, 26.5 * SCALE, PHOTO_VILLA_CLUSTER),
+    "PHILOSOPHY":   (26.5 * SCALE, 29.0 * SCALE, PHOTO_BAMBOO_PATH),
+    "CTA":          (29.0 * SCALE, 33.0 * SCALE, None),
 }
-SOURCE_LENGTH = 33.0
-SLOW = 1.32
+SOURCE_LENGTH = 33.0 * SCALE
+SLOW = 1.0  # beat-synced — any slowdown breaks the cut-to-beat alignment
 IMPACT_BEATS = [0, 7, 15, 22, 32, 39, 46, 53, 58]
 
 OUT_ROOT = REPO / "out"

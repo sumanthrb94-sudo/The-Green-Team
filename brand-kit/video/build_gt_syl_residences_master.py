@@ -67,19 +67,24 @@ PHOTO_INFINITY    = GAL / "1776279350036.webp"   # infinity pool with forest vie
 PHOTO_BALCONY_TUB = GAL / "1776279361294.webp"   # sunset balcony with soaking tub
 PHOTO_BEDROOM     = GAL / "1776279377269.webp"   # forest-view bedroom
 
+# ─── La Samba beat-sync (126 BPM, Tech House) ─────────────────────────
+# Same beat-sync rationale as the Agartha master — every section
+# boundary lands on a 126 BPM beat. Playback ~31.4s.
+BPM = 126
+SCALE = 120.0 / BPM
 SECTIONS = {
-    "HOOK":         (0.0,  3.5,  PHOTO_INFINITY),      # drone-style hero
-    "REVEAL":       (3.5,  7.5,  PHOTO_PLAZA),
-    "CONTEXT":      (7.5, 10.5,  GT_OLIVE_900),        # solid for diagram
-    "NUMBERS":      (10.5, 15.5, PHOTO_3PANEL),
-    "AMENITIES":    (15.5, 19.0, PHOTO_LOBBY),
-    "OPPORTUNITY":  (19.0, 23.0, PHOTO_BALCONY_TUB),
-    "LIFESTYLE":    (23.0, 26.5, PHOTO_BEDROOM),
-    "PHILOSOPHY":   (26.5, 29.0, PHOTO_INFINITY),
-    "CTA":          (29.0, 33.0, None),
+    "HOOK":         (0.0  * SCALE, 3.5  * SCALE, PHOTO_INFINITY),
+    "REVEAL":       (3.5  * SCALE, 7.5  * SCALE, PHOTO_PLAZA),
+    "CONTEXT":      (7.5  * SCALE, 10.5 * SCALE, GT_OLIVE_900),
+    "NUMBERS":      (10.5 * SCALE, 15.5 * SCALE, PHOTO_3PANEL),
+    "AMENITIES":    (15.5 * SCALE, 19.0 * SCALE, PHOTO_LOBBY),
+    "OPPORTUNITY":  (19.0 * SCALE, 23.0 * SCALE, PHOTO_BALCONY_TUB),
+    "LIFESTYLE":    (23.0 * SCALE, 26.5 * SCALE, PHOTO_BEDROOM),
+    "PHILOSOPHY":   (26.5 * SCALE, 29.0 * SCALE, PHOTO_INFINITY),
+    "CTA":          (29.0 * SCALE, 33.0 * SCALE, None),
 }
-SOURCE_LENGTH = 33.0
-SLOW = 1.32
+SOURCE_LENGTH = 33.0 * SCALE
+SLOW = 1.0
 IMPACT_BEATS = [0, 7, 15, 21, 31, 38, 46, 53, 58]
 
 OUT_ROOT = REPO / "out"
