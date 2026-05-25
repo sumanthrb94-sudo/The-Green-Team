@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <defs>
+    <style>
+      .bg { fill: #2d3a1d; }
+      .path-dim { fill: #faf9f6; opacity: 0.35; }
+      .path-light { fill: #faf9f6; }
+      .path-line { fill: none; stroke: #faf9f6; stroke-width: 2.5; stroke-linecap: round; opacity: 0.5; }
+    </style>
+  </defs>
+  <!-- Background matches brand primary color -->
+  <rect width="100" height="100" rx="20" class="bg"/>
+
+  <!-- Original Leaf Paths -->
+  <path d="M50 90C50 90 48 80 40 70C30 60 10 55 5 40C0 25 15 5 40 10C55 13 65 25 70 40C75 55 65 75 50 90Z" class="path-dim" />
+  <path d="M50 90C50 90 52 75 60 65C70 55 90 50 95 35C100 20 85 0 60 5C45 8 35 20 30 35C25 50 35 70 50 90Z" class="path-light" />
+  <path d="M50 90L50 45M50 90C50 90 44 72 34 62M50 90C50 90 56 72 66 62" class="path-line" />
+</svg>

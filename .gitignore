@@ -10,3 +10,9 @@ coverage/
 
 # Internal docs (security audits, deploy notes) — not committed
 docs/internal/
+
+# Brand Mint video render artifacts
+out/frames_*/
+out/_audio_*.wav
+out/checks/
+__pycache__/

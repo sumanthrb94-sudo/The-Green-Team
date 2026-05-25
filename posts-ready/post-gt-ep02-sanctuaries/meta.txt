@@ -1,0 +1,14 @@
+EPISODE     gt-ep02-sanctuaries
+PILLAR      Editorial · Forest Real Estate · Ranking (Countdown)
+FORMAT      Countdown Reel (Brand Mint v21-beast, 3-rank variant)
+LENGTH      16.0s @ 120 BPM · 1080×1920 · 60fps · H.264
+FILE        out/brandmint-gt-ep02-sanctuaries-120bpm.mp4
+KEYWORD     SANCTUARY
+DM ASSET    Full 3-way comparison doc (Agartha · SYL · Dates County)
+POST SLOT   Reels — Thursday 8:00 PM IST
+HOOK        "WE CURATED 3 SANCTUARIES NEAR HYDERABAD. ONLY 1 WINS."
+WINNER      MODCON Agartha (Outlook Business Eco Award 2024)
+PROVENANCE  thegreenteam.in site copy · RERA P02400002648/003813 ·
+            Outlook Business 2024 (public record)
+RENDER      python3 brand-kit/video/build_gt_ep02_sanctuaries.py [--bpm 120]
+AUDIO       Silent video + 120 BPM click track

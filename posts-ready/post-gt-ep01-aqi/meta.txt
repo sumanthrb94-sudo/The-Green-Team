@@ -1,0 +1,14 @@
+EPISODE     gt-ep01-aqi
+PILLAR      Editorial · Forest Real Estate · Proof-Of-Filter
+FORMAT      Spotlight Reel (Brand Mint v21-beast)
+LENGTH      15.5s @ 120 BPM · 1080×1920 · 60fps · H.264
+FILE        out/brandmint-gt-ep01-aqi-120bpm.mp4
+KEYWORD     GREEN
+DM ASSET    Full AQI + ambient-noise verification doc (PDF)
+POST SLOT   Reels — Tuesday 7:30 PM IST (peak audience)
+HOOK        "ONLY 1 IN 100 HYDERABAD PROJECTS HAS AQI UNDER 25."
+PROOF       Outlook Business 2024 — Best Sustainable Eco-Friendly Project
+PROVENANCE  thegreenteam.in site copy · Outlook Business public record
+RENDER      python3 brand-kit/video/build_gt_ep01_aqi.py [--bpm 120]
+AUDIO       Silent video + 120 BPM click track (drop your IG-licensed
+            track on top in CapCut/Premiere — beat grid is locked)
