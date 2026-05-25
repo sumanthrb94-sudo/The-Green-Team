@@ -1,0 +1,42 @@
+EPISODE     gt-agartha-master-b  (Variant B for Meta A/B test)
+PILLAR      Editorial · Forest Real Estate · Cornerstone Reel (A/B Variant)
+FORMAT      Master Spotlight (9-section narrative arc)
+LENGTH      33s source @ 120 BPM × 1.32 slowdown ≈ 43.6s playback
+            (1080×1920 · 60fps · H.264 CRF 22 · silent · no audio)
+FILE        out/brandmint-gt-agartha-master-b-silent.mp4
+
+A/B TEST PAIRING
+  A (control): out/brandmint-gt-agartha-master-silent.mp4
+               CTA on screen: "DM TO KNOW / THE PRICES NOW."
+               Hard-sell, price-driven
+  B (variant): this file
+               CTA on screen: "COMMENT 'GREEN' / WE DM THE FULL AQI + NOISE DOC."
+               Soft-sell, information-led
+
+HYPOTHESIS  A softer, document-led CTA may pull more cold-traffic DMs from
+            real-estate-curious viewers who aren't yet price-shopping.
+            The hard-sell CTA qualifies harder but may filter the top of
+            the funnel.
+
+KEYWORD     GREEN
+DM ASSET    Full AQI + ambient-noise verification doc (PDF)
+
+META A/B TEST PARAMETERS (when activated)
+  Ad account     : 816550177930882 (The Green Team)  [needs payment method]
+  Page           : 461668390362587 (Thegreenteam)    [needs link to ad acct]
+  Campaign       : 1 campaign, OUTCOME_ENGAGEMENT, daily budget ₹500
+  Ad sets        : 2 (A and B), ₹250/day each, ABO
+  Targeting      : Hyderabad metro + Telangana, age 28-55, broad interest
+                   (real estate, sustainable living, luxury homes)
+  Placement      : Reels + Feed + Stories (Advantage+ placement)
+  Optimization   : POST_ENGAGEMENT
+  Duration       : 7 days
+  Total budget   : ₹3,500
+  Win criterion  : Lower cost per DM keyword response ('GREEN')
+                   OR lower cost per qualified link click
+  Statistical    : With ₹250/day at ~₹3-7 CPC, expect ~250-500 clicks/variant
+                   over 7 days — enough signal for a directional read
+
+PROVENANCE  thegreenteam.in site copy · Outlook Business 2024 (public record)
+RENDER      python3 brand-kit/video/build_gt_agartha_master_b.py
+AUDIO       Silent · drop your voice-over straight on top in CapCut
