@@ -490,14 +490,12 @@ def phase1_cold_open(t: float, dust: list[DustParticle],
     field.jpg photo, slowly tilting down toward the property below.
     Narrative: forest first; sanctuary later."""
     u = norm(t, 0.0, P1_END)
-    # Start TIGHT on the dense forest canopy band (zoom 3.0, cy=0.20 —
-    # crops to y=27..693 of the 2000-tall field.jpg, which is the pure
-    # forest strip). Slow tilt down toward zoom 2.0 cy=0.30 so by the
-    # end of phase 1 we're still in forest with buildings just starting
-    # to emerge at the bottom edge.
+    # Start tight on the UPPER PINE CANOPY of agartha/14 (cy=0.18,
+    # cx=0.55 pushes right to avoid the parked car in the lower-left).
+    # Slow downward tilt to reveal more context.
     im = photos["hero"].ken_burns(
-        t, P1_END, start_zoom=3.00, end_zoom=2.00,
-        start_cx=0.50, start_cy=0.20, end_cx=0.50, end_cy=0.30,
+        t, P1_END, start_zoom=1.70, end_zoom=1.30,
+        start_cx=0.55, start_cy=0.25, end_cx=0.55, end_cy=0.32,
     )
     # Fade up from black: at u=0 → full black, at u=0.6 → photo. Cinematic.
     fade_up = ease_out_cubic(clamp(u / 0.6))
@@ -519,11 +517,11 @@ def phase2_hook1(t: float, dust: list[DustParticle],
     Continues the slow tilt-down from phase 1 — by the end the property
     starts emerging from under the forest canopy."""
     u = norm(t, P1_END, P2_END)
-    # Continue tilt-down: zoom 2.0→1.4 (pulling back), cy 0.30→0.50
-    # (panning down so the property emerges from under the forest canopy).
+    # Continue from where P1 ended: zoom 1.30→1.10 (pulling back further),
+    # cy 0.32→0.42 (slow tilt down). cx stays at 0.55 to keep car off-frame.
     im = photos["hero"].ken_burns(
-        t, P2_END, start_zoom=2.00, end_zoom=1.40,
-        start_cx=0.50, start_cy=0.30, end_cx=0.50, end_cy=0.50,
+        t, P2_END, start_zoom=1.30, end_zoom=1.10,
+        start_cx=0.55, start_cy=0.32, end_cx=0.55, end_cy=0.42,
     )
     # Darken a horizontal band where the headline sits
     headline_y = 1090
@@ -574,10 +572,10 @@ def phase3_photo_stat(t: float, dust: list[DustParticle],
     u = norm(t, P2_END, P3_END)
     # Crossfade between photos across the first 0.5 of the phase
     fade = ease_in_out(clamp(u / 0.5))
-    # Hero photo continues pulling back to a full wide reveal of the property
+    # Hero continues from P2 end-state
     im_a = photos["hero"].ken_burns(
-        t, P3_END, start_zoom=1.40, end_zoom=1.10,
-        start_cx=0.50, start_cy=0.50, end_cx=0.50, end_cy=0.55,
+        t, P3_END, start_zoom=1.10, end_zoom=1.05,
+        start_cx=0.55, start_cy=0.42, end_cx=0.55, end_cy=0.50,
     )
     # New aerial photo
     im_b = photos["aerial"].ken_burns(
@@ -865,14 +863,14 @@ def main():
     rng = random.Random(11)
     dust = init_dust(rng, n=90)
 
-    # Hero shot: dates-county/field.jpg — pure forest canopy band on top
-    # with the property nested in greenery below. Used across P1→P3 with
-    # a continuous slow tilt-down (forest → reveal sanctuary narrative).
-    # Phase 4 cuts to a biophilic-villa close-up (agartha/4.webp — earth-bag
-    # villa wrapped in living vines) which fades to ink for the brand reveal.
+    # Hero shot: agartha/14.webp (2400×1350) — tall pines dominate the
+    # frame with the villa peeking on the right. Used across P1→P2 with
+    # a Ken Burns that frames the pines (cx pushed right to avoid the
+    # parked car in lower-left). For P3 stat card we crossfade to
+    # agartha/4.webp (biophilic earth-bag villa wrapped in living vines).
     photos = {
-        "hero":   Photo(GAL_DATES / "field.jpg"),      # 2000×2000 forest+property aerial
-        "aerial": Photo(REPO / "public" / "gallery" / "agartha" / "4.webp"),  # biophilic villa
+        "hero":   Photo(REPO / "public" / "gallery" / "agartha" / "14.webp"),  # 2400×1350 pines
+        "aerial": Photo(REPO / "public" / "gallery" / "agartha" / "4.webp"),   # biophilic villa
     }
     # Force-load and pre-resize so the first frame isn't slow
     for p in photos.values():
