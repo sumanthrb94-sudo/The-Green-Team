@@ -1,0 +1,45 @@
+EPISODE     gt-thumb-v40   (Green Team brand-identity ident · PRODUCTION V40 SYSTEM)
+PILLAR      Brand · Cornerstone Ident · Channel Poster
+FORMAT      Brand-identity reel (particle lattice → monogram coalesce → brand reveal)
+LENGTH      22.0s @ 60fps · 1320 frames
+            (1080×1920 · H.264 libx264 preset slow CRF 17 · yuv420p · faststart)
+            Silent — operator drops cinematic audio in post (hit grid below)
+FILE        out/greenteam-thumb-60fps.mp4
+
+ARCHITECTURE (verbatim PRODUCTION V40 SYSTEM)
+  Particle system     : 392 particles, 14×28 lattice, radial wavefront birth
+  Monogram coalesce   : greedy proximity match to leaf-logo M-targets
+                        (extracted via cairosvg rasterization + PIL sampling
+                        of public/logo-the-green-team-original.svg)
+  Phase grid          : audio-hit timestamps drive visual boundaries
+                        [1.90, 5.75, 9.60, 13.45, 15.40, 18.60]
+  Motion graphics     : camera drift + breath, vignette breath, god-ray bloom,
+                        shockwave on hits, lens-flare, atmospheric noise
+  Brand reveal        : kicker → wordmark → italic-gold tagline → signature
+                        with blinking cursor
+  Editorial hooks     : "FORESTS DON'T STAY BY ACCIDENT." /
+                        "THEY'RE curated." (italic + gold gradient) /
+                        "ONE SANCTUARY AT A TIME."
+  First-frame thumb   : brand poster composition baked into frame 0 for IG/YT
+
+PALETTE (V40 §7 override — only swappable block)
+  INK     #1a2410  deep olive ground
+  PAPER   #faf9f6  cream type
+  GT_1    #dcd5b8  softest cream-gold highlight
+  GT_2    #c8a951  gold-light bright accent
+  GT_3    #a3b18a  sage core brand
+  GT_4    #4a5c3d  deep sage shadow
+
+CONTENT BRIEF
+  BRAND_NAME      : THE GREEN TEAM
+  TAGLINE_KICKER  : WE CURATE FOREST-ADJACENT
+  TAGLINE_MAIN    : sanctuaries.   (italic, gold gradient)
+  SIGNATURE       : EDITORIAL REAL ESTATE — HYDERABAD · thegreenteam.in
+
+DEPLOYMENT
+  IG Reels channel poster (pin to top)
+  YouTube Shorts channel trailer (replace existing)
+  Linktree / bio embed thumbnail (first-frame poster)
+
+RENDER      python3 brand-kit/video/build_gt_thumb_v40.py
+AUDIO       Silent · operator drops cinematic track aligned to hit grid
