@@ -486,12 +486,18 @@ DEFS = (
 
 def phase1_cold_open(t: float, dust: list[DustParticle],
                      photos: dict[str, Photo]) -> tuple[Image.Image, str]:
-    """0.00 → 2.42s — forest photo fades up from black, slow dolly down."""
+    """0.00 → 2.42s — open on pure forest canopy band of the dates-county
+    field.jpg photo, slowly tilting down toward the property below.
+    Narrative: forest first; sanctuary later."""
     u = norm(t, 0.0, P1_END)
-    # Photo (Agartha "8.webp" - sweeping forest aerial). Slow zoom out.
+    # Start TIGHT on the dense forest canopy band (zoom 3.0, cy=0.20 —
+    # crops to y=27..693 of the 2000-tall field.jpg, which is the pure
+    # forest strip). Slow tilt down toward zoom 2.0 cy=0.30 so by the
+    # end of phase 1 we're still in forest with buildings just starting
+    # to emerge at the bottom edge.
     im = photos["hero"].ken_burns(
-        t, P1_END, start_zoom=1.18, end_zoom=1.06,
-        start_cx=0.5, start_cy=0.42, end_cx=0.5, end_cy=0.50,
+        t, P1_END, start_zoom=3.00, end_zoom=2.00,
+        start_cx=0.50, start_cy=0.20, end_cx=0.50, end_cy=0.30,
     )
     # Fade up from black: at u=0 → full black, at u=0.6 → photo. Cinematic.
     fade_up = ease_out_cubic(clamp(u / 0.6))
@@ -509,12 +515,15 @@ def phase1_cold_open(t: float, dust: list[DustParticle],
 
 def phase2_hook1(t: float, dust: list[DustParticle],
                  photos: dict[str, Photo]) -> tuple[Image.Image, str]:
-    """2.42 → 6.61s — "FORESTS DON'T STAY BY ACCIDENT." typewriter hook."""
+    """2.42 → 6.61s — "FORESTS DON'T STAY BY ACCIDENT." typewriter hook.
+    Continues the slow tilt-down from phase 1 — by the end the property
+    starts emerging from under the forest canopy."""
     u = norm(t, P1_END, P2_END)
-    # Continue the hero photo Ken Burns from where phase 1 left off
+    # Continue tilt-down: zoom 2.0→1.4 (pulling back), cy 0.30→0.50
+    # (panning down so the property emerges from under the forest canopy).
     im = photos["hero"].ken_burns(
-        t, P2_END, start_zoom=1.06, end_zoom=1.14,
-        start_cx=0.5, start_cy=0.50, end_cx=0.5, end_cy=0.58,
+        t, P2_END, start_zoom=2.00, end_zoom=1.40,
+        start_cx=0.50, start_cy=0.30, end_cx=0.50, end_cy=0.50,
     )
     # Darken a horizontal band where the headline sits
     headline_y = 1090
@@ -559,15 +568,16 @@ def phase2_hook1(t: float, dust: list[DustParticle],
 
 def phase3_photo_stat(t: float, dust: list[DustParticle],
                       photos: dict[str, Photo]) -> tuple[Image.Image, str]:
-    """6.61 → 10.24s — crossfade to aerial photo, stat card slides in from right.
+    """6.61 → 10.24s — crossfade from the field-aerial reveal into the
+    biophilic-villa close-up. Stat card slides in from right.
     Dots start fading out across DOTS_OUT_START..DOTS_OUT_END."""
     u = norm(t, P2_END, P3_END)
-    # Crossfade between photos across the first 0.6 of the phase
+    # Crossfade between photos across the first 0.5 of the phase
     fade = ease_in_out(clamp(u / 0.5))
-    # Hero photo (continuing zoom)
+    # Hero photo continues pulling back to a full wide reveal of the property
     im_a = photos["hero"].ken_burns(
-        t, P3_END, start_zoom=1.14, end_zoom=1.20,
-        start_cx=0.5, start_cy=0.58, end_cx=0.5, end_cy=0.62,
+        t, P3_END, start_zoom=1.40, end_zoom=1.10,
+        start_cx=0.50, start_cy=0.50, end_cx=0.50, end_cy=0.55,
     )
     # New aerial photo
     im_b = photos["aerial"].ken_burns(
@@ -855,10 +865,14 @@ def main():
     rng = random.Random(11)
     dust = init_dust(rng, n=90)
 
-    # Pick best hero + aerial photos (we just verified these load)
+    # Hero shot: dates-county/field.jpg — pure forest canopy band on top
+    # with the property nested in greenery below. Used across P1→P3 with
+    # a continuous slow tilt-down (forest → reveal sanctuary narrative).
+    # Phase 4 cuts to a biophilic-villa close-up (agartha/4.webp — earth-bag
+    # villa wrapped in living vines) which fades to ink for the brand reveal.
     photos = {
-        "hero":   Photo(GAL_AGARTHA / "8.webp"),    # forest aerial 2400x1691
-        "aerial": Photo(GAL_AGARTHA / "11.webp"),   # 2400x1691
+        "hero":   Photo(GAL_DATES / "field.jpg"),      # 2000×2000 forest+property aerial
+        "aerial": Photo(REPO / "public" / "gallery" / "agartha" / "4.webp"),  # biophilic villa
     }
     # Force-load and pre-resize so the first frame isn't slow
     for p in photos.values():
