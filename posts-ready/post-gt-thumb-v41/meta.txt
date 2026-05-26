@@ -1,0 +1,61 @@
+EPISODE     gt-thumb-v41   (Green Team brand ident · V41 — rebuilt from V40 feedback)
+PILLAR      Brand · Cornerstone Ident · Channel Poster
+FORMAT      Multi-template editorial reel — 6 distinct phase styles
+LENGTH      22.0s @ 60fps · 1320 frames
+            (1080×1920 · H.264 libx264 preset slow CRF 18 · yuv420p · faststart)
+            With audio (mrclaps_fashion · 99.4 BPM · "fashion abstract")
+FILE        out/greenteam-thumb-v41-60fps.mp4
+
+WHY V41 (CEO FEEDBACK ON V40)
+  V40 issues addressed:
+  1. Dots-becoming-logo didn't work — leaf is organic curves, not pixel-
+     shaped like Brand Mint's M. Coalesce produced a blob, not a mark.
+     → V41 abandons the coalesce concept entirely. Leaf draws in via SVG
+       stroke-dashoffset animation across the 3 native leaf-path layers.
+  2. Lattice grid overlapped text on the "THEY'RE curated." frame.
+     → V41 uses sparse ambient dust drift (not a centered lattice).
+       Dust FULLY FADES OUT by t=11.0s — well before brand reveal at 13.5s.
+       Text always sits on a darkened photo band or solid ink. No collisions.
+  3. V40 was a Brand Mint reskin. → V41 uses SIX distinct animation
+     templates, each borrowed from competitor editorial-real-estate ad
+     research (see PHASE MAP below).
+
+PHASE MAP (each a different motion template)
+  P1 ColdOpen     0.00 → 2.42s  forest photo fade up + slow dolly + dust
+  P2 Hook1        2.42 → 6.61s  TYPEWRITER hook over photo + EDITORIAL chip
+  P3 PhotoStat    6.61 → 10.24s photo CROSSFADE + Ken Burns + STAT CARD slide-in
+                                 (Lodha amenity-card template pattern)
+  P4 ChipStack    10.24 → 13.26s 3 magazine CHIPS fly in stacked; dots fully gone
+                                 (House of Hiranandani amenity-grid template)
+  P5 BrandReveal  13.26 → 18.70s photos fade to ink · leaf STROKE-DRAWS in across
+                                 3 staggered path layers · wordmark TYPES in ·
+                                 italic gold "sanctuaries." mask-reveals
+  P6 Close        18.70 → 22.00s signature + URL fade up · CTA blink ·
+                                 vignette breath-out
+
+BEAT GRID  Detected from mrclaps_fashion via librosa.beat.beat_track
+           99.4 BPM · 0.604s/beat · first beat at 1.184s
+           Phase boundaries land on detected beat indices [2,9,15,20,29]
+
+CONTENT BRIEF (same as V40 — only motion architecture changed)
+  BRAND_NAME      : THE GREEN TEAM
+  TAGLINE_KICKER  : WE CURATE FOREST-ADJACENT
+  TAGLINE_MAIN    : sanctuaries.   (italic, gold gradient mask-reveal)
+  HOOK_1          : FORESTS DON'T STAY BY ACCIDENT.
+  CHIPS           : 01 BIOPHILIC · 02 GATED · 03 FOREST-VIEW
+  STAT            : 4.5 ACRES · FOREST EDGE — TUKKUGUDA
+  SIGNATURE       : EDITORIAL REAL ESTATE — HYDERABAD · thegreenteam.in
+  CTA             : DM FOR THE BRIEF (blinking)
+
+ASSETS USED FROM REPO
+  public/gallery/agartha/8.webp      (2400×1691 — hero forest aerial)
+  public/gallery/agartha/11.webp     (2400×1691 — aerial property view)
+  public/logo-the-green-team-original.svg  (leaf logo · 3 path layers)
+  /tmp/uploads/mrclaps_fashion.mp3   (audio · 99.4 BPM · 30s)
+
+DEPLOYMENT
+  IG Reels channel poster (pin to top)
+  YouTube Shorts channel trailer
+  Linktree / bio embed thumbnail (first-frame poster)
+
+RENDER      python3 brand-kit/video/build_gt_thumb_v41.py
