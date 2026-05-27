@@ -1,0 +1,40 @@
+EPISODE     gt-thumb-v42a   (A/B variant A — TEXTURED EDITORIAL)
+PILLAR      Brand · Cornerstone Ident · A/B Variant
+FORMAT      6-phase editorial reel w/ TEXT-MASK PHOTO REVEAL + FILM GRAIN
+LENGTH      22.0s @ 60fps · 1320 frames
+            (1080×1920 · H.264 libx264 CRF 18 + AAC 192k · cover art embedded)
+            First 0.5s = static poster (gallery thumbnail), then video plays
+FILE        out/greenteam-thumb-v42a-60fps.mp4 (production)
+            out/greenteam-thumb-v42a-mobile.mp4 (mobile-compressed)
+POSTER      out/greenteam-thumb-v42a-poster.jpg
+
+A/B PAIR    Versus v42b (NARRATIVE TRANSFORMATION) and v42c (KINETIC TRAILER)
+HYPOTHESIS  Premium/editorial cadence wins HIGH-INTENT luxury buyers who
+            scan for craft signals (grain texture, magazine framing).
+            Will likely score LOWER raw CTR than v42c but HIGHER quality
+            DMs (longer reads, more property-specific questions).
+
+TECHNIQUES APPLIED (from 100-Meta-Animation-Styles brief)
+  #5  Text Mask Video Reveal
+      Phase 5 brand reveal: instead of v41's leaf-stroke + wordmark-type
+      sequence, "GREEN TEAM" letters act as a photo mask — the forest
+      photo plays INSIDE the cut-out letterforms as the mask sweeps left
+      to right. The leaf + tagline appear smaller, below the text-mask
+      reveal. Magazine-cover effect.
+  #49 Grain Texture Overlay
+      Per-frame numpy noise (270×480 quarter-res, nearest-neighbor upscaled
+      for chunky 35mm-film grain) composited at 7% strength over every
+      frame. Cycles through 8 precomputed tiles to give natural per-frame
+      variance without per-frame compute cost.
+
+NARRATIVE INHERITED FROM V41
+  P1 ColdOpen  0.00-2.42  agartha/14 tall pines + biophilic A-frame
+  P2 Hook1     2.42-6.61  "FORESTS DON'T STAY BY ACCIDENT." typewriter
+  P3 PhotoStat 6.61-10.24 photo crossfade + Ken Burns + stat card slide-in
+  P4 ChipStack 10.24-13.26 magazine chips · dots gone by 11s
+  P5 BrandReveal 13.26-18.70 TEXT-MASK PHOTO REVEAL (NEW) + leaf + tagline
+  P6 Close     18.70-22.00 signature + thegreenteam.in + CTA blink
+
+AUDIO       mrclaps_fashion · 99.4 BPM · fashion-abstract editorial cadence
+RENDER      python3 brand-kit/video/build_gt_thumb_v42a.py
+POSTER GEN  python3 brand-kit/video/build_gt_thumb_v42_posters.py

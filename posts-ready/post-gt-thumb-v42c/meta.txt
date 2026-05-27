@@ -1,0 +1,42 @@
+EPISODE     gt-thumb-v42c   (A/B variant C — KINETIC TRAILER)
+PILLAR      Brand · Cornerstone Ident · A/B Variant
+FORMAT      6-phase editorial reel w/ STROBE-CUT STATS + 2.35:1 CINEMA BARS
+LENGTH      22.0s @ 60fps · 1320 frames
+            (1080×1920 · H.264 libx264 CRF 18 + AAC 192k · cover art embedded)
+            First 0.5s = static poster (gallery thumbnail), then video plays
+FILE        out/greenteam-thumb-v42c-60fps.mp4 (production)
+            out/greenteam-thumb-v42c-mobile.mp4 (mobile-compressed)
+POSTER      out/greenteam-thumb-v42c-poster.jpg
+
+A/B PAIR    Versus v42a (TEXTURED EDITORIAL) and v42b (NARRATIVE TRANSFORMATION)
+HYPOTHESIS  Kinetic energy + trailer-grade cinema close appeals to YOUNGER
+            buyers and signals "production quality." Likely highest RAW CTR
+            of the three (hard cuts on beats are pattern-interrupt) but may
+            score lower on completion (younger audiences swipe sooner).
+
+TECHNIQUES APPLIED (from 100-Meta-Animation-Styles brief)
+  #98 Strobe Cut on Beat
+      Phase 3 abandons the single slide-in stat card. Instead 3 stat
+      values STROBE-CUT every ~1.2s (sync'd to detected beat pairs):
+        01/03  4.5 ACRES         · FOREST EDGE — TUKKUGUDA
+        02/03  22 K SFT          · CHEMICAL-FREE CLUBHOUSE + BIO POOL
+        03/03  ORR EX-14         · 10 MIN TO INTL AIRPORT
+      Each cut has a 0.06s exponential flash decay (hot cream overlay
+      fades out). Progress dots top-right show position. Pure punch.
+  #100 Cinematic End Frame
+      Phase 6 close animates 100px horizontal black letterbox bars in
+      from top and bottom across the first 1.2s of the phase (ease-out
+      cubic). Brand mark + wordmark + tagline + URL + CTA all sit inside
+      the cinema frame. Trailer-grade close.
+
+NARRATIVE INHERITED FROM V41
+  P1 ColdOpen  0.00-2.42  agartha/14 tall pines + biophilic A-frame
+  P2 Hook1     2.42-6.61  "FORESTS DON'T STAY BY ACCIDENT." typewriter
+  P3 PhotoStat 6.61-10.24 STROBE-CUT 3 STATS (NEW) — hard cuts on beat
+  P4 ChipStack 10.24-13.26 magazine chips
+  P5 BrandReveal 13.26-18.70 leaf stroke draw-in + wordmark + tagline
+  P6 Close     18.70-22.00 CINEMA BARS ANIMATE IN (NEW) + brand block
+
+AUDIO       mrclaps_fashion · 99.4 BPM · fashion-abstract editorial cadence
+RENDER      python3 brand-kit/video/build_gt_thumb_v42c.py
+POSTER GEN  python3 brand-kit/video/build_gt_thumb_v42_posters.py

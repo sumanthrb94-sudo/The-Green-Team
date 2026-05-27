@@ -1,0 +1,41 @@
+EPISODE     gt-thumb-v42b   (A/B variant B — NARRATIVE TRANSFORMATION)
+PILLAR      Brand · Cornerstone Ident · A/B Variant
+FORMAT      6-phase editorial reel w/ BEFORE/AFTER WIPE + LIGHT-LEAK BURN
+LENGTH      22.0s @ 60fps · 1320 frames
+            (1080×1920 · H.264 libx264 CRF 18 + AAC 192k · cover art embedded)
+            First 0.5s = static poster (gallery thumbnail), then video plays
+FILE        out/greenteam-thumb-v42b-60fps.mp4 (production)
+            out/greenteam-thumb-v42b-mobile.mp4 (mobile-compressed)
+POSTER      out/greenteam-thumb-v42b-poster.jpg
+
+A/B PAIR    Versus v42a (TEXTURED EDITORIAL) and v42c (KINETIC TRAILER)
+HYPOTHESIS  Narrative storytelling/transformation appeals to ASPIRATIONAL
+            buyers — viewers stay through the wipe to see the reveal, then
+            the light leaks punctuate each act break. Likely highest
+            COMPLETION RATE of the three (story curiosity holds attention).
+
+TECHNIQUES APPLIED (from 100-Meta-Animation-Styles brief)
+  #19 Before/After Wipe (Diagonal)
+      Phase 2→3 boundary becomes a 14° diagonal wipe instead of v41's soft
+      crossfade. Forest hero photo wipes off-screen toward bottom-left,
+      revealing the biophilic-villa aerial below — "the forest stays · the
+      sanctuary appears". 80px feather for editorial softness.
+  #44 Light Leak Burn
+      At P3→P4 and P4→P5 boundaries (0.6s window each), a warm orange/gold
+      radial gradient sweeps across the frame, briefly overexposes the
+      highlights at mid-burn, then fades. Two-tone (white-yellow core →
+      warm orange outer), sin-curve strength envelope. Cinematic act break.
+
+NARRATIVE INHERITED FROM V41
+  P1 ColdOpen  0.00-2.42  agartha/14 tall pines + biophilic A-frame
+  P2 Hook1     2.42-6.61  "FORESTS DON'T STAY BY ACCIDENT." typewriter
+  P3 PhotoStat 6.61-10.24 DIAGONAL WIPE (NEW) → villa + stat card
+  P3→P4 transition         LIGHT-LEAK BURN (NEW)
+  P4 ChipStack 10.24-13.26 magazine chips
+  P4→P5 transition         LIGHT-LEAK BURN (NEW)
+  P5 BrandReveal 13.26-18.70 leaf stroke draw-in + wordmark + tagline
+  P6 Close     18.70-22.00 signature + thegreenteam.in + CTA blink
+
+AUDIO       mrclaps_fashion · 99.4 BPM · fashion-abstract editorial cadence
+RENDER      python3 brand-kit/video/build_gt_thumb_v42b.py
+POSTER GEN  python3 brand-kit/video/build_gt_thumb_v42_posters.py
