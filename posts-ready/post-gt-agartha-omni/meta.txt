@@ -1,0 +1,82 @@
+EPISODE     gt-agartha-omni  (Agartha reel built on Google Omni / Veo 3 footage)
+PILLAR      Property Showcase · Cornerstone Reel · MODCON AGARTHA
+FORMAT      Hybrid pipeline — generative cinematic footage + brand reveal architecture
+LENGTH      25.0s @ 60fps · 1500 frames
+            (1080×1920 · H.264 libx264 CRF 18 + AAC 192k · cover-art embedded)
+            First 30 frames replaced with poster (gallery thumbnail behavior)
+FILE        out/agartha-omni-60fps.mp4 (production)
+            out/agartha-omni-mobile.mp4 (mobile-compressed)
+POSTER      out/agartha-omni-poster.jpg
+
+BRAND HIERARCHY
+  DEVELOPER       MODCON BUILDERS  (builds + owns AGARTHA)
+  PROPERTY        AGARTHA  (project name; full naming: MODCON AGARTHA)
+  CHANNEL PARTNER THE GREEN TEAM  (curates, runs the reel, handles the DM,
+                                    owns the leaf mark that appears in the
+                                    PRESENTED BY sequence)
+
+INPUTS
+  HERO FOOTAGE    Google Omni / Veo 3 generated 10s drone shot
+                  Source: 1280×720 24fps H.264 + AAC voice-over + ambient
+                  Prompt: brand-kit/prompts/omni-veo-master-prompt.md
+                  Content: drone forward over dense tropical canopy at golden
+                  hour, then property reveal — biophilic earth-bag villas
+                  nestled in the trees with green living roofs
+  MUSIC BED       mrclaps_fashion · 99.4 BPM · "fashion abstract"
+
+PHASE MAP
+  P1 HeroPlate    0.00 → 10.00s  Omni footage (scaled to 9:16, frame-doubled
+                                  60fps, Veo watermark cropped out of frame).
+                                  Editorial chip top-left:  MODCON AGARTHA
+                                                            CURATED · THE GREEN TEAM
+                                  Hook typewriter reinforces Omni's voice-over:
+                                    FORESTS DON'T STAY (line 1, 2.0-4.5s)
+                                    BY ACCIDENT.        (line 2, 4.5-6.5s)
+                                    they're curated.    (italic gold, 7.0-8.5s)
+  P2 StatStrobe   10.00 → 13.00s 3 specs strobe on beats:
+                                    01/03  PROJECT SIZE     · 25 ACRES
+                                    02/03  AIR QUALITY      · AQI 12  · 18 dB
+                                    03/03  FINANCIAL DIST.  · 40 MIN · VIA RRR
+  P3 BrandReveal  13.00 → 18.00s photo-to-ink crossfade  ·  MODCON wordmark
+                                  fades in  ·  AGARTHA wordmark types in
+                                  (140pt, 14px tracking)  ·  italic gold
+                                  "forest-edge sanctuary." mask-reveal
+  P4 PresentedBy  18.00 → 22.00s AGARTHA block compresses upward
+                                  Gold dividing rule animates in
+                                  "PRESENTED BY" caption types in
+                                  Green Team LEAF stroke-draws in
+                                  (3 staggered path layers)
+                                  "THE GREEN TEAM" wordmark types in
+                                  "CHANNEL PARTNER" caption fades up
+  P5 CTAClose     22.00 → 25.00s CTA gold:  COMMENT 'AGARTHA' (blinking)
+                                  CTA cream: WE DM THE BRIEF
+                                  URL gold:  thegreenteam.in
+                                  90px cinema letterbox bars animate in
+
+AUDIO MIX
+  0.00 → 10.00s   Omni native audio (voice-over + forest ambient)
+  8.00 → 10.00s   crossfade (Omni fading out, music fading in)
+  8.00 → 25.00s   mrclaps_fashion music bed
+  23.00 → 25.00s  music fades out
+  alimiter on master @ 0.95 to prevent clipping
+
+CONTENT FACTS (verified — do NOT confuse with SYL Residences)
+  LOCATION        Narsapur forest boundary (NOT Tukkuguda)
+  SIZE            25 acres · 36 plots · 100+ tree varieties per plot
+  AIR QUALITY     AQI 12 · ambient 18 dB
+  CLUBHOUSE       36,000 sq ft · aquatic pool · kayaking lake · gym ·
+                  farm-to-table dining · staycation villas
+  ACCESS          40 min to Financial District via the RRR corridor
+  AWARD           Outlook Business Best Sustainable Eco-Friendly Project 2024
+
+RERA NOTE   No prices · no assured returns · facts only
+
+DEPLOYMENT  IG Reels (with caption.txt) · YouTube Shorts
+            DM keyword: 'AGARTHA' → triggers automated brief send
+
+RENDER      python3 brand-kit/video/build_gt_agartha_omni.py
+            Step 1: ffmpeg extracts Omni 24fps source to 60fps 1080×1920
+                    JPG sequence (Veo watermark falls outside the crop)
+            Step 2: render brand-overlay frames composited on top of Omni
+                    frames (0-10s) and on ink (10-25s)
+            Step 3: mux video + audio crossfade graph + embed cover-art
