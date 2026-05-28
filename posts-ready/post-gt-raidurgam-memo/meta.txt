@@ -1,0 +1,62 @@
+POST        post-gt-raidurgam-memo
+PILLAR      Market Intelligence · Carousel
+FORMAT      Instagram carousel · 9 slides · 1080×1350 (4:5)
+FILE        posts-ready/post-gt-raidurgam-memo/slides/s01.jpg → s09.jpg
+
+HOOK        "1 ACRE IN RAIDURGAM JUST CROSSED ₹100 CR."
+KEYWORD     RAIDURGAM
+DM ASSET    Raidurgam transaction log (18 months) + heat map + adjacent
+            corridor projections (12 mo)
+
+SLIDE MAP
+  01  HOOK             "1 ACRE IN RAIDURGAM JUST CROSSED ₹100 CR."
+                       big editorial type · gold italic price
+  02  WHERE            RAIDURGAM · West Hyderabad's new financial district
+                       + 4 fact rows (position / distance / adjacency / metro)
+  03  THE RECORD       ₹100+ CR per acre stat block
+                       + 4 transaction-detail rows
+  04  TRAJECTORY       7-year bar chart  (₹18 CR 2019 → ₹110 CR 2025)
+                       + 7-year growth callout
+  05  COMPARISON       ranked table — Raidurgam, HITEC City, Jubilee, Banjara,
+                       Kokapet, Tellapur, Narsapur (forest)
+                       Raidurgam row highlighted gold
+  06  WHY              3 numbered drivers (Metro · Knowledge City · Scarcity)
+  07  EDITORIAL READ   pull-quote on olive ground: "The new centre of Hyderabad
+                       isn't downtown. It's a 4 km strip where land doubled
+                       in 18 months."  attributed to The Green Team Market Desk
+  08  CONTRAST PIVOT   side-by-side: Raidurgam ₹100+/acre vs Agartha ₹3-5/acre
+                       "Same investment quality. Different filter."
+  09  CTA              "Want the full transaction log?"
+                       COMMENT 'RAIDURGAM' · WE DM
+                       + 3-item list of DM contents
+                       + thegreenteam.in
+
+BRAND CHROME (on every slide)
+  Top-left      THE GREEN TEAM
+                MARKET MEMO · HYDERABAD · Q2 2026
+  Top-right     slide number (01/09, 02/09, ...)
+  Gold left rule  full-height 6px gold
+  Bottom-left   small leaf icon + thegreenteam.in
+  Bottom-right  9 progress dots (current slide gold, others sage)
+
+POSITIONING
+  This is a market-intel post that positions The Green Team as the
+  channel partner with data + an editorial point of view. The contrast
+  pivot in slide 8 redirects investor attention from Raidurgam (financial
+  district) to AGARTHA (forest-edge sanctuary), maintaining brand voice.
+
+DATA SOURCING / DISCLAIMER
+  All ₹ figures in this carousel are approximations from public industry
+  reports (Knight Frank, Anarock, JLL India, ET RealEstate). They should
+  be VERIFIED against primary deal databases before publishing.
+
+  Specifically verify:
+    - Slide 3: ₹100-130 CR per acre price band (currently approximate)
+    - Slide 4: 2019-2025 trajectory bars (18, 22, 38, 55, 78, 95, 110)
+    - Slide 5: comparison table ranges (HITEC City, Jubilee Hills, etc.)
+    - Slide 8: Agartha indicative ₹3-5 CR / acre (consult MODCON pricing)
+
+RENDER     python3 brand-kit/video/build_gt_raidurgam_memo.py
+
+DEPLOYMENT IG carousel post (caption.txt) · push all 9 slides in order.
+           DM keyword 'RAIDURGAM' triggers the transaction log send.
