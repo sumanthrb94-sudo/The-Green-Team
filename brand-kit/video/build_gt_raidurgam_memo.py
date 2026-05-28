@@ -88,12 +88,7 @@ def chrome(slide_idx: int) -> str:
         f'MARKET MEMO  ·  HYDERABAD  ·  Q2 2026</text>'
         f'</g>'
     )
-    # Slide number top-right
-    parts.append(
-        f'<text x="{W-64}" y="92" font-family="{FONT_MONO}" font-size="14" '
-        f'fill="{PAPER}" opacity="0.7" letter-spacing="3" '
-        f'text-anchor="end">{slide_idx:02d}  /  {TOTAL_SLIDES:02d}</text>'
-    )
+    # (slide number removed per CEO note — "remove carousel no on each")
     # Bottom leaf + URL
     leaf_size = 30
     leaf_x = 64
