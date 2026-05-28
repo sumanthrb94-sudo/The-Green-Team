@@ -52,6 +52,39 @@ from build_gt_thumb_v41 import (
     REPO,
 )
 
+
+# ─── MODCON LOGO (developer brand mark) ─────────────────────────────────
+# Load the official MODCON SVG once and stash the inner content for inline
+# embedding in our composition.
+def _load_modcon_inner() -> str:
+    """Return everything inside the <svg ...> wrapper of modcon-logo.svg."""
+    raw = (REPO / "public" / "logos" / "modcon-logo.svg").read_text()
+    # Strip the <?xml ?> and the outer <svg ...> ... </svg> tags so we
+    # can drop the inner content into our composite SVG.
+    start = raw.index(">", raw.index("<svg")) + 1
+    end = raw.rindex("</svg>")
+    return raw[start:end]
+
+
+MODCON_VIEWBOX_W = 646.65
+MODCON_VIEWBOX_H = 288.10
+MODCON_INNER = _load_modcon_inner()
+
+
+def modcon_logo_svg(cx: int, cy: int, target_w: int, opacity: float = 1.0) -> str:
+    """Render the MODCON wordmark logo centered at (cx, cy), scaled so its
+    width equals target_w. Uses the official SVG content."""
+    if opacity <= 0.001:
+        return ""
+    scale = target_w / MODCON_VIEWBOX_W
+    target_h = MODCON_VIEWBOX_H * scale
+    tx = cx - target_w / 2
+    ty = cy - target_h / 2
+    return (
+        f'<g transform="translate({tx:.2f},{ty:.2f}) scale({scale:.5f})" '
+        f'opacity="{opacity:.3f}">{MODCON_INNER}</g>'
+    )
+
 # V42b technique — borrow the diagonal wipe + light leak helpers
 import build_gt_thumb_v42b as v42b
 
@@ -275,8 +308,13 @@ def phase4_specs_strobe(t, dust, photos):
 
 
 def phase5_brand_reveal_agartha(t, dust, photos):
-    """Phase 5 — leaf draws in, then 'AGARTHA' big + 'by THE GREEN TEAM'
-    smaller + 'forest-edge sanctuary.' italic gold."""
+    """Phase 5 — MODCON wordmark fades in (developer's official brand mark),
+    then 'AGARTHA' typewriter reveal, then italic gold 'forest-edge sanctuary.'.
+
+    No Green Team leaf here. AGARTHA is built by MODCON, so the developer's
+    actual wordmark sits above the property name. The Green Team leaf
+    appears later in the close as a small channel-partner attribution mark.
+    """
     u = norm(t, P4_END, P5_END)
     fade_out = ease_in_out(clamp(u / 0.30))
     im_photo = photos["aerial"].ken_burns(
@@ -289,53 +327,41 @@ def phase5_brand_reveal_agartha(t, dust, photos):
     if fade_out > 0.98:
         im = ink
 
-    draw_p = clamp((u - 0.00) / 0.55)
-    fill_p = clamp((u - 0.40) / 0.45)
-    leaf_size = 320
-    leaf_cy = 750
+    # MODCON logo fades in across u 0.05 → 0.45
+    modcon_opacity = ease_out_cubic(clamp((u - 0.05) / 0.40))
 
-    # AGARTHA wordmark (big property name) types in after leaf fill starts
-    pname_progress = ease_out_cubic(clamp((u - 0.50) / 0.25))
+    # AGARTHA wordmark types in after MODCON settles
+    pname_progress = ease_out_cubic(clamp((u - 0.45) / 0.25))
     pname_visible_n = int(round(pname_progress * len(PROPERTY_NAME)))
     pname_shown = PROPERTY_NAME[:pname_visible_n]
 
-    # "by THE GREEN TEAM" subline reveals after property name
-    sub_progress = ease_out_cubic(clamp((u - 0.68) / 0.18))
+    rule_w = clamp((u - 0.62) / 0.18) * 320
 
     # "forest-edge sanctuary." italic gold tagline last
-    tag_progress = ease_out_cubic(clamp((u - 0.80) / 0.18))
-
-    rule_w = clamp((u - 0.62) / 0.18) * 320
+    tag_progress = ease_out_cubic(clamp((u - 0.75) / 0.20))
 
     parts = [
         v41.DEFS,
         f'<rect width="{W}" height="{H}" fill="url(#vig)"/>',
-        leaf_logo_svg(CX, leaf_cy, leaf_size, draw_p, fill_p),
-        # AGARTHA — big editorial display
-        f'<text x="{CX}" y="1090" font-family="{FONT_DISPLAY}" font-size="140" '
+        # MODCON developer wordmark (renders the official SVG content)
+        modcon_logo_svg(CX, 800, 340, opacity=modcon_opacity),
+        # AGARTHA — big editorial display under MODCON
+        f'<text x="{CX}" y="1100" font-family="{FONT_DISPLAY}" font-size="140" '
         f'fill="{PAPER}" font-weight="800" letter-spacing="14" '
         f'text-anchor="middle">{pname_shown}</text>',
         # Gold rule under AGARTHA
-        f'<line x1="{CX - rule_w/2:.0f}" y1="1130" '
-        f'x2="{CX + rule_w/2:.0f}" y2="1130" stroke="{GT_GOLD}" '
+        f'<line x1="{CX - rule_w/2:.0f}" y1="1140" '
+        f'x2="{CX + rule_w/2:.0f}" y2="1140" stroke="{GT_GOLD}" '
         f'stroke-width="2.5"/>',
     ]
-    if sub_progress > 0.001:
-        parts.append(
-            f'<g transform="translate({CX},1200)" opacity="{sub_progress:.3f}">'
-            f'<text x="0" y="0" font-family="{FONT_MONO}" font-size="22" '
-            f'fill="{PAPER}" letter-spacing="6" font-weight="600" '
-            f'text-anchor="middle">{DEVELOPER_LINE}</text>'
-            f'</g>'
-        )
     if tag_progress > 0.001:
         clip_w = tag_progress * 700
         parts.append(
             f'<defs><clipPath id="agtag">'
-            f'<rect x="{CX-350:.0f}" y="1260" width="{clip_w:.0f}" height="100"/>'
+            f'<rect x="{CX-350:.0f}" y="1220" width="{clip_w:.0f}" height="100"/>'
             f'</clipPath></defs>'
             f'<g clip-path="url(#agtag)">'
-            f'<text x="{CX}" y="1340" font-family="{FONT_SERIF}" '
+            f'<text x="{CX}" y="1300" font-family="{FONT_SERIF}" '
             f'font-size="68" font-style="italic" '
             f'fill="url(#goldHL)" font-weight="400" '
             f'text-anchor="middle">{TAGLINE_MAIN}</text>'
@@ -378,21 +404,20 @@ def phase6_cta_close(t, dust, photos):
 
     overlay = (
         final_defs
-        + leaf_logo_svg(CX, 750, 320, 1.0, 1.0)
-        + f'<text x="{CX}" y="1090" font-family="{FONT_DISPLAY}" font-size="140" '
+        # MODCON developer wordmark (hero brand mark — held from P5)
+        + modcon_logo_svg(CX, 800, 340, opacity=1.0)
+        # AGARTHA — big editorial display
+        + f'<text x="{CX}" y="1100" font-family="{FONT_DISPLAY}" font-size="140" '
         f'fill="{PAPER}" font-weight="800" letter-spacing="14" '
         f'text-anchor="middle">{PROPERTY_NAME}</text>'
-        + f'<line x1="{CX - 160}" y1="1130" x2="{CX + 160}" y2="1130" '
+        + f'<line x1="{CX - 160}" y1="1140" x2="{CX + 160}" y2="1140" '
         f'stroke="{GT_GOLD}" stroke-width="2.5"/>'
-        + f'<text x="{CX}" y="1200" font-family="{FONT_MONO}" font-size="22" '
-        f'fill="{PAPER}" letter-spacing="6" font-weight="600" '
-        f'text-anchor="middle">{DEVELOPER_LINE}</text>'
-        + f'<text x="{CX}" y="1340" font-family="{FONT_SERIF}" '
+        + f'<text x="{CX}" y="1300" font-family="{FONT_SERIF}" '
         f'font-size="68" font-style="italic" '
         f'fill="url(#goldHL)" font-weight="400" '
         f'text-anchor="middle">{TAGLINE_MAIN}</text>'
         # CTA block — two lines
-        + f'<g transform="translate({CX},1450)" opacity="{cta_progress:.3f}">'
+        + f'<g transform="translate({CX},1430)" opacity="{cta_progress:.3f}">'
         + f'<line x1="-200" y1="-50" x2="200" y2="-50" '
         f'stroke="{GT_SAGE}" stroke-width="1" opacity="0.45"/>'
         + f'<text x="0" y="0" font-family="{FONT_MONO}" font-size="22" '
@@ -402,12 +427,13 @@ def phase6_cta_close(t, dust, photos):
         f'fill="{PAPER}" letter-spacing="4" font-weight="600" '
         f'text-anchor="middle">{CTA_LINE_2}</text>'
         + '</g>'
-        # Channel partner attribution + URL
-        + f'<g transform="translate({CX},1610)" opacity="{sig_progress:.3f}">'
-        + f'<text x="0" y="0" font-family="{FONT_MONO}" font-size="15" '
+        # Channel partner attribution: small Green Team leaf + line + URL
+        + f'<g transform="translate({CX},1590)" opacity="{sig_progress:.3f}">'
+        + leaf_logo_svg(0, 0, 38, 1.0, 1.0)  # small Green Team leaf — channel partner mark
+        + f'<text x="0" y="60" font-family="{FONT_MONO}" font-size="15" '
         f'fill="{PAPER}" opacity="0.85" letter-spacing="3" '
         f'text-anchor="middle">{CHANNEL_PARTNER_LINE}</text>'
-        + f'<text x="0" y="32" font-family="{FONT_MONO}" font-size="22" '
+        + f'<text x="0" y="92" font-family="{FONT_MONO}" font-size="22" '
         f'fill="{GT_GOLD}" font-weight="700" letter-spacing="3" '
         f'text-anchor="middle">thegreenteam.in</text>'
         + '</g>'
@@ -507,19 +533,16 @@ def build_poster():
         f'<text x="{CX}" y="770" font-family="{FONT_SERIF}" font-size="58" '
         f'font-style="italic" fill="url(#gh)" font-weight="500" '
         f'text-anchor="middle">{TAGLINE_MAIN}</text>'
-        # Leaf (small)
-        + leaf_logo_svg(CX, 1100, 220, 1.0, 1.0)
+        # MODCON developer wordmark (the actual builder's mark)
+        + modcon_logo_svg(CX, 1110, 280, opacity=1.0)
         # AGARTHA wordmark big
-        + f'<text x="{CX}" y="1340" font-family="{FONT_DISPLAY}" font-size="120" '
+        + f'<text x="{CX}" y="1310" font-family="{FONT_DISPLAY}" font-size="120" '
         f'fill="{PAPER}" font-weight="800" letter-spacing="12" '
         f'text-anchor="middle">{PROPERTY_NAME}</text>'
-        + f'<line x1="{CX-160}" y1="1380" x2="{CX+160}" y2="1380" '
+        + f'<line x1="{CX-160}" y1="1350" x2="{CX+160}" y2="1350" '
         f'stroke="{GT_GOLD}" stroke-width="2.5"/>'
-        + f'<text x="{CX}" y="1450" font-family="{FONT_MONO}" font-size="20" '
-        f'fill="{PAPER}" letter-spacing="5" font-weight="600" '
-        f'text-anchor="middle">{DEVELOPER_LINE}</text>'
-        # Specs row at the bottom (Agartha facts)
-        + f'<g transform="translate(0,1620)">'
+        # Specs row (Agartha facts)
+        + f'<g transform="translate(0,1450)">'
         + f'<text x="200" y="0" font-family="{FONT_MONO}" font-size="14" '
         f'fill="{GT_GOLD}" letter-spacing="2" text-anchor="middle">25 ACRES</text>'
         + f'<text x="540" y="0" font-family="{FONT_MONO}" font-size="14" '
@@ -527,10 +550,11 @@ def build_poster():
         + f'<text x="880" y="0" font-family="{FONT_MONO}" font-size="14" '
         f'fill="{GT_GOLD}" letter-spacing="2" text-anchor="middle">40 MIN TO FD</text>'
         + '</g>'
-        # Signature: channel partner attribution + URL
-        + f'<line x1="{CX-200}" y1="1700" x2="{CX+200}" y2="1700" '
+        # Signature: small Green Team leaf + channel partner attribution + URL
+        + f'<line x1="{CX-200}" y1="1620" x2="{CX+200}" y2="1620" '
         f'stroke="{GT_SAGE}" stroke-width="1" opacity="0.45"/>'
-        + f'<text x="{CX}" y="1750" font-family="{FONT_MONO}" font-size="16" '
+        + leaf_logo_svg(CX, 1685, 44, 1.0, 1.0)
+        + f'<text x="{CX}" y="1740" font-family="{FONT_MONO}" font-size="16" '
         f'fill="{PAPER}" opacity="0.85" letter-spacing="3" '
         f'text-anchor="middle">{CHANNEL_PARTNER_LINE}</text>'
         + f'<text x="{CX}" y="1790" font-family="{FONT_MONO}" font-size="24" '
@@ -585,7 +609,14 @@ def main():
         target = FRAMES_DIR / f"f{i:05d}.jpg"
         Image.open(POSTER_JPG).save(target, "JPEG", quality=92)
 
-    # Production encode (CRF 18) with cover art
+    # Slow the entire output down by 40% (video + audio stay in sync).
+    # SLOW_FACTOR = 1.4 means playback is 1/1.4 = 0.7143x speed.
+    # 22.0s source frames + 22.0s source audio → 30.8s output.
+    SLOW_FACTOR = 1.4
+    OUT_DUR = TOTAL_S * SLOW_FACTOR  # 30.8s
+    ATEMPO = 1.0 / SLOW_FACTOR        # ~0.7143
+
+    # Production encode (CRF 18) with cover art + 1.4x slowdown
     for label, crf, audio_kb, out_path in (
         ("prod",   18, 192, FINAL_MP4),
         ("mobile", 26,  96, MOBILE_MP4),
@@ -596,18 +627,20 @@ def main():
             "-i", str(AUDIO_SRC),
             "-i", str(POSTER_JPG),
             "-map", "0:v:0", "-map", "1:a:0", "-map", "2:v:0",
+            "-filter:v:0", f"setpts={SLOW_FACTOR}*PTS",
+            "-filter:a", f"atempo={ATEMPO:.6f},afade=t=out:st={OUT_DUR-1.0:.2f}:d=1.0",
             "-c:v:0", "libx264", "-preset", "slow", "-crf", str(crf),
-            "-pix_fmt", "yuv420p",
+            "-pix_fmt", "yuv420p", "-r", str(FPS),
             "-c:v:1", "copy", "-disposition:v:1", "attached_pic",
             "-c:a", "aac", "-b:a", f"{audio_kb}k",
-            "-af", f"afade=t=out:st={TOTAL_S - 1.0:.2f}:d=1.0",
             "-movflags", "+faststart",
-            "-t", str(TOTAL_S),
+            "-t", str(OUT_DUR),
             str(out_path),
         ]
         subprocess.run(cmd, check=True, capture_output=True)
         print(f"[{label}] {out_path.name}  "
-              f"{out_path.stat().st_size // (1024*1024)} MB")
+              f"{out_path.stat().st_size // (1024*1024)} MB  "
+              f"({OUT_DUR:.1f}s, slowed {SLOW_FACTOR}x)")
 
 
 if __name__ == "__main__":
