@@ -16,3 +16,4 @@ out/frames_*/
 out/_audio_*.wav
 out/checks/
 __pycache__/
+out/_omni_extracted/
