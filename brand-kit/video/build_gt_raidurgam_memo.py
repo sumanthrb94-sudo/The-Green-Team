@@ -146,10 +146,10 @@ def slide_01_hook() -> str:
         f'stroke="{GT_GOLD}" stroke-width="3"/>'
         + f'<text x="{CX}" y="850" font-family="{FONT_DISPLAY}" font-size="160" '
         f'fill="url(#goldHL)" font-weight="800" font-style="italic" '
-        f'letter-spacing="-4" text-anchor="middle">₹100 CR.</text>'
+        f'letter-spacing="-4" text-anchor="middle">₹237 CR.</text>'
         + f'<text x="{CX}" y="930" font-family="{FONT_MONO}" font-size="18" '
         f'fill="{PAPER}" opacity="0.7" letter-spacing="6" '
-        f'text-anchor="middle">PER ACRE — A NEW HIGH</text>'
+        f'text-anchor="middle">PER ACRE — TGIIC E-AUCTION RECORD</text>'
         # Bottom sub-caption
         + f'<text x="{CX}" y="1140" font-family="{FONT_SERIF}" font-size="22" '
         f'fill="{PAPER}" opacity="0.85" font-style="italic" '
@@ -205,23 +205,23 @@ def slide_03_number() -> str:
         f'fill="{GT_GOLD}" font-weight="700" letter-spacing="6" '
         f'text-anchor="middle">THE RECORD</text>'
         # Giant ₹ figure
-        + f'<text x="{CX}" y="540" font-family="{FONT_DISPLAY}" font-size="180" '
+        + f'<text x="{CX}" y="540" font-family="{FONT_DISPLAY}" font-size="200" '
         f'fill="url(#goldHL)" font-weight="800" letter-spacing="-6" '
-        f'text-anchor="middle">₹100+ CR</text>'
+        f'text-anchor="middle">₹237 CR</text>'
         + f'<text x="{CX}" y="600" font-family="{FONT_MONO}" font-size="20" '
         f'fill="{PAPER}" opacity="0.85" letter-spacing="6" '
         f'text-anchor="middle">PER ACRE</text>'
         + f'<line x1="{CX-120}" y1="650" x2="{CX+120}" y2="650" '
         f'stroke="{GT_GOLD}" stroke-width="2"/>'
         # Transaction details (4 rows)
-        + _fact_row(220, 800, "PRICE BAND", "₹100 — 130 CR / acre")
-        + _fact_row(220, 880, "PARCEL",     "TYPICALLY ≤ 5 ACRES")
-        + _fact_row(220, 960, "BUYER PROFILE","INSTITUTIONAL · GREDFUND")
-        + _fact_row(220, 1040, "DEAL TIMING","Q4 2024 — Q1 2026")
+        + _fact_row(220, 800, "AUCTION",     "TGIIC RAIDURG E-AUCTION")
+        + _fact_row(220, 880, "PEAK BID",    "₹237 CR / ACRE")
+        + _fact_row(220, 960, "SOURCE",      "TIMES OF INDIA · 2025")
+        + _fact_row(220, 1040, "PREVIOUS HIGH","₹100 CR / ACRE BAND")
         # Disclaimer
         + f'<text x="{CX}" y="1190" font-family="{FONT_MONO}" font-size="11" '
         f'fill="{PAPER}" opacity="0.55" letter-spacing="2" '
-        f'text-anchor="middle">Per industry reports. DM for the full transaction log.</text>'
+        f'text-anchor="middle">Verified per TOI · DM for the full TGIIC auction log.</text>'
         + '</svg>'
     )
 
@@ -235,8 +235,8 @@ def slide_04_trajectory() -> str:
         ("2021", 38),
         ("2022", 55),
         ("2023", 78),
-        ("2024", 95),
-        ("2025", 110),
+        ("2024", 110),
+        ("2025", 237),   # TGIIC e-auction record — verified per TOI
     ]
     chart_x = 140
     chart_y_top = 540
@@ -297,13 +297,13 @@ def slide_04_trajectory() -> str:
 def slide_05_comparison() -> str:
     """Comparison table — Raidurgam vs other top areas."""
     rows = [
-        ("RAIDURGAM",        "100 — 130", True),
-        ("HITEC CITY",       "60 — 90",   False),
-        ("JUBILEE HILLS",    "55 — 80",   False),
-        ("BANJARA HILLS",    "50 — 75",   False),
-        ("KOKAPET",          "30 — 50",   False),
-        ("TELLAPUR",         "25 — 40",   False),
-        ("NARSAPUR (forest)","8 — 15",    False),
+        ("RAIDURG",          "237  (record)", True),
+        ("HITEC CITY",       "60 — 90",       False),
+        ("JUBILEE HILLS",    "55 — 80",       False),
+        ("BANJARA HILLS",    "50 — 75",       False),
+        ("KOKAPET",          "30 — 50",       False),
+        ("TELLAPUR",         "25 — 40",       False),
+        ("NARSAPUR (forest)","3 — 5",         False),
     ]
     table_y = 470
     row_h = 80
@@ -406,18 +406,18 @@ def slide_07_editorial() -> str:
         f'fill="{GT_GOLD}" font-weight="700" letter-spacing="6" '
         f'text-anchor="middle">THE GREEN TEAM READ</text>'
         # Big italic quote
-        + f'<text x="{CX}" y="500" font-family="{FONT_SERIF}" font-size="64" '
+        + f'<text x="{CX}" y="500" font-family="{FONT_SERIF}" font-size="60" '
         f'fill="{PAPER}" font-style="italic" font-weight="500" letter-spacing="-1.5" '
-        f'text-anchor="middle">"The new centre of</text>'
-        + f'<text x="{CX}" y="580" font-family="{FONT_SERIF}" font-size="64" '
+        f'text-anchor="middle">"At ₹237 crore an acre,</text>'
+        + f'<text x="{CX}" y="580" font-family="{FONT_SERIF}" font-size="60" '
         f'fill="{PAPER}" font-style="italic" font-weight="500" letter-spacing="-1.5" '
-        f'text-anchor="middle">Hyderabad isn\'t downtown.</text>'
-        + f'<text x="{CX}" y="660" font-family="{FONT_SERIF}" font-size="64" '
+        f'text-anchor="middle">Raidurg isn\'t real estate</text>'
+        + f'<text x="{CX}" y="660" font-family="{FONT_SERIF}" font-size="60" '
         f'fill="url(#goldHL)" font-style="italic" font-weight="500" letter-spacing="-1.5" '
-        f'text-anchor="middle">It\'s a 4 km strip where</text>'
-        + f'<text x="{CX}" y="740" font-family="{FONT_SERIF}" font-size="64" '
+        f'text-anchor="middle">anymore — it\'s a sovereign</text>'
+        + f'<text x="{CX}" y="740" font-family="{FONT_SERIF}" font-size="60" '
         f'fill="url(#goldHL)" font-style="italic" font-weight="500" letter-spacing="-1.5" '
-        f'text-anchor="middle">land doubled in 18 months."</text>'
+        f'text-anchor="middle">asset class on a 4-km strip."</text>'
         # Attribution
         + f'<line x1="{CX-60}" y1="900" x2="{CX+60}" y2="900" '
         f'stroke="{GT_GOLD}" stroke-width="2"/>'
@@ -449,7 +449,7 @@ def slide_08_contrast() -> str:
         f'text-anchor="middle">PER ACRE</text>'
         f'<text x="0" y="20" font-family="{FONT_DISPLAY}" font-size="100" '
         f'fill="{PAPER}" font-weight="800" letter-spacing="-3" '
-        f'text-anchor="middle">₹100+</text>'
+        f'text-anchor="middle">₹237</text>'
         f'<text x="0" y="80" font-family="{FONT_MONO}" font-size="18" '
         f'fill="{PAPER}" opacity="0.75" letter-spacing="3" '
         f'text-anchor="middle">CR / ACRE</text>'

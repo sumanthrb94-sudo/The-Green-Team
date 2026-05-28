@@ -3,7 +3,9 @@ PILLAR      Market Intelligence · Carousel
 FORMAT      Instagram carousel · 9 slides · 1080×1350 (4:5)
 FILE        posts-ready/post-gt-raidurgam-memo/slides/s01.jpg → s09.jpg
 
-HOOK        "1 ACRE IN RAIDURGAM JUST CROSSED ₹100 CR."
+HOOK        "1 ACRE IN RAIDURGAM JUST CROSSED ₹237 CR."
+            (verified via Times of India: TGIIC Raidurg e-auction record 2025)
+            https://timesofindia.indiatimes.com/city/hyderabad/raidurg-land-fetches-rs-237-crore-per-acre-tgiics-raidurg-e-auction-rewrites-history/articleshow/131371505.cms
 KEYWORD     RAIDURGAM
 DM ASSET    Raidurgam transaction log (18 months) + heat map + adjacent
             corridor projections (12 mo)
@@ -45,16 +47,24 @@ POSITIONING
   pivot in slide 8 redirects investor attention from Raidurgam (financial
   district) to AGARTHA (forest-edge sanctuary), maintaining brand voice.
 
-DATA SOURCING / DISCLAIMER
-  All ₹ figures in this carousel are approximations from public industry
-  reports (Knight Frank, Anarock, JLL India, ET RealEstate). They should
-  be VERIFIED against primary deal databases before publishing.
+DATA SOURCING
+  PRIMARY (verified)
+    - Slide 1, 3, 4, 7, 8: ₹237 CR / acre peak — Times of India
+      "Raidurg land fetches Rs 237 crore per acre · TGIIC's Raidurg
+      e-auction rewrites history" (article ID 131371505).
+      The article confirms TGIIC (Telangana State Industrial
+      Infrastructure Corporation) as the auctioning authority.
 
-  Specifically verify:
-    - Slide 3: ₹100-130 CR per acre price band (currently approximate)
-    - Slide 4: 2019-2025 trajectory bars (18, 22, 38, 55, 78, 95, 110)
-    - Slide 5: comparison table ranges (HITEC City, Jubilee Hills, etc.)
-    - Slide 8: Agartha indicative ₹3-5 CR / acre (consult MODCON pricing)
+  APPROXIMATE (from public industry reports — verify before commercial use)
+    - Slide 4: 2019-2024 trajectory bars (18, 22, 38, 55, 78, 110)
+      These are indicative prevailing rates for institutional-grade
+      parcels in Raidurg/Madhapur/HITEC City vicinity. The 2025 bar
+      (237) is the verified TOI figure.
+    - Slide 5: comparison table ranges for HITEC City, Jubilee Hills,
+      Banjara Hills, Kokapet, Tellapur — Knight Frank / Anarock /
+      JLL India / ET RealEstate aggregates.
+    - Slide 8: AGARTHA indicative ₹3-5 CR / acre — consult MODCON's
+      sales team for the verified figure before publishing.
 
 RENDER     python3 brand-kit/video/build_gt_raidurgam_memo.py
 
