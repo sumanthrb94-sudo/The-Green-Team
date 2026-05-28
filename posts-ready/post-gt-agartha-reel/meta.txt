@@ -1,5 +1,13 @@
-EPISODE     gt-agartha-reel  (property-focused reel for AGARTHA by The Green Team)
+EPISODE     gt-agartha-reel  (property-focused reel for MODCON AGARTHA
+                              curated by The Green Team, the channel partner)
 PILLAR      Property Showcase · Cornerstone Reel · MODCON AGARTHA
+
+BRAND HIERARCHY
+  DEVELOPER       MODCON BUILDERS  (builds + owns AGARTHA)
+  PROPERTY        AGARTHA  (project name; full naming: MODCON AGARTHA)
+  CHANNEL PARTNER THE GREEN TEAM  (curates the project, runs the reel,
+                                    handles the DM, owns the leaf mark
+                                    that opens the brand reveal)
 FORMAT      6-phase editorial property reel
             (V41 architecture + V42b/V42c techniques selectively applied)
 LENGTH      22.0s @ 60fps · 1320 frames
@@ -35,14 +43,16 @@ PHASE MAP (V41 beat grid · boundaries on detected beats)
                                                                 · VIA THE RRR CORRIDOR
                                   each cut has 0.06s exponential flash decay
   P5 BrandReveal  13.26 → 18.70s photos fade to ink · leaf STROKE-DRAWS in
-                                  3 staggered path layers · "AGARTHA" wordmark
-                                  types in (140pt display, 14px tracking)
-                                  "BY THE GREEN TEAM" subline · italic gold
-                                  "forest-edge sanctuary." tagline mask-reveal
+                                  3 staggered path layers (Green Team's mark
+                                  as the curator who opens the reveal)
+                                  "AGARTHA" wordmark types in (140pt, 14px track)
+                                  "BY MODCON BUILDERS" sub (developer attribution)
+                                  italic gold "forest-edge sanctuary." mask-reveal
   P6 CTAClose     18.70 → 22.00s 90px cinema letterbox bars animate IN
                                   CTA gold:  COMMENT 'AGARTHA'
                                   CTA cream: WE DM THE BRIEF
-                                  signature + thegreenteam.in + URL
+                                  signature: CURATED BY THE GREEN TEAM · CHANNEL PARTNER
+                                  URL gold:  thegreenteam.in
 
 ASSETS USED FROM REPO
   public/gallery/agartha/14.webp   (2400×1350 — pines + biophilic A-frame, P1+P2 hero)

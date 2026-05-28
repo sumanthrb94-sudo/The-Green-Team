@@ -79,9 +79,12 @@ SPECS = [
     ("FINANCIAL DISTRICT","40 MIN",      "VIA THE RRR CORRIDOR"),
 ]
 
-# Tagline for brand reveal
-TAGLINE_KICKER = "BY THE GREEN TEAM"
+# Brand reveal copy
+# AGARTHA is built by MODCON BUILDERS (the developer).
+# The Green Team is the CHANNEL PARTNER — curating + DMing the brief.
+DEVELOPER_LINE = "BY MODCON BUILDERS"
 TAGLINE_MAIN   = "forest-edge sanctuary."
+CHANNEL_PARTNER_LINE = "CURATED BY THE GREEN TEAM  ·  CHANNEL PARTNER"
 
 # CTA
 CTA_LINE_1 = "COMMENT 'AGARTHA'"
@@ -322,7 +325,7 @@ def phase5_brand_reveal_agartha(t, dust, photos):
             f'<g transform="translate({CX},1200)" opacity="{sub_progress:.3f}">'
             f'<text x="0" y="0" font-family="{FONT_MONO}" font-size="22" '
             f'fill="{PAPER}" letter-spacing="6" font-weight="600" '
-            f'text-anchor="middle">{TAGLINE_KICKER}</text>'
+            f'text-anchor="middle">{DEVELOPER_LINE}</text>'
             f'</g>'
         )
     if tag_progress > 0.001:
@@ -383,13 +386,13 @@ def phase6_cta_close(t, dust, photos):
         f'stroke="{GT_GOLD}" stroke-width="2.5"/>'
         + f'<text x="{CX}" y="1200" font-family="{FONT_MONO}" font-size="22" '
         f'fill="{PAPER}" letter-spacing="6" font-weight="600" '
-        f'text-anchor="middle">{TAGLINE_KICKER}</text>'
+        f'text-anchor="middle">{DEVELOPER_LINE}</text>'
         + f'<text x="{CX}" y="1340" font-family="{FONT_SERIF}" '
         f'font-size="68" font-style="italic" '
         f'fill="url(#goldHL)" font-weight="400" '
         f'text-anchor="middle">{TAGLINE_MAIN}</text>'
         # CTA block — two lines
-        + f'<g transform="translate({CX},1470)" opacity="{cta_progress:.3f}">'
+        + f'<g transform="translate({CX},1450)" opacity="{cta_progress:.3f}">'
         + f'<line x1="-200" y1="-50" x2="200" y2="-50" '
         f'stroke="{GT_SAGE}" stroke-width="1" opacity="0.45"/>'
         + f'<text x="0" y="0" font-family="{FONT_MONO}" font-size="22" '
@@ -399,11 +402,12 @@ def phase6_cta_close(t, dust, photos):
         f'fill="{PAPER}" letter-spacing="4" font-weight="600" '
         f'text-anchor="middle">{CTA_LINE_2}</text>'
         + '</g>'
-        + f'<g transform="translate({CX},1640)" opacity="{sig_progress:.3f}">'
-        + f'<text x="0" y="0" font-family="{FONT_MONO}" font-size="18" '
-        f'fill="{PAPER}" opacity="0.85" letter-spacing="4" '
-        f'text-anchor="middle">EDITORIAL REAL ESTATE — HYDERABAD</text>'
-        + f'<text x="0" y="34" font-family="{FONT_MONO}" font-size="22" '
+        # Channel partner attribution + URL
+        + f'<g transform="translate({CX},1610)" opacity="{sig_progress:.3f}">'
+        + f'<text x="0" y="0" font-family="{FONT_MONO}" font-size="15" '
+        f'fill="{PAPER}" opacity="0.85" letter-spacing="3" '
+        f'text-anchor="middle">{CHANNEL_PARTNER_LINE}</text>'
+        + f'<text x="0" y="32" font-family="{FONT_MONO}" font-size="22" '
         f'fill="{GT_GOLD}" font-weight="700" letter-spacing="3" '
         f'text-anchor="middle">thegreenteam.in</text>'
         + '</g>'
@@ -481,14 +485,14 @@ def build_poster():
         f'<stop offset="0.55" stop-color="#e6ce85"/>'
         f'<stop offset="1" stop-color="{GT_GOLD_DEEP}"/>'
         f'</linearGradient></defs>'
-        # Eyebrow chip
+        # Eyebrow chip — attributes the developer + reel context
         f'<g transform="translate(80,360)">'
         f'<rect x="0" y="-22" width="6" height="44" fill="{GT_GOLD}"/>'
         f'<text x="22" y="-4" font-family="{FONT_MONO}" font-size="18" '
-        f'fill="{PAPER}" font-weight="700" letter-spacing="3">AGARTHA</text>'
-        f'<text x="22" y="20" font-family="{FONT_MONO}" font-size="14" '
+        f'fill="{PAPER}" font-weight="700" letter-spacing="3">MODCON AGARTHA</text>'
+        f'<text x="22" y="20" font-family="{FONT_MONO}" font-size="13" '
         f'fill="{GT_GOLD}" font-weight="600" letter-spacing="3">'
-        f'BY THE GREEN TEAM</text></g>'
+        f'CURATED · THE GREEN TEAM</text></g>'
         # Hook (2 lines)
         f'<text x="{CX}" y="540" font-family="{FONT_DISPLAY}" font-size="86" '
         f'fill="{PAPER}" font-weight="900" letter-spacing="-2.5" '
@@ -513,7 +517,7 @@ def build_poster():
         f'stroke="{GT_GOLD}" stroke-width="2.5"/>'
         + f'<text x="{CX}" y="1450" font-family="{FONT_MONO}" font-size="20" '
         f'fill="{PAPER}" letter-spacing="5" font-weight="600" '
-        f'text-anchor="middle">{TAGLINE_KICKER}</text>'
+        f'text-anchor="middle">{DEVELOPER_LINE}</text>'
         # Specs row at the bottom (Agartha facts)
         + f'<g transform="translate(0,1620)">'
         + f'<text x="200" y="0" font-family="{FONT_MONO}" font-size="14" '
@@ -523,12 +527,12 @@ def build_poster():
         + f'<text x="880" y="0" font-family="{FONT_MONO}" font-size="14" '
         f'fill="{GT_GOLD}" letter-spacing="2" text-anchor="middle">40 MIN TO FD</text>'
         + '</g>'
-        # Signature
+        # Signature: channel partner attribution + URL
         + f'<line x1="{CX-200}" y1="1700" x2="{CX+200}" y2="1700" '
         f'stroke="{GT_SAGE}" stroke-width="1" opacity="0.45"/>'
-        + f'<text x="{CX}" y="1750" font-family="{FONT_MONO}" font-size="18" '
-        f'fill="{PAPER}" opacity="0.85" letter-spacing="4" '
-        f'text-anchor="middle">EDITORIAL REAL ESTATE — HYDERABAD</text>'
+        + f'<text x="{CX}" y="1750" font-family="{FONT_MONO}" font-size="16" '
+        f'fill="{PAPER}" opacity="0.85" letter-spacing="3" '
+        f'text-anchor="middle">{CHANNEL_PARTNER_LINE}</text>'
         + f'<text x="{CX}" y="1790" font-family="{FONT_MONO}" font-size="24" '
         f'fill="{GT_GOLD}" font-weight="700" letter-spacing="3" '
         f'text-anchor="middle">thegreenteam.in</text>'
