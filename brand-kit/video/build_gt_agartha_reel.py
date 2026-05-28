@@ -41,7 +41,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 import build_gt_thumb_v41 as v41
 from build_gt_thumb_v41 import (
-    W, H, FPS, TOTAL_S, N_FRAMES, CX,
+    W, H, FPS, CX,
     INK, PAPER, GT_SAGE, GT_GOLD, GT_GOLD_DEEP,
     FONT_DISPLAY, FONT_SERIF, FONT_MONO,
     P1_END, P2_END, P3_END, P4_END, P5_END,
@@ -51,6 +51,16 @@ from build_gt_thumb_v41 import (
     chip_eyebrow, leaf_logo_svg, LEAF_PATHS, LEAF_DASH,
     REPO,
 )
+
+# Override total runtime for the agartha reel — extends P6 so we have
+# room for the "PRESENTED BY THE GREEN TEAM" sequence after AGARTHA lands.
+# v41's TOTAL_S was 22.0 (P5_END=18.70, P6 was just 3.30s).
+# We extend to 25.0 so P6 = 6.30s, giving:
+#   ~1.0s hold on AGARTHA reveal
+#   ~2.5s "PRESENTED BY THE GREEN TEAM" + leaf stroke-draws in + wordmark
+#   ~2.8s CTA + URL + cinema bars
+TOTAL_S = 25.0
+N_FRAMES = int(TOTAL_S * FPS)  # 1500 frames @ 60fps
 
 
 # ─── MODCON LOGO (developer brand mark) ─────────────────────────────────
@@ -85,8 +95,40 @@ def modcon_logo_svg(cx: int, cy: int, target_w: int, opacity: float = 1.0) -> st
         f'opacity="{opacity:.3f}">{MODCON_INNER}</g>'
     )
 
-# V42b technique — borrow the diagonal wipe + light leak helpers
+# V42b technique — borrow the diagonal wipe + light leak helpers.
+# NOTE: diagonal_wipe had an inverted offset that left the old image
+# visible until very late in the wipe (which made the villa→pavilion
+# transition look stuck on the villa). We override with a correctly
+# centered implementation below.
 import build_gt_thumb_v42b as v42b
+
+
+def diagonal_wipe(im_a, im_b, progress: float,
+                  angle_deg: float = 14.0, feather: int = 80) -> Image.Image:
+    """A correct top-to-bottom diagonal wipe.
+
+    At progress=0 the wipe line sits just above the frame top, so
+    every visible pixel is BELOW the line → all im_a (old image).
+    At progress=1 the line sits just below the frame bottom, so every
+    visible pixel is ABOVE the line → all im_b (new image).
+    The line is tilted by `angle_deg`, with `feather` px of soft falloff."""
+    if progress <= 0.001:
+        return im_a
+    if progress >= 0.999:
+        return im_b
+    angle = math.radians(angle_deg)
+    tan_a = math.tan(angle)
+    # base_y travels from -feather (top, progress=0) to H+feather (bottom, progress=1)
+    base_y = -feather + progress * (H + 2 * feather)
+    yy, xx = np.meshgrid(np.arange(H, dtype=np.float32),
+                         np.arange(W, dtype=np.float32), indexing="ij")
+    # Tilt the line around the horizontal center for a symmetric look
+    line_y = base_y + (xx - W / 2.0) * tan_a
+    # d > 0 when pixel is ABOVE the wipe line (new image revealed)
+    d = line_y - yy
+    mask = np.clip(0.5 + d / feather, 0.0, 1.0)
+    mask_img = Image.fromarray((mask * 255).astype(np.uint8), "L")
+    return Image.composite(im_b, im_a, mask_img)
 
 FRAMES_DIR = REPO / "out" / "frames_gt-agartha-reel"
 FINAL_MP4 = REPO / "out" / "agartha-reel-60fps.mp4"
@@ -171,13 +213,14 @@ def phase2_hook_agartha(t, dust, photos):
 
 
 def phase3_property_tour(t, dust, photos):
-    """Phase 3 — 3-photo carousel with V42b diagonal wipes between them.
-    Photos: vine villa (4) → pavilion (20) → aerial detail (11)."""
+    """Phase 3 — 3-photo carousel with V42b diagonal wipes between three
+    VISUALLY DISTINCT shots:
+      villa     (4.webp)   vine-covered earth-bag villa — close-up architecture
+      pavilion  (13.webp)  A-frame thatched villa — different building style
+      aerial    (7.webp)   AERIAL trefoil + mandala gardens — top-down view
+    """
     u = norm(t, P2_END, P3_END)
-    # Split into 3 sub-windows: 0-0.40, 0.40-0.70, 0.70-1.0
-    # First half of each window is the wipe-in, second half holds.
     if u < 0.40:
-        # Continuing from hero into vine villa
         im_a = photos["hero"].ken_burns(
             t, P3_END, start_zoom=1.10, end_zoom=1.05,
             start_cx=0.55, start_cy=0.42, end_cx=0.55, end_cy=0.50,
@@ -187,12 +230,11 @@ def phase3_property_tour(t, dust, photos):
             start_zoom=1.05, end_zoom=1.18,
             start_cx=0.50, start_cy=0.55, end_cx=0.55, end_cy=0.50,
         )
-        # wipe across u 0.0 → 0.30
         wipe_p = ease_in_out(clamp(u / 0.30))
-        im = v42b.diagonal_wipe(im_a, im_b, wipe_p, angle_deg=14.0, feather=80)
+        im = diagonal_wipe(im_a, im_b, wipe_p, angle_deg=14.0, feather=80)
         active_label = "BIOPHILIC VILLA"
     elif u < 0.70:
-        # Vine villa → pavilion
+        # Vine villa → A-frame thatched villa (architecturally distinct)
         im_a = photos["villa"].ken_burns(
             t - P2_END, P3_END - P2_END,
             start_zoom=1.05, end_zoom=1.18,
@@ -201,30 +243,30 @@ def phase3_property_tour(t, dust, photos):
         im_b = photos["pavilion"].ken_burns(
             t - (P2_END + 0.40 * (P3_END - P2_END)),
             (P3_END - P2_END) * 0.30,
-            start_zoom=1.04, end_zoom=1.12,
-            start_cx=0.50, start_cy=0.45, end_cx=0.50, end_cy=0.50,
+            start_zoom=1.04, end_zoom=1.14,
+            start_cx=0.50, start_cy=0.50, end_cx=0.55, end_cy=0.55,
         )
         sub_u = (u - 0.40) / 0.30
         wipe_p = ease_in_out(clamp(sub_u))
-        im = v42b.diagonal_wipe(im_a, im_b, wipe_p, angle_deg=-12.0, feather=80)
-        active_label = "PAVILION + CLUBHOUSE"
+        im = diagonal_wipe(im_a, im_b, wipe_p, angle_deg=-12.0, feather=80)
+        active_label = "THATCHED VILLAS"
     else:
-        # Pavilion → aerial detail
+        # A-frame villa → AERIAL trefoil + mandala (top-down view — radically different)
         im_a = photos["pavilion"].ken_burns(
             t - (P2_END + 0.40 * (P3_END - P2_END)),
             (P3_END - P2_END) * 0.30,
-            start_zoom=1.04, end_zoom=1.12,
-            start_cx=0.50, start_cy=0.45, end_cx=0.50, end_cy=0.50,
+            start_zoom=1.04, end_zoom=1.14,
+            start_cx=0.50, start_cy=0.50, end_cx=0.55, end_cy=0.55,
         )
         im_b = photos["aerial"].ken_burns(
             t - (P2_END + 0.70 * (P3_END - P2_END)),
             (P3_END - P2_END) * 0.30,
-            start_zoom=1.06, end_zoom=1.18,
-            start_cx=0.45, start_cy=0.50, end_cx=0.55, end_cy=0.50,
+            start_zoom=1.02, end_zoom=1.14,
+            start_cx=0.50, start_cy=0.50, end_cx=0.50, end_cy=0.50,
         )
         sub_u = (u - 0.70) / 0.30
         wipe_p = ease_in_out(clamp(sub_u))
-        im = v42b.diagonal_wipe(im_a, im_b, wipe_p, angle_deg=10.0, feather=80)
+        im = diagonal_wipe(im_a, im_b, wipe_p, angle_deg=10.0, feather=80)
         active_label = "MASTER PLAN"
 
     # Dim band at the bottom for the active label
@@ -371,22 +413,56 @@ def phase5_brand_reveal_agartha(t, dust, photos):
 
 
 def phase6_cta_close(t, dust, photos):
-    """Phase 6 — CTA + cinematic letterbox close."""
+    """Phase 6 — three sub-beats over 6.30s (slowed to ~8.82s):
+      P6a  0.00-0.18  HOLD AGARTHA reveal (the brand block from P5 stays put)
+      P6b  0.18-0.62  PRESENTED BY THE GREEN TEAM — divider rule animates in,
+                      "PRESENTED BY" caption types in, Green Team LEAF
+                      stroke-draws in (path-dim → path-light → veins stagger),
+                      "THE GREEN TEAM" wordmark types in, "CHANNEL PARTNER"
+                      caption fades in
+      P6c  0.62-1.00  CTA + URL fade up + cinematic letterbox bars animate
+    """
     u = norm(t, P5_END, TOTAL_S)
     ink = Image.new("RGB", (W, H), (14, 20, 8))
     im = ink
 
-    # Cinema bars: animate 0 → 90px each by u=0.36
-    bar_h = int(90 * ease_out_cubic(clamp(u / 0.36)))
+    # Cinema bars animate in starting at u=0.55 (end of presented-by section)
+    bar_h = int(90 * ease_out_cubic(clamp((u - 0.55) / 0.40)))
 
-    # Hold the phase 5 brand block (leaf full + AGARTHA full + tagline full)
-    sig_progress = ease_out_cubic(clamp((u - 0.05) / 0.30))
-    cta_progress = ease_out_cubic(clamp((u - 0.20) / 0.35))
-    cta_t = t - (TOTAL_S - 2.5)
+    cta_t = t - (TOTAL_S - 2.0)
     cta_blink = (
-        0.55 + 0.45 * (0.5 + 0.5 * math.sin(cta_t * 6.0))
+        0.55 + 0.45 * (0.5 + 0.5 * math.sin(cta_t * 5.5))
         if cta_t > 0 else 0.0
     )
+
+    # ──  Phase 6a/b: AGARTHA block is HELD but COMPRESSED upward to make
+    # room for the presented-by reveal.
+    # u=0.0: positions same as end of P5 (modcon@800, agartha@1100, tagline@1300)
+    # u=0.40: positions compressed (modcon@600, agartha@850, tagline@1010)
+    # then HELD at compressed positions.
+    compress = ease_in_out(clamp((u - 0.05) / 0.30))
+    modcon_y = int(lerp(800, 580, compress))
+    agartha_y = int(lerp(1100, 830, compress))
+    rule_y   = int(lerp(1140, 875, compress))
+    tagline_y = int(lerp(1300, 970, compress))
+    modcon_w = int(lerp(340, 250, compress))
+
+    # ──  Phase 6b: PRESENTED BY THE GREEN TEAM reveal
+    # Starts at u=0.20, completes by u=0.65.
+    pb_caption_p = ease_out_cubic(clamp((u - 0.20) / 0.10))
+    pb_rule_p    = ease_out_cubic(clamp((u - 0.22) / 0.10))
+    pb_leaf_draw = ease_out_cubic(clamp((u - 0.28) / 0.18))
+    pb_leaf_fill = ease_out_cubic(clamp((u - 0.40) / 0.16))
+    pb_wordmark_p = ease_out_cubic(clamp((u - 0.45) / 0.18))
+    pb_channel_p  = ease_out_cubic(clamp((u - 0.58) / 0.12))
+
+    wordmark = "THE GREEN TEAM"
+    wm_visible_n = int(round(pb_wordmark_p * len(wordmark)))
+    wm_shown = wordmark[:wm_visible_n]
+
+    # ──  Phase 6c: CTA + URL fade up
+    cta_progress = ease_out_cubic(clamp((u - 0.62) / 0.20))
+    sig_progress = ease_out_cubic(clamp((u - 0.72) / 0.22))
 
     final_defs = (
         '<defs>'
@@ -402,43 +478,80 @@ def phase6_cta_close(t, dust, photos):
         '</defs>'
     )
 
-    overlay = (
-        final_defs
-        # MODCON developer wordmark (hero brand mark — held from P5)
-        + modcon_logo_svg(CX, 800, 340, opacity=1.0)
-        # AGARTHA — big editorial display
-        + f'<text x="{CX}" y="1100" font-family="{FONT_DISPLAY}" font-size="140" '
-        f'fill="{PAPER}" font-weight="800" letter-spacing="14" '
+    # AGARTHA brand block (held + compressed)
+    agartha_block = (
+        modcon_logo_svg(CX, modcon_y, modcon_w, opacity=1.0)
+        + f'<text x="{CX}" y="{agartha_y}" font-family="{FONT_DISPLAY}" font-size="100" '
+        f'fill="{PAPER}" font-weight="800" letter-spacing="10" '
         f'text-anchor="middle">{PROPERTY_NAME}</text>'
-        + f'<line x1="{CX - 160}" y1="1140" x2="{CX + 160}" y2="1140" '
-        f'stroke="{GT_GOLD}" stroke-width="2.5"/>'
-        + f'<text x="{CX}" y="1300" font-family="{FONT_SERIF}" '
-        f'font-size="68" font-style="italic" '
+        + f'<line x1="{CX - 130}" y1="{rule_y}" x2="{CX + 130}" y2="{rule_y}" '
+        f'stroke="{GT_GOLD}" stroke-width="2"/>'
+        + f'<text x="{CX}" y="{tagline_y}" font-family="{FONT_SERIF}" '
+        f'font-size="52" font-style="italic" '
         f'fill="url(#goldHL)" font-weight="400" '
         f'text-anchor="middle">{TAGLINE_MAIN}</text>'
-        # CTA block — two lines
-        + f'<g transform="translate({CX},1430)" opacity="{cta_progress:.3f}">'
-        + f'<line x1="-200" y1="-50" x2="200" y2="-50" '
+    )
+
+    # PRESENTED BY THE GREEN TEAM block
+    pb_block_parts = []
+    # Gold dividing rule above the presented-by section
+    if pb_rule_p > 0.001:
+        rule_w = pb_rule_p * 280
+        pb_block_parts.append(
+            f'<line x1="{CX - rule_w/2:.0f}" y1="1080" '
+            f'x2="{CX + rule_w/2:.0f}" y2="1080" '
+            f'stroke="{GT_GOLD}" stroke-width="2" opacity="0.7"/>'
+        )
+    # "PRESENTED BY" caption
+    if pb_caption_p > 0.001:
+        pb_block_parts.append(
+            f'<text x="{CX}" y="1140" font-family="{FONT_MONO}" font-size="18" '
+            f'fill="{PAPER}" opacity="{pb_caption_p * 0.85:.3f}" letter-spacing="6" '
+            f'font-weight="600" text-anchor="middle">PRESENTED BY</text>'
+        )
+    # Green Team LEAF stroke-draws in then fills
+    pb_block_parts.append(
+        leaf_logo_svg(CX, 1280, 160, pb_leaf_draw, pb_leaf_fill)
+    )
+    # "THE GREEN TEAM" wordmark types in
+    if wm_shown:
+        pb_block_parts.append(
+            f'<text x="{CX}" y="1410" font-family="{FONT_DISPLAY}" font-size="50" '
+            f'fill="{PAPER}" font-weight="800" letter-spacing="6" '
+            f'text-anchor="middle">{wm_shown}</text>'
+        )
+    # "CHANNEL PARTNER" subscript
+    if pb_channel_p > 0.001:
+        pb_block_parts.append(
+            f'<text x="{CX}" y="1450" font-family="{FONT_MONO}" font-size="14" '
+            f'fill="{GT_GOLD}" opacity="{pb_channel_p:.3f}" letter-spacing="6" '
+            f'font-weight="600" text-anchor="middle">CHANNEL PARTNER</text>'
+        )
+
+    # CTA + URL block (bottom)
+    cta_block = (
+        f'<g transform="translate({CX},1620)" opacity="{cta_progress:.3f}">'
+        f'<line x1="-200" y1="-40" x2="200" y2="-40" '
         f'stroke="{GT_SAGE}" stroke-width="1" opacity="0.45"/>'
-        + f'<text x="0" y="0" font-family="{FONT_MONO}" font-size="22" '
+        f'<text x="0" y="0" font-family="{FONT_MONO}" font-size="20" '
         f'fill="{GT_GOLD}" opacity="{cta_blink:.3f}" letter-spacing="4" '
         f'font-weight="700" text-anchor="middle">{CTA_LINE_1}</text>'
-        + f'<text x="0" y="40" font-family="{FONT_MONO}" font-size="22" '
+        f'<text x="0" y="36" font-family="{FONT_MONO}" font-size="20" '
         f'fill="{PAPER}" letter-spacing="4" font-weight="600" '
         f'text-anchor="middle">{CTA_LINE_2}</text>'
-        + '</g>'
-        # Channel partner attribution: small Green Team leaf + line + URL
-        + f'<g transform="translate({CX},1590)" opacity="{sig_progress:.3f}">'
-        + leaf_logo_svg(0, 0, 38, 1.0, 1.0)  # small Green Team leaf — channel partner mark
-        + f'<text x="0" y="60" font-family="{FONT_MONO}" font-size="15" '
-        f'fill="{PAPER}" opacity="0.85" letter-spacing="3" '
-        f'text-anchor="middle">{CHANNEL_PARTNER_LINE}</text>'
-        + f'<text x="0" y="92" font-family="{FONT_MONO}" font-size="22" '
+        '</g>'
+        f'<text x="{CX}" y="1740" font-family="{FONT_MONO}" font-size="22" '
         f'fill="{GT_GOLD}" font-weight="700" letter-spacing="3" '
-        f'text-anchor="middle">thegreenteam.in</text>'
-        + '</g>'
+        f'text-anchor="middle" opacity="{sig_progress:.3f}">thegreenteam.in</text>'
+    )
+
+    overlay = (
+        final_defs
+        + agartha_block
+        + "".join(pb_block_parts)
+        + cta_block
         + f'<rect width="{W}" height="{H}" fill="url(#vig)"/>'
-        # Cinema bars on top of everything
+        # Cinema bars
         + f'<rect x="0" y="0" width="{W}" height="{bar_h}" fill="#000"/>'
         + f'<rect x="0" y="{H - bar_h}" width="{W}" height="{bar_h}" fill="#000"/>'
     )
@@ -581,12 +694,15 @@ def main():
     FRAMES_DIR.mkdir(parents=True, exist_ok=True)
     rng = random.Random(11)
     dust = init_dust(rng)
-    # Photo cast for the reel
+    # Photo cast for the reel — chosen for visual distinctness so each
+    # phase 3 tour beat lands on an obviously-different building/view.
+    # (Previously: villa=4 and aerial=11 were the SAME vine villa from
+    # different angles, which made the tour look stuck on one building.)
     photos = {
-        "hero":     Photo(REPO / "public" / "gallery" / "agartha" / "14.webp"),  # pines
-        "villa":    Photo(REPO / "public" / "gallery" / "agartha" / "4.webp"),   # vine villa
-        "pavilion": Photo(REPO / "public" / "gallery" / "agartha" / "20.webp"),  # pergola+palms
-        "aerial":   Photo(REPO / "public" / "gallery" / "agartha" / "11.webp"),  # aerial detail
+        "hero":     Photo(REPO / "public" / "gallery" / "agartha" / "14.webp"),  # tall pines — cold open
+        "villa":    Photo(REPO / "public" / "gallery" / "agartha" / "4.webp"),   # vine-covered earth-bag villa
+        "pavilion": Photo(REPO / "public" / "gallery" / "agartha" / "13.webp"),  # A-frame thatched villa
+        "aerial":   Photo(REPO / "public" / "gallery" / "agartha" / "7.webp"),   # AERIAL trefoil + mandala gardens
     }
     for p in photos.values():
         p.load()
