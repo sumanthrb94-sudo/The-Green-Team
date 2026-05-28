@@ -17,3 +17,4 @@ out/_audio_*.wav
 out/checks/
 __pycache__/
 out/_omni_extracted/
+out/_omni_transcript.json

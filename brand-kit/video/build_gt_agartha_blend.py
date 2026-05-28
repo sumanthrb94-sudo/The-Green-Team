@@ -109,13 +109,39 @@ CTA_LINE_2 = "WE DM THE BRIEF"
 
 
 # ─── HERO OVERLAY (0-10s) — typography over Omni footage ────────────────
+# Speech-onset timing for Omni audio (librosa silence segmentation @ 20dB).
+# These are the ACTUAL voice-over phrase boundaries Omni rendered, NOT the
+# intended timings in the master prompt. Subtitles below are timed to land
+# ON these boundaries so audio + visuals stay in sync.
+#
+# Detected phrases:
+#   1.79 → 3.74s   "Forests don't stay by accident."
+#   4.32 → 7.11s   "They're curated. Twenty-five acres on the Narsapur..."
+#   7.13 → 9.45s   "...forest boundary. Air-quality index — twelve."
+VO_P1_START = 1.79   # phrase 1 starts
+VO_P1_END   = 3.74   # phrase 1 ends
+VO_P2_START = 4.32   # phrase 2 starts (curated + 25 acres)
+VO_P2_END   = 7.11
+VO_P3_START = 7.13   # phrase 3 starts (Narsapur + AQI 12)
+VO_P3_END   = 9.45
+
+
 def hero_overlay_svg(t: float) -> str:
-    """Same logic as agartha-omni: eyebrow chip + hook typewriter + italic
-    gold subtitle, baked over the Omni drone footage."""
+    """Typography overlay synced to Omni's actual voice-over boundaries.
+
+    Sync map:
+      0.5 -> chip fades in
+      1.79-2.7s  "FORESTS DON'T STAY" line 1 typewriter      (during phrase 1)
+      2.7-3.7s   "BY ACCIDENT." line 2 typewriter             (during phrase 1)
+      4.3-5.4s   italic gold "they're curated." mask reveal   (during phrase 2 head)
+      5.5-7.0s   "25 ACRES" stat preview slides in            (during phrase 2 tail)
+      7.1-9.0s   "NARSAPUR FOREST EDGE" stat preview slides   (during phrase 3)
+    """
     parts = [DEFS]
 
     # Top shade for chip
     parts.append(f'<rect width="{W}" height="380" fill="url(#topshade)"/>')
+
     chip_op = ease_out_cubic(clamp((t - 0.5) / 0.6))
     if chip_op > 0.001:
         parts.append(
@@ -130,17 +156,22 @@ def hero_overlay_svg(t: float) -> str:
             f'</g>'
         )
 
-    # Bottom shade for hook
-    if t > 1.5:
-        shade_op = ease_out_cubic(clamp((t - 1.5) / 0.5))
+    # Bottom shade — present once VO starts so the hook reads on the foliage
+    if t > VO_P1_START - 0.2:
+        shade_op = ease_out_cubic(clamp((t - (VO_P1_START - 0.2)) / 0.4))
         parts.append(
             f'<rect x="0" y="{H-600}" width="{W}" height="600" '
             f'fill="url(#botshade)" opacity="{shade_op:.3f}"/>'
         )
 
+    # Hook lines — typewriter, locked to VO phrase 1 boundaries
     hook_y = 1280
-    line1_p = ease_out_cubic(clamp((t - 2.0) / 2.5))
-    line2_p = ease_out_cubic(clamp((t - 4.5) / 2.0))
+    # Line 1 spans VO_P1_START .. midpoint
+    p1_mid = VO_P1_START + (VO_P1_END - VO_P1_START) * 0.50
+    line1_p = ease_out_cubic(clamp((t - VO_P1_START) / (p1_mid - VO_P1_START)))
+    # Line 2 spans midpoint .. VO_P1_END
+    line2_p = ease_out_cubic(clamp((t - p1_mid) / (VO_P1_END - p1_mid)))
+
     n1 = max(1, len(HOOK_LINE_1))
     v1 = int(round(line1_p * n1))
     line1 = HOOK_LINE_1[:v1]
@@ -159,7 +190,9 @@ def hero_overlay_svg(t: float) -> str:
             f'font-size="76" fill="{PAPER}" font-weight="800" '
             f'letter-spacing="-2" text-anchor="middle">{line2}</text>'
         )
-    rule_p = clamp((t - 6.3) / 0.7)
+
+    # Gold rule draws in just before italic subtitle (end of phrase 1)
+    rule_p = clamp((t - (VO_P1_END - 0.15)) / 0.25)
     if rule_p > 0.001:
         rw = rule_p * 180
         parts.append(
@@ -167,7 +200,11 @@ def hero_overlay_svg(t: float) -> str:
             f'x2="{CX + rw/2:.0f}" y2="{hook_y+165}" '
             f'stroke="{GT_GOLD}" stroke-width="2"/>'
         )
-    sub_p = ease_out_cubic(clamp((t - 7.0) / 1.5))
+
+    # Italic gold "they're curated." — mask reveal, locked to VO phrase 2 START
+    # (first ~1.1s of phrase 2 = "they're curated.")
+    sub_dur = 1.1
+    sub_p = ease_out_cubic(clamp((t - VO_P2_START) / sub_dur))
     if sub_p > 0.001:
         clip_w = sub_p * 460
         parts.append(
@@ -179,6 +216,38 @@ def hero_overlay_svg(t: float) -> str:
             f'font-size="56" font-style="italic" '
             f'fill="url(#goldHL)" font-weight="400" '
             f'text-anchor="middle">{HOOK_TAG}</text>'
+            f'</g>'
+        )
+
+    # Stat preview chip #1 — "25 ACRES" — locked to phrase 2 TAIL
+    # (Omni voice transitioning from "they're curated" to "twenty-five acres")
+    stat1_in = VO_P2_START + 1.3   # ~5.6s
+    stat1_p = ease_out_cubic(clamp((t - stat1_in) / 0.8))
+    if stat1_p > 0.001:
+        # Slide in from left, fade in
+        dx = (1 - stat1_p) * -180
+        parts.append(
+            f'<g transform="translate({80 + dx:.0f},580)" opacity="{stat1_p:.3f}">'
+            f'<rect x="0" y="-22" width="4" height="64" fill="{GT_GOLD}"/>'
+            f'<text x="18" y="-2" font-family="{FONT_MONO}" font-size="14" '
+            f'fill="{GT_GOLD}" font-weight="700" letter-spacing="3">PROJECT SIZE</text>'
+            f'<text x="18" y="34" font-family="{FONT_DISPLAY}" font-size="44" '
+            f'fill="{PAPER}" font-weight="800" letter-spacing="-1.5">25 ACRES</text>'
+            f'</g>'
+        )
+
+    # Stat preview chip #2 — "NARSAPUR FOREST EDGE" — locked to phrase 3 START
+    stat2_in = VO_P3_START + 0.1   # ~7.2s
+    stat2_p = ease_out_cubic(clamp((t - stat2_in) / 0.8))
+    if stat2_p > 0.001:
+        dx = (1 - stat2_p) * -180
+        parts.append(
+            f'<g transform="translate({80 + dx:.0f},700)" opacity="{stat2_p:.3f}">'
+            f'<rect x="0" y="-22" width="4" height="64" fill="{GT_GOLD}"/>'
+            f'<text x="18" y="-2" font-family="{FONT_MONO}" font-size="14" '
+            f'fill="{GT_GOLD}" font-weight="700" letter-spacing="3">ADDRESS</text>'
+            f'<text x="18" y="34" font-family="{FONT_DISPLAY}" font-size="36" '
+            f'fill="{PAPER}" font-weight="800" letter-spacing="-1">NARSAPUR FOREST</text>'
             f'</g>'
         )
     return svg_wrap("".join(parts))
