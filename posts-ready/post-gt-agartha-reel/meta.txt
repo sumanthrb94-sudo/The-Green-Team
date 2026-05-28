@@ -1,5 +1,5 @@
 EPISODE     gt-agartha-reel  (property-focused reel for AGARTHA by The Green Team)
-PILLAR      Property Showcase · Cornerstone Reel · AGARTHA
+PILLAR      Property Showcase · Cornerstone Reel · MODCON AGARTHA
 FORMAT      6-phase editorial property reel
             (V41 architecture + V42b/V42c techniques selectively applied)
 LENGTH      22.0s @ 60fps · 1320 frames
@@ -9,17 +9,30 @@ FILE        out/agartha-reel-60fps.mp4 (production)
             out/agartha-reel-mobile.mp4 (mobile-compressed)
 POSTER      out/agartha-reel-poster.jpg
 
+CORRECT FACTS  (do not confuse with SYL Residences in Tukkuguda)
+  PROPERTY      MODCON AGARTHA
+  LOCATION      Narsapur forest boundary (NOT Tukkuguda)
+  SIZE          25 acres · 36 plots, each pre-planted with 100+ tree varieties
+  AIR QUALITY   AQI 12 · ambient noise 18 dB (sub-city stats — signature claim)
+  CLUBHOUSE     36,000 sq ft · aquatic pool, kayaking lake, gym, farm-to-table
+  ACCESS        40 min from Financial District via the RRR corridor
+  AWARD         Outlook Business Best Sustainable Eco-Friendly Project 2024
+  RETURNS       +37% in 18 months (early-investor performance)
+
 PHASE MAP (V41 beat grid · boundaries on detected beats)
   P1 ColdOpen     0.00 → 2.42s   tall pines (agartha/14) — slow tilt down
   P2 Hook         2.42 → 6.61s   "WHERE THE FOREST / IS THE AMENITY."
-                                  typewriter reveal w/ EDITORIAL/AGARTHA chip
+                                  typewriter reveal w/ AGARTHA · 01/06 chip
   P3 PropertyTour 6.61 → 10.24s  3-photo carousel w/ diagonal wipes:
                                     BIOPHILIC VILLA → PAVILION + CLUBHOUSE → MASTER PLAN
                                   each with active tour label at bottom
   P4 Specs        10.24 → 13.26s STROBE-CUT 3 specs on beat (~1s each):
-                                    01/03  PROJECT SIZE  · 4.5 ACRES
-                                    02/03  ADDRESS       · ORR EX-14 · TUKKUGUDA
-                                    03/03  AIRPORT       · 10 MIN  · RGIA
+                                    01/03  PROJECT SIZE       · 25 ACRES
+                                                                · NARSAPUR FOREST · 36 PLOTS
+                                    02/03  AIR QUALITY        · AQI 12
+                                                                · AMBIENT 18 dB · SUB-CITY AIR
+                                    03/03  FINANCIAL DISTRICT · 40 MIN
+                                                                · VIA THE RRR CORRIDOR
                                   each cut has 0.06s exponential flash decay
   P5 BrandReveal  13.26 → 18.70s photos fade to ink · leaf STROKE-DRAWS in
                                   3 staggered path layers · "AGARTHA" wordmark
@@ -30,16 +43,6 @@ PHASE MAP (V41 beat grid · boundaries on detected beats)
                                   CTA gold:  COMMENT 'AGARTHA'
                                   CTA cream: WE DM THE BRIEF
                                   signature + thegreenteam.in + URL
-
-CONTENT BRIEF (AGARTHA-specific)
-  PROPERTY      AGARTHA — biophilic forest-edge sanctuary
-  ADDRESS       Tukkuguda · ORR Exit-14 · Hyderabad
-  SIZE          4.5 acres
-  AIRPORT       10 min to RGIA (Hyderabad International)
-  POSITIONING   Fourth City Hyderabad growth corridor
-  HOOK          WHERE THE FOREST IS THE AMENITY.
-  TAGLINE       forest-edge sanctuary.
-  CTA           COMMENT 'AGARTHA' → WE DM THE BRIEF
 
 ASSETS USED FROM REPO
   public/gallery/agartha/14.webp   (2400×1350 — pines + biophilic A-frame, P1+P2 hero)
@@ -52,8 +55,9 @@ AUDIO       mrclaps_fashion · 99.4 BPM · "fashion abstract" editorial cadence
             Same beat grid as v41/v42 — phase boundaries on detected beats
             File: /tmp uploaded - 5de4b633-mrclapsfashionabstract492552.mp3
 
-RERA NOTE   No prices · no assured returns · facts only (size/location/distance)
+RERA NOTE   No prices · no assured returns · facts only (size/location/AQI/distance/award)
             Compliant with pre-RERA marketing guidelines.
+            "+37% in 18 months" only quoted in past tense for early investors.
 
 DEPLOYMENT  IG Reels (with caption.txt) · YouTube Shorts
             DM keyword: 'AGARTHA' → triggers automated brief send

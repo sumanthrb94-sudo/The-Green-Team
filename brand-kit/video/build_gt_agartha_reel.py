@@ -70,11 +70,13 @@ PROPERTY_NAME = "AGARTHA"
 HOOK_TOP = "WHERE THE FOREST"
 HOOK_BOT = "IS THE AMENITY."
 
-# 3 spec cards strobing in phase 4
+# 3 spec cards strobing in phase 4 — Agartha-specific facts
+# (NOT to be confused with SYL Residences which is 4.5 acres in Tukkuguda).
+# Source: posts-ready/post-gt-agartha-master/meta.txt + thegreenteam.in site.
 SPECS = [
-    ("PROJECT SIZE",      "4.5 ACRES",   "FOREST-EDGE · BIOPHILIC"),
-    ("ADDRESS",           "ORR EX-14",   "TUKKUGUDA · FOURTH CITY"),
-    ("AIRPORT",           "10 MIN",      "TO HYDERABAD INTL · RGIA"),
+    ("PROJECT SIZE",      "25 ACRES",    "NARSAPUR FOREST · 36 PLOTS"),
+    ("AIR QUALITY",       "AQI 12",      "AMBIENT 18 dB · SUB-CITY AIR"),
+    ("FINANCIAL DISTRICT","40 MIN",      "VIA THE RRR CORRIDOR"),
 ]
 
 # Tagline for brand reveal
@@ -512,14 +514,14 @@ def build_poster():
         + f'<text x="{CX}" y="1450" font-family="{FONT_MONO}" font-size="20" '
         f'fill="{PAPER}" letter-spacing="5" font-weight="600" '
         f'text-anchor="middle">{TAGLINE_KICKER}</text>'
-        # Specs row at the bottom
+        # Specs row at the bottom (Agartha facts)
         + f'<g transform="translate(0,1620)">'
         + f'<text x="200" y="0" font-family="{FONT_MONO}" font-size="14" '
-        f'fill="{GT_GOLD}" letter-spacing="2" text-anchor="middle">4.5 ACRES</text>'
+        f'fill="{GT_GOLD}" letter-spacing="2" text-anchor="middle">25 ACRES</text>'
         + f'<text x="540" y="0" font-family="{FONT_MONO}" font-size="14" '
-        f'fill="{GT_GOLD}" letter-spacing="2" text-anchor="middle">ORR EX-14</text>'
+        f'fill="{GT_GOLD}" letter-spacing="2" text-anchor="middle">AQI 12 · 18 dB</text>'
         + f'<text x="880" y="0" font-family="{FONT_MONO}" font-size="14" '
-        f'fill="{GT_GOLD}" letter-spacing="2" text-anchor="middle">10 MIN AIRPORT</text>'
+        f'fill="{GT_GOLD}" letter-spacing="2" text-anchor="middle">40 MIN TO FD</text>'
         + '</g>'
         # Signature
         + f'<line x1="{CX-200}" y1="1700" x2="{CX+200}" y2="1700" '
