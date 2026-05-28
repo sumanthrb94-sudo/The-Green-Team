@@ -150,6 +150,9 @@ def slide_01_hook() -> str:
         + f'<text x="{CX}" y="930" font-family="{FONT_MONO}" font-size="18" '
         f'fill="{PAPER}" opacity="0.7" letter-spacing="6" '
         f'text-anchor="middle">PER ACRE — TGIIC E-AUCTION RECORD</text>'
+        + f'<text x="{CX}" y="965" font-family="{FONT_MONO}" font-size="14" '
+        f'fill="{GT_GOLD}" opacity="0.75" letter-spacing="3" '
+        f'text-anchor="middle">+70.5% OVER RESERVE  ·  6.29 ACRES  ·  GOWRA VENTURES</text>'
         # Bottom sub-caption
         + f'<text x="{CX}" y="1140" font-family="{FONT_SERIF}" font-size="22" '
         f'fill="{PAPER}" opacity="0.85" font-style="italic" '
@@ -213,15 +216,17 @@ def slide_03_number() -> str:
         f'text-anchor="middle">PER ACRE</text>'
         + f'<line x1="{CX-120}" y1="650" x2="{CX+120}" y2="650" '
         f'stroke="{GT_GOLD}" stroke-width="2"/>'
-        # Transaction details (4 rows)
-        + _fact_row(220, 800, "AUCTION",     "TGIIC RAIDURG E-AUCTION")
-        + _fact_row(220, 880, "PEAK BID",    "₹237 CR / ACRE")
-        + _fact_row(220, 960, "SOURCE",      "TIMES OF INDIA · 2025")
-        + _fact_row(220, 1040, "PREVIOUS HIGH","₹100 CR / ACRE BAND")
-        # Disclaimer
-        + f'<text x="{CX}" y="1190" font-family="{FONT_MONO}" font-size="11" '
+        # Transaction details (6 rows — verified per TOI & Deccan Chronicle)
+        + _fact_row(160, 770,  "BUYER",          "GOWRA VENTURES PVT LTD")
+        + _fact_row(160, 840,  "PARCEL",         "PLOT 1A &amp; 1/F  ·  6.29 ACRES  ·  MULTI-USE")
+        + _fact_row(160, 910,  "TOTAL VALUE",    "₹1,490.73 CR")
+        + _fact_row(160, 980,  "RESERVE PRICE",  "₹139 CR / ACRE")
+        + _fact_row(160, 1050, "BID SURGE",      "+70.5% OVER RESERVE")
+        + _fact_row(160, 1120, "PREVIOUS RECORD","₹177 CR / ACRE  ·  2025")
+        # Source / disclaimer
+        + f'<text x="{CX}" y="1210" font-family="{FONT_MONO}" font-size="11" '
         f'fill="{PAPER}" opacity="0.55" letter-spacing="2" '
-        f'text-anchor="middle">Verified per TOI · DM for the full TGIIC auction log.</text>'
+        f'text-anchor="middle">SOURCE  ·  TIMES OF INDIA  ·  DECCAN CHRONICLE  ·  TGIIC MSTC E-AUCTION</text>'
         + '</svg>'
     )
 
@@ -229,14 +234,17 @@ def slide_03_number() -> str:
 # ─── SLIDE 4 — 5-YEAR TRAJECTORY ────────────────────────────────────────
 def slide_04_trajectory() -> str:
     """Simple bar chart showing approximate per-acre prices 2019-2025."""
+    # Verified record: 2025 TGIIC e-auction set ₹237 CR/acre, surpassing
+    # an earlier 2025 Raidurg auction at ₹177 CR/acre. 2024 estimated ~110.
     bars = [
-        ("2019", 18),
-        ("2020", 22),
-        ("2021", 38),
-        ("2022", 55),
-        ("2023", 78),
-        ("2024", 110),
-        ("2025", 237),   # TGIIC e-auction record — verified per TOI
+        ("2019",     18),
+        ("2020",     22),
+        ("2021",     38),
+        ("2022",     55),
+        ("2023",     78),
+        ("2024",    110),
+        ("2025 H1", 177),    # previous record per TOI
+        ("2025 H2", 237),    # NEW record (Gowra Ventures · TGIIC e-auction)
     ]
     chart_x = 140
     chart_y_top = 540
@@ -251,8 +259,13 @@ def slide_04_trajectory() -> str:
         bh = int((val / max_val) * (chart_y_bot - chart_y_top))
         bx = chart_x + i * bar_gap + 7
         by = chart_y_bot - bh
-        # Bar gradient — last bar gold, others sage→gold tinted
-        col = GT_GOLD if i == len(bars) - 1 else GT_SAGE
+        # Last bar gold (record), previous record gold-deep, others sage
+        if i == len(bars) - 1:
+            col = GT_GOLD
+        elif i == len(bars) - 2:
+            col = GT_GOLD_DEEP
+        else:
+            col = GT_SAGE
         bar_svg.append(
             f'<rect x="{bx}" y="{by}" width="{bar_w}" height="{bh}" fill="{col}"/>'
         )
@@ -360,12 +373,12 @@ def slide_05_comparison() -> str:
 # ─── SLIDE 6 — WHY ──────────────────────────────────────────────────────
 def slide_06_why() -> str:
     drivers = [
-        ("01", "METRO PHASE-2",       "Raidurgam ↔ Shamshabad line approved.",
-                                       "Direct airport connectivity finally arrives."),
-        ("02", "KNOWLEDGE CITY PULL", "HCU + research campuses + AMD India HQ.",
-                                       "Anchors a new economic gravity centre."),
-        ("03", "SCARCITY",            "Last large institutional-grade parcels.",
-                                       "When supply ends, the price discovery ends with it."),
+        ("01", "INSTITUTIONAL APPETITE", "Final bid 70.5% above the reserve price.",
+                                          "Buyers aren't bidding for value — they're bidding for position."),
+        ("02", "KNOWLEDGE CITY PULL",    "HCU + research + AMD India HQ + Microsoft.",
+                                          "Anchors a new economic gravity centre."),
+        ("03", "SCARCITY",               "Last institutional-grade parcels via TGIIC.",
+                                          "When supply ends, the price discovery ends with it."),
     ]
     row_svg = []
     for i, (num, title, line1, line2) in enumerate(drivers):

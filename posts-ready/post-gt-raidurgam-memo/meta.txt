@@ -48,18 +48,25 @@ POSITIONING
   district) to AGARTHA (forest-edge sanctuary), maintaining brand voice.
 
 DATA SOURCING
-  PRIMARY (verified)
-    - Slide 1, 3, 4, 7, 8: ₹237 CR / acre peak — Times of India
-      "Raidurg land fetches Rs 237 crore per acre · TGIIC's Raidurg
-      e-auction rewrites history" (article ID 131371505).
-      The article confirms TGIIC (Telangana State Industrial
-      Infrastructure Corporation) as the auctioning authority.
+  PRIMARY (verified per TOI + Deccan Chronicle)
+    - PEAK PER-ACRE      ₹237 CR
+    - PARCEL              Plot 1A & 1/F  ·  6.29 acres  ·  multi-use
+    - BUYER               Gowra Ventures Pvt Ltd
+    - INTENT              IT office towers + mixed-use infrastructure
+    - TOTAL VALUE         ₹1,490.73 CR
+    - RESERVE PRICE       ₹139 CR / acre
+    - BID SURGE           +70.5% over reserve
+    - PREVIOUS RECORD     ₹177 CR / acre  ·  earlier 2025 Raidurg auction
+    - AUCTIONING BODY     TGIIC (Telangana Industrial Infrastructure Corporation)
+    - PLATFORM            MSTC e-Auction
+    - SOURCE              Times of India · Deccan Chronicle
+    - TOI ARTICLE         articleshow/131371505
 
-  APPROXIMATE (from public industry reports — verify before commercial use)
+  APPROXIMATE (industry-aggregator estimates — flag if you have verified data)
     - Slide 4: 2019-2024 trajectory bars (18, 22, 38, 55, 78, 110)
       These are indicative prevailing rates for institutional-grade
-      parcels in Raidurg/Madhapur/HITEC City vicinity. The 2025 bar
-      (237) is the verified TOI figure.
+      parcels in Raidurg/Madhapur vicinity. 2025 H1 (177) and 2025 H2
+      (237) are the verified TOI figures.
     - Slide 5: comparison table ranges for HITEC City, Jubilee Hills,
       Banjara Hills, Kokapet, Tellapur — Knight Frank / Anarock /
       JLL India / ET RealEstate aggregates.
