@@ -19,3 +19,4 @@ __pycache__/
 out/_omni_extracted/
 out/_omni_transcript.json
 out/raw/
+out/_gem_extracted_villa/
