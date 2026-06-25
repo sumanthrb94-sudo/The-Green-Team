@@ -61,7 +61,7 @@ import type { User, ConfirmationResult } from 'firebase/auth';
 import { auth, db, googleProvider } from './lib/firebase';
 import { saveLead, saveNewsletter, getLeads, getNewsletterSubs, subscribeLeads, subscribeNewsletter } from './lib/leads';
 import type { Lead, NewsletterEntry } from './lib/leads';
-import { upsertUserProfile, getAllUsers } from './lib/users';
+import { upsertUserProfile, getAllUsers, findUserByEmail, findUserByPhone, normalizePhone } from './lib/users';
 import type { UserProfile } from './lib/users';
 import { subscribeProperties, createProperty, updateProperty, deleteProperty } from './lib/properties';
 import type { PropertyDoc, PropertyInput } from './lib/properties';
@@ -6311,33 +6311,101 @@ const AuthModal = ({
 const ProfileModal = ({
   isOpen,
   user,
+  requirePhone,
+  requireEmail,
   onDone,
 }: {
   isOpen: boolean;
   user: User | null;
+  // True when the user signed in via Google/email and we don't have their phone yet.
+  requirePhone: boolean;
+  // True when the user signed in via phone OTP and we don't have their email yet.
+  requireEmail: boolean;
   onDone: () => void;
 }) => {
   const [name, setName]             = useState('');
   const [occupation, setOccupation] = useState('');
   const [city, setCity]             = useState('');
+  const [extraPhone, setExtraPhone] = useState('');
+  const [extraEmail, setExtraEmail] = useState('');
   const [saving, setSaving]         = useState(false);
+  const [error, setError]           = useState('');
+
+  // A contact rail is mandatory if signup came in without it.
+  const contactRequired = requirePhone || requireEmail;
 
   useEffect(() => {
-    if (isOpen && user) setName(user.displayName || '');
+    if (isOpen && user) {
+      setName(user.displayName || '');
+      setExtraPhone('');
+      setExtraEmail('');
+      setError('');
+    }
   }, [isOpen, user]);
 
   const handleSave = async (skip = false) => {
     if (!user) { onDone(); return; }
+    setError('');
+
+    // Enforce the missing contact rail. Skip is disabled when a rail is missing.
+    if (contactRequired && skip) return;
+
+    let normalizedPhone: string | null = null;
+    let normalizedEmail: string | null = null;
+
+    if (requirePhone) {
+      normalizedPhone = normalizePhone(extraPhone);
+      // Must be at least +91XXXXXXXXXX (13 chars) — basic E.164 sanity check.
+      if (!normalizedPhone || normalizedPhone.length < 11) {
+        setError('Enter a valid phone number with country code (e.g. +91 98765 43210).');
+        return;
+      }
+    }
+    if (requireEmail) {
+      normalizedEmail = extraEmail.trim().toLowerCase();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+        setError('Enter a valid email address.');
+        return;
+      }
+    }
+
     setSaving(true);
     try {
+      // Duplicate guard — block save if the contact already belongs to another uid.
+      if (normalizedPhone) {
+        const dup = await findUserByPhone(normalizedPhone);
+        if (dup && dup.uid !== user.uid) {
+          setError('This phone number is already linked to another account. Sign in with that account instead.');
+          setSaving(false);
+          return;
+        }
+      }
+      if (normalizedEmail) {
+        const dup = await findUserByEmail(normalizedEmail);
+        if (dup && dup.uid !== user.uid) {
+          setError('This email is already linked to another account. Sign in with that account instead.');
+          setSaving(false);
+          return;
+        }
+      }
+
       await upsertUserProfile(user.uid, {
         uid: user.uid,
-        email: user.email,
+        email: normalizedEmail ?? user.email,
+        phone: normalizedPhone ?? user.phoneNumber ?? null,
         displayName: user.displayName,
         photoURL: user.photoURL,
-        ...(skip ? {} : { name: name.trim() || undefined, occupation: occupation.trim() || undefined, city: city.trim() || undefined }),
+        ...(skip ? {} : {
+          name: name.trim() || undefined,
+          occupation: occupation.trim() || undefined,
+          city: city.trim() || undefined,
+        }),
       });
-    } catch { /* silent */ }
+    } catch (err: any) {
+      setError(err?.message || 'Could not save your details. Try again.');
+      setSaving(false);
+      return;
+    }
     setSaving(false);
     onDone();
   };
@@ -6347,7 +6415,8 @@ const ProfileModal = ({
       {isOpen && user && (
         <div className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center">
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-olive-900/70 backdrop-blur-xl" onClick={() => handleSave(true)} />
+            className="absolute inset-0 bg-olive-900/70 backdrop-blur-xl"
+            onClick={contactRequired ? undefined : () => handleSave(true)} />
           <motion.div
             initial={{ opacity: 0, y: 80 }}
             animate={{ opacity: 1, y: 0 }}
@@ -6361,26 +6430,52 @@ const ProfileModal = ({
                 {user.photoURL
                   ? <img src={user.photoURL} referrerPolicy="no-referrer" loading="lazy" decoding="async" alt="You" className="w-11 h-11 rounded-full object-cover ring-2 ring-primary/20" />
                   : <div className="w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-lg">
-                      {(user.displayName?.[0] || user.email?.[0] || '?').toUpperCase()}
+                      {(user.displayName?.[0] || user.email?.[0] || user.phoneNumber?.[1] || '?').toUpperCase()}
                     </div>
                 }
                 <div>
                   <p className="text-[8px] uppercase tracking-[0.5em] text-primary/60 font-bold">Welcome</p>
-                  <p className="text-sm font-bold text-olive-900">{user.displayName || user.email}</p>
+                  <p className="text-sm font-bold text-olive-900">{user.displayName || user.email || user.phoneNumber}</p>
                 </div>
               </div>
-              <button onClick={() => handleSave(true)} className="text-olive-800/30 hover:text-olive-900 transition-all">
-                <X className="w-5 h-5" />
-              </button>
+              {!contactRequired && (
+                <button onClick={() => handleSave(true)} className="text-olive-800/30 hover:text-olive-900 transition-all">
+                  <X className="w-5 h-5" />
+                </button>
+              )}
             </div>
 
             <div className="px-8 pb-10 space-y-6">
               <div>
-                <h2 className="text-xl font-serif italic text-olive-900">One quick thing</h2>
-                <p className="text-olive-800/40 text-xs font-light mt-1 leading-relaxed">Help us match you with the right sanctuary. Totally optional — skip anytime.</p>
+                <h2 className="text-xl font-serif italic text-olive-900">
+                  {contactRequired ? 'Finish your account' : 'One quick thing'}
+                </h2>
+                <p className="text-olive-800/40 text-xs font-light mt-1 leading-relaxed">
+                  {requirePhone && 'We need a phone number to keep your account unique and reachable for site visits.'}
+                  {requireEmail && 'We need an email so we can send the master plan, AQI doc, and price list.'}
+                  {!contactRequired && 'Help us match you with the right sanctuary. Totally optional — skip anytime.'}
+                </p>
               </div>
 
               <div className="space-y-4">
+                {requirePhone && (
+                  <div>
+                    <label htmlFor="prof-extra-phone" className="text-[9px] uppercase tracking-[0.4em] text-primary/70 font-bold block mb-1.5">Phone Number *</label>
+                    <input id="prof-extra-phone" name="extraPhone" type="tel" value={extraPhone} onChange={e => setExtraPhone(e.target.value)} required
+                      className="w-full bg-surface border-2 border-primary/30 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors"
+                      placeholder="+91 98765 43210" autoFocus />
+                    <p className="text-[8px] text-olive-800/30 mt-1.5 tracking-wider">Indian numbers auto-prefixed with +91.</p>
+                  </div>
+                )}
+                {requireEmail && (
+                  <div>
+                    <label htmlFor="prof-extra-email" className="text-[9px] uppercase tracking-[0.4em] text-primary/70 font-bold block mb-1.5">Email *</label>
+                    <input id="prof-extra-email" name="extraEmail" type="email" value={extraEmail} onChange={e => setExtraEmail(e.target.value)} required
+                      className="w-full bg-surface border-2 border-primary/30 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors"
+                      placeholder="email@domain.com" autoFocus />
+                    <p className="text-[8px] text-olive-800/30 mt-1.5 tracking-wider">We send the master plan + AQI doc here. No newsletter dump.</p>
+                  </div>
+                )}
                 <div>
                   <label htmlFor="prof-name" className="text-[9px] uppercase tracking-[0.4em] text-olive-800/40 font-bold block mb-1.5">Full Name</label>
                   <input id="prof-name" name="name" value={name} onChange={e => setName(e.target.value)}
@@ -6401,16 +6496,20 @@ const ProfileModal = ({
                 </div>
               </div>
 
+              {error && <p className="text-red-500 text-xs text-center">{error}</p>}
+
               <div className="flex gap-3 pt-2">
                 <button onClick={() => handleSave(false)} disabled={saving}
                   className="flex-1 py-4 bg-olive-900 text-cream text-sm font-semibold rounded-2xl hover:bg-primary transition-all disabled:opacity-60 flex items-center justify-center gap-2">
                   {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-                  {saving ? 'Saving…' : 'Complete Profile'}
+                  {saving ? 'Saving…' : contactRequired ? 'Continue' : 'Complete Profile'}
                 </button>
-                <button onClick={() => handleSave(true)} disabled={saving}
-                  className="px-6 py-4 border border-olive-800/10 text-olive-800/40 text-xs font-bold rounded-2xl hover:border-olive-800/30 hover:text-olive-900 transition-all">
-                  Skip
-                </button>
+                {!contactRequired && (
+                  <button onClick={() => handleSave(true)} disabled={saving}
+                    className="px-6 py-4 border border-olive-800/10 text-olive-800/40 text-xs font-bold rounded-2xl hover:border-olive-800/30 hover:text-olive-900 transition-all">
+                    Skip
+                  </button>
+                )}
               </div>
             </div>
           </motion.div>
@@ -6446,6 +6545,8 @@ export default function App() {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [profileUser, setProfileUser] = useState<User | null>(null);
+  const [requirePhone, setRequirePhone] = useState(false);
+  const [requireEmail, setRequireEmail] = useState(false);
 
   // Silent geolocation capture — saves to Firestore without any UI
   const captureLocation = useCallback((uid: string) => {
@@ -6469,23 +6570,48 @@ export default function App() {
     if (user.email === ADMIN_EMAIL) setShowAdmin(true);
     // Request geolocation silently after a short delay
     setTimeout(() => captureLocation(user.uid), 1500);
-    // Show profile modal for new users (or returning users who never filled it)
-    if (isNew) {
+
+    // Decide which contact rail is missing — the modal will hard-require it
+    // so a Google sign-up gets a phone, and a phone sign-up gets an email.
+    const hasFirebaseEmail = !!user.email;
+    const hasFirebasePhone = !!user.phoneNumber;
+
+    const openProfile = (needPhone: boolean, needEmail: boolean) => {
       setProfileUser(user);
+      setRequirePhone(needPhone);
+      setRequireEmail(needEmail);
       setShowProfile(true);
+    };
+
+    if (isNew) {
+      // First-ever sign-in: always open the profile. Force the missing rail.
+      openProfile(hasFirebaseEmail && !hasFirebasePhone, hasFirebasePhone && !hasFirebaseEmail);
       // Ensure all signups are captured as leads immediately
       saveLead({
         name: user.displayName || 'New User',
         email: user.email || undefined,
         intent: 'New Sign-up',
         source: 'signup'
-      }).catch(() => {}); 
+      }).catch(() => {});
     } else {
-      // For returning users: check if they have a profile, if not show it
+      // Returning user: check the stored profile. If the rail we now require
+      // is missing on disk, force-open the modal so we collect it once.
       upsertUserProfile(user.uid, {
-        uid: user.uid, email: user.email, displayName: user.displayName, photoURL: user.photoURL,
-      }).then(wasNew => {
-        if (wasNew) { setProfileUser(user); setShowProfile(true); }
+        uid: user.uid,
+        email: user.email,
+        phone: user.phoneNumber ?? undefined,
+        displayName: user.displayName,
+        photoURL: user.photoURL,
+      }).then(async wasNew => {
+        try {
+          const { getUserProfile } = await import('./lib/users');
+          const stored = await getUserProfile(user.uid);
+          const needPhone = !hasFirebasePhone && !stored?.phone;
+          const needEmail = !hasFirebaseEmail && !stored?.email;
+          if (wasNew || needPhone || needEmail) {
+            openProfile(needPhone, needEmail);
+          }
+        } catch { /* silent */ }
       }).catch(() => {});
     }
   }, [captureLocation]);
@@ -6879,7 +7005,13 @@ export default function App() {
       <ProfileModal
         isOpen={showProfile}
         user={profileUser}
-        onDone={() => setShowProfile(false)}
+        requirePhone={requirePhone}
+        requireEmail={requireEmail}
+        onDone={() => {
+          setShowProfile(false);
+          setRequirePhone(false);
+          setRequireEmail(false);
+        }}
       />
     </div>
   );
