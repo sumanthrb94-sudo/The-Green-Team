@@ -3,13 +3,15 @@
 # SarvamSTTService/SarvamTTSService signatures before bumping this.
 pipecat-ai[sarvam,silero,webrtc]==1.7.0
 
-fastapi==0.115.6
-uvicorn[standard]==0.34.0
-pydantic==2.10.4
+fastapi==0.141.1
+uvicorn[standard]==0.52.1
 loguru==0.7.3
 
-plivo==4.60.0
-google-cloud-firestore==2.20.0
+plivo==4.62.0
+google-cloud-firestore==2.28.1
+
+# pydantic is deliberately unpinned — pipecat sets the floor, and pinning it
+# here produced "ResolutionImpossible" on every install.
 
 # dev
 pytest==8.3.4
