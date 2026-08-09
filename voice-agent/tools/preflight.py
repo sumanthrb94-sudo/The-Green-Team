@@ -93,6 +93,11 @@ def check_tts(c: Check, key: str) -> None:
         return
 
     c.ok(f"TTS {model}", f"voice '{voice}', {ms:.0f} ms for one short line")
+    if ms > 900:
+        c.warn("latency", f"{ms:.0f} ms for a short line is mostly network "
+                          "distance. Sarvam is hosted in India — if this shell "
+                          "or host is not, every turn pays it twice. Deploy to "
+                          "Cloud Run asia-south1 to remove it.")
     if voice in ("priya", "kavya", "ritu", "neha", "aditya", "rahul"):
         c.warn("voice", f"'{voice}' is a stock speaker — clone a real voice "
                         "before showing this to a client")

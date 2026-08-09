@@ -93,9 +93,10 @@ def build_services(sample_rate: int):
             # second-guess text that is already Telugu words.
             enable_preprocessing=False,
             pace=float(os.getenv("TTS_PACE", "1.0")),
-            # Small buffer keeps time-to-first-audio down; the tradeoff is
-            # slightly choppier prosody on long sentences.
-            min_buffer_size=int(os.getenv("TTS_MIN_BUFFER", "50")),
+            # Characters buffered before synthesis starts. Lower means the
+            # first word lands sooner, at some cost to prosody across a
+            # sentence boundary. 50 was worth ~150 ms of dead air.
+            min_buffer_size=int(os.getenv("TTS_MIN_BUFFER", "20")),
         ),
     )
 
@@ -106,13 +107,14 @@ def build_services(sample_rate: int):
 def _vad_settings():
     """How readily the agent lets itself be interrupted.
 
-    The first live test on a phone stopped the agent on every cough, every
-    background noise, and on its own voice coming back through the speaker —
-    the browser's echo canceller does not reliably cancel audio we play
-    through a separate AudioContext. High sensitivity is right for a headset
-    and wrong for a phone on speaker, so "robust" is the default.
+    On a phone speaker the agent's own voice returns through the mic and the
+    browser's echo canceller does not reliably remove audio played through a
+    separate AudioContext, so it interrupts itself. Raising the detection
+    thresholds fixed that and made it deaf instead; only the interruption
+    threshold should move.
 
-        VAD_PROFILE=robust     phone speaker, noisy room (default)
+        VAD_PROFILE=balanced   default — normal detection, hard to interrupt
+        VAD_PROFILE=robust     genuinely loud room; deaf on a normal phone mic
         VAD_PROFILE=sensitive  headset, quiet room — interrupts eagerly
     """
     from pipecat.services.sarvam.stt import SarvamSTTSettings

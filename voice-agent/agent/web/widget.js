@@ -317,7 +317,10 @@
     // means any network jitter lands it in the past, where browsers drop it
     // silently — you see activity and hear nothing. So keep a lookahead
     // cushion and schedule strictly back to back from it.
-    const JITTER_SECONDS = 0.2;
+    // Straight latency on every reply, so keep it just big enough to absorb
+    // jitter. 200 ms was audible padding; 80 ms still clears the
+    // scheduled-into-the-past bug.
+    const JITTER_SECONDS = 0.08;
     let idleTimer = null;
     let logged = false;
 
