@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
-# Deploy the voice agent to Cloud Run in Mumbai.
+# Deploy the voice agent to Cloud Run in Mumbai. This is the default host.
 #
-# ⚠ PHONE CHANNEL ONLY. Cloud Run accepts HTTP, gRPC and WebSocket inbound —
-# no raw UDP. WebRTC media is UDP, so the web widget would connect, signalling
-# would succeed, and the call would be silent. Plivo streams over a WebSocket,
-# so the phone leg is fine here.
+# Both channels work here because both stream over WebSockets: the widget
+# sends PCM to /web/ws, and Plivo streams call audio to /plivo/stream. Cloud
+# Run terminates HTTPS on its own *.run.app hostname with a valid
+# certificate, so there is no DNS record to create and no VM to run.
 #
-# For the web channel use deploy/gce.sh, which puts the agent on a VM with a
-# public IP and the media ports open.
+# The one thing Cloud Run cannot do is inbound UDP, which rules out the
+# WebRTC transport (/web/offer). If you later want WebRTC for its jitter
+# resilience on poor mobile networks, deploy/gce.sh puts the agent on a VM
+# with the media ports open — at the cost of a VM, a DNS record and a cert.
 #
 # Credentials: the service runs as a dedicated service account and reads
 # secrets from Secret Manager. There is no service-account key file anywhere
@@ -60,7 +62,7 @@ gcloud run deploy "${SERVICE}" \
   --cpu 1 --memory 2Gi \
   --timeout 3600 \
   --session-affinity \
-  --set-env-vars "GOOGLE_CLOUD_PROJECT=${PROJECT},AGENT_PROJECT=${AGENT_PROJECT:-agartha}" \
+  --set-env-vars "GOOGLE_CLOUD_PROJECT=${PROJECT},AGENT_PROJECT=${AGENT_PROJECT:-portfolio},ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-https://thegreenteam.in,https://www.thegreenteam.in},SARVAM_VOICE_ID=${SARVAM_VOICE_ID:-anushka}" \
   --set-secrets "SARVAM_API_KEY=SARVAM_API_KEY:latest,PLIVO_AUTH_ID=PLIVO_AUTH_ID:latest,PLIVO_AUTH_TOKEN=PLIVO_AUTH_TOKEN:latest"
 
 HOST=$(gcloud run services describe "${SERVICE}" --project "${PROJECT}" \

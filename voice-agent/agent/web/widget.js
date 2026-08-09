@@ -29,6 +29,18 @@
   const PROJECT = (script && script.dataset.project) || "agartha";
   const RERA = (script && script.dataset.rera) || "";
 
+  // "ws" (default) streams PCM over a WebSocket — works on any HTTPS host
+  // including Cloud Run, so no VM, no DNS record, no certificate to manage.
+  // "webrtc" needs UDP and therefore a VM, but degrades better on bad
+  // networks. Same pipeline behind both.
+  // ?gt_transport=webrtc overrides the tag, so both can be compared on a live
+  // page without a redeploy.
+  const TRANSPORT =
+    new URLSearchParams(window.location.search).get("gt_transport") ||
+    (script && script.dataset.transport) ||
+    "ws";
+  const SAMPLE_RATE = 16000;
+
   const COPY = {
     launcher: "మాట్లాడండి",
     launcherSub: "Talk to us",
@@ -86,6 +98,9 @@
   let pc = null;
   let stream = null;
   let pcId = null;
+  let ws = null;
+  let audioCtx = null;
+  let playHead = 0;
 
   function el(tag, cls, text) {
     const n = document.createElement(tag);
@@ -166,6 +181,16 @@
       return;
     }
 
+    if (TRANSPORT === "ws") {
+      try {
+        await connectWebSocket(dot, label);
+      } catch (err) {
+        console.warn("[VoiceAgent]", err);
+        label.textContent = COPY.error;
+      }
+      return;
+    }
+
     pc = new RTCPeerConnection({
       iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
     });
@@ -237,10 +262,135 @@
     await pc.setRemoteDescription(answer);
   }
 
+  /**
+   * PCM16 over a WebSocket. Mic → AudioWorklet → binary frames up;
+   * binary frames down → scheduled AudioBuffers.
+   */
+  async function connectWebSocket(dot, label) {
+    // Ask for the context at the wire rate so no resampling is needed in
+    // either direction. Browsers have honoured this since Safari 14.1.
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)({
+      sampleRate: SAMPLE_RATE,
+    });
+    await audioCtx.resume();
+    playHead = 0;
+
+    const url = new URL(HOST.replace(/^http/, "ws").replace(/\/$/, "") + "/web/ws");
+    if (PROJECT) url.searchParams.set("project", PROJECT);
+
+    ws = new WebSocket(url);
+    ws.binaryType = "arraybuffer";
+
+    await new Promise((resolve, reject) => {
+      ws.onopen = resolve;
+      ws.onerror = () => reject(new Error("websocket failed to open"));
+      setTimeout(() => reject(new Error("websocket timed out")), 15000);
+    });
+
+    dot.className = "gt-va-dot live";
+    label.textContent = COPY.listening;
+
+    // --- playback ---
+    ws.onmessage = (event) => {
+      if (!(event.data instanceof ArrayBuffer) || !audioCtx) return;
+      const pcm = new Int16Array(event.data);
+      if (!pcm.length) return;
+
+      const buffer = audioCtx.createBuffer(1, pcm.length, SAMPLE_RATE);
+      const channel = buffer.getChannelData(0);
+      for (let i = 0; i < pcm.length; i++) channel[i] = pcm[i] / 32768;
+
+      const source = audioCtx.createBufferSource();
+      source.buffer = buffer;
+      source.connect(audioCtx.destination);
+
+      // Schedule back to back. A small floor keeps late chunks from being
+      // scheduled in the past, which browsers drop silently.
+      const now = audioCtx.currentTime;
+      if (playHead < now) playHead = now + 0.05;
+      source.start(playHead);
+      playHead += buffer.duration;
+
+      dot.className = "gt-va-dot talk";
+      label.textContent = COPY.speaking;
+      source.onended = () => {
+        if (audioCtx && playHead <= audioCtx.currentTime + 0.02) {
+          dot.className = "gt-va-dot live";
+          label.textContent = COPY.listening;
+        }
+      };
+    };
+
+    ws.onclose = () => {
+      dot.className = "gt-va-dot";
+      label.textContent = COPY.ended;
+    };
+
+    // --- capture ---
+    // AudioWorklet from a Blob so the widget stays a single file.
+    const workletSource = `
+      class PCMCapture extends AudioWorkletProcessor {
+        process(inputs) {
+          const input = inputs[0];
+          if (input && input[0]) {
+            const f32 = input[0];
+            const pcm = new Int16Array(f32.length);
+            for (let i = 0; i < f32.length; i++) {
+              const s = Math.max(-1, Math.min(1, f32[i]));
+              pcm[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
+            }
+            this.port.postMessage(pcm.buffer, [pcm.buffer]);
+          }
+          return true;
+        }
+      }
+      registerProcessor('pcm-capture', PCMCapture);
+    `;
+    const blobUrl = URL.createObjectURL(
+      new Blob([workletSource], { type: "application/javascript" }),
+    );
+    await audioCtx.audioWorklet.addModule(blobUrl);
+    URL.revokeObjectURL(blobUrl);
+
+    const mic = audioCtx.createMediaStreamSource(stream);
+    const capture = new AudioWorkletNode(audioCtx, "pcm-capture");
+
+    // A worklet render quantum is 128 samples — 8 ms, 256 bytes. Sending each
+    // one is ~125 WebSocket frames a second of mostly header. Batch to 20 ms.
+    const CHUNK_BYTES = SAMPLE_RATE / 50 * 2; // 640
+    let pending = [];
+    let pendingBytes = 0;
+
+    capture.port.onmessage = (e) => {
+      if (!ws || ws.readyState !== WebSocket.OPEN) return;
+      pending.push(new Uint8Array(e.data));
+      pendingBytes += e.data.byteLength;
+      if (pendingBytes < CHUNK_BYTES) return;
+
+      const out = new Uint8Array(pendingBytes);
+      let offset = 0;
+      for (const part of pending) {
+        out.set(part, offset);
+        offset += part.length;
+      }
+      pending = [];
+      pendingBytes = 0;
+      ws.send(out.buffer);
+    };
+    mic.connect(capture);
+    // Worklets only run while connected to the graph; a zero-gain sink keeps
+    // it alive without echoing the caller back to themselves.
+    const silent = audioCtx.createGain();
+    silent.gain.value = 0;
+    capture.connect(silent).connect(audioCtx.destination);
+  }
+
   function teardown(root, panel, launcher, label, dot) {
     if (pc) pc.close();
+    if (ws && ws.readyState <= WebSocket.OPEN) ws.close();
+    if (audioCtx) audioCtx.close().catch(() => {});
     if (stream) stream.getTracks().forEach((t) => t.stop());
-    pc = stream = pcId = null;
+    pc = stream = pcId = ws = audioCtx = null;
     if (label) label.textContent = COPY.ended;
     if (dot) dot.className = "gt-va-dot";
     panel.remove();

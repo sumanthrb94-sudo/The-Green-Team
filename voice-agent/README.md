@@ -86,10 +86,16 @@ pitches exactly one, never all three.
 
 ## Two channels, one pipeline
 
-**Web ships first.** A WebRTC agent on your own site never touches a telecom
+**Web ships first.** A browser agent on your own site never touches a telecom
 network, so no DLT registration, 140-series number or DND scrub applies — it
 can go live while DLT is still processing. The phone leg needs DLT before any
 outbound dial.
+
+The web channel has two transports behind the same pipeline. **WebSocket
+(default)** streams PCM and runs on Cloud Run — no VM, no DNS, no certificate
+to manage. **WebRTC** (`?gt_transport=webrtc` or `data-transport="webrtc"`)
+needs UDP and therefore a VM, but handles packet loss better. Both are covered
+by `tests/test_e2e_web.py`.
 
 Only the transport differs. The prompt, turn cap, normalizer and endpointing
 are shared, so what you tune on the website carries over to the phone
@@ -136,36 +142,36 @@ python3 -m tools.costs card
 
 ## Hosting the agent
 
-You need a host only when the demo isn't on your own laptop. Locally, browser
-and agent are both on localhost and WebRTC just works.
+You need a host only when the demo isn't on your own laptop.
 
-**Web channel → a GCE VM, not Cloud Run.** Cloud Run accepts HTTP, gRPC and
-WebSocket inbound but no raw UDP, and WebRTC media is UDP. On Cloud Run the
-browser connects, signalling succeeds, and the call is silent. A VM with a
-public IP and the media ports open is the simplest thing that works; the
-alternative is a TURN server relaying media, which is a second box anyway.
+**Cloud Run, no DNS, no VM.** The widget streams PCM over a WebSocket, so it
+runs anywhere HTTPS and WebSockets are terminated. Cloud Run gives you a
+`*.run.app` hostname with a valid certificate out of the box — which matters,
+because browsers refuse `getUserMedia` on a plain-HTTP origin.
 
 ```bash
 cd voice-agent
-./deploy/gce.sh setup                                  # VM + firewall + static IP
-# add an A record for agent.thegreenteam.in → the printed IP
-echo -n '<sarvam key>' | gcloud secrets create SARVAM_API_KEY --data-file=-
-AGENT_DOMAIN=agent.thegreenteam.in ./deploy/gce.sh deploy
-./deploy/gce.sh logs
+gcloud auth login
+./deploy/cloudrun.sh setup                                   # APIs, SA, secrets
+printf '%s' '<sarvam key>' | gcloud secrets versions add SARVAM_API_KEY --data-file=-
+./deploy/cloudrun.sh                                         # prints the URL
 ```
 
-Then set `VITE_AGENT_HOST=https://agent.thegreenteam.in` in Vercel and
-redeploy the site.
+Then set `VITE_AGENT_HOST=https://voice-agent-xxxx.a.run.app` in Vercel and
+redeploy the site. That's the whole deployment — the Vercel site and the agent
+are separate services, and this env var is the only link between them.
 
-The domain and certificate are not optional: browsers refuse `getUserMedia`
-on a plain-HTTP origin, so a bare IP cannot be demoed to a client. Caddy gets
-the certificate automatically once DNS resolves.
+The same service handles the phone leg when DLT clears; Plivo streams over a
+WebSocket too.
 
-Cost: `e2-small` in `asia-south1` is ~₹1,150/month. Move to `e2-medium` past
-roughly 8 concurrent conversations.
+### If you later want WebRTC
 
-**Phone channel → Cloud Run is fine.** Plivo streams audio over a WebSocket,
-which Cloud Run handles. `deploy/cloudrun.sh` covers it, for when DLT clears.
+`deploy/gce.sh` puts the agent on a VM with the media ports open. WebRTC
+brings its own jitter buffer and packet-loss concealment, so it degrades more
+gracefully on bad mobile networks — at the cost of a VM (~₹1,150/mo), a DNS
+record and a certificate. Cloud Run cannot do it: WebRTC media is UDP and
+Cloud Run takes no inbound UDP. Switch a page with `?gt_transport=webrtc` to
+compare them on the same deployment.
 
 **There is no service-account key file in this deployment, deliberately.**
 Cloud Run runs the service as an attached service account and Firestore picks

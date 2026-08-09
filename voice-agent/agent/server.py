@@ -145,6 +145,54 @@ async def _record_web_session(state) -> None:
     })
 
 
+@app.websocket("/web/ws")
+async def web_websocket(websocket: WebSocket):
+    """Browser audio over a WebSocket — the default web transport.
+
+    Works anywhere HTTPS and WebSockets are terminated, including Cloud Run,
+    which means no VM, no DNS record and no certificate to manage: the
+    *.run.app hostname already has one. WebRTC (/web/offer) stays available
+    for a VM deployment where jitter resilience matters more.
+    """
+    await websocket.accept()
+
+    from pipecat.audio.vad.silero import SileroVADAnalyzer
+    from pipecat.transports.websocket.fastapi import (
+        FastAPIWebsocketParams,
+        FastAPIWebsocketTransport,
+    )
+
+    from agent.bot import WEB_SAMPLE_RATE, run_bot
+    from agent.serializers import RawPCMSerializer
+
+    project = websocket.query_params.get("project")
+
+    transport = FastAPIWebsocketTransport(
+        websocket=websocket,
+        params=FastAPIWebsocketParams(
+            audio_in_enabled=True,
+            audio_out_enabled=True,
+            add_wav_header=False,
+            audio_in_sample_rate=WEB_SAMPLE_RATE,
+            audio_out_sample_rate=WEB_SAMPLE_RATE,
+            vad_analyzer=SileroVADAnalyzer(),
+            serializer=RawPCMSerializer(sample_rate=WEB_SAMPLE_RATE),
+        ),
+    )
+
+    try:
+        state = await run_bot(
+            transport,
+            sample_rate=WEB_SAMPLE_RATE,
+            lead={"source": "website"},
+            channel="web",
+            project=project or None,
+        )
+        await _record_web_session(state)
+    except Exception:
+        logger.exception("web websocket session failed")
+
+
 @app.get("/web/widget.js")
 async def widget_js():
     return Response(

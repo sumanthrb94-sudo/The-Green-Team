@@ -39,6 +39,11 @@ class EchoSTT(STTService):
     so the test doesn't depend on synthesising realistic Telugu audio.
     """
 
+    # Fire after roughly half a second of audio. Transports deliver very
+    # different chunk sizes — WebRTC gave 640-byte frames, the WebSocket path
+    # gives 256 — so accumulate rather than thresholding a single chunk.
+    TRIGGER_BYTES = 16000  # 0.5 s of 16 kHz PCM16 mono
+
     def __init__(self, *, utterance: str = "ధర ఎంత సర్?", **kwargs):
         # pipecat validates that every settings field is initialised; stubs
         # support none of them, so declare them explicitly as None.
@@ -47,9 +52,11 @@ class EchoSTT(STTService):
         super().__init__(**kwargs)
         self._utterance = utterance
         self._fired = False
+        self._buffered = 0
 
     async def run_stt(self, audio: bytes) -> AsyncGenerator[Frame | None, None]:
-        if self._fired or len(audio) < 640:
+        self._buffered += len(audio)
+        if self._fired or self._buffered < self.TRIGGER_BYTES:
             yield None
             return
         self._fired = True

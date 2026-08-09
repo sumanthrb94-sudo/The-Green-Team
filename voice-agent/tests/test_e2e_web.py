@@ -136,9 +136,61 @@ class TestWidget:
         page.wait_for_function("() => window.__micCalls === 1", timeout=10000)
 
 
-class TestConversation:
-    def test_webrtc_connects_and_the_agent_speaks(self, page):
+class TestWebSocketTransport:
+    """The default web transport: PCM over a WebSocket, no UDP, Cloud Run-able."""
+
+    def test_audio_flows_both_ways(self, page):
         page.reload(wait_until="networkidle")
+
+        # Count bytes in each direction on the real WebSocket.
+        page.evaluate("""() => {
+            window.__ws = { sent: 0, received: 0, opened: false };
+            const Orig = window.WebSocket;
+            window.WebSocket = function (...a) {
+                const sock = new Orig(...a);
+                window.__ws.url = String(a[0]);
+                sock.addEventListener('open', () => { window.__ws.opened = true; });
+                sock.addEventListener('message', (e) => {
+                    window.__ws.received += (e.data.byteLength || 0);
+                });
+                const send = sock.send.bind(sock);
+                sock.send = (d) => { window.__ws.sent += (d.byteLength || 0); return send(d); };
+                return sock;
+            };
+            window.WebSocket.prototype = Orig.prototype;
+            window.WebSocket.OPEN = Orig.OPEN;
+            window.WebSocket.CLOSED = Orig.CLOSED;
+        }""")
+
+        page.locator(".gt-va-btn").click()
+        page.locator(".gt-va-panel").wait_for(state="visible", timeout=5000)
+        page.get_by_text("Allow mic & start").click()
+
+        page.wait_for_function("() => window.__ws && window.__ws.opened", timeout=20000)
+
+        sent = received = 0
+        deadline = time.time() + 30
+        while time.time() < deadline:
+            stats = page.evaluate("() => window.__ws")
+            sent, received = stats["sent"], stats["received"]
+            if sent > 0 and received > 0:
+                break
+            page.wait_for_timeout(500)
+
+        assert sent > 0, "no microphone audio was sent to the agent"
+        assert received > 0, "no agent audio came back"
+
+    def test_it_uses_the_ws_endpoint_not_webrtc(self, page):
+        url = page.evaluate("() => window.__ws && window.__ws.url")
+        assert url and "/web/ws" in url, url
+
+
+class TestWebRTCTransport:
+    """Still supported for a VM deployment where jitter resilience matters."""
+
+    def test_webrtc_connects_and_the_agent_speaks(self, page, agent_server):
+        # ws is the default now, so ask for the WebRTC path explicitly.
+        page.goto(f"{agent_server}/?gt_transport=webrtc", wait_until="networkidle")
         page.locator(".gt-va-btn").click()
         page.locator(".gt-va-panel").wait_for(state="visible", timeout=5000)
 
