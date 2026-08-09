@@ -180,6 +180,30 @@ class TestWebSocketTransport:
         assert sent > 0, "no microphone audio was sent to the agent"
         assert received > 0, "no agent audio came back"
 
+    def test_audio_is_actually_audible(self, page):
+        """Bytes arriving proves nothing — they have to reach the speakers.
+
+        The first version of this suite asserted only that bytes came back,
+        and shipped a playback path that scheduled every 20 ms chunk into the
+        past, where browsers drop it silently. Audio arrived; nothing was
+        heard. So assert on the AudioContext instead.
+        """
+        state = page.evaluate("""() => {
+            const ctx = window.__gtAudioCtx;
+            return ctx ? { state: ctx.state, rate: ctx.sampleRate,
+                           time: ctx.currentTime } : null;
+        }""")
+        assert state, "widget exposed no AudioContext"
+        assert state["state"] == "running", (
+            f"AudioContext is {state['state']} — playback is blocked"
+        )
+        assert state["rate"] == 16000, f"unexpected rate {state['rate']}"
+        # currentTime only advances while the context is actually running.
+        assert state["time"] > 0, "AudioContext clock never started"
+
+        scheduled = page.evaluate("() => window.__gtScheduled || 0")
+        assert scheduled > 0, "no audio buffers were scheduled for playback"
+
     def test_it_uses_the_ws_endpoint_not_webrtc(self, page):
         url = page.evaluate("() => window.__ws && window.__ws.url")
         assert url and "/web/ws" in url, url

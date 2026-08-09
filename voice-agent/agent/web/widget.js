@@ -172,6 +172,20 @@
     end.addEventListener("click", () => teardown(root, panel, launcher, label, dot));
     panel.appendChild(end);
 
+    // Create the AudioContext synchronously, while the click that got us here
+    // still counts as user activation. Created after the getUserMedia await it
+    // can come up suspended, and then nothing is ever audible.
+    if (TRANSPORT === "ws" && !audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)({
+        sampleRate: SAMPLE_RATE,
+      });
+      // Exposed so the e2e suite can assert playback really started; the
+      // byte count alone hid a scheduler bug that made everything inaudible.
+      window.__gtAudioCtx = audioCtx;
+      window.__gtScheduled = 0;
+      audioCtx.resume().catch(() => {});
+    }
+
     try {
       stream = await navigator.mediaDevices.getUserMedia({
         audio: { echoCancellation: true, noiseSuppression: true },
@@ -267,12 +281,20 @@
    * binary frames down → scheduled AudioBuffers.
    */
   async function connectWebSocket(dot, label) {
-    // Ask for the context at the wire rate so no resampling is needed in
-    // either direction. Browsers have honoured this since Safari 14.1.
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)({
-      sampleRate: SAMPLE_RATE,
-    });
-    await audioCtx.resume();
+    // Normally created in connect() during the click; this is the fallback.
+    // Asking for the wire rate avoids resampling in either direction.
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)({
+        sampleRate: SAMPLE_RATE,
+      });
+    }
+    await audioCtx.resume().catch(() => {});
+    if (audioCtx.state !== "running") {
+      console.warn(
+        "[VoiceAgent] AudioContext is " + audioCtx.state +
+        " — the browser is blocking playback. Click the page and retry.",
+      );
+    }
     playHead = 0;
 
     const url = new URL(HOST.replace(/^http/, "ws").replace(/\/$/, "") + "/web/ws");
@@ -291,10 +313,38 @@
     label.textContent = COPY.listening;
 
     // --- playback ---
-    ws.onmessage = (event) => {
+    // Chunks arrive roughly every 20 ms. Scheduling each one to start "now"
+    // means any network jitter lands it in the past, where browsers drop it
+    // silently — you see activity and hear nothing. So keep a lookahead
+    // cushion and schedule strictly back to back from it.
+    const JITTER_SECONDS = 0.2;
+    let idleTimer = null;
+    let logged = false;
+
+    const goIdle = () => {
+      dot.className = "gt-va-dot live";
+      label.textContent = COPY.listening;
+    };
+
+    ws.onmessage = async (event) => {
       if (!(event.data instanceof ArrayBuffer) || !audioCtx) return;
+
+      // An AudioContext created after an await can come up suspended, because
+      // the user-activation that authorised it has already been consumed.
+      if (audioCtx.state !== "running") {
+        try { await audioCtx.resume(); } catch (err) { /* reported below */ }
+      }
+
       const pcm = new Int16Array(event.data);
       if (!pcm.length) return;
+
+      if (!logged) {
+        logged = true;
+        console.info(
+          `[VoiceAgent] audio in: ${pcm.length} samples/chunk, ` +
+          `ctx ${audioCtx.state} @ ${audioCtx.sampleRate} Hz`,
+        );
+      }
 
       const buffer = audioCtx.createBuffer(1, pcm.length, SAMPLE_RATE);
       const channel = buffer.getChannelData(0);
@@ -304,21 +354,20 @@
       source.buffer = buffer;
       source.connect(audioCtx.destination);
 
-      // Schedule back to back. A small floor keeps late chunks from being
-      // scheduled in the past, which browsers drop silently.
       const now = audioCtx.currentTime;
-      if (playHead < now) playHead = now + 0.05;
+      // Rebuild the cushion whenever we have fallen behind, rather than
+      // scheduling into the past.
+      if (playHead < now + 0.02) playHead = now + JITTER_SECONDS;
       source.start(playHead);
       playHead += buffer.duration;
+      window.__gtScheduled = (window.__gtScheduled || 0) + 1;
 
+      // Status follows the stream, not individual 20 ms fragments — driving it
+      // per fragment made it flap between speaking and listening.
       dot.className = "gt-va-dot talk";
       label.textContent = COPY.speaking;
-      source.onended = () => {
-        if (audioCtx && playHead <= audioCtx.currentTime + 0.02) {
-          dot.className = "gt-va-dot live";
-          label.textContent = COPY.listening;
-        }
-      };
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(goIdle, 700);
     };
 
     ws.onclose = () => {
