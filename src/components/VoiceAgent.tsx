@@ -14,9 +14,17 @@ import { useEffect } from 'react';
  *   local   VITE_AGENT_HOST=http://localhost:8080
  *   prod    VITE_AGENT_HOST=https://voice-agent-xxxx.a.run.app
  */
+/** Local agent default, so `npm run dev` shows the button with no setup. */
+const DEV_AGENT_HOST = 'http://localhost:8080';
+
 export function VoiceAgent({ project }: { project?: string }) {
-  const host = import.meta.env.VITE_AGENT_HOST as string | undefined;
+  const configured = import.meta.env.VITE_AGENT_HOST as string | undefined;
   const rera = import.meta.env.VITE_RERA_AGENT_REG_NO as string | undefined;
+
+  // In dev, fall back to a local agent so the button is always there to test.
+  // In production it stays gated: a button with no agent behind it is worse
+  // than no button.
+  const host = configured || (import.meta.env.DEV ? DEV_AGENT_HOST : undefined);
 
   useEffect(() => {
     if (!host) return;
@@ -35,14 +43,21 @@ export function VoiceAgent({ project }: { project?: string }) {
     if (rera) script.dataset.rera = rera;
 
     script.onerror = () => {
-      console.warn('[VoiceAgent] widget failed to load from', host);
+      console.warn(
+        `[VoiceAgent] no agent at ${host}. Start it with:\n` +
+          '    cd voice-agent && .venv/bin/uvicorn agent.server:app --port 8080',
+      );
     };
 
     document.body.appendChild(script);
 
     return () => {
       script.remove();
-      document.querySelector('.gt-va')?.remove();
+      document.querySelectorAll('.gt-va').forEach((n) => n.remove());
+      // Let the widget mount again on the next effect run — StrictMode
+      // unmounts and remounts once in dev.
+      delete (window as Window & { __gtVoiceAgentMounted?: boolean })
+        .__gtVoiceAgentMounted;
     };
     // Re-mount when the visitor navigates to a different property so the
     // agent opens already knowing which one they're looking at.

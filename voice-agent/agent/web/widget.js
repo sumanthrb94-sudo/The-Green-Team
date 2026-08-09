@@ -17,6 +17,13 @@
 (function () {
   "use strict";
 
+  // The host page may evaluate this script more than once — React StrictMode
+  // re-runs effects in dev, and a SPA can remount the loader on navigation.
+  // Mounting twice would put two call buttons on the page, so the guard lives
+  // here rather than in any one host framework's loader.
+  if (window.__gtVoiceAgentMounted) return;
+  window.__gtVoiceAgentMounted = true;
+
   const script = document.currentScript;
   const HOST = (script && script.dataset.agentHost) || window.location.origin;
   const PROJECT = (script && script.dataset.project) || "agartha";
@@ -45,7 +52,12 @@
 
   const CSS = `
   .gt-va, .gt-va * { box-sizing: border-box; font-family: ui-sans-serif, -apple-system, "Segoe UI", Roboto, sans-serif; }
-  .gt-va { position: fixed; right: 20px; bottom: 20px; z-index: 2147483000; }
+  /* Sits above the site's existing bottom-right control (48px FAB at
+     bottom-8 right-8 on desktop, bottom-20 on mobile) rather than on top of
+     it. Override with data-offset-bottom if that button ever moves. */
+  .gt-va { position: fixed; right: 20px; bottom: var(--gt-va-bottom, 96px);
+           z-index: 2147483000; }
+  @media (max-width: 767px) { .gt-va { bottom: var(--gt-va-bottom, 144px); } }
   .gt-va-btn { display: flex; align-items: center; gap: 10px; padding: 13px 20px; border: 0;
     border-radius: 999px; background: #2d3a1d; color: #faf9f6; cursor: pointer;
     box-shadow: 0 6px 24px rgba(26,36,16,.28); font-size: 15px; font-weight: 600; }
@@ -83,11 +95,16 @@
   }
 
   function mount() {
+    if (document.querySelector(".gt-va")) return;
+
     const style = el("style");
     style.textContent = CSS;
     document.head.appendChild(style);
 
     const root = el("div", "gt-va");
+    const offset = script && script.dataset.offsetBottom;
+    if (offset) root.style.setProperty("--gt-va-bottom", offset);
+
     const launcher = el("button", "gt-va-btn");
     launcher.type = "button";
     launcher.setAttribute("aria-label", COPY.title);
