@@ -117,25 +117,27 @@ def _vad_settings():
     """
     from pipecat.services.sarvam.stt import SarvamSTTSettings
 
-    profile = os.getenv("VAD_PROFILE", "robust").lower()
+    profile = os.getenv("VAD_PROFILE", "balanced").lower()
 
     if profile == "sensitive":
         return SarvamSTTSettings(high_vad_sensitivity=True)
 
+    if profile == "robust":
+        # Only for a genuinely loud room. Deaf on a normal phone mic.
+        return SarvamSTTSettings(
+            high_vad_sensitivity=False,
+            positive_speech_threshold=0.7,
+            min_speech_frames=8,
+            interrupt_min_speech_frames=16,
+        )
+
+    # balanced — the default. Detection thresholds are left at Sarvam's own
+    # defaults, because raising them stopped a phone mic being heard at all.
+    # The only thing hardened is how much evidence it takes to CUT THE AGENT
+    # OFF mid-sentence, which is the thing that was actually misbehaving.
     return SarvamSTTSettings(
         high_vad_sensitivity=False,
-        # Louder than ambient before anything counts as speech at all.
-        positive_speech_threshold=float(os.getenv("VAD_START", "0.7")),
-        negative_speech_threshold=float(os.getenv("VAD_STOP", "0.45")),
-        # Require sustained speech, not a transient. ~30 ms per frame.
-        min_speech_frames=int(os.getenv("VAD_MIN_FRAMES", "8")),
-        # Cutting the agent off is the expensive mistake, so demand more
-        # evidence for that than for starting a turn normally.
-        interrupt_min_speech_frames=int(os.getenv("VAD_INTERRUPT_FRAMES", "16")),
-        start_speech_volume_threshold=float(os.getenv("VAD_VOLUME", "0.35")),
-        # Ignore the first moments of a session — mic AGC settling and the
-        # click of the button both read as speech.
-        num_initial_ignored_frames=int(os.getenv("VAD_IGNORE_FRAMES", "10")),
+        interrupt_min_speech_frames=int(os.getenv("VAD_INTERRUPT_FRAMES", "12")),
     )
 
 

@@ -416,7 +416,10 @@
     // itself and treats it as an interruption — it stops on every sentence.
     // Gate the uplink during playback unless the input is clearly louder than
     // the echo, which is what a real interruption sounds like.
-    const ECHO_GATE_RMS = 0.12;
+    // Low enough that ordinary speech passes — an earlier value of 0.12 was
+    // above what a phone mic produces at conversational volume, so nothing
+    // reached the agent at all while it was speaking.
+    const ECHO_GATE_RMS = 0.045;
 
     const rmsOf = (bytes) => {
       const pcm = new Int16Array(bytes.buffer, bytes.byteOffset,

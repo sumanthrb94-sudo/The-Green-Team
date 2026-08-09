@@ -105,12 +105,24 @@ def build_text_filter(state: CallState):
 
     Sits between the LLM service and the TTS service in the pipeline.
     """
-    from pipecat.frames.frames import Frame, TTSSpeakFrame, LLMTextFrame
+    from loguru import logger
+    from pipecat.frames.frames import (
+        Frame,
+        LLMTextFrame,
+        TranscriptionFrame,
+        TTSSpeakFrame,
+    )
     from pipecat.processors.frame_processor import FrameDirection, FrameProcessor
 
     class TeluguSpeechFilter(FrameProcessor):
         async def process_frame(self, frame: Frame, direction: FrameDirection):
             await super().process_frame(frame, direction)
+
+            # Both sides of the conversation on one line each. Without this,
+            # "it isn't behaving like a real agent" is impossible to act on —
+            # you cannot tell mishearing from bad wording.
+            if isinstance(frame, TranscriptionFrame) and frame.text.strip():
+                logger.info(f"CALLER » {frame.text.strip()}")
 
             if isinstance(frame, LLMTextFrame) and frame.text.strip():
                 speakable, controls, truncated = prepare_for_speech(frame.text)
@@ -119,6 +131,11 @@ def build_text_filter(state: CallState):
                 if truncated:
                     state.truncations += 1
                 if speakable:
+                    logger.info(
+                        f"AGENT  » {speakable}"
+                        + ("   [TRUNCATED]" if truncated else "")
+                        + (f"   {controls}" if controls else "")
+                    )
                     await self.push_frame(TTSSpeakFrame(speakable), direction)
                 return
 
