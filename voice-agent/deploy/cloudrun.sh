@@ -38,13 +38,35 @@ if [[ "${1:-}" == "setup" ]]; then
       cloudbuild.googleapis.com --project "${PROJECT}"
 
   gcloud iam service-accounts create voice-agent \
-      --display-name="Telugu voice agent" --project "${PROJECT}" || true
+      --display-name="Telugu voice agent" --project "${PROJECT}" 2>/dev/null || true
+
+  # A new service account is not immediately visible to the IAM policy API —
+  # binding a role straight after creating it fails with "does not exist".
+  # Wait for it to appear rather than racing.
+  echo "==> waiting for the service account to propagate"
+  for attempt in $(seq 1 30); do
+    if gcloud iam service-accounts describe "${SA}" --project "${PROJECT}" \
+         >/dev/null 2>&1; then
+      break
+    fi
+    sleep 2
+    [[ ${attempt} -eq 30 ]] && { echo "service account never appeared"; exit 1; }
+  done
 
   # Least privilege: Firestore read/write, and read on the secrets it needs.
-  gcloud projects add-iam-policy-binding "${PROJECT}" \
-      --member="serviceAccount:${SA}" --role="roles/datastore.user"
-  gcloud projects add-iam-policy-binding "${PROJECT}" \
-      --member="serviceAccount:${SA}" --role="roles/secretmanager.secretAccessor"
+  # Retried for the same propagation reason — describe can succeed a moment
+  # before the policy backend agrees.
+  for role in datastore.user secretmanager.secretAccessor; do
+    for attempt in $(seq 1 10); do
+      if gcloud projects add-iam-policy-binding "${PROJECT}" --quiet \
+           --member="serviceAccount:${SA}" --role="roles/${role}" >/dev/null 2>&1; then
+        echo "==> granted roles/${role}"
+        break
+      fi
+      sleep 3
+      [[ ${attempt} -eq 10 ]] && { echo "could not grant roles/${role}"; exit 1; }
+    done
+  done
 
   for secret in SARVAM_API_KEY PLIVO_AUTH_ID PLIVO_AUTH_TOKEN; do
     gcloud secrets create "${secret}" --replication-policy=automatic \
@@ -86,7 +108,7 @@ gcloud run deploy "${SERVICE}" \
   --cpu 1 --memory 2Gi \
   --timeout 3600 \
   --session-affinity \
-  --set-env-vars "GOOGLE_CLOUD_PROJECT=${PROJECT},AGENT_PROJECT=${AGENT_PROJECT:-portfolio},ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-https://thegreenteam.in,https://www.thegreenteam.in},SARVAM_VOICE_ID=${SARVAM_VOICE_ID:-anushka}" \
+  --set-env-vars "^@^GOOGLE_CLOUD_PROJECT=${PROJECT}@AGENT_PROJECT=${AGENT_PROJECT:-portfolio}@ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-https://thegreenteam.in,https://www.thegreenteam.in}@SARVAM_VOICE_ID=${SARVAM_VOICE_ID:-anushka}" \
   --set-secrets "SARVAM_API_KEY=SARVAM_API_KEY:latest,PLIVO_AUTH_ID=PLIVO_AUTH_ID:latest,PLIVO_AUTH_TOKEN=PLIVO_AUTH_TOKEN:latest"
 
 HOST=$(gcloud run services describe "${SERVICE}" --project "${PROJECT}" \
@@ -96,8 +118,11 @@ HOST=$(gcloud run services describe "${SERVICE}" --project "${PROJECT}" \
 # depend on it: PUBLIC_HOST for the Plivo callbacks, and the origin allowlist
 # so the test page served from this very host can open its own WebSocket.
 ORIGINS="${ALLOWED_ORIGINS:-https://thegreenteam.in,https://www.thegreenteam.in}"
+# ^@^ makes @ the separator. ALLOWED_ORIGINS is itself a comma-separated list,
+# and with gcloud's default separator its second entry is parsed as a new
+# variable name — which fails with "Bad syntax for dict arg".
 gcloud run services update "${SERVICE}" --project "${PROJECT}" --region "${REGION}" \
-  --update-env-vars "PUBLIC_HOST=${HOST},ALLOWED_ORIGINS=https://${HOST},${ORIGINS}"
+  --update-env-vars "^@^PUBLIC_HOST=${HOST}@ALLOWED_ORIGINS=https://${HOST},${ORIGINS}"
 
 cat <<EOF
 
