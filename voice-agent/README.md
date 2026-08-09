@@ -134,12 +134,38 @@ python3 -m tools.costs cogs --minutes 2000
 python3 -m tools.costs card
 ```
 
-## Deploy
+## Hosting the agent
+
+You need a host only when the demo isn't on your own laptop. Locally, browser
+and agent are both on localhost and WebRTC just works.
+
+**Web channel → a GCE VM, not Cloud Run.** Cloud Run accepts HTTP, gRPC and
+WebSocket inbound but no raw UDP, and WebRTC media is UDP. On Cloud Run the
+browser connects, signalling succeeds, and the call is silent. A VM with a
+public IP and the media ports open is the simplest thing that works; the
+alternative is a TURN server relaying media, which is a second box anyway.
 
 ```bash
-deploy/cloudrun.sh setup    # once: APIs, service account, secrets
-deploy/cloudrun.sh          # deploy to asia-south1
+cd voice-agent
+./deploy/gce.sh setup                                  # VM + firewall + static IP
+# add an A record for agent.thegreenteam.in → the printed IP
+echo -n '<sarvam key>' | gcloud secrets create SARVAM_API_KEY --data-file=-
+AGENT_DOMAIN=agent.thegreenteam.in ./deploy/gce.sh deploy
+./deploy/gce.sh logs
 ```
+
+Then set `VITE_AGENT_HOST=https://agent.thegreenteam.in` in Vercel and
+redeploy the site.
+
+The domain and certificate are not optional: browsers refuse `getUserMedia`
+on a plain-HTTP origin, so a bare IP cannot be demoed to a client. Caddy gets
+the certificate automatically once DNS resolves.
+
+Cost: `e2-small` in `asia-south1` is ~₹1,150/month. Move to `e2-medium` past
+roughly 8 concurrent conversations.
+
+**Phone channel → Cloud Run is fine.** Plivo streams audio over a WebSocket,
+which Cloud Run handles. `deploy/cloudrun.sh` covers it, for when DLT clears.
 
 **There is no service-account key file in this deployment, deliberately.**
 Cloud Run runs the service as an attached service account and Firestore picks

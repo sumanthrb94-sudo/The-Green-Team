@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
 # Deploy the voice agent to Cloud Run in Mumbai.
 #
+# ⚠ PHONE CHANNEL ONLY. Cloud Run accepts HTTP, gRPC and WebSocket inbound —
+# no raw UDP. WebRTC media is UDP, so the web widget would connect, signalling
+# would succeed, and the call would be silent. Plivo streams over a WebSocket,
+# so the phone leg is fine here.
+#
+# For the web channel use deploy/gce.sh, which puts the agent on a VM with a
+# public IP and the media ports open.
+#
 # Credentials: the service runs as a dedicated service account and reads
 # secrets from Secret Manager. There is no service-account key file anywhere
 # in this deployment — that is deliberate, a key on disk is a key that leaks.
