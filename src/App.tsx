@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef, FC, startTransition } from 'react';
 import { createPortal } from 'react-dom';
+import { VoiceAgent } from './components/VoiceAgent';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Wind, 
@@ -6881,6 +6882,11 @@ export default function App() {
         user={profileUser}
         onDone={() => setShowProfile(false)}
       />
+
+      {/* Telugu voice agent — floating call button. Renders only when
+          VITE_AGENT_HOST is set, so it is off by default in any environment
+          that hasn't been pointed at a running agent. */}
+      <VoiceAgent project={selectedProperty?.id} />
     </div>
   );
 }

@@ -31,7 +31,7 @@ import time
 from loguru import logger
 
 from agent.processors import CallState, build_text_filter
-from agent.prompt import build_system_prompt
+from agent.prompt import PORTFOLIO, build_system_prompt
 
 # Telephony is 8 kHz μ-law. Matching it end to end avoids a resample and,
 # usefully, hides TTS artifacts that are audible at 48 kHz.
@@ -127,6 +127,7 @@ async def run_bot(
     sample_rate: int,
     lead: dict | None = None,
     channel: str = "phone",
+    project: str | None = None,
 ) -> CallState:
     from pipecat.pipeline.pipeline import Pipeline
     from pipecat.pipeline.runner import PipelineRunner
@@ -142,7 +143,9 @@ async def run_bot(
         {
             "role": "system",
             "content": build_system_prompt(
-                project=os.getenv("AGENT_PROJECT", "agartha"),
+                # Per-session, never from mutated global env — concurrent
+                # visitors can be looking at different projects.
+                project=project or os.getenv("AGENT_PROJECT", PORTFOLIO),
                 lead_name=lead.get("name"),
                 lead_source=lead.get("source"),
                 channel=channel,

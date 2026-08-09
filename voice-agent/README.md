@@ -30,6 +30,60 @@ caller audio ──► Sarvam Saaras v3 STT   (streaming, codemix, VAD + barge-i
 | `agent/compliance.py` | Calling window and suppression list, enforced at dial time |
 | `tools/costs.py` | COGS per minute and margin under the pricing card |
 
+## Do this first: is the voice right?
+
+Everything else is plumbing until you've heard it. One command, no deploy, no
+telephony:
+
+```bash
+export SARVAM_API_KEY=...
+python3 -m tools.voice_preview            # 3 clips x 4 stock voices → out/
+python3 -m tools.voice_preview --all --voices <your-cloned-id>
+```
+
+Listen on a phone speaker, not monitors — the call is 8 kHz and that's what
+the customer hears. Score against the checklist in
+`../scripts/voice/modcon-telugu-cold-call.md`: numerals, initialisms, the
+సర్ at clause ends, and whether `07c-price` still sounds warm under pushback.
+
+Pick a winner, set `SARVAM_VOICE_ID`, then run the live agent below.
+
+## Live demo in front of a client
+
+```bash
+cp .env.example .env                      # set SARVAM_API_KEY, SARVAM_VOICE_ID
+.venv/bin/uvicorn agent.server:app --port 8080
+```
+
+Open <http://localhost:8080/> → click the button → talk. That is the demo.
+
+To demo through the real website instead, add `VITE_AGENT_HOST=http://localhost:8080`
+to the site's `.env` and run `npm run dev` — the call button appears on
+thegreenteam site itself, and if the client is on a property page the agent
+opens already knowing which one.
+
+For a client demo that isn't on your laptop, deploy the agent first
+(`deploy/cloudrun.sh`) and point `VITE_AGENT_HOST` at the Cloud Run URL.
+
+## What the agent knows
+
+The whole portfolio, from `agent/prompt.py` — mirroring `SANCTUARIES` in
+`src/App.tsx`:
+
+| | Location | Price | AQI |
+|---|---|---|---|
+| MODCON Agartha | Narsapur forest boundary | from ₹68.7 L | 12 |
+| MODCON SYL Residences | Tukkuguda, ORR Exit-14 | ₹4,499/SFT | 22 |
+| Dates County | Kandukur, Srisailam Hwy | ₹18,000/sq yd | 18 |
+
+Plus who The Green Team is, the AQI-under-25 and 45-minute criteria, and that
+the developer pays the commission, not the buyer.
+
+On a property page the agent talks about that project. Everywhere else it
+takes the whole portfolio and routes: farm and clean air → Agartha; apartment
+near the airport → SYL; large villa plot or land banking → Dates County. It
+pitches exactly one, never all three.
+
 ## Two channels, one pipeline
 
 **Web ships first.** A WebRTC agent on your own site never touches a telecom

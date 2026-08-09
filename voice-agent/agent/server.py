@@ -112,13 +112,16 @@ async def web_offer(offer: WebOffer):
 
     transport = build_web_transport(connection)
     lead = {"source": "website"}
-    if offer.project:
-        os.environ.setdefault("AGENT_PROJECT", offer.project)
 
     async def _run():
         try:
             state = await run_bot(
-                transport, sample_rate=WEB_SAMPLE_RATE, lead=lead, channel="web"
+                transport,
+                sample_rate=WEB_SAMPLE_RATE,
+                lead=lead,
+                channel="web",
+                # Page the visitor is on; falls back to the whole portfolio.
+                project=offer.project or None,
             )
             await _record_web_session(state)
         except Exception:

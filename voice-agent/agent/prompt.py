@@ -10,6 +10,26 @@ fact that isn't in FACTS below.
 
 from __future__ import annotations
 
+# Who we are. The agent needs this to answer "who is this?" and "what do you
+# do?" — the two questions a demo audience always asks first.
+COMPANY = {
+    "name": "The Green Team",
+    "what_we_do": (
+        "An independent collective that curates forest-adjacent homes near "
+        "Hyderabad. We visit and verify every property before we show it."
+    ),
+    "criteria": (
+        "Everything we recommend must have AQI below 25 — Hyderabad city air "
+        "is typically 100 to 180 — and be within 45 minutes of the Financial "
+        "District or HITEC City."
+    ),
+    "role": (
+        "Authorised channel partner. We do not charge the buyer — the "
+        "developer pays us."
+    ),
+    "portfolio": "Three curated projects: MODCON Agartha, MODCON SYL Residences, and Dates County by Planet Green.",
+}
+
 # Facts mirror SANCTUARIES in src/App.tsx. If the site changes, change these —
 # an agent quoting a stale price is worse than one that says it will check.
 FACTS = {
@@ -30,16 +50,52 @@ FACTS = {
     },
     "syl": {
         "name": "MODCON SYL Residences",
+        "developer": "MODCON Builders",
         "location": "Tukkuguda, ORR Exit-14",
         "acres": 4.5,
         "unit_range": "2,500 – 4,500 SFT villaments",
         "price_from": "₹4,499 per SFT",
         "aqi": 22,
+        "noise_db": 24,
         "commute": "10 mins to airport, 30-45 mins to Financial District",
-        "clubhouse": "22,000 SFT",
-        "amenities": "chemical-free natural bio pool, yoga pavilion, forest-view balconies",
+        "clubhouse": "22,000 SFT — health, wellness, nature",
+        "amenities": (
+            "chemical-free natural bio pool, yoga and meditation pavilion, "
+            "large forest-view balconies, biophilic green corridors, EV "
+            "charging, 100% power backup, 4 high-speed lifts, gated with "
+            "24/7 security"
+        ),
+        "also": "Commercial spaces available at one-time investor pricing — enquire.",
+        "positioning": "Threshold of Hyderabad's Fourth City growth corridor.",
+    },
+    "dates_county": {
+        "name": "Dates County by Planet Green",
+        "developer": "Planet Green Infra",
+        "location": "Kandukur, Srisailam Highway",
+        "acres": "300+",
+        "plot_range": "500 sq yds",
+        "per_sq_yd": "₹18,000",
+        "price_from": "₹90 L",
+        "aqi": 18,
+        "noise_db": 22,
+        "commute": "15 mins to airport, 15 mins to ORR Exit-14",
+        "open_space": "40% of the land reserved for open and recreational space",
+        "amenities": (
+            "adjacent to a 4,000-acre reserve forest, date palm plantations "
+            "with Vedic farming, clubhouse, swimming pool, gym, themed parks, "
+            "natural fishing ponds, senior citizen park, 24/7 gated security"
+        ),
+        "positioning": "Epicentre of Hyderabad's emerging Future City on Srisailam Highway.",
+        # Project RERA numbers — these are the developer's project
+        # registrations, published on the site. They are NOT our agent
+        # registration, which is a separate thing we do not yet hold.
+        "project_rera": "P02400002648, P02400003813",
     },
 }
+
+# Demo and website mode: the agent knows the whole portfolio and picks the
+# project that fits what the visitor says, instead of pitching one blindly.
+PORTFOLIO = "portfolio"
 
 _STATE_1 = {
     "phone": """1. GREET      — Namaskaram, name, The Green Team, authorised channel partner
@@ -112,9 +168,48 @@ FORMATTING FOR SPEECH
 """
 
 
-def _brief(project: str) -> str:
-    facts = FACTS[project]
+def _fmt(facts: dict) -> str:
     return "\n".join(f"- {k.replace('_', ' ')}: {v}" for k, v in facts.items())
+
+
+def resolve_project(project: str | None) -> str:
+    """Map whatever the website sends onto a facts key.
+
+    The site uses hyphenated sanctuary ids ("dates-county"); the facts use
+    underscores. An unknown id falls back to the whole portfolio rather than
+    raising — a visitor on an unrecognised page should still get an agent that
+    can talk, not a dropped session.
+    """
+    if not project:
+        return PORTFOLIO
+    key = project.strip().lower().replace("-", "_")
+    return key if key in FACTS else PORTFOLIO
+
+
+def _brief(project: str) -> str:
+    """The facts block. Portfolio mode carries all three projects."""
+    company = f"ABOUT THE GREEN TEAM\n{_fmt(COMPANY)}\n"
+
+    if project == PORTFOLIO:
+        blocks = [
+            f"\nPROJECT — {facts['name']}\n{_fmt(facts)}"
+            for facts in FACTS.values()
+        ]
+        return company + "".join(blocks)
+
+    return f"{company}\nPROJECT — {FACTS[project]['name']}\n{_fmt(FACTS[project])}"
+
+
+_ROUTING = """
+CHOOSING A PROJECT — you represent three, so listen before you pitch.
+- Wants a farm, trees, weekend escape, "nature", clean air → MODCON Agartha.
+- Wants an apartment or villament, near the airport, ready to live in,
+  rental yield → MODCON SYL Residences.
+- Wants a large villa plot, land banking, Future City / Srisailam growth
+  story, biggest budget → Dates County.
+- Unsure → ask one question: farm land, a home to live in, or an investment?
+  Then pitch exactly one project. Never list all three at once.
+"""
 
 
 # The web visitor came to us — opening with a cold-call permission ask
@@ -165,12 +260,19 @@ def build_system_prompt(
 
     # Anything that isn't explicitly "web" is treated as a phone call — the
     # stricter of the two, so a typo can never silently downgrade the rules.
+    project = resolve_project(project)
     channel = "web" if channel == "web" else "phone"
     medium = "conversation" if channel == "web" else "call"
+    subject = (
+        "the properties we curate"
+        if project == PORTFOLIO
+        else FACTS[project]["name"]
+    )
+    routing = _ROUTING if project == PORTFOLIO else ""
 
-    return f"""You are {agent_name}, speaking for The Green Team, an authorised
-channel partner for MODCON Builders in Hyderabad. This is a Telugu voice
-{medium} about {FACTS[project]['name']}.
+    return f"""You are {agent_name}, speaking for The Green Team, an independent
+collective that curates forest-adjacent homes near Hyderabad. This is a Telugu
+voice {medium} about {subject}.
 
 {who}{src}Your goal is one thing only: book a site visit. Not to sell a plot in
 this conversation.
@@ -180,7 +282,7 @@ OPENING
 
 CONVERSATION FLOW — move forward one state per turn, and go back if they ask a question.
 {STATES.format(state_1=_STATE_1[channel])}
-{RULES}{rera}
+{routing}{RULES}{rera}
 PROJECT BRIEF — the only facts you may state
 {_brief(project)}
 """
