@@ -1,0 +1,19 @@
+# Container requirements. Deliberately NOT requirements.txt.
+#
+# The webrtc extra pulls aiortc, PyAV and opencv — roughly 300 MB of native
+# wheels — for a transport Cloud Run cannot serve anyway (WebRTC media is UDP,
+# Cloud Run takes none). Leaving it out makes the build faster and removes the
+# largest source of native-compilation failures.
+#
+# Consequence: /web/offer returns an error in this image. /web/ws, which is
+# what the widget uses by default, is unaffected. Deploy with requirements.txt
+# instead if you move to a VM and want WebRTC (see deploy/gce.sh).
+pipecat-ai[sarvam,silero]==1.7.0
+
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.4
+loguru==0.7.3
+
+plivo==4.60.0
+google-cloud-firestore==2.20.0

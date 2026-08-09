@@ -118,6 +118,10 @@ EOF
 fi
 
 # --- deploy -----------------------------------------------------------------
+# The dependency install is slow — onnxruntime, numba and scipy are large
+# wheels. Cloud Build's 10-minute default is not enough on a cold cache.
+gcloud config set builds/timeout 1800 --quiet 2>/dev/null || true
+
 gcloud run deploy "${SERVICE}" \
   --source . \
   --project "${PROJECT}" \

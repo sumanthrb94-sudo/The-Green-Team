@@ -9,8 +9,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# requirements-deploy.txt, not requirements.txt — it omits the webrtc extra,
+# which Cloud Run cannot use and which accounts for ~300 MB of native wheels.
+COPY requirements-deploy.txt .
+RUN pip install --no-cache-dir -r requirements-deploy.txt
 
 COPY . .
 
