@@ -227,16 +227,31 @@ prompt then instructs the agent to defer rather than state a number it doesn't
 have. `test_no_number_is_ever_fabricated` guards it. Set the env var and the
 widget's `data-rera` attribute once you have it.
 
+## Before any demo
+
+```bash
+python3 -m tools.preflight
+```
+
+Exercises the real APIs with your real credentials: key valid, voice id
+accepted, LLM answering, normalizer converting, all three projects loaded. The
+failures it catches — bad key, wrong voice id, unreachable LLM — otherwise
+show up as thirty seconds of silence in front of a client. Exits non-zero on
+failure, so it works in a pre-deploy hook.
+
 ## Known gaps
 
 - **Not yet run against live Sarvam credentials.** Signatures are verified
-  against pipecat 1.7.0 and all modules import cleanly, but no real call has
-  been placed. Expect to adjust model ids and the Plivo start-frame field names
-  on first contact.
+  against pipecat 1.7.0, all modules import cleanly, and `tools/preflight.py`
+  will tell you in ten seconds whether the live APIs agree — but no real
+  conversation has happened yet. Expect to adjust model ids on first contact.
 - `PlivoFrameSerializer` gets `streamId` from Plivo's first WebSocket frame;
-  the exact nesting is handled defensively but unverified against live traffic.
+  the nesting is handled defensively but unverified against live traffic. This
+  affects the phone leg only.
 - Sarvam voice cloning may be enterprise-gated. If it is, the fallback is
   Google Instant Custom Voice at ~₹3.17/min — worse economics, already on the
   GCP bill.
 - The Gemini figure in `tools/costs.py` excludes context caching and is an
-  upper bound. Measure both LLMs in week 1 before treating the gap as final.
+  upper bound. Measure both LLMs before treating the gap as final.
+- Concurrency on one `e2-small` is untested. `MAX_WEB_SESSIONS` defaults to 20;
+  watch CPU under real load before trusting that.
