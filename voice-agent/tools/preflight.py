@@ -58,7 +58,7 @@ def check_env(c: Check) -> str | None:
 
 
 def check_tts(c: Check, key: str) -> None:
-    voice = os.getenv("SARVAM_VOICE_ID", "anushka")
+    voice = os.getenv("SARVAM_VOICE_ID", "priya")
     model = os.getenv("SARVAM_TTS_MODEL", "bulbul:v3")
     headers = {"api-subscription-key": key, "Content-Type": "application/json"}
     payload = {
@@ -93,7 +93,7 @@ def check_tts(c: Check, key: str) -> None:
         return
 
     c.ok(f"TTS {model}", f"voice '{voice}', {ms:.0f} ms for one short line")
-    if voice in ("anushka", "vidya", "manisha", "abhilash"):
+    if voice in ("priya", "kavya", "ritu", "neha", "aditya", "rahul"):
         c.warn("voice", f"'{voice}' is a stock speaker — clone a real voice "
                         "before showing this to a client")
 
@@ -108,7 +108,7 @@ def check_llm(c: Check, key: str) -> None:
         return
 
     base = os.getenv("SARVAM_LLM_BASE_URL", "https://api.sarvam.ai/v1")
-    model = os.getenv("SARVAM_LLM_MODEL", "sarvam-30b")
+    model = os.getenv("SARVAM_LLM_MODEL", "sarvam-105b-conversations")
     try:
         body = _post(
             f"{base.rstrip('/')}/chat/completions",

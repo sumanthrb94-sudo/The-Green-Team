@@ -129,7 +129,7 @@ deploy)
   echo "==> installing runtime, building, starting"
   # SARVAM_VOICE_ID is expanded HERE, not on the VM — on the remote shell it
   # would be unset and silently fall back to the stock speaker.
-  VOICE_ID="${SARVAM_VOICE_ID:-anushka}"
+  VOICE_ID="${SARVAM_VOICE_ID:-priya}"
 
   _ssh "
     set -euo pipefail

@@ -134,7 +134,7 @@ gcloud run deploy "${SERVICE}" \
   --cpu 1 --memory 2Gi \
   --timeout 3600 \
   --session-affinity \
-  --set-env-vars "^@^GOOGLE_CLOUD_PROJECT=${PROJECT}@AGENT_PROJECT=${AGENT_PROJECT:-portfolio}@ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-https://thegreenteam.in,https://www.thegreenteam.in}@SARVAM_VOICE_ID=${SARVAM_VOICE_ID:-anushka}" \
+  --set-env-vars "^@^GOOGLE_CLOUD_PROJECT=${PROJECT}@AGENT_PROJECT=${AGENT_PROJECT:-portfolio}@ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-https://thegreenteam.in,https://www.thegreenteam.in}@SARVAM_VOICE_ID=${SARVAM_VOICE_ID:-priya}" \
   --set-secrets "SARVAM_API_KEY=SARVAM_API_KEY:latest,PLIVO_AUTH_ID=PLIVO_AUTH_ID:latest,PLIVO_AUTH_TOKEN=PLIVO_AUTH_TOKEN:latest"
 
 HOST=$(gcloud run services describe "${SERVICE}" --project "${PROJECT}" \

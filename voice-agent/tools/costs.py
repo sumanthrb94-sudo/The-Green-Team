@@ -20,9 +20,11 @@ USD_INR = 88.0
 # --- Vendor rates -----------------------------------------------------------
 SARVAM_TTS_PER_10K_CHARS = 30.0     # Bulbul v3; v2 is ₹15
 SARVAM_STT_PER_HOUR = 30.0          # Saaras v3 streaming
-SARVAM_LLM_IN_PER_1M = 2.5          # sarvam-30b
-SARVAM_LLM_CACHED_IN_PER_1M = 1.5
-SARVAM_LLM_OUT_PER_1M = 10.0
+# sarvam-105b-conversations. sarvam-30b is deprecated. Sarvam quotes $0.80
+# per 1M blended tokens; split here on a conventional 1:4 in/out ratio.
+SARVAM_LLM_IN_PER_1M = 0.40 * USD_INR
+SARVAM_LLM_CACHED_IN_PER_1M = 0.10 * USD_INR
+SARVAM_LLM_OUT_PER_1M = 1.60 * USD_INR
 GEMINI_FLASH_IN_PER_1M = 1.0 * USD_INR
 GEMINI_FLASH_OUT_PER_1M = 6.0 * USD_INR
 PLIVO_OUTBOUND_PER_MIN = 0.75

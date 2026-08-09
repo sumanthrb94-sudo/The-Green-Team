@@ -1,7 +1,7 @@
 """The Telugu voice agent pipeline.
 
     caller audio ──► Sarvam Saaras v3 STT (streaming, VAD + barge-in)
-                 ──► Sarvam-30B
+                 ──► Sarvam-105B (conversations)
                  ──► TeluguSpeechFilter (cap turn, strip controls, normalise)
                  ──► Sarvam Bulbul v3 TTS (cloned voice)
                  ──► caller
@@ -80,8 +80,10 @@ def build_services(sample_rate: int):
         api_key=api_key,
         model=os.getenv("SARVAM_TTS_MODEL", "bulbul:v3"),
         # The cloned voice id from Sarvam's console. Falls back to a stock
-        # speaker so the pipeline runs before the voice actor is recorded.
-        voice_id=os.getenv("SARVAM_VOICE_ID", "anushka"),
+        # bulbul:v3 speaker so the pipeline runs before the voice actor is
+        # recorded — "priya" matches the agent's name in the prompt. Note the
+        # v2 speaker names (anushka, vidya, ...) are NOT valid on v3.
+        voice_id=os.getenv("SARVAM_VOICE_ID", "priya"),
         sample_rate=sample_rate,
         params=SarvamTTSService.InputParams(
             language=Language.TE_IN,
@@ -100,7 +102,8 @@ def build_services(sample_rate: int):
 
 
 def _build_llm():
-    """Sarvam-30B by default; Gemini behind an env flag for the week-1 bench."""
+    """sarvam-105b-conversations by default (sarvam-30b is deprecated);
+    Gemini behind an env flag for the bench."""
     provider = os.getenv("LLM_PROVIDER", "sarvam").lower()
 
     if provider == "gemini":
@@ -117,7 +120,7 @@ def _build_llm():
     return OpenAILLMService(
         api_key=_require("SARVAM_API_KEY"),
         base_url=os.getenv("SARVAM_LLM_BASE_URL", "https://api.sarvam.ai/v1"),
-        model=os.getenv("SARVAM_LLM_MODEL", "sarvam-30b"),
+        model=os.getenv("SARVAM_LLM_MODEL", "sarvam-105b-conversations"),
     )
 
 

@@ -28,9 +28,12 @@ API_URL = "https://api.sarvam.ai/text-to-speech"
 CLIPS = Path(__file__).resolve().parents[2] / "scripts/voice/modcon-telugu-cold-call.clips.json"
 OUT = Path(__file__).resolve().parent.parent / "out"
 
-# Bulbul stock speakers. v3 ships 30+; these are the ones worth auditioning
-# for a sales register. Replace with your cloned voice id once you have one.
-DEFAULT_VOICES = ["anushka", "vidya", "manisha", "abhilash"]
+# bulbul:v3 speakers. The v2 names (anushka, vidya, manisha, abhilash) are
+# rejected by v3. Full v3 list includes aditya, ritu, ashutosh, priya, neha,
+# rahul, pooja, rohan, simran, kavya, amit, dev. These four are worth
+# auditioning for a female sales register; swap in your cloned id when you
+# have one.
+DEFAULT_VOICES = ["priya", "kavya", "ritu", "neha"]
 
 # The clips that expose the most failure modes: numerals + initialisms,
 # warmth under pushback, and the flat voicemail register.
