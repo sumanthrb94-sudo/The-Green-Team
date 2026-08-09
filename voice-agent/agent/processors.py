@@ -73,6 +73,8 @@ class CallState:
     truncations: int = 0
     turns: int = 0
     latencies_ms: list[float] = field(default_factory=list)
+    # Set only in offline mode, so a test can inspect what reached the TTS.
+    tts: object | None = None
 
     def apply(self, controls: list[str]) -> None:
         if "[[DNC]]" in controls:

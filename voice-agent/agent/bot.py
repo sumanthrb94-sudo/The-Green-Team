@@ -129,17 +129,23 @@ async def run_bot(
     channel: str = "phone",
     project: str | None = None,
 ) -> CallState:
-    from pipecat.pipeline.pipeline import Pipeline
-    from pipecat.pipeline.runner import PipelineRunner
-    from pipecat.pipeline.task import PipelineParams, PipelineTask
-    from pipecat.processors.aggregators.openai_llm_context import OpenAILLMContext
-
     lead = lead or {}
     state = CallState(lead_id=lead.get("id"))
 
+    if os.getenv("AGENT_OFFLINE") == "1":
+        return await _run_offline(transport, sample_rate=sample_rate, state=state)
+
+    from pipecat.pipeline.pipeline import Pipeline
+    from pipecat.pipeline.runner import PipelineRunner
+    from pipecat.pipeline.task import PipelineParams, PipelineTask
+    from pipecat.processors.aggregators.llm_context import LLMContext
+    from pipecat.processors.aggregators.llm_response_universal import (
+        LLMContextAggregatorPair,
+    )
+
     stt, llm, tts = build_services(sample_rate)
 
-    context = OpenAILLMContext([
+    context = LLMContext([
         {
             "role": "system",
             "content": build_system_prompt(
@@ -157,7 +163,7 @@ async def run_bot(
         # Nudge the first turn. Without this both sides wait for each other.
         {"role": "user", "content": "[connected — greet them]"},
     ])
-    aggregator = llm.create_context_aggregator(context)
+    aggregator = LLMContextAggregatorPair(context)
 
     pipeline = Pipeline([
         transport.input(),
@@ -181,6 +187,42 @@ async def run_bot(
     )
 
     _wire_latency_logging(task, state)
+    await PipelineRunner().run(task)
+    return state
+
+
+async def _run_offline(transport, *, sample_rate: int, state: CallState) -> CallState:
+    """Same pipeline shape with stub services — see agent/offline.py.
+
+    No LLM context aggregator here: the scripted stand-in is a plain processor
+    with no conversation history to accumulate.
+    """
+    from pipecat.pipeline.pipeline import Pipeline
+    from pipecat.pipeline.runner import PipelineRunner
+    from pipecat.pipeline.task import PipelineParams, PipelineTask
+
+    from agent.offline import build_offline_services
+
+    stt, llm, tts = build_offline_services(sample_rate)
+    logger.warning("AGENT_OFFLINE=1 — stub services, the voice is a sine tone")
+
+    task = PipelineTask(
+        Pipeline([
+            transport.input(),
+            stt,
+            llm,
+            build_text_filter(state),
+            tts,
+            transport.output(),
+        ]),
+        params=PipelineParams(
+            audio_in_sample_rate=sample_rate,
+            audio_out_sample_rate=sample_rate,
+            allow_interruptions=True,
+        ),
+    )
+    _wire_latency_logging(task, state)
+    state.tts = tts          # so the test can assert what reached the TTS
     await PipelineRunner().run(task)
     return state
 

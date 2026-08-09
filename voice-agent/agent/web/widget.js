@@ -170,10 +170,11 @@
       iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
     });
 
+    // addTrack creates a sendrecv transceiver, which already carries the
+    // agent's audio back. Adding a second recvonly transceiver produces a
+    // second audio m-line that the answerer does not fill — ontrack then
+    // never fires and no audio flows in either direction.
     stream.getTracks().forEach((t) => pc.addTrack(t, stream));
-    // The agent needs a receive slot for its own audio even though the
-    // browser sends nothing on it.
-    pc.addTransceiver("audio", { direction: "recvonly" });
 
     const remote = new Audio();
     remote.autoplay = true;
