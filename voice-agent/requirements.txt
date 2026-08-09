@@ -1,0 +1,15 @@
+# Pinned to the version the pipeline was written and verified against.
+# Pipecat's service APIs move between minors — re-verify agent/bot.py against
+# SarvamSTTService/SarvamTTSService signatures before bumping this.
+pipecat-ai[sarvam,silero,webrtc]==1.7.0
+
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.4
+loguru==0.7.3
+
+plivo==4.60.0
+google-cloud-firestore==2.20.0
+
+# dev
+pytest==8.3.4
