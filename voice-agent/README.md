@@ -30,6 +30,26 @@ caller audio ──► Sarvam Saaras v3 STT   (streaming, codemix, VAD + barge-i
 | `agent/compliance.py` | Calling window and suppression list, enforced at dial time |
 | `tools/costs.py` | COGS per minute and margin under the pricing card |
 
+## No local machine? Use Cloud Shell
+
+Everything below assumes a terminal. If you don't have one, open
+**[shell.cloud.google.com](https://shell.cloud.google.com)** — it runs in the
+browser, it's free, and `gcloud` is already signed in as you.
+
+```bash
+git clone -b claude/modcon-telugu-cold-call-script-e8m0g6 \
+    https://github.com/sumanthrb94-sudo/the-green-team.git
+cd the-green-team/voice-agent
+
+./deploy/cloudrun.sh setup
+printf '%s' '<your sarvam key>' | gcloud secrets versions add SARVAM_API_KEY --data-file=-
+./deploy/cloudrun.sh
+```
+
+It prints an `https://…run.app` URL. **Open it and click the button** — that
+page serves the widget itself, so there is nothing else to deploy and nothing
+to install. Roughly five minutes, most of it the first container build.
+
 ## Do this first: is the voice right?
 
 Everything else is plumbing until you've heard it. One command, no deploy, no

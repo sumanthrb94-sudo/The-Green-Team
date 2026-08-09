@@ -68,12 +68,26 @@ gcloud run deploy "${SERVICE}" \
 HOST=$(gcloud run services describe "${SERVICE}" --project "${PROJECT}" \
         --region "${REGION}" --format='value(status.url)' | sed 's|https://||')
 
-# PUBLIC_HOST is only known after the first deploy, so set it and redeploy.
+# The service's own URL is only known after the first deploy. Both of these
+# depend on it: PUBLIC_HOST for the Plivo callbacks, and the origin allowlist
+# so the test page served from this very host can open its own WebSocket.
+ORIGINS="${ALLOWED_ORIGINS:-https://thegreenteam.in,https://www.thegreenteam.in}"
 gcloud run services update "${SERVICE}" --project "${PROJECT}" --region "${REGION}" \
-  --update-env-vars "PUBLIC_HOST=${HOST}"
+  --update-env-vars "PUBLIC_HOST=${HOST},ALLOWED_ORIGINS=https://${HOST},${ORIGINS}"
 
-echo "==> live at https://${HOST}"
-echo "==> point the Plivo application answer_url at https://${HOST}/plivo/answer"
+cat <<EOF
+
+==> live at https://${HOST}
+
+    Test it right now — open that URL in a browser and click the button.
+    The page serves the widget itself, so nothing else needs deploying.
+
+    To put it on the website instead, set this in Vercel and redeploy:
+        VITE_AGENT_HOST=https://${HOST}
+
+    Phone leg, later: point the Plivo answer_url at
+        https://${HOST}/plivo/answer
+EOF
 
 # Notes on the flags that matter:
 #   --min-instances 1   a cold start on an inbound call is a dropped call
