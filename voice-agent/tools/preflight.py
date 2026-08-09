@@ -153,12 +153,6 @@ def check_pipeline(c: Check) -> None:
     else:
         c.ok("prompt", f"all three projects loaded, {len(prompt)} chars")
 
-    if os.getenv("RERA_AGENT_REG_NO"):
-        c.ok("RERA", "registration number set")
-    else:
-        c.warn("RERA", "no agent registration number — the agent will defer "
-                       "if asked, which is correct until TG-RERA clears")
-
 
 def main() -> None:
     print("\nPreflight — Telugu voice agent\n")

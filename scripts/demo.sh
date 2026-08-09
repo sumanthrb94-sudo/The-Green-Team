@@ -31,18 +31,16 @@ if [[ ! -d "${AGENT}/.venv" ]]; then
   "${AGENT}/.venv/bin/pip" install -q -r "${AGENT}/requirements.txt"
 fi
 
-# Answer "is it ready?" before starting, not in front of a client. Preflight
-# exercises the live Sarvam APIs — bad key, wrong voice id and an unreachable
-# LLM all surface here as text instead of as silence on the call.
+# Preflight reports, it does not block. If something is off you still get a
+# running agent and a specific error to chase — being stopped at the door is
+# worse than being told what is wrong.
 echo "==> preflight"
-if ! ( cd "${AGENT}" && set -a && [[ -f .env ]] && . ./.env; set +a; \
-       "${AGENT}/.venv/bin/python" -m tools.preflight ); then
+( cd "${AGENT}" && set -a && [[ -f .env ]] && . ./.env; set +a; \
+  "${AGENT}/.venv/bin/python" -m tools.preflight ) || {
   echo
-  echo "Not ready — fix the failures above, then run this again."
-  echo "To start anyway (the agent will be mute where preflight failed):"
-  echo "    SKIP_PREFLIGHT=1 ./scripts/demo.sh"
-  [[ "${SKIP_PREFLIGHT:-}" == "1" ]] || exit 1
-fi
+  echo "    ^ starting anyway. Set REQUIRE_PREFLIGHT=1 to stop on failures."
+  [[ "${REQUIRE_PREFLIGHT:-}" == "1" ]] && exit 1
+}
 
 echo "==> starting voice agent on :8080"
 ( cd "${AGENT}" && "${AGENT}/.venv/bin/uvicorn" agent.server:app --port 8080 ) &
