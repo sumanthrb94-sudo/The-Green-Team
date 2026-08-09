@@ -195,6 +195,8 @@ class TestConversation:
         )
         assert lines == 1, f"expected one audio m-line, got {lines}"
 
-    def test_status_reaches_the_listening_state(self, page):
-        assert "Listening" in page.locator(".gt-va-status").inner_text() \
-            or "Speaking" in page.locator(".gt-va-status").inner_text()
+        # Asserted here rather than in its own test: the status is state left
+        # by this connection, and reading it from a separate test made the
+        # suite order-dependent and flaky under load.
+        status = page.locator(".gt-va-status").inner_text()
+        assert "Listening" in status or "Speaking" in status, status
