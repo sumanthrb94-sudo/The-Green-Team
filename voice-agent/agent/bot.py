@@ -58,6 +58,8 @@ def build_services(sample_rate: int):
 
     api_key = _require("SARVAM_API_KEY")
 
+    from pipecat.services.sarvam.stt import SarvamSTTSettings
+
     stt = SarvamSTTService(
         api_key=api_key,
         # Leave unset to take Sarvam's current default rather than pinning a
@@ -72,8 +74,8 @@ def build_services(sample_rate: int):
             # Sarvam's own VAD signals drive barge-in; START_SPEECH is the cue
             # to stop playback mid-sentence.
             vad_signals=True,
-            high_vad_sensitivity=True,
         ),
+        settings=_vad_settings(),
     )
 
     tts = SarvamTTSService(
@@ -99,6 +101,42 @@ def build_services(sample_rate: int):
 
     llm = _build_llm()
     return stt, llm, tts
+
+
+def _vad_settings():
+    """How readily the agent lets itself be interrupted.
+
+    The first live test on a phone stopped the agent on every cough, every
+    background noise, and on its own voice coming back through the speaker —
+    the browser's echo canceller does not reliably cancel audio we play
+    through a separate AudioContext. High sensitivity is right for a headset
+    and wrong for a phone on speaker, so "robust" is the default.
+
+        VAD_PROFILE=robust     phone speaker, noisy room (default)
+        VAD_PROFILE=sensitive  headset, quiet room — interrupts eagerly
+    """
+    from pipecat.services.sarvam.stt import SarvamSTTSettings
+
+    profile = os.getenv("VAD_PROFILE", "robust").lower()
+
+    if profile == "sensitive":
+        return SarvamSTTSettings(high_vad_sensitivity=True)
+
+    return SarvamSTTSettings(
+        high_vad_sensitivity=False,
+        # Louder than ambient before anything counts as speech at all.
+        positive_speech_threshold=float(os.getenv("VAD_START", "0.7")),
+        negative_speech_threshold=float(os.getenv("VAD_STOP", "0.45")),
+        # Require sustained speech, not a transient. ~30 ms per frame.
+        min_speech_frames=int(os.getenv("VAD_MIN_FRAMES", "8")),
+        # Cutting the agent off is the expensive mistake, so demand more
+        # evidence for that than for starting a turn normally.
+        interrupt_min_speech_frames=int(os.getenv("VAD_INTERRUPT_FRAMES", "16")),
+        start_speech_volume_threshold=float(os.getenv("VAD_VOLUME", "0.35")),
+        # Ignore the first moments of a session — mic AGC settling and the
+        # click of the button both read as speech.
+        num_initial_ignored_frames=int(os.getenv("VAD_IGNORE_FRAMES", "10")),
+    )
 
 
 def _build_llm():

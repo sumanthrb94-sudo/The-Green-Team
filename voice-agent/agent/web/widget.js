@@ -410,6 +410,25 @@
     let pending = [];
     let pendingBytes = 0;
 
+    // While the agent is speaking, its own voice comes back through the phone
+    // speaker into the mic. The browser's echo canceller does not reliably
+    // remove audio played through a separate AudioContext, so the agent hears
+    // itself and treats it as an interruption — it stops on every sentence.
+    // Gate the uplink during playback unless the input is clearly louder than
+    // the echo, which is what a real interruption sounds like.
+    const ECHO_GATE_RMS = 0.12;
+
+    const rmsOf = (bytes) => {
+      const pcm = new Int16Array(bytes.buffer, bytes.byteOffset,
+                                 bytes.byteLength >> 1);
+      let sum = 0;
+      for (let i = 0; i < pcm.length; i++) {
+        const s = pcm[i] / 32768;
+        sum += s * s;
+      }
+      return pcm.length ? Math.sqrt(sum / pcm.length) : 0;
+    };
+
     capture.port.onmessage = (e) => {
       if (!ws || ws.readyState !== WebSocket.OPEN) return;
       pending.push(new Uint8Array(e.data));
@@ -424,6 +443,10 @@
       }
       pending = [];
       pendingBytes = 0;
+
+      const agentSpeaking = audioCtx && playHead > audioCtx.currentTime + 0.05;
+      if (agentSpeaking && rmsOf(out) < ECHO_GATE_RMS) return;
+
       ws.send(out.buffer);
     };
     mic.connect(capture);
