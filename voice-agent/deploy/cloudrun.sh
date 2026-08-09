@@ -68,6 +68,28 @@ if [[ "${1:-}" == "setup" ]]; then
     done
   done
 
+  # `gcloud run deploy --source` builds via Cloud Build, which runs as the
+  # project's DEFAULT COMPUTE service account — not the one above. Newer
+  # projects no longer auto-grant it the roles it needs, so the build fails
+  # with "does not have storage.objects.get access" on the source zip it just
+  # uploaded. Grant them here.
+  PROJECT_NUMBER=$(gcloud projects describe "${PROJECT}" --format='value(projectNumber)')
+  BUILD_SA="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
+  echo "==> granting build roles to ${BUILD_SA}"
+  for role in cloudbuild.builds.builder storage.objectViewer \
+              artifactregistry.writer logging.logWriter; do
+    for attempt in $(seq 1 5); do
+      if gcloud projects add-iam-policy-binding "${PROJECT}" --quiet \
+           --member="serviceAccount:${BUILD_SA}" --role="roles/${role}" \
+           >/dev/null 2>&1; then
+        echo "    roles/${role}"
+        break
+      fi
+      sleep 3
+      [[ ${attempt} -eq 5 ]] && echo "    WARNING: could not grant roles/${role}"
+    done
+  done
+
   for secret in SARVAM_API_KEY PLIVO_AUTH_ID PLIVO_AUTH_TOKEN; do
     gcloud secrets create "${secret}" --replication-policy=automatic \
         --project "${PROJECT}" 2>/dev/null || true
