@@ -41,10 +41,13 @@ git clone -b claude/modcon-telugu-cold-call-script-e8m0g6 \
     https://github.com/sumanthrb94-sudo/the-green-team.git
 cd the-green-team/voice-agent
 
-./deploy/cloudrun.sh setup
-printf '%s' '<your sarvam key>' | gcloud secrets versions add SARVAM_API_KEY --data-file=-
-./deploy/cloudrun.sh
+export SARVAM_API_KEY='<your key>'
+bash deploy/cloudrun.sh setup     # sets the project, stores the key
+bash deploy/cloudrun.sh           # deploys, prints the URL
 ```
+
+Use `bash deploy/...` rather than `./deploy/...` — a clone doesn't always
+preserve the executable bit.
 
 It prints an `https://…run.app` URL. **Open it and click the button** — that
 page serves the widget itself, so there is nothing else to deploy and nothing

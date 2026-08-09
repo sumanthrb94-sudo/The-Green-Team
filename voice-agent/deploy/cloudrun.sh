@@ -24,6 +24,13 @@ SA="voice-agent@${PROJECT}.iam.gserviceaccount.com"
 
 echo "==> project=${PROJECT} region=${REGION} service=${SERVICE}"
 
+# Cloud Shell starts with no default project, which breaks every gcloud command
+# you run by hand afterwards. Set it once, here.
+if [[ "$(gcloud config get-value project 2>/dev/null)" != "${PROJECT}" ]]; then
+  echo "==> setting default project to ${PROJECT}"
+  gcloud config set project "${PROJECT}" --quiet
+fi
+
 # --- one-time setup ---------------------------------------------------------
 if [[ "${1:-}" == "setup" ]]; then
   gcloud services enable run.googleapis.com secretmanager.googleapis.com \
@@ -42,10 +49,27 @@ if [[ "${1:-}" == "setup" ]]; then
   for secret in SARVAM_API_KEY PLIVO_AUTH_ID PLIVO_AUTH_TOKEN; do
     gcloud secrets create "${secret}" --replication-policy=automatic \
         --project "${PROJECT}" 2>/dev/null || true
-    echo "    set it with: echo -n '<value>' | gcloud secrets versions add ${secret} --data-file=-"
   done
 
-  echo "==> setup done. Add the secret values, then run: $0 deploy"
+  # Store the Sarvam key here if it's in the environment, so there is no
+  # separate command to get wrong. Reads from the env, never from a file that
+  # could be committed.
+  if [[ -n "${SARVAM_API_KEY:-}" ]]; then
+    printf '%s' "${SARVAM_API_KEY}" | gcloud secrets versions add SARVAM_API_KEY \
+        --data-file=- --project "${PROJECT}" >/dev/null
+    echo "==> stored SARVAM_API_KEY in Secret Manager"
+    echo
+    echo "==> setup done. Now run:  $0"
+  else
+    cat <<EOF
+
+==> setup done, but SARVAM_API_KEY is not set. Do this:
+
+    export SARVAM_API_KEY='<your key>'
+    $0 setup      # stores it
+    $0            # deploys
+EOF
+  fi
   exit 0
 fi
 
