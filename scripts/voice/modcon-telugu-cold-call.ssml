@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<!--
+  MODCON Builders — Telugu cold call, SSML build for TTS voice testing.
+  Tested shape: Azure / Google Cloud TTS te-IN. ElevenLabs ignores most tags —
+  use the .txt line file there instead and set pauses via the UI.
+  Variant B (Telugu-only script) is used throughout so no engine has to code-switch.
+-->
+<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="te-IN">
+  <voice name="te-IN-ShrutiNeural">
+    <prosody rate="-4%">
+
+      <!-- Block 1 — opening + permission -->
+      <s>నమస్కారం సర్.</s>
+      <break time="250ms"/>
+      <s>నేను ప్రియ మాట్లాడుతున్నాను, ద గ్రీన్ టీమ్ నుంచి — మోడ్‌కాన్ బిల్డర్స్ వాళ్ళ ఆథరైజ్డ్ ఛానెల్ పార్టనర్.</s>
+      <break time="200ms"/>
+      <s><prosody pitch="+6%">మీకు ఒక్క నిమిషం టైం ఉందా సర్?</prosody></s>
+      <break time="600ms"/>
+
+      <!-- Block 2 — hook -->
+      <s>థాంక్యూ సర్.</s>
+      <s>హైదరాబాద్ కి నలభై నిమిషాల దూరంలో, నార్సాపూర్ ఫారెస్ట్ బౌండరీ లో — మోడ్‌కాన్ అగర్తా అని ఇరవై ఐదు ఎకరాల పర్మాకల్చర్ ఫార్మ్ ఎస్టేట్ ఉంది.</s>
+      <break time="250ms"/>
+      <s>మొత్తం ముప్పై ఆరు ప్లాట్లే సర్, అందుకే ముందుగా మా మెంబర్స్ కి మాత్రమే చెప్తున్నాం.</s>
+      <break time="350ms"/>
+
+      <!-- Block 3 — qualifying question -->
+      <s>ఒక్క విషయం అడగనా సర్ —</s>
+      <break time="150ms"/>
+      <s><prosody pitch="+5%">మీరు ఇన్వెస్ట్‌మెంట్ కోసం చూస్తున్నారా, లేక వీకెండ్ హోమ్ లా ఫ్యామిలీ తో వాడుకోవడానికా?</prosody></s>
+      <break time="1200ms"/>
+
+      <!-- Block 4 — value pitch -->
+      <s>చాలా బాగుంది సర్.</s>
+      <s>అక్కడ ప్రతి ప్లాట్ లోనూ వంద కి పైగా రకాల చెట్లు ముందే నాటి ఉంటాయి, డ్రిప్ ఇరిగేషన్ వేసి ఉంటుంది, కూరగాయల బెడ్స్, ఒక స్పైరల్ హెర్బల్ గార్డెన్ కూడా.</s>
+      <break time="250ms"/>
+      <s>మధ్యలో ముప్పై ఆరు వేల చదరపు అడుగుల క్లబ్‌హౌస్ — స్విమ్మింగ్ పూల్, కయాకింగ్ లేక్, జిమ్, ఫార్మ్-టు-టేబుల్ డైనింగ్, ఇంకా స్టేకేషన్ విల్లాలు.</s>
+      <break time="200ms"/>
+      <s>పక్కనే గోశాల కూడా ఉంది సర్.</s>
+      <break time="350ms"/>
+
+      <!-- Block 5 — proof + price. Initialisms spelled out character by character. -->
+      <s>ఎయిర్ క్వాలిటీ అక్కడ <say-as interpret-as="characters">AQI</say-as> పన్నెండు మాత్రమే సర్ — సిటీలో వంద నుంచి నూట ఎనభై ఉంటుంది.</s>
+      <break time="250ms"/>
+      <s>ఫైనాన్షియల్ డిస్ట్రిక్ట్ నుంచి <say-as interpret-as="characters">RRR</say-as> మీదుగా నలభై నిమిషాలు.</s>
+      <break time="200ms"/>
+      <s>రెండు వేల ఇరవై నాలుగు లో బెస్ట్ సస్టైనబుల్ ఎకో-ఫ్రెండ్లీ ప్రాజెక్ట్ ఆఫ్ ద ఇయర్ అవార్డ్ కూడా వచ్చింది ఈ ప్రాజెక్ట్ కి.</s>
+      <break time="300ms"/>
+      <s>ప్లాట్లు ఎనిమిది వందల ఎనిమిది చదరపు గజాల నుంచి, ధర <emphasis level="moderate">అరవై ఎనిమిది లక్షల డెబ్బై వేల</emphasis> నుంచి మొదలు సర్.</s>
+      <break time="400ms"/>
+
+      <!-- Block 6 — close -->
+      <s>సర్, ఫోన్‌లో చెప్పేదాని కంటే ఒకసారి చూస్తే బాగా అర్థమవుతుంది.</s>
+      <break time="200ms"/>
+      <s>ఈ శనివారం ఉదయం పదకొండు గంటలకు సైట్ విజిట్ ఉంది — క్యాబ్ మేమే అరేంజ్ చేస్తాం, మీరు ఏమీ పే చేయనవసరం లేదు.</s>
+      <break time="300ms"/>
+      <s><prosody pitch="+7%">మీ పేరు రిజిస్టర్ చేయనా సర్?</prosody></s>
+      <break time="500ms"/>
+
+    </prosody>
+  </voice>
+</speak>
