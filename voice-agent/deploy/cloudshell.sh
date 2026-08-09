@@ -50,4 +50,7 @@ EOF
 export GOOGLE_CLOUD_PROJECT="${GOOGLE_CLOUD_PROJECT:-thegreenteam-17cfc}"
 export AGENT_PROJECT="${AGENT_PROJECT:-portfolio}"
 
-exec ./.venv/bin/uvicorn agent.server:app --host 0.0.0.0 --port 8080
+# Tee to a file as well as the terminal, so deploy/diagnose.sh can read what
+# actually happened instead of asking you to scroll and copy.
+exec ./.venv/bin/uvicorn agent.server:app --host 0.0.0.0 --port 8080 \
+    2>&1 | tee /tmp/voice-agent.log
