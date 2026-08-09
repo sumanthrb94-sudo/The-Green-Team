@@ -6,21 +6,25 @@
                  ──► Sarvam Bulbul v3 TTS (cloned voice)
                  ──► caller
 
-Run it two ways:
+Two transports, one pipeline:
 
-    python -m agent.bot --transport webrtc    # week 1: browser mic, no telephony
-    python -m agent.bot --transport plivo     # week 2+: real phone call
+    web    — WebRTC from the browser. Ships first: no telecom licence, no DLT,
+             no DND scrubbing, because it never touches a telecom network.
+    plivo  — real phone call. Needs DLT registration before any outbound dial.
 
-The transport is the only thing that changes between them. Everything that
-decides whether the agent sounds human — the prompt, the turn cap, the
-normalizer, the endpointing — is identical, so what you tune in the browser
-carries over to the phone unchanged.
+The transport is the only thing that differs. Everything that decides whether
+the agent sounds human — the prompt, the turn cap, the normalizer, the
+endpointing — is identical, so what you tune on the website carries over to
+the phone unchanged when DLT clears.
+
+Both are served by agent/server.py:
+
+    uvicorn agent.server:app --port 8080     # then open http://localhost:8080/
 """
 
 from __future__ import annotations
 
 import argparse
-import asyncio
 import os
 import time
 
@@ -117,7 +121,13 @@ def _build_llm():
     )
 
 
-async def run_bot(transport, *, sample_rate: int, lead: dict | None = None) -> CallState:
+async def run_bot(
+    transport,
+    *,
+    sample_rate: int,
+    lead: dict | None = None,
+    channel: str = "phone",
+) -> CallState:
     from pipecat.pipeline.pipeline import Pipeline
     from pipecat.pipeline.runner import PipelineRunner
     from pipecat.pipeline.task import PipelineParams, PipelineTask
@@ -135,11 +145,14 @@ async def run_bot(transport, *, sample_rate: int, lead: dict | None = None) -> C
                 project=os.getenv("AGENT_PROJECT", "agartha"),
                 lead_name=lead.get("name"),
                 lead_source=lead.get("source"),
+                channel=channel,
+                # Empty until TG-RERA agent registration comes through. The
+                # prompt then tells the agent to defer rather than invent one.
+                rera_reg_no=os.getenv("RERA_AGENT_REG_NO") or None,
             ),
         },
-        # Nudge the first turn. Without this the agent waits for the caller,
-        # and on an outbound call the caller is waiting for the agent.
-        {"role": "user", "content": "[call connected — greet them]"},
+        # Nudge the first turn. Without this both sides wait for each other.
+        {"role": "user", "content": "[connected — greet them]"},
     ])
     aggregator = llm.create_context_aggregator(context)
 
@@ -190,37 +203,31 @@ def _wire_latency_logging(task, state: CallState) -> None:
             logger.log(level.upper(), f"time-to-first-audio {ms:.0f} ms")
 
 
-async def _main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--transport", choices=("webrtc", "plivo"), default="webrtc")
-    args = parser.parse_args()
+def build_web_transport(webrtc_connection):
+    """Browser transport. Silero handles VAD here — there is no telephony
+    VAD signal to lean on as there is on the Plivo leg."""
+    from pipecat.audio.vad.silero import SileroVADAnalyzer
+    from pipecat.transports.base_transport import TransportParams
+    from pipecat.transports.smallwebrtc.transport import SmallWebRTCTransport
 
-    if args.transport == "webrtc":
-        from pipecat.transports.smallwebrtc.transport import SmallWebRTCTransport
-        from pipecat.transports.base_transport import TransportParams
-        from pipecat.audio.vad.silero import SileroVADAnalyzer
+    return SmallWebRTCTransport(
+        webrtc_connection=webrtc_connection,
+        params=TransportParams(
+            audio_in_enabled=True,
+            audio_out_enabled=True,
+            vad_analyzer=SileroVADAnalyzer(),
+        ),
+    )
 
-        transport = SmallWebRTCTransport(
-            params=TransportParams(
-                audio_in_enabled=True,
-                audio_out_enabled=True,
-                vad_analyzer=SileroVADAnalyzer(),
-            )
-        )
-        logger.info("browser transport ready — open the local client and talk")
-        state = await run_bot(transport, sample_rate=WEB_SAMPLE_RATE)
-    else:
-        raise SystemExit(
-            "Plivo calls are driven by server.py, not this entrypoint. "
-            "Run: uvicorn agent.server:app --port 8080"
-        )
 
-    logger.info(
-        f"call ended — turns={state.turns} truncated={state.truncations} "
-        f"p50_latency={state.p50_latency_ms} dnc={state.do_not_call} "
-        f"booked={state.booked}"
+def _main() -> None:
+    argparse.ArgumentParser(description=__doc__).parse_args()
+    raise SystemExit(
+        "Both transports are served by the app. Run:\n"
+        "    uvicorn agent.server:app --port 8080\n"
+        "then open http://localhost:8080/ to talk to it in the browser."
     )
 
 
 if __name__ == "__main__":
-    asyncio.run(_main())
+    _main()

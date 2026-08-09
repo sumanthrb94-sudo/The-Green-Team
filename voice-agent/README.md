@@ -30,18 +30,42 @@ caller audio ──► Sarvam Saaras v3 STT   (streaming, codemix, VAD + barge-i
 | `agent/compliance.py` | Calling window and suppression list, enforced at dial time |
 | `tools/costs.py` | COGS per minute and margin under the pricing card |
 
+## Two channels, one pipeline
+
+**Web ships first.** A WebRTC agent on your own site never touches a telecom
+network, so no DLT registration, 140-series number or DND scrub applies — it
+can go live while DLT is still processing. The phone leg needs DLT before any
+outbound dial.
+
+Only the transport differs. The prompt, turn cap, normalizer and endpointing
+are shared, so what you tune on the website carries over to the phone
+unchanged. The one deliberate difference is the opening move: a web visitor
+clicked "talk to us", so the agent skips the cold-call permission ask
+(`agent/prompt.py`, `_STATE_1`).
+
 ## Run it
 
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 cp .env.example .env      # fill in SARVAM_API_KEY at minimum
 
-# Week 1 — browser mic, no telephony, no regulatory exposure
-.venv/bin/python -m agent.bot --transport webrtc
-
-# Week 2+ — behind Plivo
 .venv/bin/uvicorn agent.server:app --port 8080
 ```
+
+Then open <http://localhost:8080/> and talk to it. The same process serves the
+Plivo webhooks once you have a trunk.
+
+Embed on the live site:
+
+```html
+<script src="https://<agent-host>/web/widget.js"
+        data-agent-host="https://<agent-host>"
+        data-project="agartha"
+        data-rera="<reg-no>"></script>
+```
+
+Set `ALLOWED_ORIGINS` to the sites permitted to embed it. Never `*` — that
+lets any site mount your agent and spend your Sarvam credits.
 
 Tests need no API keys and no pipecat — the logic modules import it lazily:
 
@@ -85,20 +109,43 @@ Ranked by contribution. Everything else is plumbing.
 4. **Short turns** — the prompt asks for 2 sentences; `cap_turn` enforces it,
    because models drift and a 20-second monologue is the clearest tell.
 
-## Compliance, enforced in code
+## Compliance
 
-`agent/compliance.py` blocks the two rules that are easy to lose under time
-pressure. Both are checked at dial time, so no scheduler bug or manual `curl`
-can route around them:
+### What applies where
 
-- **Calling window** 09:00–21:00 IST. `/calls/outbound` returns 409 outside it.
-- **Suppression list.** When the agent emits `[[DNC]]` the number is hashed and
+| Obligation | Web | Phone |
+|---|---|---|
+| DLT, 140-series, DND scrub | no | yes, before any dial |
+| 09:00–21:00 window | no | yes |
+| AI disclosure (IT Rules 2026) | **yes** | yes |
+| DPDP notice + consent before recording | **yes** | yes |
+| TG-RERA agent registration | **yes** | yes |
+
+Anything that dials a phone number pulls the web channel back under DLT — a
+callback to confirm a booking, a click-to-call bridge. Booking inside the app
+is clean; ringing to confirm is not.
+
+### Enforced in code
+
+`agent/compliance.py` blocks the two phone rules that are easiest to lose under
+time pressure, at dial time, so no scheduler bug or manual `curl` routes around
+them:
+
+- **Calling window** 09:00–21:00 IST — `/calls/outbound` returns 409 outside it.
+- **Suppression list** — when the agent emits `[[DNC]]` the number is hashed and
   written to `call_suppression` immediately, and `/calls/outbound` returns 403
-  for it forever. There is no un-suppress path in code on purpose.
+  for it forever. There is no un-suppress path in code, on purpose.
 
-Everything else — DLT registration, 140-series numbers, DND scrubbing, AI
-disclosure in the opening line — is process, not code. The opening line
-discloses the AI; keep it that way.
+On the web side, the widget shows the AI disclosure and the recording notice
+**before** `getUserMedia` is called — notice has to precede collection, not sit
+in a policy page nobody opens. Don't reorder that.
+
+### RERA
+
+`RERA_AGENT_REG_NO` is empty until TG-RERA registration comes through, and the
+prompt then instructs the agent to defer rather than state a number it doesn't
+have. `test_no_number_is_ever_fabricated` guards it. Set the env var and the
+widget's `data-rera` attribute once you have it.
 
 ## Known gaps
 

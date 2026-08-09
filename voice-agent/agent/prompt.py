@@ -41,9 +41,15 @@ FACTS = {
     },
 }
 
-STATES = """
-1. GREET      — Namaskaram, name, The Green Team, authorised channel partner
-                for MODCON Builders. Ask for one minute. WAIT for an answer.
+_STATE_1 = {
+    "phone": """1. GREET      — Namaskaram, name, The Green Team, authorised channel partner
+                for MODCON Builders. Ask for one minute. WAIT for an answer.""",
+    "web": """1. GREET      — Namaskaram, name, The Green Team, authorised channel partner
+                for MODCON Builders, and that you are an AI assistant. One
+                line. Do NOT ask for their time — they opened this themselves.""",
+}
+
+STATES = """{state_1}
 2. HOOK       — Why you called: Agartha, 25 acres on the Narsapur forest
                 boundary, only 36 plots.
 3. QUALIFY    — Investment, or a weekend home for the family? WAIT.
@@ -111,13 +117,35 @@ def _brief(project: str) -> str:
     return "\n".join(f"- {k.replace('_', ' ')}: {v}" for k, v in facts.items())
 
 
+# The web visitor came to us — opening with a cold-call permission ask
+# ("do you have one minute?") reads as absurd when they just clicked "talk to
+# us". Same agent, same facts, different first move.
+_OPENINGS = {
+    "phone": """You are making an outbound call. Open with state 1: greet, say who
+you are, and ask for one minute of their time. Wait for an answer before
+continuing.""",
+    "web": """The visitor clicked "talk to us" on thegreenteam.in and is already
+looking at the project — they came to you. Skip the permission ask entirely.
+Greet them, say in one line who you are and that you are an AI assistant, and
+go straight to state 3: ask what they are looking for. Never ask whether they
+have a minute.""",
+}
+
+
 def build_system_prompt(
     project: str = "agartha",
     agent_name: str = "ప్రియ",
     lead_name: str | None = None,
     lead_source: str | None = None,
+    channel: str = "phone",
+    rera_reg_no: str | None = None,
 ) -> str:
-    """Assemble the system prompt for one call."""
+    """Assemble the system prompt for one conversation.
+
+    ``channel`` is "web" or "phone". It changes the opening move only —
+    everything that governs how the agent sounds is shared, so tuning on the
+    website carries over to the phone unchanged.
+    """
     who = f"The caller's name is {lead_name}. " if lead_name else ""
     src = (
         f"They enquired through {lead_source}, so they have already shown "
@@ -126,18 +154,33 @@ def build_system_prompt(
         if lead_source
         else ""
     )
+    rera = (
+        f"\nIf asked whether you are a registered agent, say The Green Team is "
+        f"a RERA-registered real estate agent, registration number "
+        f"{rera_reg_no}.\n"
+        if rera_reg_no
+        else "\nIf asked about RERA registration, say you will have the team "
+        "confirm the registration details — do not state a number.\n"
+    )
 
-    return f"""You are {agent_name}, a telecaller for The Green Team, an authorised
-channel partner for MODCON Builders in Hyderabad. You are making an outbound
-call in Telugu about {FACTS[project]['name']}.
+    # Anything that isn't explicitly "web" is treated as a phone call — the
+    # stricter of the two, so a typo can never silently downgrade the rules.
+    channel = "web" if channel == "web" else "phone"
+    medium = "conversation" if channel == "web" else "call"
 
-{who}{src}Your goal is one thing only: book a site visit. Not to sell a plot on
-the phone.
+    return f"""You are {agent_name}, speaking for The Green Team, an authorised
+channel partner for MODCON Builders in Hyderabad. This is a Telugu voice
+{medium} about {FACTS[project]['name']}.
 
-CALL FLOW — move forward one state per turn, and go back if they ask a question.
-{STATES}
-{RULES}
+{who}{src}Your goal is one thing only: book a site visit. Not to sell a plot in
+this conversation.
 
+OPENING
+{_OPENINGS.get(channel, _OPENINGS['phone'])}
+
+CONVERSATION FLOW — move forward one state per turn, and go back if they ask a question.
+{STATES.format(state_1=_STATE_1[channel])}
+{RULES}{rera}
 PROJECT BRIEF — the only facts you may state
 {_brief(project)}
 """

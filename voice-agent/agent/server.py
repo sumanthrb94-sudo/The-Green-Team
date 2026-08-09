@@ -1,8 +1,14 @@
 """HTTP surface for the voice agent — runs on Cloud Run.
 
-Three endpoints:
+Web (ships first — no telecom licence, no DLT, never touches a telecom network):
 
-    POST /calls/outbound   trigger a call to one lead (called by n8n/Scheduler)
+    GET  /                 dev page for talking to the agent
+    GET  /web/widget.js    embeddable widget for thegreenteam site
+    POST /web/offer        WebRTC signalling; starts one browser session
+
+Phone (needs DLT registration before any outbound dial):
+
+    POST /calls/outbound   trigger a call to one lead (n8n / Cloud Scheduler)
     POST /plivo/answer     Plivo fetches this when a call connects; returns XML
     WS   /plivo/stream     Plivo streams call audio here, bidirectionally
 
@@ -13,17 +19,39 @@ leak. Never mount a service-account JSON here.
 
 from __future__ import annotations
 
+import asyncio
 import os
 from datetime import datetime, timezone
+from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request, WebSocket
-from fastapi.responses import JSONResponse, Response
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse, JSONResponse, Response
 from loguru import logger
 from pydantic import BaseModel
 
 from agent.compliance import CallWindow, is_suppressed, suppress
 
 app = FastAPI(title="Green Team voice agent")
+
+# The widget is embedded on thegreenteam site, which is a different origin
+# from Cloud Run. Keep this list explicit — a wildcard here would let any
+# site mount your agent and spend your Sarvam credits.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        o.strip()
+        for o in os.getenv(
+            "ALLOWED_ORIGINS",
+            "http://localhost:5173,http://localhost:8080",
+        ).split(",")
+        if o.strip()
+    ],
+    allow_methods=["GET", "POST"],
+    allow_headers=["*"],
+)
+
+STATIC = Path(__file__).parent / "web"
 
 PUBLIC_HOST = os.getenv("PUBLIC_HOST", "")           # e.g. agent-xyz.run.app
 PLIVO_FROM = os.getenv("PLIVO_FROM_NUMBER", "")
@@ -37,6 +65,95 @@ def _db():
     from google.cloud import firestore
 
     return firestore.Client(project=os.getenv("GOOGLE_CLOUD_PROJECT"))
+
+
+# --- Web (WebRTC) -----------------------------------------------------------
+# This path carries no telecom exposure: it never touches a telecom network,
+# so no DLT registration, 140-series number or DND scrub applies. The AI
+# disclosure and DPDP obligations do still apply, and both are handled — the
+# disclosure is in the agent's opening line, consent is captured by the widget
+# before the microphone is opened.
+
+_sessions: dict[str, object] = {}
+
+
+class WebOffer(BaseModel):
+    sdp: str
+    type: str
+    pc_id: str | None = None
+    project: str | None = None
+
+
+@app.post("/web/offer")
+async def web_offer(offer: WebOffer):
+    """WebRTC signalling. One POST per browser session."""
+    from pipecat.transports.smallwebrtc.connection import SmallWebRTCConnection
+
+    from agent.bot import WEB_SAMPLE_RATE, build_web_transport, run_bot
+
+    if offer.pc_id and offer.pc_id in _sessions:
+        # Renegotiation of an existing session (network change, ICE restart).
+        connection = _sessions[offer.pc_id]
+        await connection.renegotiate(sdp=offer.sdp, type=offer.type)
+        return connection.get_answer()
+
+    if len(_sessions) >= int(os.getenv("MAX_WEB_SESSIONS", "20")):
+        raise HTTPException(status_code=503, detail="all agents are busy")
+
+    connection = SmallWebRTCConnection()
+    await connection.initialize(sdp=offer.sdp, type=offer.type)
+
+    @connection.event_handler("closed")
+    async def _on_closed(conn):
+        _sessions.pop(conn.pc_id, None)
+
+    answer = connection.get_answer()
+    _sessions[answer["pc_id"]] = connection
+
+    transport = build_web_transport(connection)
+    lead = {"source": "website"}
+    if offer.project:
+        os.environ.setdefault("AGENT_PROJECT", offer.project)
+
+    async def _run():
+        try:
+            state = await run_bot(
+                transport, sample_rate=WEB_SAMPLE_RATE, lead=lead, channel="web"
+            )
+            await _record_web_session(state)
+        except Exception:
+            logger.exception("web session failed")
+        finally:
+            _sessions.pop(answer["pc_id"], None)
+
+    asyncio.create_task(_run())
+    return answer
+
+
+async def _record_web_session(state) -> None:
+    """Log the outcome. No phone number involved, so nothing to suppress."""
+    _db().collection("web_sessions").add({
+        "created_at": datetime.now(timezone.utc),
+        "turns": state.turns,
+        "booked": state.booked,
+        "transfer_requested": state.transfer_requested,
+        "p50_latency_ms": state.p50_latency_ms,
+        "truncations": state.truncations,
+    })
+
+
+@app.get("/web/widget.js")
+async def widget_js():
+    return Response(
+        content=(STATIC / "widget.js").read_text(),
+        media_type="application/javascript",
+        headers={"Cache-Control": "public, max-age=300"},
+    )
+
+
+@app.get("/", response_class=HTMLResponse)
+async def dev_page():
+    return (STATIC / "index.html").read_text()
 
 
 # --- Outbound trigger -------------------------------------------------------
@@ -157,7 +274,9 @@ async def plivo_stream(websocket: WebSocket):
         ),
     )
 
-    state = await run_bot(transport, sample_rate=TELEPHONY_SAMPLE_RATE, lead=lead)
+    state = await run_bot(
+        transport, sample_rate=TELEPHONY_SAMPLE_RATE, lead=lead, channel="phone"
+    )
     await _write_outcome(lead_id, state)
 
 
