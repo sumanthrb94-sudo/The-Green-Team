@@ -1,0 +1,647 @@
+<title>Telugu Voice Agent — Build Blueprint</title>
+<style>
+  /* ---- Tokens: light (default, un-stamped) ---- */
+  :root {
+    --ground:      #faf9f6;
+    --surface:     #f2f3ee;
+    --surface-2:   #e9ebe2;
+    --ink:         #1a2410;
+    --ink-2:       #3d4636;
+    --muted:       #6b7363;
+    --rule:        #d5d8cb;
+    --rule-strong: #b6bca8;
+    --accent:      #4a5c3d;
+    --accent-soft: #eef0e6;
+    --gold:        #8a6708;
+    --gold-soft:   #f5eeda;
+    --code-bg:     #eceee4;
+  }
+  /* ---- Tokens: dark via OS preference (un-stamped viewers) ---- */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:      #131810;
+      --surface:     #1b2117;
+      --surface-2:   #232a1e;
+      --ink:         #e7eade;
+      --ink-2:       #c3c9b7;
+      --muted:       #8d9682;
+      --rule:        #2f382a;
+      --rule-strong: #46523d;
+      --accent:      #a8bf8e;
+      --accent-soft: #1f2718;
+      --gold:        #c8a951;
+      --gold-soft:   #262010;
+      --code-bg:     #202719;
+    }
+  }
+  /* ---- Tokens: dark via explicit toggle ---- */
+  :root[data-theme="dark"] {
+    --ground:      #131810;
+    --surface:     #1b2117;
+    --surface-2:   #232a1e;
+    --ink:         #e7eade;
+    --ink-2:       #c3c9b7;
+    --muted:       #8d9682;
+    --rule:        #2f382a;
+    --rule-strong: #46523d;
+    --accent:      #a8bf8e;
+    --accent-soft: #1f2718;
+    --gold:        #c8a951;
+    --gold-soft:   #262010;
+    --code-bg:     #202719;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: ui-sans-serif, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    margin: 0;
+    padding: 0 24px 96px;
+  }
+
+  .wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  /* ---- Masthead ---- */
+  header.masthead {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 72px 0 40px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .eyebrow {
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  h1 {
+    font-family: Georgia, "Iowan Old Style", "Times New Roman", serif;
+    font-weight: 400;
+    font-size: clamp(38px, 6.5vw, 58px);
+    line-height: 1.05;
+    letter-spacing: -0.015em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .deck {
+    font-size: 20px;
+    line-height: 1.5;
+    color: var(--ink-2);
+    max-width: 60ch;
+    margin: 0;
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 28px;
+    font-size: 13px;
+    color: var(--muted);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    padding-top: 6px;
+  }
+  .meta b { color: var(--ink-2); font-weight: 600; }
+
+  /* ---- Sections ---- */
+  section { padding: 56px 0 0; display: flex; flex-direction: column; gap: 20px; }
+  section + section { border-top: 1px solid var(--rule); margin-top: 56px; padding-top: 56px; }
+
+  .part-label {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+    margin: 0;
+  }
+  h2 {
+    font-family: Georgia, "Iowan Old Style", "Times New Roman", serif;
+    font-weight: 400;
+    font-size: clamp(27px, 4vw, 34px);
+    line-height: 1.18;
+    letter-spacing: -0.01em;
+    margin: -12px 0 0;
+    text-wrap: balance;
+  }
+  h3 {
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.005em;
+    margin: 16px 0 -8px;
+    color: var(--ink);
+  }
+  h4 {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--muted);
+    margin: 20px 0 -10px;
+  }
+  p { margin: 0; max-width: 68ch; }
+  a { color: var(--ink); text-decoration: underline; text-decoration-color: var(--rule-strong); text-underline-offset: 3px; }
+  a:hover { text-decoration-color: var(--accent); color: var(--accent); }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+  strong { font-weight: 680; }
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.86em;
+    background: var(--code-bg);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+
+  ul, ol { margin: 0; padding-left: 1.3em; display: flex; flex-direction: column; gap: 10px; max-width: 68ch; }
+  li { padding-left: 4px; }
+  li::marker { color: var(--muted); }
+
+  /* ---- Tables ---- */
+  .scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 4px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: 15px; min-width: 460px; }
+  th, td { text-align: left; padding: 11px 16px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  thead th {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 11.5px; letter-spacing: 0.07em; text-transform: uppercase;
+    color: var(--muted); font-weight: 700; background: var(--surface-2);
+    border-bottom: 1px solid var(--rule-strong);
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space: nowrap; }
+  tr.total td { background: var(--gold-soft); font-weight: 700; border-top: 1px solid var(--rule-strong); }
+  tr.total td.num { color: var(--gold); }
+  .pick { color: var(--accent); font-weight: 700; }
+
+  /* ---- Ranked realism drivers ---- */
+  ol.ranked { list-style: none; padding: 0; gap: 0; }
+  ol.ranked li {
+    display: grid;
+    grid-template-columns: 68px 1fr;
+    gap: 4px 20px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--rule);
+    align-items: baseline;
+  }
+  ol.ranked li:first-child { border-top: 1px solid var(--rule); }
+  .weight {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-variant-numeric: tabular-nums;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: -0.03em;
+  }
+  ol.ranked li:first-child .weight { color: var(--gold); font-size: 26px; }
+  .driver-name { font-weight: 680; }
+  .driver-body { grid-column: 2; color: var(--ink-2); font-size: 15.5px; }
+
+  /* ---- Diagram ---- */
+  pre.diagram {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12.5px;
+    line-height: 1.6;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 20px;
+    overflow-x: auto;
+    margin: 0;
+    color: var(--ink-2);
+  }
+
+  /* ---- Callout ---- */
+  .callout {
+    background: var(--accent-soft);
+    border-left: 3px solid var(--accent);
+    padding: 18px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border-radius: 0 4px 4px 0;
+  }
+  .callout p { max-width: none; }
+
+  /* ---- Checklist ---- */
+  ul.check { list-style: none; padding: 0; gap: 0; }
+  ul.check li {
+    display: grid;
+    grid-template-columns: 22px 1fr;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--rule);
+    align-items: start;
+  }
+  ul.check li::before {
+    content: "";
+    width: 15px; height: 15px;
+    border: 1.5px solid var(--rule-strong);
+    border-radius: 3px;
+    margin-top: 5px;
+  }
+
+  /* ---- Timeline ---- */
+  ol.timeline { list-style: none; padding: 0; gap: 0; }
+  ol.timeline li {
+    display: grid;
+    grid-template-columns: 92px 1fr;
+    gap: 6px 20px;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  ol.timeline li:first-child { border-top: 1px solid var(--rule); }
+  .day {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--accent); padding-top: 4px;
+  }
+  .step-name { font-weight: 680; }
+  .step-body { grid-column: 2; color: var(--ink-2); font-size: 15.5px; }
+
+  /* ---- Verdict ---- */
+  .verdict {
+    border-top: 2px solid var(--ink);
+    border-bottom: 2px solid var(--ink);
+    padding: 36px 0;
+    margin-top: 64px;
+    display: flex; flex-direction: column; gap: 18px;
+  }
+  .verdict h2 { margin: 0; }
+  .verdict p { font-size: 18.5px; }
+
+  footer {
+    padding-top: 40px;
+    font-size: 14px;
+    color: var(--muted);
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  footer a { color: var(--muted); }
+  .src-line { max-width: none; line-height: 1.9; }
+
+  @media (max-width: 560px) {
+    body { font-size: 16px; padding: 0 18px 72px; }
+    ol.ranked li { grid-template-columns: 54px 1fr; }
+    ol.timeline li { grid-template-columns: 1fr; }
+    .driver-body, .step-body { grid-column: 1; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Build blueprint</p>
+    <h1>Telugu voice agent, from open source</h1>
+    <p class="deck">A teardown of the Outpero Telugu calling agents, and a costed plan to build the equivalent yourself — at roughly a third of the running cost.</p>
+    <div class="meta">
+      <span>Researched <b>Aug 2026</b></span>
+      <span>Prices <b>INR, list</b></span>
+      <span>For <b>The Green Team</b></span>
+    </div>
+  </header>
+
+  <section>
+    <p class="part-label">Part 1</p>
+    <h2>What Outpero actually is</h2>
+    <p>Read their homepage and their Telugu page together and the shape is unambiguous. <strong>They are an automation agency, not a voice-AI lab.</strong> The homepage sells three "systems" — Revenue Capture from ₹60,000, Ops Efficiency from ₹1,00,000, Web Capture from ₹50,000 — plus 19 pre-built solutions from ₹14,999, delivered "live in 2 weeks." That's a services business with a fixed build kit.</p>
+    <p>The tell is on their own homepage: the Ops system lists <em>"Custom n8n/Make Logic"</em> as a deliverable. n8n is the glue. The voice layer is bought, not built.</p>
+
+    <h4>What each claim maps to</h4>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Their claim</th><th>What it actually is</th></tr></thead>
+        <tbody>
+          <tr><td>"10+ native Telugu voices" in a Voice Library</td><td>Cloned voices. Telugu voice actors recorded for 30–120 s, run through a cloning TTS. The names are their labels on cloned assets, not model names.</td></tr>
+          <tr><td>"3-second call" after a Facebook lead form</td><td>Meta Lead Ads webhook → n8n → outbound-call API. One automation node.</td></tr>
+          <tr><td>"Scale from 10 to 10,000 parallel calls"</td><td>The <em>telephony provider's</em> concurrency (Plivo/Exotel trunk channels), resold. Not their infrastructure.</td></tr>
+          <tr><td>"Transfer the live call to your team"</td><td>SIP REFER / warm transfer. A checkbox in Vapi, Retell, Bolna and LiveKit alike.</td></tr>
+          <tr><td>Voice Hub — recordings, transcripts, intent scores</td><td>A dashboard over webhook payloads. Recordings and transcripts come free from the platform; "intent score" is one LLM call after hangup.</td></tr>
+          <tr><td>"Telugu-first tuning… dialects, interruptions, Tanglish"</td><td>Prompt engineering, a good cloned voice, and endpointing tuned for Telugu. Real work — but config work, not model training.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p><strong>Most likely stack underneath:</strong> a managed voice platform (Vapi / Retell / Bland, or Bolna given the India focus) + ElevenLabs or Sarvam for the cloned voices + GPT/Gemini for the brain + Plivo or Exotel for Indian PSTN + n8n for CRM glue + a custom dashboard. Their margin is the gap between ~₹4/min of vendor cost and what they bill. There is no moat here.</p>
+
+    <h3>Why the demos sound ultra-realistic</h3>
+    <p>Ranked by contribution. This ordering is the most useful thing in this document — it tells you where to spend your two weeks.</p>
+
+    <ol class="ranked">
+      <li>
+        <span class="weight">50%</span>
+        <span class="driver-name">A cloned voice from a real Telugu speaker</span>
+        <span class="driver-body">Stock <code>te-IN</code> voices sound like a railway announcement. Sixty seconds of a real Hyderabad salesperson, cloned, sounds like a person — because it is one. This is the whole game; everything below is polish.</span>
+      </li>
+      <li>
+        <span class="weight">15%</span>
+        <span class="driver-name">Native-script text normalization</span>
+        <span class="driver-body"><code>₹68.7 L</code> must reach the TTS as <span lang="te">అరవై ఎనిమిది లక్షల డెబ్బై వేల</span>. Every engine mangles digits, currency and initialisms in Indic scripts, and one mangled number ends the illusion instantly.</span>
+      </li>
+      <li>
+        <span class="weight">15%</span>
+        <span class="driver-name">Under ~800 ms to first audio</span>
+        <span class="driver-body">Humans reply in 200–500 ms. Past a second of silence the caller says "hello?" and the spell breaks. An engineering budget, not a model choice.</span>
+      </li>
+      <li>
+        <span class="weight">10%</span>
+        <span class="driver-name">Short turns</span>
+        <span class="driver-body">Cap the agent at two sentences / ~35 Telugu words. A twenty-second uninterrupted monologue is the single clearest giveaway of a bot.</span>
+      </li>
+      <li>
+        <span class="weight">5%</span>
+        <span class="driver-name">Barge-in and backchannels</span>
+        <span class="driver-body">The caller must be able to cut the agent off mid-sentence and have it stop instantly. Sprinkle <span lang="te">హా సర్</span>, <span lang="te">అవును</span>, <span lang="te">సరే</span> while the LLM thinks.</span>
+      </li>
+      <li>
+        <span class="weight">5%</span>
+        <span class="driver-name">The phone codec is helping them</span>
+        <span class="driver-body">PSTN is 8 kHz μ-law, which strips exactly the high frequencies where TTS artifacts live. The same voice that sounds slightly synthetic in a browser sounds human on a call.</span>
+      </li>
+    </ol>
+
+    <div class="callout">
+      <p>Their website demo players are almost certainly full-band studio renders. Never judge a voice on studio playback — A/B every candidate through an actual phone call before assuming they are ahead of what you can build in a week.</p>
+    </div>
+  </section>
+
+  <section>
+    <p class="part-label">Part 2</p>
+    <h2>Three stacks, priced</h2>
+    <p>All per-minute maths assumes one minute of conversation: caller speaks ~25 s, agent speaks ~35 s ≈ 90 Telugu words ≈ <strong>600 characters of TTS</strong>, across ~5 turns. USD at ₹88.</p>
+
+    <h3>Stack A — cascade on managed Indic APIs</h3>
+    <pre class="diagram">Plivo/Exotel PSTN ──► LiveKit SIP ──► LiveKit Agents (self-hosted, free)
+                                        │
+                          ┌─────────────┼─────────────┐
+                          ▼             ▼             ▼
+                   Sarvam Saarika   Gemini 3.5    Sarvam Bulbul
+                       (STT)         Flash (LLM)   (TTS, cloned)
+                          │             │             │
+                          └─────────────┴─────────────┘
+                                        │
+                              n8n ──► Supabase (leads, transcripts)</pre>
+
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Line item</th><th>Rate</th><th class="num">₹ / call-min</th></tr></thead>
+        <tbody>
+          <tr><td>Outbound PSTN (Plivo, mobile)</td><td>~₹0.71–0.80/min</td><td class="num">0.75</td></tr>
+          <tr><td>STT — Sarvam Saarika</td><td>₹30 / hour of audio</td><td class="num">0.50</td></tr>
+          <tr><td>LLM — Gemini 3.5 Flash</td><td>~$1/M in, $6/M out</td><td class="num">0.15</td></tr>
+          <tr><td>TTS — Sarvam Bulbul</td><td>₹30 / 10k chars × 600</td><td class="num">1.80</td></tr>
+          <tr><td>Orchestration VPS (~20 concurrent)</td><td>₹1,500/mo fixed</td><td class="num">0.05</td></tr>
+          <tr class="total"><td>Total</td><td>≈ $0.037</td><td class="num">3.25</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>TTS is 55% of the bill. That is the number to attack.</p>
+
+    <h3>Stack B — speech-to-speech</h3>
+    <p>Gemini Live native audio: no STT→LLM→TTS chain, ~300 ms response, Telugu supported, ~$0.036/min ≈ ₹3.15, plus telephony ₹0.75 → <strong>≈ ₹3.90/min</strong>. Fewest moving parts and the best latency — but <strong>you cannot use your own cloned voice</strong>, and the cloned voice is half the realism. Wrong trade for a sales agent trying to sound like a specific human; right choice for an inbound receptionist where neutral-but-fast wins. Build it in week 1 as your latency baseline; it takes an afternoon.</p>
+
+    <h3>Stack C — self-hosted STT + TTS</h3>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Line item</th><th class="num">₹ / call-min</th></tr></thead>
+        <tbody>
+          <tr><td>Outbound PSTN</td><td class="num">0.75</td></tr>
+          <tr><td>LLM (Gemini Flash; ~0 if self-hosted)</td><td class="num">0.15</td></tr>
+          <tr><td>One L4 24 GB @ $0.39/hr ≈ ₹34/hr, STT + TTS, ~10 concurrent</td><td class="num">0.06</td></tr>
+          <tr><td>Orchestration VPS</td><td class="num">0.05</td></tr>
+          <tr class="total"><td>Total ≈ $0.012</td><td class="num">1.00</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <p><strong>Break-even.</strong> Self-hosting saves ~₹2.25/min. A GPU running 24/7 costs ~₹816/day. You need <strong>~360 call-minutes/day (6 hours of talk time)</strong> to justify it.</p>
+      <p><strong>Build Stack A, instrument it, migrate to Stack C past ~350 call-min/day.</strong> Starting at C means three weeks on GPU autoscaling instead of on the conversation — which is where all the quality actually lives.</p>
+    </div>
+  </section>
+
+  <section>
+    <p class="part-label">Part 3</p>
+    <h2>Components, with repos</h2>
+
+    <h4>Orchestration — pick one</h4>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Repo</th><th>License</th><th>Verdict</th></tr></thead>
+        <tbody>
+          <tr><td><a href="https://github.com/livekit/agents">livekit/agents</a> <span class="pick">← pick</span></td><td>Apache-2.0</td><td>WebRTC rooms, <strong>native SIP and phone numbers built in</strong> — no Twilio bridge. Best turn-detection model ships in-repo. Runs OpenAI's and xAI's production voice. Free self-hosted.</td></tr>
+          <tr><td><a href="https://github.com/pipecat-ai/pipecat">pipecat-ai/pipecat</a></td><td>BSD-2</td><td>Pipeline-of-processors, largest plugin library, near-daily commits. Choose it if you want to hand-tune every stage — e.g. a custom Telugu normalizer between LLM and TTS.</td></tr>
+          <tr><td><a href="https://github.com/bolna-ai/bolna">bolna-ai/bolna</a></td><td>MIT</td><td>India-native: Plivo/Exotel/Vobiz + BYO-SIP, agents as JSON, Sarvam integrated. Fastest path to a ringing Indian phone. Caveat — the README currently asks for maintainers. Borrow the telephony servers; don't make it your core.</td></tr>
+          <tr><td><a href="https://github.com/TEN-framework/ten-framework">TEN-framework</a></td><td>Apache-2.0</td><td>Strong real-time multimodal, C++/Go core. Heavier to learn. Only if you need avatar/video later.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Framework choice barely affects latency — that's set by your model stack (cascade adds 300–800 ms, speech-to-speech ~300 ms; framework overhead is tens of ms). Choose on telephony and ecosystem.</p>
+
+    <h4>TTS — where the realism lives</h4>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Model</th><th>License</th><th>Verdict</th></tr></thead>
+        <tbody>
+          <tr><td><a href="https://github.com/AI4Bharat/IndicF5">ai4bharat/IndicF5</a></td><td>open</td><td>1,417 h of Indian speech, 11 languages incl. Telugu. Reference-audio cloning — clip + its transcript. <strong>The default open choice.</strong> Not natively streaming; chunk by sentence.</td></tr>
+          <tr><td><a href="https://github.com/praxelhq/praxy">praxelhq/praxy</a></td><td>Apache-2.0</td><td>Chatterbox + Telugu LoRA, with a published benchmark beating Sarvam Bulbul on Telugu retroflex collapse (26.7% vs 33.3%) and a router that transliterates Tanglish before synthesis — exactly the problem Outpero advertises. <strong>Brand new (Apr 2026), zero stars, unproven.</strong> Evaluate; don't bet on it yet.</td></tr>
+          <tr><td><a href="https://github.com/resemble-ai/chatterbox">resemble-ai/chatterbox</a></td><td>MIT</td><td>350M params, sub-200 ms tuned, emotion control, zero-shot cloning. 65% blind preference over ElevenLabs (English). ~8 GB VRAM. Good fine-tune base.</td></tr>
+          <tr><td><a href="https://github.com/canopyai/Orpheus-TTS">canopyai/Orpheus-TTS</a></td><td>Apache-2.0</td><td>Llama-based, true streaming, guided emotion, 150M–3B. Needs a Telugu fine-tune.</td></tr>
+          <tr><td>Sarvam Bulbul (API)</td><td>commercial</td><td>₹30/10k chars, Indic-tuned, no GPU. The pragmatic Stack-A default.</td></tr>
+          <tr><td>ElevenLabs Multilingual v2</td><td>commercial</td><td>Best cloning, 5–10× Sarvam's price. Use it to prove the voice, then replicate on IndicF5.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4>Speech to text</h4>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Model</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td><a href="https://github.com/AI4Bharat/IndicConformer">AI4Bharat IndicConformer</a> 600M</td><td>22 Indian languages incl. Telugu. The strongest open Indic ASR. Streaming-capable.</td></tr>
+          <tr><td><a href="https://github.com/SYSTRAN/faster-whisper">faster-whisper</a> + <code>vasista22/whisper-telugu-large-v2</code></td><td>Easiest path. Needs chunking for streaming, heavier GPU.</td></tr>
+          <tr><td><a href="https://github.com/collabora/WhisperLive">collabora/WhisperLive</a></td><td>Ready-made streaming wrapper if you go Whisper.</td></tr>
+          <tr><td>Sarvam Saarika (API)</td><td>₹30/hour, Indic-tuned, zero ops. Stack-A default.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4>Turn-taking — do not skip this</h4>
+    <ul>
+      <li><a href="https://github.com/snakers4/silero-vad">snakers4/silero-vad</a> — the baseline VAD everyone uses. MIT, tiny, CPU.</li>
+      <li><strong>LiveKit turn detector</strong> (in <code>livekit/agents</code>) — semantic end-of-turn detection; knows <span lang="te">"నేను అనుకుంటున్నాను…"</span> isn't finished. Cuts false interrupts dramatically.</li>
+      <li><strong>Smart Turn</strong> (in <code>pipecat</code>) — the equivalent on that side.</li>
+    </ul>
+    <p>Endpointing is the difference between an agent that talks over people and one that doesn't. Budget real tuning time — it's the most under-rated component in every voice stack.</p>
+
+    <h4>Telephony (India)</h4>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Provider</th><th class="num">Outbound mobile</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Plivo</strong></td><td class="num">~₹0.71/min</td><td>Best API and docs, 100 default concurrency, first-class in Bolna and LiveKit SIP.</td></tr>
+          <tr><td>Exotel</td><td class="num">₹0.80–1.20</td><td>Most India-native; strongest on DLT paperwork.</td></tr>
+          <tr><td>Direct SIP (Tata/Airtel)</td><td class="num">₹0.60–1.20</td><td>Cheapest at volume, most paperwork. Worth it past ~50k min/mo.</td></tr>
+          <tr><td>Twilio India</td><td class="num">highest</td><td>Don't, for domestic India.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Inbound DID ₹0.40–0.90/min. Toll-free inbound ₹1.20–2.50/min.</p>
+
+    <h4>Everything else</h4>
+    <ul>
+      <li><strong>Glue:</strong> <a href="https://github.com/n8n-io/n8n">n8n-io/n8n</a>, self-hosted — the same tool Outpero uses. Meta Lead Ads → webhook → trigger call.</li>
+      <li><strong>Data + dashboard:</strong> Supabase for leads, transcripts and recordings; <a href="https://github.com/metabase/metabase">Metabase</a> or a Next.js page as your Voice Hub.</li>
+      <li><strong>Post-call intelligence:</strong> one Gemini Flash call over the transcript → intent score, budget, objection tags, next action. ~₹0.10/call.</li>
+    </ul>
+  </section>
+
+  <section>
+    <p class="part-label">Part 4</p>
+    <h2>The realism checklist</h2>
+    <p>Ship none of these and you have a robot. Ship all of them and you're at parity.</p>
+    <ol>
+      <li><strong>Clone a real voice.</strong> Hire a Telugu voice actor for two hours. Record 10–15 minutes clean — no room echo, no compression, 48 kHz — reading the objection blocks from the cold-call script, so you capture the <em>sales register</em>, not neutral narration. Get a signed release covering synthetic reproduction. This one step outranks every model choice.</li>
+      <li><strong>Normalize text before TTS.</strong> Numbers, currency, dates and initialisms into Telugu words. Praxy ships <code>indic_numbers.py</code> for exactly this — steal it. Never send <code>₹68.7L</code> or <code>AQI 12</code> raw.</li>
+      <li><strong>Cap turn length in the system prompt.</strong> "At most 2 sentences, under 35 Telugu words, never more than 3 items." Enforce it — truncate server-side when the LLM overruns.</li>
+      <li><strong>Stream TTS sentence-by-sentence.</strong> Start speaking on sentence one while the rest generates. Halves perceived latency for free.</li>
+      <li><strong>Hold sub-800 ms to first audio.</strong> Typical budget: VAD close 250 ms → STT final 150 ms → LLM first token 250 ms → TTS first chunk 150 ms. Instrument each stage separately.</li>
+      <li><strong>Barge-in that actually stops.</strong> On detected speech, kill the audio buffer immediately — not at the end of the current chunk.</li>
+      <li><strong>Filler while thinking.</strong> If the LLM hasn't returned in 400 ms, play a pre-rendered <span lang="te">"హా సర్…"</span>. Pre-render once; never synthesize live.</li>
+      <li><strong>Warm human transfer.</strong> SIP REFER on <span lang="te">"మనిషితో మాట్లాడాలి"</span>. Test it on day one — it's the most business-critical path in the system.</li>
+      <li><strong>Handle Tanglish input.</strong> Real callers say "sir, price entha?" Your STT must not drop the English, and your prompt must not correct the caller's register.</li>
+      <li><strong>Tune on 8 kHz.</strong> Evaluate every voice through a real PSTN call, never laptop speakers.</li>
+      <li><strong>Re-listen weekly.</strong> Pull 20 real calls, mark every moment you'd have hung up, fix the top three. This loop is what separates a demo from a product — and it's the only part nobody can sell you.</li>
+      <li><strong>Disclose the AI in the first sentence.</strong> Compliance, yes — but also, callers who feel deceived hang up harder and complain louder.</li>
+    </ol>
+  </section>
+
+  <section>
+    <p class="part-label">Part 5</p>
+    <h2>India compliance, non-negotiable</h2>
+    <p>Outbound commercial calling in India in 2026 is regulated and actively enforced — TRAI's own detection models look for synthetic-voice signatures and abnormal call patterns. Over 47,000 numbers were disconnected in Q1 2026 alone, including legitimate businesses with sloppy DLT registration. Penalties run to ₹10 lakh.</p>
+    <p>Before your first live dial:</p>
+    <ul class="check">
+      <li><span><strong>Register as a telemarketer on the DLT platform</strong> — entity, sender IDs, and your call scripts.</span></li>
+      <li><span><strong>Use the correct number series</strong> — 140 promotional, 1600 transactional. Promotional traffic from a normal 10-digit mobile is the fastest route to disconnection.</span></li>
+      <li><span><strong>Scrub every list against DND</strong> before each campaign, not once.</span></li>
+      <li><span><strong>Capture revocable consent</strong> with timestamp and source. A Meta Lead Ad submission is consent for <em>that</em> enquiry — log the lead ID against the call record.</span></li>
+      <li><span><strong>Call only 09:00–21:00</strong> local time.</span></li>
+      <li><span><strong>Disclose the AI</strong> in the opening line and label synthetic voice per the 2026 IT Rules amendment. Never impersonate a named real person.</span></li>
+      <li><span><strong>Honour opt-out instantly and permanently</strong> — wire it to a hard suppression list, not a CRM tag.</span></li>
+      <li><span><strong>DPDP Act:</strong> recordings and transcripts are personal data. Define retention, restrict access, support deletion on request.</span></li>
+    </ul>
+    <p>The cheapest stack in the world is worthless if the numbers get cut off in week three.</p>
+  </section>
+
+  <section>
+    <p class="part-label">Part 6</p>
+    <h2>Fourteen days</h2>
+    <ol class="timeline">
+      <li>
+        <span class="day">Days 1–2</span>
+        <span class="step-name">Voice asset</span>
+        <span class="step-body">Book the voice actor. Record 15 minutes. Clone into ElevenLabs <em>and</em> IndicF5 from the same source clip, A/B them on the 17-clip test set — through a phone call, not speakers. Pick a winner.</span>
+      </li>
+      <li>
+        <span class="day">Days 3–4</span>
+        <span class="step-name">Local loop</span>
+        <span class="step-body">LiveKit Agents locally, browser mic, no telephony: Saarika → Gemini Flash → your voice. Get one full turn working. Spend an afternoon on Gemini Live speech-to-speech as the latency baseline to beat.</span>
+      </li>
+      <li>
+        <span class="day">Days 5–6</span>
+        <span class="step-name">Conversation design</span>
+        <span class="step-body">Port the nine blocks and seven objection handles into the system prompt as a state machine: greet → qualify → pitch → objection → close → book/transfer. Add the turn cap and the Telugu normalizer. Give this the <em>most</em> time — it's where the quality is.</span>
+      </li>
+      <li>
+        <span class="day">Days 7–8</span>
+        <span class="step-name">Telephony</span>
+        <span class="step-body">Plivo trunk → LiveKit SIP, outbound and inbound. Test warm transfer. Start DLT registration now — approval takes days and it will be your critical path.</span>
+      </li>
+      <li>
+        <span class="day">Days 9–10</span>
+        <span class="step-name">Latency and endpointing</span>
+        <span class="step-body">Instrument the four-stage budget. Add turn detection, barge-in, pre-rendered fillers. Target sub-800 ms. This is the gap between "impressive" and "real".</span>
+      </li>
+      <li>
+        <span class="day">Days 11–12</span>
+        <span class="step-name">Data loop</span>
+        <span class="step-body">n8n: Meta Lead Ad → Supabase → trigger call → post-call summary → back to Supabase. Build the minimal Voice Hub view: calls, duration, outcome, transcript, recording, intent score.</span>
+      </li>
+      <li>
+        <span class="day">Days 13–14</span>
+        <span class="step-name">Pilot and regression set</span>
+        <span class="step-body">Fifty real calls to consented leads. Listen to all fifty. Build a fixed 20-case Telugu regression suite from the failures and re-run it on every prompt change, forever.</span>
+      </li>
+    </ol>
+    <p>Then, and only then: if you're past ~350 call-min/day, migrate STT and TTS onto an L4 and take the bill from ₹3.25 to ₹1.00 per minute.</p>
+  </section>
+
+  <div class="verdict">
+    <h2>Bottom line</h2>
+    <p>Outpero is a well-executed assembly job on bought parts, sold at agency prices. Nothing on that page requires technology you cannot self-host this month.</p>
+    <p>Your real costs: <strong>~₹3.25/min managed, ~₹1.00/min self-hosted</strong>, plus one voice actor (₹5–15k, one-time) and about two weeks of build time. What decides whether it sounds ultra-realistic is not the framework — it's the quality of that one voice recording, whether your numbers are spelled out in Telugu, and whether you keep the agent's turns short.</p>
+    <p>Everything else is plumbing.</p>
+  </div>
+
+  <footer>
+    <p class="src-line"><strong>Sources.</strong>
+      Frameworks — <a href="https://soniox.com/wiki/voice-agent-frameworks">Soniox</a>, <a href="https://www.thinnest.ai/blog/open-source-voice-ai-frameworks">ThinnestAI</a>, <a href="https://www.evalgent.com/blog/pipecat-vs-livekit">Evalgent</a>.
+      Models — <a href="https://huggingface.co/ai4bharat/IndicF5">IndicF5</a>, <a href="https://github.com/praxelhq/praxy">Praxy</a>, <a href="https://github.com/bolna-ai/bolna">Bolna</a>, <a href="https://www.marktechpost.com/2026/07/23/best-open-speech-recognition-asr-models-in-2026-wer-languages-latency-and-license-compared/">MarkTechPost ASR 2026</a>, <a href="https://www.tryspeakeasy.io/blog/open-source-text-to-speech-2026">Speakeasy TTS 2026</a>.
+      Pricing — <a href="https://www.sarvam.ai/api-pricing">Sarvam</a>, <a href="https://www.plivo.com/voice/pricing/in/">Plivo India</a>, <a href="https://www.runpod.io/pricing">Runpod</a>, <a href="https://caller.digital/blog/telephony-partner-voice-ai-india-plivo-exotel-ozonetel-knowlarity-twilio-2026">Caller Digital telephony comparison</a>.
+      Compliance — <a href="https://www.ondial.ai/blog/trai-dlt-ai-calling-india">TRAI DLT for AI calling</a>, <a href="https://caller.digital/blog/ai-cold-calling-india-trai-compliant-2026">AI cold calling India 2026</a>, <a href="https://www.autointerviewai.com/blog/ai-calling-india-dpdp-trai-dlt-compliance-complete-guide-2026">DPDP + TRAI + RBI guide</a>.
+    </p>
+    <p>Figures researched August 2026 and approximate. Verify vendor pricing and DLT requirements before committing.</p>
+  </footer>
+
+</div>
+
+<style>
+  /* ---- print overrides ---- */
+  @page { size: A4; margin: 15mm 14mm 16mm; }
+  body {
+    font-family:'Noto Sans','Noto Sans Telugu',sans-serif;
+    font-size:9.5pt; line-height:1.55; padding:0;
+    -webkit-print-color-adjust:exact; print-color-adjust:exact;
+  }
+  .wrap { max-width:none; }
+  body { background:#fff; }
+  p, ul, ol, .deck { max-width:none; }
+  h1,h2,.verdict h2 { font-family:'Noto Serif',serif; }
+  h1 { font-size:30pt; }
+  h2 { font-size:19pt; }
+  h3 { font-size:11pt; margin:14pt 0 -6pt; }
+  h4, .part-label, .eyebrow, .meta, .weight, .day, thead th, code, pre.diagram, td.num, th.num
+    { font-family:'Noto Sans Mono',monospace; }
+  .te, [lang="te"] { font-family:'Noto Sans Telugu','Noto Sans',sans-serif; }
+  header.masthead { padding:0 0 14pt; }
+  .deck { font-size:12.5pt; }
+  section { padding:20pt 0 0; gap:12pt; }
+  section + section { margin-top:20pt; padding-top:20pt; break-before:auto; }
+  h2, h3, h4, .part-label { break-after:avoid; }
+  table, .scroll, .callout, pre.diagram, ol.ranked li, ol.timeline li, ul.check li { break-inside:avoid; }
+  .scroll { overflow:visible; }
+  table { min-width:0; font-size:8.5pt; }
+  th, td { padding:5pt 8pt; }
+  pre.diagram { font-size:7.8pt; padding:10pt; }
+  ol.ranked li { padding:9pt 0; grid-template-columns:56px 1fr; }
+  .weight { font-size:17pt; }
+  ol.ranked li:first-child .weight { font-size:19pt; }
+  .driver-body, .step-body { font-size:9pt; }
+  ol.timeline li { padding:10pt 0; grid-template-columns:78px 1fr; }
+  ul, ol { gap:6pt; }
+  .verdict { margin-top:24pt; padding:20pt 0; break-inside:avoid; }
+  .verdict p { font-size:11pt; }
+  footer { padding-top:18pt; font-size:8pt; }
+  a { text-decoration:none; color:var(--ink); border-bottom:0.5pt solid var(--rule-strong); }
+</style>

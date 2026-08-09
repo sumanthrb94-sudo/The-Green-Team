@@ -1,0 +1,327 @@
+<meta charset="utf-8">
+<title>MODCON Builders — Telugu Cold Call Script</title>
+<style>
+  @page { size: A4; margin: 16mm 15mm 18mm; }
+
+  :root {
+    --ground:#ffffff; --surface:#f4f5ef; --surface-2:#eaece1;
+    --ink:#1a2410; --ink-2:#3d4636; --muted:#6b7363;
+    --rule:#d5d8cb; --rule-strong:#b0b7a2; --accent:#4a5c3d; --gold:#8a6708; --gold-soft:#f6efdb;
+  }
+  * { box-sizing:border-box; }
+  body {
+    margin:0; background:var(--ground); color:var(--ink);
+    font-family:'Noto Sans','Noto Sans Telugu',sans-serif;
+    font-size:10pt; line-height:1.55; -webkit-print-color-adjust:exact; print-color-adjust:exact;
+  }
+  h1,h2,h3 { text-wrap:balance; }
+  p { margin:0; }
+
+  /* Telugu runs need more leading and a size bump to optically match Latin */
+  .te { font-family:'Noto Sans Telugu','Noto Sans',sans-serif; font-size:12.5pt; line-height:1.85; }
+
+  /* ---------- masthead ---------- */
+  .masthead { border-bottom:2pt solid var(--ink); padding-bottom:12pt; margin-bottom:16pt; }
+  .eyebrow { font-family:'Noto Sans Mono',monospace; font-size:7.5pt; letter-spacing:.14em;
+             text-transform:uppercase; color:var(--muted); font-weight:700; margin-bottom:6pt; }
+  h1 { font-family:'Noto Serif',serif; font-weight:400; font-size:26pt; line-height:1.1;
+       letter-spacing:-.01em; margin:0 0 8pt; }
+  .deck { font-size:11pt; color:var(--ink-2); max-width:52em; margin-bottom:10pt; }
+  .metagrid { display:grid; grid-template-columns:repeat(4,1fr); gap:8pt; font-size:8.5pt; }
+  .metagrid div { border-left:1.5pt solid var(--rule-strong); padding-left:7pt; }
+  .metagrid dt { font-family:'Noto Sans Mono',monospace; font-size:7pt; letter-spacing:.08em;
+                 text-transform:uppercase; color:var(--muted); font-weight:700; }
+  .metagrid dd { margin:1pt 0 0; font-weight:600; }
+
+  /* ---------- variant key ---------- */
+  .key { background:var(--surface); border:0.75pt solid var(--rule); border-radius:2pt;
+         padding:9pt 12pt; margin-bottom:16pt; font-size:9pt; color:var(--ink-2); }
+  .key b { color:var(--ink); }
+  .key ul { margin:5pt 0 0; padding-left:14pt; }
+  .key li { margin-bottom:2pt; }
+
+  /* ---------- section heads ---------- */
+  h2.sec {
+    font-family:'Noto Sans Mono',monospace; font-size:8.5pt; letter-spacing:.12em;
+    text-transform:uppercase; color:var(--accent); font-weight:700;
+    border-bottom:1pt solid var(--rule-strong); padding-bottom:4pt; margin:20pt 0 12pt;
+    break-after:avoid;
+  }
+
+  /* ---------- blocks ---------- */
+  /* Blocks may split across pages, but never mid-line and never right after a heading */
+  .block { margin-bottom:14pt; }
+  .bhead { display:flex; align-items:baseline; gap:8pt; margin-bottom:6pt; break-after:avoid; }
+  .line, .direction { break-inside:avoid; }
+  .bnum { font-family:'Noto Sans Mono',monospace; font-size:8pt; font-weight:700;
+          background:var(--ink); color:#fff; padding:1.5pt 5pt; border-radius:2pt; letter-spacing:.04em; }
+  .btitle { font-weight:700; font-size:10.5pt; }
+  .btime { font-family:'Noto Sans Mono',monospace; font-size:8pt; color:var(--muted);
+           margin-left:auto; white-space:nowrap; }
+
+  .line { border-left:2.5pt solid var(--rule-strong); padding:2pt 0 2pt 11pt; margin-bottom:7pt; }
+  .line.a { border-left-color:var(--accent); }
+  .line.b { border-left-color:var(--rule-strong); }
+  .vlabel { font-family:'Noto Sans Mono',monospace; font-size:7pt; letter-spacing:.1em;
+            text-transform:uppercase; color:var(--muted); font-weight:700; margin-bottom:2pt; }
+  .translit { font-size:8.5pt; font-style:italic; color:var(--muted); line-height:1.5; margin-top:3pt; }
+
+  .direction { font-size:8.5pt; color:var(--ink-2); background:var(--gold-soft);
+               border-left:2.5pt solid var(--gold); padding:5pt 10pt; margin-top:6pt; }
+  .direction b { color:var(--gold); }
+
+  /* ---------- tables ---------- */
+  table { border-collapse:collapse; width:100%; font-size:8.5pt; margin-top:4pt; }
+  th,td { text-align:left; padding:5pt 8pt; border-bottom:0.75pt solid var(--rule); vertical-align:top; }
+  thead th { font-family:'Noto Sans Mono',monospace; font-size:7pt; letter-spacing:.07em;
+             text-transform:uppercase; color:var(--muted); font-weight:700;
+             background:var(--surface-2); border-bottom:1pt solid var(--rule-strong); }
+  td.n { font-family:'Noto Sans Mono',monospace; text-align:center; width:22pt; color:var(--muted); font-weight:700; }
+  tbody tr { break-inside:avoid; }
+
+  .settings { background:var(--surface); border:0.75pt solid var(--rule); border-radius:2pt;
+              padding:9pt 12pt; font-size:9pt; margin-top:10pt; }
+  .settings b { font-family:'Noto Sans Mono',monospace; font-size:8.5pt; }
+
+  .compliance { border-top:1.5pt solid var(--ink); margin-top:20pt; padding-top:10pt; font-size:8.5pt; color:var(--ink-2); }
+  .compliance b { color:var(--ink); }
+
+  .pagebreak { break-before:page; }
+</style>
+
+<div class="masthead">
+  <p class="eyebrow">Text-to-speech voice test · Source script</p>
+  <h1>MODCON Builders — Telugu Cold Call</h1>
+  <p class="deck">Source text for evaluating Telugu TTS voices. Telangana / Hyderabad spoken register, natural code-mixed with English real-estate terms. Core pitch (Blocks 1–6) targets 45–60 seconds.</p>
+  <dl class="metagrid">
+    <div><dt>Caller</dt><dd>The Green Team</dd></div>
+    <div><dt>Properties</dt><dd>Agartha · SYL</dd></div>
+    <div><dt>Language</dt><dd>te-IN</dd></div>
+    <div><dt>Target rate</dt><dd>145–160 wpm</dd></div>
+  </dl>
+</div>
+
+<div class="key">
+  <b>Two variants per line.</b> Record both and compare — which one wins depends entirely on your engine.
+  <ul>
+    <li><b>A — Code-mixed:</b> English brand and technical words left in Latin script. For multilingual voices (ElevenLabs Multilingual v2, Azure te-IN, Sarvam). This is what a real agent actually says.</li>
+    <li><b>B — Telugu-only:</b> everything transliterated into Telugu script. For engines that mangle Latin words mid-sentence, or when testing pure te-IN phoneme coverage.</li>
+  </ul>
+  Roman transliteration sits under each line as a pronunciation reference for reviewers who don't read Telugu script.
+</div>
+
+<h2 class="sec">Block 0 · Voice-test warm-up</h2>
+<div class="block">
+  <div class="bhead"><span class="bnum">00</span><span class="btitle">Phoneme warm-up</span><span class="btime">~10 sec</span></div>
+  <p style="font-size:9pt;color:var(--ink-2);margin-bottom:6pt;">Read this first on every new voice. It exercises the sounds Telugu TTS most often breaks on: retroflex ళ/ణ, aspirates ఖ/ఘ/ధ, long vowels, and a rupee figure.</p>
+  <div class="line a">
+    <p class="te">నమస్కారం. నేను ద గ్రీన్ టీమ్ నుంచి మాట్లాడుతున్నాను. మీ ఇంటి కల నిజం చేయడానికి, హైదరాబాద్ దగ్గర ఒక అందమైన అడవి అంచున, ఇరవై ఐదు ఎకరాల ఫార్మ్ ఎస్టేట్ — ధర అరవై ఎనిమిది లక్షల డెబ్బై వేల నుంచి.</p>
+    <p class="translit">namaskāram. nēnu The Green Team nunchi māṭlāḍutunnānu. mī iṇṭi kala nijam chēyaḍāniki, Hyderabad daggara oka andamaina aḍavi anchuna, iravai aidu ekarāla farm estate — dhara aravai enimidi lakṣala ḍebbai vēla nunchi.</p>
+  </div>
+</div>
+
+<h2 class="sec">Blocks 1–6 · The core call</h2>
+
+<div class="block">
+  <div class="bhead"><span class="bnum">01</span><span class="btitle">Opening + permission</span><span class="btime">0:00 – 0:08</span></div>
+  <div class="line a">
+    <p class="vlabel">Variant A — code-mixed</p>
+    <p class="te">నమస్కారం సర్. నేను ప్రియ మాట్లాడుతున్నాను, ద గ్రీన్ టీమ్ నుంచి — MODCON Builders వాళ్ళ authorised channel partner. మీకు ఒక్క నిమిషం టైం ఉందా సర్?</p>
+  </div>
+  <div class="line b">
+    <p class="vlabel">Variant B — Telugu-only</p>
+    <p class="te">నమస్కారం సర్. నేను ప్రియ మాట్లాడుతున్నాను, ద గ్రీన్ టీమ్ నుంచి — మోడ్‌కాన్ బిల్డర్స్ వాళ్ళ ఆథరైజ్డ్ ఛానెల్ పార్టనర్. మీకు ఒక్క నిమిషం టైం ఉందా సర్?</p>
+    <p class="translit">namaskāram sar. nēnu Priya māṭlāḍutunnānu, The Green Team nunchi — MODCON Builders vāḷḷa authorised channel partner. mīku okka nimiṣam ṭaim undā sar?</p>
+  </div>
+  <p class="direction"><b>Direction.</b> Pause 0.6 s and wait — never continue over the prospect. For female prospects swap సర్ → మేడమ్ (sar → mēḍam).</p>
+</div>
+
+<div class="block">
+  <div class="bhead"><span class="bnum">02</span><span class="btitle">Reason for the call — the hook</span><span class="btime">0:08 – 0:20</span></div>
+  <div class="line a">
+    <p class="vlabel">Variant A — code-mixed</p>
+    <p class="te">థాంక్యూ సర్. హైదరాబాద్ కి నలభై నిమిషాల దూరంలో, నార్సాపూర్ forest boundary లో — MODCON Agartha అని ఇరవై ఐదు ఎకరాల permaculture farm estate ఉంది. మొత్తం ముప్పై ఆరు plots మాత్రమే సర్, అందుకే ముందుగా మా members కి మాత్రమే చెప్తున్నాం.</p>
+  </div>
+  <div class="line b">
+    <p class="vlabel">Variant B — Telugu-only</p>
+    <p class="te">థాంక్యూ సర్. హైదరాబాద్ కి నలభై నిమిషాల దూరంలో, నార్సాపూర్ ఫారెస్ట్ బౌండరీ లో — మోడ్‌కాన్ అగర్తా అని ఇరవై ఐదు ఎకరాల పర్మాకల్చర్ ఫార్మ్ ఎస్టేట్ ఉంది. మొత్తం ముప్పై ఆరు ప్లాట్లే సర్, అందుకే ముందుగా మా మెంబర్స్ కి మాత్రమే చెప్తున్నాం.</p>
+    <p class="translit">thānkyū sar. Hyderabad ki nalabhai nimiṣāla dūramlō, Narsapur forest boundary lō — MODCON Agartha ani iravai aidu ekarāla permaculture farm estate undi. mottam muppai āru plots mātramē sar, andukē mundugā mā members ki mātramē cheptunnām.</p>
+  </div>
+</div>
+
+<div class="block">
+  <div class="bhead"><span class="bnum">03</span><span class="btitle">Qualifying question</span><span class="btime">0:20 – 0:26</span></div>
+  <div class="line a">
+    <p class="vlabel">Variant A — code-mixed</p>
+    <p class="te">ఒక్క విషయం అడగనా సర్ — మీరు investment కోసం చూస్తున్నారా, లేక weekend home లా family తో వాడుకోవడానికా?</p>
+  </div>
+  <div class="line b">
+    <p class="vlabel">Variant B — Telugu-only</p>
+    <p class="te">ఒక్క విషయం అడగనా సర్ — మీరు ఇన్వెస్ట్‌మెంట్ కోసం చూస్తున్నారా, లేక వీకెండ్ హోమ్ లా ఫ్యామిలీ తో వాడుకోవడానికా?</p>
+    <p class="translit">okka viṣayam aḍaganā sar — mīru investment kōsam chūstunnārā, lēka weekend home lā family tō vāḍukōvaḍānikā?</p>
+  </div>
+  <p class="direction"><b>Direction.</b> Pause 1.2 s — the longest silence in the script, and a good stress test for engines that clip trailing audio.</p>
+</div>
+
+<div class="block">
+  <div class="bhead"><span class="bnum">04</span><span class="btitle">Value pitch</span><span class="btime">0:26 – 0:42</span></div>
+  <div class="line a">
+    <p class="vlabel">Variant A — code-mixed</p>
+    <p class="te">చాలా బాగుంది సర్. అక్కడ ప్రతి plot లోనూ వంద కి పైగా రకాల చెట్లు ముందే నాటి ఉంటాయి, drip irrigation వేసి ఉంటుంది, కూరగాయల beds, ఒక spiral herbal garden కూడా. మధ్యలో ముప్పై ఆరు వేల చదరపు అడుగుల clubhouse — swimming pool, kayaking lake, gym, farm-to-table dining, ఇంకా staycation villas. పక్కనే గోశాల కూడా ఉంది సర్.</p>
+  </div>
+  <div class="line b">
+    <p class="vlabel">Variant B — Telugu-only</p>
+    <p class="te">చాలా బాగుంది సర్. అక్కడ ప్రతి ప్లాట్ లోనూ వంద కి పైగా రకాల చెట్లు ముందే నాటి ఉంటాయి, డ్రిప్ ఇరిగేషన్ వేసి ఉంటుంది, కూరగాయల బెడ్స్, ఒక స్పైరల్ హెర్బల్ గార్డెన్ కూడా. మధ్యలో ముప్పై ఆరు వేల చదరపు అడుగుల క్లబ్‌హౌస్ — స్విమ్మింగ్ పూల్, కయాకింగ్ లేక్, జిమ్, ఫార్మ్-టు-టేబుల్ డైనింగ్, ఇంకా స్టేకేషన్ విల్లాలు. పక్కనే గోశాల కూడా ఉంది సర్.</p>
+    <p class="translit">chālā bāgundi sar. akkaḍa prati plot lōnū vanda ki paigā rakāla cheṭlu mundē nāṭi uṇṭāyi, drip irrigation vēsi uṇṭundi, kūragāyala beds, oka spiral herbal garden kūḍā. madhyalō muppai āru vēla chadarapu aḍugula clubhouse — swimming pool, kayaking lake, gym, farm-to-table dining, inkā staycation villas. pakkanē gōśāla kūḍā undi sar.</p>
+  </div>
+</div>
+
+<div class="block">
+  <div class="bhead"><span class="bnum">05</span><span class="btitle">Proof points + price</span><span class="btime">0:42 – 0:56</span></div>
+  <div class="line a">
+    <p class="vlabel">Variant A — code-mixed</p>
+    <p class="te">Air quality అక్కడ A.Q.I. పన్నెండు మాత్రమే సర్ — సిటీలో వంద నుంచి నూట ఎనభై ఉంటుంది. Financial District నుంచి R.R.R. మీదుగా నలభై నిమిషాలు. రెండు వేల ఇరవై నాలుగు లో "Best Sustainable Eco-Friendly Project of the Year" అవార్డ్ కూడా వచ్చింది ఈ project కి. Plots ఎనిమిది వందల ఎనిమిది చదరపు గజాల నుంచి, ధర అరవై ఎనిమిది లక్షల డెబ్బై వేల నుంచి మొదలు సర్.</p>
+  </div>
+  <div class="line b">
+    <p class="vlabel">Variant B — Telugu-only</p>
+    <p class="te">ఎయిర్ క్వాలిటీ అక్కడ ఏ. క్యూ. ఐ. పన్నెండు మాత్రమే సర్ — సిటీలో వంద నుంచి నూట ఎనభై ఉంటుంది. ఫైనాన్షియల్ డిస్ట్రిక్ట్ నుంచి ఆర్. ఆర్. ఆర్. మీదుగా నలభై నిమిషాలు. రెండు వేల ఇరవై నాలుగు లో "బెస్ట్ సస్టైనబుల్ ఎకో-ఫ్రెండ్లీ ప్రాజెక్ట్ ఆఫ్ ద ఇయర్" అవార్డ్ కూడా వచ్చింది ఈ ప్రాజెక్ట్ కి. ప్లాట్లు ఎనిమిది వందల ఎనిమిది చదరపు గజాల నుంచి, ధర అరవై ఎనిమిది లక్షల డెబ్బై వేల నుంచి మొదలు సర్.</p>
+    <p class="translit">air quality akkaḍa A.Q.I. panneṇḍu mātramē sar — siṭīlō vanda nunchi nūṭa enabhai uṇṭundi. Financial District nunchi R.R.R. mīdugā nalabhai nimiṣālu. reṇḍu vēla iravai nālugu lō "Best Sustainable Eco-Friendly Project of the Year" award kūḍā vachchindi ī project ki. plots enimidi vandala enimidi chadarapu gajāla nunchi, dhara aravai enimidi lakṣala ḍebbai vēla nunchi modalu sar.</p>
+  </div>
+</div>
+
+<div class="block">
+  <div class="bhead"><span class="bnum">06</span><span class="btitle">Close — site visit ask</span><span class="btime">0:56 – 1:06</span></div>
+  <div class="line a">
+    <p class="vlabel">Variant A — code-mixed</p>
+    <p class="te">సర్, ఫోన్‌లో చెప్పేదాని కంటే ఒకసారి చూస్తే బాగా అర్థమవుతుంది. ఈ శనివారం ఉదయం పదకొండు గంటలకు site visit ఉంది — cab మేమే arrange చేస్తాం, మీరు ఏమీ pay చేయనవసరం లేదు. మీ పేరు register చేయనా సర్?</p>
+  </div>
+  <div class="line b">
+    <p class="vlabel">Variant B — Telugu-only</p>
+    <p class="te">సర్, ఫోన్‌లో చెప్పేదాని కంటే ఒకసారి చూస్తే బాగా అర్థమవుతుంది. ఈ శనివారం ఉదయం పదకొండు గంటలకు సైట్ విజిట్ ఉంది — క్యాబ్ మేమే అరేంజ్ చేస్తాం, మీరు ఏమీ పే చేయనవసరం లేదు. మీ పేరు రిజిస్టర్ చేయనా సర్?</p>
+    <p class="translit">sar, phōnlō cheppēdāni kaṇṭē okasāri chūstē bāgā arthamavutundi. ī śanivāram udayam padakoṇḍu gaṇṭalaku site visit undi — cab mēmē arrange chēstām, mīru ēmī pay chēyanavasaram lēdu. mī pēru register chēyanā sar?</p>
+  </div>
+</div>
+
+<h2 class="sec">Block 7 · Objection handles</h2>
+<p style="font-size:9pt;color:var(--ink-2);margin-bottom:10pt;">Each is a standalone 8–12 second clip. Record all seven per voice — they carry the most emotional range and are the best test of whether a synthetic voice stays warm under pushback.</p>
+
+<div class="block">
+  <div class="bhead"><span class="bnum">7.1</span><span class="btitle">"బిజీగా ఉన్నాను" — busy</span></div>
+  <div class="line a">
+    <p class="te">అర్థమైంది సర్, సారీ. మీకు సాయంత్రం ఆరు గంటలకు కాల్ చేయనా, లేక రేపు ఉదయం మంచిదా?</p>
+    <p class="translit">arthamaindi sar, sorry. mīku sāyantram āru gaṇṭalaku call chēyanā, lēka rēpu udayam manchidā?</p>
+  </div>
+</div>
+
+<div class="block">
+  <div class="bhead"><span class="bnum">7.2</span><span class="btitle">"ఇంట్రెస్ట్ లేదు" — not interested</span></div>
+  <div class="line a">
+    <p class="te">ఫర్వాలేదు సర్, థాంక్యూ. ఒక్క వాట్సాప్ మెసేజ్ పంపిస్తాను — బ్రోచర్, లేఅవుట్, ప్రైస్ లిస్ట్ అన్నీ ఉంటాయి. తీరిక ఉన్నప్పుడు చూడండి, అంతే. మిమ్మల్ని మళ్ళీ కాల్ చేసి ఇబ్బంది పెట్టం.</p>
+    <p class="translit">pharvālēdu sar, thank you. okka WhatsApp message pampistānu — brochure, layout, price list annī uṇṭāyi. tīrika unnappuḍu chūḍaṇḍi, antē. mimmalni maḷḷī call chēsi ibbandi peṭṭam.</p>
+  </div>
+</div>
+
+<div class="block">
+  <div class="bhead"><span class="bnum">7.3</span><span class="btitle">"చాలా ఎక్కువ ధర" — too expensive</span></div>
+  <div class="line a">
+    <p class="te">నిజమే సర్, మొదట అలాగే అనిపిస్తుంది. కానీ ఇది ఖాళీ ప్లాట్ కాదు — వంద రకాల చెట్లు, డ్రిప్ ఇరిగేషన్, క్లబ్‌హౌస్, మెయింటెనెన్స్ అన్నీ కలిపి ఉన్న ధర ఇది. చదరపు గజం ఎనిమిది వేల ఐదు వందలు మాత్రమే. అదే ఓ. ఆర్. ఆర్. లోపల చూస్తే ఇంతకు మూడు రెట్లు సర్. బ్యాంక్ లోన్ ఆప్షన్ కూడా ఉంది.</p>
+    <p class="translit">nijamē sar, modaṭa alāgē anipistundi. kānī idi khāḷī plot kādu — vanda rakāla cheṭlu, drip irrigation, clubhouse, maintenance annī kalipi unna dhara idi. chadarapu gajam enimidi vēla aidu vandalu mātramē. adē ORR lōpala chūstē intaku mūḍu reṭlu sar. bank loan option kūḍā undi.</p>
+  </div>
+</div>
+
+<div class="block">
+  <div class="bhead"><span class="bnum">7.4</span><span class="btitle">"అంత దూరమా?" — too far</span></div>
+  <div class="line a">
+    <p class="te">నలభై నిమిషాలే సర్ — ఫైనాన్షియల్ డిస్ట్రిక్ట్ నుంచి ఆర్. ఆర్. ఆర్. మీదుగా. గచ్చిబౌలి నుంచి కొండాపూర్ వెళ్ళడానికి పీక్ టైం లో అంతే పడుతుంది కదా సర్. పైగా ఆర్. ఆర్. ఆర్. పూర్తయ్యాక ఆ ప్రాంతం విలువ ఇంకా పెరుగుతుంది.</p>
+    <p class="translit">nalabhai nimiṣālē sar — Financial District nunchi RRR mīdugā. Gachibowli nunchi Kondapur veḷḷaḍāniki peak time lō antē paḍutundi kadā sar. paigā RRR pūrtayyāka ā prāntam viluva inkā perugutundi.</p>
+  </div>
+</div>
+
+<div class="block">
+  <div class="bhead"><span class="bnum">7.5</span><span class="btitle">"Documents clear గా ఉన్నాయా?" — legal check</span></div>
+  <div class="line a">
+    <p class="te">అడిగినందుకు సంతోషం సర్ — అదే ముఖ్యం. అన్ని ప్లాట్లకీ క్లియర్ టైటిల్ ఉంది, అప్రూవల్స్ ఉన్నాయి, బ్యాంక్ లోన్ ఎలిజిబిలిటీ కూడా ఉంది. మీ లాయర్ తో వెరిఫై చేయించుకోండి సర్, మేము అన్ని డాక్యుమెంట్స్ ముందే ఇస్తాం.</p>
+    <p class="translit">aḍiginanduku santōṣam sar — adē mukhyam. anni plots kī clear title undi, approvals unnāyi, bank loan eligibility kūḍā undi. mī lawyer tō verify chēyinchukōṇḍi sar, mēmu anni documents mundē istām.</p>
+  </div>
+  <p class="direction"><b>Before live use.</b> Verify the specific approval names (HMDA / DTCP) against current MODCON sanction letters before this line goes on a real call. For voice testing, read as written.</p>
+</div>
+
+<div class="block">
+  <div class="bhead"><span class="bnum">7.6</span><span class="btitle">"ఇప్పటికే plot ఉంది" — already own land</span></div>
+  <div class="line a">
+    <p class="te">చాలా మంచిది సర్. అయితే ఇది కొంచెం వేరే సర్ — ఇక్కడ మీరు కొనేది ప్లాట్ కాదు, ఒక రెడీ ఫార్మ్. చెట్లు, నీళ్ళు, మెయింటెనెన్స్ టీమ్ అన్నీ సెటప్ అయి ఉంటాయి. మీరు వెళ్ళి కూర్చుంటే చాలు. రెండు నిమిషాల వీడియో పంపనా సర్?</p>
+    <p class="translit">chālā manchidi sar. ayitē idi konchem vērē sar — ikkaḍa mīru konēdi plot kādu, oka ready farm. cheṭlu, nīḷḷu, maintenance team annī setup ayi uṇṭāyi. mīru veḷḷi kūrchuṇṭē chālu. reṇḍu nimiṣāla video pampanā sar?</p>
+  </div>
+</div>
+
+<div class="block">
+  <div class="bhead"><span class="bnum">7.7</span><span class="btitle">"నన్ను call చేయకండి" — do-not-call exit</span></div>
+  <div class="line a">
+    <p class="te">క్షమించండి సర్. మీ నంబర్ మా ఎంక్వైరీ లిస్ట్ నుంచి ఇప్పుడే తీసేస్తున్నాను. ఇక మీకు కాల్ రాదు. మీ టైం కి థాంక్యూ సర్, శుభ దినం.</p>
+    <p class="translit">kṣaminchaṇḍi sar. mī number mā enquiry list nunchi ippuḍē tīsēstunnānu. ika mīku call rādu. mī time ki thank you sar, śubha dinam.</p>
+  </div>
+  <p class="direction"><b>Always honour this immediately.</b> End the call within 5 seconds. No rebuttal, ever.</p>
+</div>
+
+<h2 class="sec">Block 8 · Alternate property — MODCON SYL Residences</h2>
+<p style="font-size:9pt;color:var(--ink-2);margin-bottom:10pt;">Swap Blocks 2, 4 and 5 with these when testing the second project. Same opening and close.</p>
+
+<div class="block">
+  <div class="bhead"><span class="bnum">8.1</span><span class="btitle">SYL — hook</span></div>
+  <div class="line a">
+    <p class="te">సర్, తుక్కుగూడ లో ఓ. ఆర్. ఆర్. ఎగ్జిట్ పద్నాలుగు దగ్గర — మోడ్‌కాన్ ఎస్. వై. ఎల్. రెసిడెన్సెస్ అని నాలుగున్నర ఎకరాల బయోఫిలిక్ ప్రాజెక్ట్ ఉంది. ఎయిర్‌పోర్ట్ కి కేవలం పది నిమిషాలు.</p>
+    <p class="translit">sar, Tukkuguda lō ORR Exit-padnālugu daggara — MODCON SYL Residences ani nālugunnara ekarāla biophilic project undi. airport ki kēvalam padi nimiṣālu.</p>
+  </div>
+</div>
+
+<div class="block">
+  <div class="bhead"><span class="bnum">8.2</span><span class="btitle">SYL — value + price</span></div>
+  <div class="line a">
+    <p class="te">రెండు వేల ఐదు వందల నుంచి నాలుగు వేల ఐదు వందల చదరపు అడుగుల విల్లామెంట్స్ సర్ — పెద్ద ఫారెస్ట్-వ్యూ బాల్కనీలు, ఇరవై రెండు వేల చదరపు అడుగుల క్లబ్‌హౌస్, కెమికల్ లేని నేచురల్ బయో పూల్, యోగా పెవిలియన్. చదరపు అడుగు నాలుగు వేల నాలుగు వందల తొంభై తొమ్మిది రూపాయలు. కమర్షియల్ స్పేసెస్ కూడా ఉన్నాయి — వన్-టైమ్ ఇన్వెస్టర్ ప్రైస్ లో సర్.</p>
+    <p class="translit">reṇḍu vēla aidu vandala nunchi nālugu vēla aidu vandala chadarapu aḍugula villaments sar — pedda forest-view balconies, iravai reṇḍu vēla chadarapu aḍugula clubhouse, chemical lēni natural bio pool, yoga pavilion. chadarapu aḍugu nālugu vēla nālugu vandala tombhai tommidi rūpāyalu. commercial spaces kūḍā unnāyi — one-time investor price lō sar.</p>
+  </div>
+</div>
+
+<h2 class="sec">Block 9 · Voicemail / no answer</h2>
+<div class="block">
+  <div class="bhead"><span class="bnum">09</span><span class="btitle">Unanswered-call message</span><span class="btime">~18 sec</span></div>
+  <p style="font-size:9pt;color:var(--ink-2);margin-bottom:6pt;">Flatter delivery, no questions, single call-to-action. A good test of a voice's "unaddressed" register.</p>
+  <div class="line a">
+    <p class="te">నమస్కారం సర్, నేను ప్రియ — ద గ్రీన్ టీమ్ నుంచి. మోడ్‌కాన్ అగర్తా, నార్సాపూర్ ఫారెస్ట్ ఫార్మ్ ప్లాట్స్ గురించి మాట్లాడాలని కాల్ చేశాను. ముప్పై ఆరు ప్లాట్లే ఉన్నాయి సర్. మీకు వీలైనప్పుడు ఇదే నంబర్ కి కాల్ చేయండి, లేదా వాట్సాప్ చేయండి — లేఅవుట్, ప్రైస్ లిస్ట్ పంపిస్తాను. ధన్యవాదాలు సర్.</p>
+    <p class="translit">namaskāram sar, nēnu Priya — The Green Team nunchi. MODCON Agartha, Narsapur forest farm plots gurinchi māṭlāḍālani call chēśānu. muppai āru plots mātramē unnāyi sar. mīku vīlainappuḍu idē number ki call chēyaṇḍi, lēdā WhatsApp chēyaṇḍi — layout, price list pampistānu. dhanyavādālu sar.</p>
+  </div>
+</div>
+
+<div class="pagebreak"></div>
+<h2 class="sec">TTS QA checklist</h2>
+<p style="font-size:9pt;color:var(--ink-2);margin-bottom:8pt;">Run every voice through Blocks 0, 1, 5, 7.3 and 9 at minimum, then score. Ordered by how audible the defect is on a sales call.</p>
+<table>
+  <thead><tr><th style="width:22pt;">#</th><th style="width:34%;">What to listen for</th><th>Common failure</th></tr></thead>
+  <tbody>
+    <tr><td class="n">1</td><td><b>Numerals</b> — 68.7 L, 4,499, 36,000, AQI 12</td><td>Engine reads digits in English, or as "sixty-eight point seven". Fix: always write numbers as Telugu words — this script already does.</td></tr>
+    <tr><td class="n">2</td><td><b>Initialisms</b> — A.Q.I., R.R.R., O.R.R.</td><td>Run together into a nonsense word. Fix: space the letters (ఏ. క్యూ. ఐ.) or use SSML say-as interpret-as="characters".</td></tr>
+    <tr><td class="n">3</td><td><b>Code-switch</b> — Latin words inside a Telugu sentence (Variant A)</td><td>Accent snaps to American English mid-sentence, or the word is skipped entirely. If it fails, switch to Variant B.</td></tr>
+    <tr><td class="n">4</td><td><b>Retroflex + geminates</b> — ళ్ళ, ట్ల, ప్ప, ణ</td><td>Flattened to dental; ళ read as ల.</td></tr>
+    <tr><td class="n">5</td><td><b>Honorific సర్ / మేడమ్</b> at clause end</td><td>Clipped or swallowed — the single most audible defect on a sales call.</td></tr>
+    <tr><td class="n">6</td><td><b>Question intonation</b> — Blocks 1, 3 and 6 all end in questions</td><td>Falling pitch turns an ask into a statement. Add an SSML pitch lift if the engine allows.</td></tr>
+    <tr><td class="n">7</td><td><b>Pause discipline</b> — 0.6 s after Block 1, 1.2 s after Block 3</td><td>Trailing silence trimmed by the encoder; the reply prompt lands too early.</td></tr>
+    <tr><td class="n">8</td><td><b>Brand names</b> — MODCON (మోడ్‌కాన్, not "mod-con"), Agartha, Narsapur, Tukkuguda</td><td>Anglicised stress on the wrong syllable.</td></tr>
+    <tr><td class="n">9</td><td><b>Warmth under objection</b> — Blocks 7.2 and 7.7</td><td>Voice turns robotic or pushy exactly where it must sound gracious.</td></tr>
+    <tr><td class="n">10</td><td><b>Rate</b></td><td>Above 160 Telugu wpm it reads as a recorded ad and gets hung up on. Target 145–160.</td></tr>
+  </tbody>
+</table>
+
+<div class="settings">
+  <b>Suggested render settings — ElevenLabs Multilingual v2:</b> stability 0.45 · similarity 0.80 · style 0.30 · speaker boost on.
+  Lower stability makes the sales lilt more natural; raise to 0.60 if the voice wanders on the long Block 4 sentence.
+  <br><br>
+  <b>Machine-readable versions:</b> <code>modcon-telugu-cold-call.ssml</code> (Azure / Google te-IN, pauses and say-as baked in) and
+  <code>modcon-telugu-cold-call.clips.json</code> (17 clips for batch rendering).
+</div>
+
+<div class="compliance">
+  <b>Usage &amp; compliance.</b> This is test copy for voice evaluation, not an approved outbound campaign. Before any live dialling:
+  verify prices, approvals and award claims against current MODCON collateral; register entity, numbers and scripts on the DLT platform;
+  call only consented numbers and scrub against DND; restrict calls to 09:00–21:00 IST; disclose that the caller is an AI agent;
+  and identify The Green Team as a channel partner in the first sentence — Block 1 already does this.
+</div>
