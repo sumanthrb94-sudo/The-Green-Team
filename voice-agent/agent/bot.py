@@ -1,7 +1,7 @@
 """The Telugu voice agent pipeline.
 
     caller audio ──► Sarvam Saaras v3 STT (streaming, VAD + barge-in)
-                 ──► Sarvam-105B (conversations)
+                 ──► Sarvam-105B
                  ──► TeluguSpeechFilter (cap turn, strip controls, normalise)
                  ──► Sarvam Bulbul v3 TTS (cloned voice)
                  ──► caller
@@ -144,8 +144,7 @@ def _vad_settings():
 
 
 def _build_llm():
-    """sarvam-105b-conversations by default (sarvam-30b is deprecated);
-    Gemini behind an env flag for the bench."""
+    """sarvam-105b by default, via Sarvam's own service; Gemini behind a flag."""
     provider = os.getenv("LLM_PROVIDER", "sarvam").lower()
 
     if provider == "gemini":
@@ -156,13 +155,17 @@ def _build_llm():
             model=os.getenv("GEMINI_MODEL", "gemini-3.5-flash"),
         )
 
-    # Sarvam exposes an OpenAI-compatible chat completions endpoint.
-    from pipecat.services.openai.llm import OpenAILLMService
+    # Sarvam ships its own service. Reaching the same endpoint through
+    # OpenAILLMService worked, but this is the path Sarvam documents and
+    # maintains, so keep to it.
+    from pipecat.services.sarvam.llm import SarvamLLMService
 
-    return OpenAILLMService(
+    return SarvamLLMService(
         api_key=_require("SARVAM_API_KEY"),
         base_url=os.getenv("SARVAM_LLM_BASE_URL", "https://api.sarvam.ai/v1"),
-        model=os.getenv("SARVAM_LLM_MODEL", "sarvam-105b-conversations"),
+        settings=SarvamLLMService.Settings(
+            model=os.getenv("SARVAM_LLM_MODEL", "sarvam-105b"),
+        ),
     )
 
 
@@ -205,8 +208,9 @@ async def run_bot(
                 rera_reg_no=os.getenv("RERA_AGENT_REG_NO") or None,
             ),
         },
-        # Nudge the first turn. Without this both sides wait for each other.
-        {"role": "user", "content": "[connected — greet them]"},
+        # The greeting is triggered by LLMRunFrame on connect (below), not by
+        # this message — a stray user turn in the history confuses the model
+        # about who spoke first.
     ])
     aggregator = LLMContextAggregatorPair(context)
 
@@ -230,6 +234,17 @@ async def run_bot(
             enable_metrics=True,        # per-stage latency, see §Verification
         ),
     )
+
+    # Make the agent open the conversation. Without this nothing ever asks the
+    # LLM to run, so it sits silent until the caller speaks first — which on an
+    # outbound call or a "talk to us" button is exactly backwards, and reads as
+    # the thing being broken.
+    @transport.event_handler("on_client_connected")
+    async def _on_connected(_transport, _client):
+        from pipecat.frames.frames import LLMRunFrame
+
+        logger.info("client connected — greeting")
+        await task.queue_frames([LLMRunFrame()])
 
     _wire_latency_logging(task, state)
     await PipelineRunner().run(task)

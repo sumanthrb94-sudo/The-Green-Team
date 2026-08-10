@@ -113,7 +113,7 @@ def check_llm(c: Check, key: str) -> None:
         return
 
     base = os.getenv("SARVAM_LLM_BASE_URL", "https://api.sarvam.ai/v1")
-    model = os.getenv("SARVAM_LLM_MODEL", "sarvam-105b-conversations")
+    model = os.getenv("SARVAM_LLM_MODEL", "sarvam-105b")
     try:
         body = _post(
             f"{base.rstrip('/')}/chat/completions",
