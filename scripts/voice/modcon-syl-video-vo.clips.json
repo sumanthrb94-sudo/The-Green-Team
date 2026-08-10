@@ -1,0 +1,66 @@
+{
+  "project": "MODCON SYL Residences — Telugu video voiceover",
+  "purpose": "Paste each `text` into ElevenLabs as a separate generation. Six clean takes cut better than one long one.",
+  "language": "te-IN",
+  "settings": {
+    "model_id": "eleven_multilingual_v2",
+    "stability": 0.5,
+    "similarity_boost": 0.85,
+    "style": 0.15,
+    "use_speaker_boost": true,
+    "speed": 0.95
+  },
+  "notes": "Numbers are already written as Telugu words. Do not convert them back to digits — ₹4,499 renders as English digits or garbled Telugu. <break> tags are honoured by ElevenLabs and carry the pacing of the film.",
+  "clips": [
+    {
+      "id": "60-1-hook",
+      "label": "Hook",
+      "timecode": "0:00–0:09",
+      "direction": "Open low and slow. The pause before the project name is the hook — do not shorten it.",
+      "text": "నగరం హడావిడి కాదు. <break time=\"0.4s\" /> ఒక ప్రశాంతమైన చిరునామా. <break time=\"0.6s\" /> మోడ్‌కాన్ ఎస్. వై. ఎల్. రెసిడెన్సెస్ — విలాసం, ప్రకృతి కలిసే చోటు."
+    },
+    {
+      "id": "60-2-location",
+      "label": "Location and access",
+      "timecode": "0:09–0:20",
+      "text": "తుక్కుగూడ, ఓ. ఆర్. ఆర్. ఎగ్జిట్ పద్నాలుగు దగ్గర. <break time=\"0.4s\" /> ఎయిర్‌పోర్ట్ కి కేవలం పది నిమిషాలు. <break time=\"0.3s\" /> ఫైనాన్షియల్ డిస్ట్రిక్ట్ కి ముప్పై నుంచి నలభై ఐదు నిమిషాలు. <break time=\"0.5s\" /> హైదరాబాద్ ఫోర్త్ సిటీ కారిడార్ ముంగిట."
+    },
+    {
+      "id": "60-3-home",
+      "label": "The home",
+      "timecode": "0:20–0:33",
+      "direction": "Slow down into the last line — it is the emotional beat of the film.",
+      "text": "నాలుగున్నర ఎకరాల బయోఫిలిక్ ప్రాజెక్ట్. <break time=\"0.4s\" /> రెండు వేల ఐదు వందల నుంచి నాలుగు వేల ఐదు వందల చదరపు అడుగుల విల్లామెంట్స్. <break time=\"0.5s\" /> పెద్ద బాల్కనీల నుంచి పచ్చదనం. <break time=\"0.3s\" /> ప్రతి గదిలోకి సూర్యోదయం."
+    },
+    {
+      "id": "60-4-wellness",
+      "label": "Clubhouse and wellness",
+      "timecode": "0:33–0:45",
+      "text": "ఇరవై రెండు వేల చదరపు అడుగుల క్లబ్‌హౌస్. <break time=\"0.4s\" /> కెమికల్స్ లేని నేచురల్ బయో పూల్. <break time=\"0.3s\" /> యోగా, ధ్యాన మందిరం. <break time=\"0.5s\" /> గాలి నాణ్యత ఏ. క్యూ. ఐ. ఇరవై రెండు. <break time=\"0.3s\" /> నిశ్శబ్దం — ఇరవై నాలుగు డెసిబెల్స్."
+    },
+    {
+      "id": "60-5-value",
+      "label": "Price and commercial",
+      "timecode": "0:45–0:54",
+      "text": "చదరపు అడుగు నాలుగు వేల నాలుగు వందల తొంభై తొమ్మిది రూపాయల నుంచి. <break time=\"0.5s\" /> కమర్షియల్ స్పేసెస్ కూడా — వన్-టైమ్ ఇన్వెస్టర్ ధరలో."
+    },
+    {
+      "id": "60-6-close",
+      "label": "Close and call to action",
+      "timecode": "0:54–1:00",
+      "text": "మోడ్‌కాన్ ఎస్. వై. ఎల్. రెసిడెన్సెస్. <break time=\"0.5s\" /> ద గ్రీన్ టీమ్ — మేము చూసి, నిర్ధారించిన ఇళ్ళు మాత్రమే మీకు చూపిస్తాం. <break time=\"0.4s\" /> సైట్ విజిట్ కోసం ఇప్పుడే కాల్ చేయండి."
+    },
+    {
+      "id": "30-full",
+      "label": "30-second cut, single take",
+      "timecode": "0:30",
+      "text": "నగరం హడావిడి కాదు — ఒక ప్రశాంతమైన చిరునామా. <break time=\"0.5s\" /> మోడ్‌కాన్ ఎస్. వై. ఎల్. రెసిడెన్సెస్, తుక్కుగూడ. <break time=\"0.4s\" /> ఎయిర్‌పోర్ట్ కి పది నిమిషాలు. <break time=\"0.4s\" /> నాలుగున్నర ఎకరాలు, రెండు వేల ఐదు వందల నుంచి నాలుగు వేల ఐదు వందల చదరపు అడుగుల విల్లామెంట్స్. <break time=\"0.4s\" /> ఇరవై రెండు వేల చదరపు అడుగుల క్లబ్‌హౌస్, కెమికల్స్ లేని బయో పూల్. <break time=\"0.5s\" /> చదరపు అడుగు నాలుగు వేల నాలుగు వందల తొంభై తొమ్మిది రూపాయల నుంచి. <break time=\"0.4s\" /> ద గ్రీన్ టీమ్ — సైట్ విజిట్ కోసం కాల్ చేయండి."
+    },
+    {
+      "id": "15-social",
+      "label": "15-second social cut",
+      "timecode": "0:15",
+      "text": "ఎయిర్‌పోర్ట్ కి పది నిమిషాలు. <break time=\"0.3s\" /> అడవి లాంటి పచ్చదనం. <break time=\"0.4s\" /> మోడ్‌కాన్ ఎస్. వై. ఎల్. రెసిడెన్సెస్, తుక్కుగూడ. <break time=\"0.4s\" /> చదరపు అడుగు నాలుగు వేల నాలుగు వందల తొంభై తొమ్మిది రూపాయల నుంచి. <break time=\"0.3s\" /> ద గ్రీన్ టీమ్."
+    }
+  ]
+}
