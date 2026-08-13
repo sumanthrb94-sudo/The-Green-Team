@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
+    "dev:demo": "vite --config vite.demo.config.ts --mode demo",
+    "screenshots": "node scripts/capture-screenshots.mjs",
     "build": "vite build",
     "preview": "vite preview",
     "clean": "rm -rf dist",
@@ -35,6 +37,7 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.6.0",
+    "playwright": "^1.62.1",
     "tailwindcss": "^4.1.14",
     "tsx": "^4.21.0",
     "typescript": "~5.8.2",

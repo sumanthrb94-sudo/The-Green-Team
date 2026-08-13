@@ -6,6 +6,7 @@ coverage/
 *.log
 .env*
 !.env.example
+!.env.demo
 *.psd
 
 # Internal docs (security audits, deploy notes) — not committed
