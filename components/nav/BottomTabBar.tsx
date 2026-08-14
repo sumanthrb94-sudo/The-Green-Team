@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 const TABS = [
   { id: 'home', href: '/', label: 'Home', icon: Home },
   { id: 'map', href: '/map', label: 'Map', icon: MapPin },
-  { id: 'gold', href: '/preinvestor-gold', label: 'Gold', icon: Award },
+  { id: 'gold', href: '/preinvestor-gold', label: 'Offer', icon: Award },
   { id: 'analytics', href: '/analytics', label: 'Edge + Nature', icon: TrendingDown },
   { id: 'join', href: '/membership', label: 'Join', icon: Shield },
 ];

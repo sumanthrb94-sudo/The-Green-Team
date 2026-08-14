@@ -3,7 +3,7 @@ import 'server-only';
 const FIELDS = [
   'title', 'location', 'aqi', 'noise', 'commute', 'valuation', 'memberPrice', 'image',
   'tagline', 'description', 'plots', 'plotRange', 'amenityAcres', 'architect',
-  'pricePerSqYd', 'sitePlanSrc', 'brochureUrl', 'status', 'order', 'features',
+  'pricePerSqYd', 'sitePlanSrc', 'brochureUrl', 'status', 'order', 'features', 'plotImages', 'mapUrl',
 ] as const;
 
 /** Whitelist + normalize an admin property payload. */

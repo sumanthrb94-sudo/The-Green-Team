@@ -23,8 +23,11 @@ const EMPTY = {
   architect: '',
   pricePerSqYd: 0,
   brochureUrl: '',
+  sitePlanSrc: '',
+  order: 0,
   status: 'draft' as 'draft' | 'live',
   features: [] as string[],
+  plotImages: [] as string[],
 };
 
 type FormState = typeof EMPTY;
@@ -151,8 +154,32 @@ export function PropertiesManager({ initial }: { initial: AdminProperty[] }) {
             </div>
           </div>
           <div>
-            <label className={label}>Image URL</label>
+            <label className={label}>Cover Image URL</label>
             <input value={form.image} onChange={e => set('image', e.target.value)} placeholder="/gallery/… or https://…" className={input} />
+          </div>
+          <div>
+            <label className={label}>Gallery Images — one URL per line ({form.plotImages.length})</label>
+            <textarea
+              rows={4}
+              value={form.plotImages.join('\n')}
+              onChange={e => set('plotImages', e.target.value.split('\n').map(x => x.trim()).filter(Boolean))}
+              placeholder={'/gallery/project/1.webp\n/gallery/project/2.webp'}
+              className={input + ' font-mono text-xs'}
+            />
+          </div>
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label className={label}>Site Plan Image (optional)</label>
+              <input value={form.sitePlanSrc} onChange={e => set('sitePlanSrc', e.target.value)} placeholder="/FINAL-LAYOUT.jpeg" className={input} />
+            </div>
+            <div>
+              <label className={label}>Display Order</label>
+              <input type="number" value={form.order} onChange={e => set('order', Number(e.target.value))} className={input} />
+            </div>
+          </div>
+          <div>
+            <label className={label}>Brochure URL</label>
+            <input value={form.brochureUrl} onChange={e => set('brochureUrl', e.target.value)} placeholder="https://…" className={input} />
           </div>
           <div>
             <label className={label}>Tagline</label>

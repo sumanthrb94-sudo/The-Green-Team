@@ -203,7 +203,7 @@ export function AuthModal() {
                 </p>
               </div>
               <p className="text-[9px] uppercase tracking-[0.35em] text-white/30">
-                Pre-launch access · Exclusive investor pricing
+                One Google sign-in · Full access to all three sanctuaries
               </p>
             </div>
 

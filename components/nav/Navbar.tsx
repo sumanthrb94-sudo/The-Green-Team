@@ -14,7 +14,7 @@ const NAV = [
   { name: 'Map', href: '/map' },
   { name: 'Edge + Nature', href: '/analytics' },
   { name: 'Blog', href: '/blog' },
-  { name: 'Pre-Investor Gold', href: '/preinvestor-gold', gold: true },
+  { name: 'Pre-Investor Offer', href: '/preinvestor-gold', gold: true },
   { name: 'Membership', href: '/membership' },
 ];
 

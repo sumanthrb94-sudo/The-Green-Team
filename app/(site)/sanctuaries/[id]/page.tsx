@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { Wind, VolumeX, Clock, ExternalLink, Check } from 'lucide-react';
 import { SANCTUARIES, getSanctuary } from '@/lib/data/sanctuaries';
+import { getPropertyById } from '@/lib/server/portfolio';
 import { PropertyTabs } from '@/components/property/PropertyTabs';
 import { Footer } from '@/components/Footer';
 import { SITE_URL } from '@/lib/data/contact';
@@ -33,9 +34,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+export const revalidate = 300;
+
 export default async function SanctuaryPage({ params }: Props) {
   const { id } = await params;
-  const s = getSanctuary(id);
+  const s = await getPropertyById(id);
   if (!s) notFound();
 
   const jsonLd = {
