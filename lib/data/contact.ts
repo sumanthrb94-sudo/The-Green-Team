@@ -4,8 +4,8 @@ export const SITE_URL = 'https://thegreenteam.in';
 export const BUSINESS = {
   name: 'The Green Team',
   legalDescriptor: 'Channel Partners · Hyderabad',
-  phone: '+91 77999 34943',
-  whatsappNumber: '917799934943',
+  phone: '+91 97001 44003',
+  whatsappNumber: '919700144003',
   email: 'hello@thegreenteam.in',
   instagram: 'https://www.instagram.com/the.green.team__',
   linkedin: 'https://linkedin.com/company/the-green-team-india',
