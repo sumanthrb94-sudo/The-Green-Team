@@ -234,8 +234,8 @@ async function main() {
   await page.locator('button[role="tab"]:has-text("Invest")').click();
   await wait(800);
   const href = await page.locator('a:has-text("WhatsApp · Enquire Now")').first().getAttribute('href');
-  href?.includes('wa.me/917799934943')
-    ? ok('WhatsApp CTA → +91 7799934943', 'with prefilled enquiry text')
+  href?.includes('wa.me/919700144003')
+    ? ok('WhatsApp CTA → +91 9700144003', 'with prefilled enquiry text')
     : fail('WhatsApp CTA number wrong', href ?? 'missing');
 
   // ── 6. Admin API security ───────────────────────────────────────────────
