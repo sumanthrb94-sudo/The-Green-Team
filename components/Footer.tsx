@@ -4,13 +4,12 @@ import { Logo } from '@/components/brand/Logo';
 import { BUSINESS } from '@/lib/data/contact';
 
 const AGENDA: { label: string; sub: string; href: string }[] = [
-  { label: 'The Intelligence Gap', sub: 'Why early entry wins', href: '/analytics' },
-  { label: 'Living Ecosystems', sub: 'Nature-first design philosophy', href: '/analytics#pillars' },
-  { label: 'Sanctuary Map', sub: 'Environmental heatmap · AQI · Noise', href: '/map' },
   { label: 'MODCON Agartha', sub: 'Narsapur Forest · 36 farm plots', href: '/sanctuaries/agartha' },
   { label: 'MODCON SYL Residences', sub: 'Tukkuguda, ORR Exit-14', href: '/sanctuaries/syl' },
   { label: 'Dates County by Planet Green', sub: 'Kandukur · 4,000-acre reserve', href: '/sanctuaries/dates-county' },
-  { label: 'Adviser Call', sub: 'Free · We respond within 24 hours', href: '/membership' },
+  { label: 'The Journal', sub: 'Field notes & sanctuary intelligence', href: '/blog' },
+  { label: 'Sanctuary Map', sub: 'Environmental heatmap · AQI · Noise', href: '/map' },
+  { label: 'Adviser Call', sub: 'Free · We respond within 24 hours', href: '/adviser-call' },
 ];
 
 export function Footer() {
@@ -26,10 +25,10 @@ export function Footer() {
             </p>
           </div>
           <Link
-            href="/membership"
+            href="/adviser-call"
             className="self-start px-10 py-5 border border-gold/50 text-gold text-[10px] uppercase tracking-[0.4em] font-bold hover:bg-gold hover:text-olive-900 transition-all duration-500"
           >
-            Apply for Access
+            Request Adviser Call
           </Link>
         </div>
 

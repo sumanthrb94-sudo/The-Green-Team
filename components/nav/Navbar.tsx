@@ -11,11 +11,9 @@ import { useAuth } from '@/components/auth/AuthProvider';
 import { AccountDrawer } from './AccountDrawer';
 
 const NAV = [
-  { name: 'Map', href: '/map' },
-  { name: 'Edge + Nature', href: '/analytics' },
-  { name: 'Blog', href: '/blog' },
-  { name: 'Pre-Investor Offer', href: '/preinvestor-gold', gold: true },
-  { name: 'Membership', href: '/membership' },
+  { name: 'Sanctuaries', href: '/#sanctuaries' },
+  { name: 'Journal', href: '/blog' },
+  { name: 'Adviser Call', href: '/adviser-call', gold: true },
 ];
 
 export function Navbar() {

@@ -171,24 +171,24 @@ async function main() {
   await shot(u, 'user-property-agartha');
   (await u.locator('h1:has-text("Agartha")').count()) ? ok('property page renders (from admin-managed Firestore record)') : fail('property page broken');
 
-  // 5. Request adviser call
-  await u.goto(`${BASE}/membership`, { waitUntil: 'load' });
-  const leadEmail = `lead-${MARK}`;
-  await u.locator('#m-name').fill('Journey Visitor');
-  await u.locator('#m-phone').fill('+91 90000 00777');
-  await u.locator('#m-email').fill(leadEmail);
-  await u.locator('#m-designation').fill('Product Manager');
-  await u.locator('#m-company').fill('Journey Labs');
+  // 5. Request adviser call — the ONE conversion form (name + phone + budget chip)
+  await u.goto(`${BASE}/adviser-call`, { waitUntil: 'load' });
+  const leadPhone = '+91 90000 00777';
+  await u.locator('#ac-name').fill('Journey Visitor');
+  await u.locator('#ac-phone').fill(leadPhone);
   await u.locator('button:has-text("₹50 L – ₹1 Cr")').click();
   await shot(u, 'user-adviser-form-filled');
   await u.locator('button:has-text("Request Adviser Call")').click();
-  await u.locator('text=Application Logged').waitFor({ timeout: 15000 }).then(
+  await u.locator("text=Done. We'll call you.").waitFor({ timeout: 15000 }).then(
     () => ok('adviser call request confirmed in UI'),
     () => fail('adviser call confirmation missing')
   );
   await shot(u, 'user-adviser-logged');
-  const leadDocs = await findDocs('leads', 'email', leadEmail);
-  leadDocs.length ? ok('ADMIN-SIDE DATA: lead created with phone + designation + budget') : fail('lead missing');
+  const leadDocs = await findDocs('leads', 'phone', leadPhone);
+  const leadData = leadDocs[0]?.data() ?? {};
+  leadDocs.length && leadData.source === 'adviser-call' && (leadData.intent ?? '').includes('₹50 L – ₹1 Cr')
+    ? ok('ADMIN-SIDE DATA: lead created with phone + budget bracket')
+    : fail('lead missing or missing budget/source');
 
   // 6. Groot chat
   await u.goto(`${BASE}/`, { waitUntil: 'load' });
@@ -233,12 +233,12 @@ async function main() {
   await a.goto(`${BASE}/admin/leads`, { waitUntil: 'load' });
   await wait(2000);
   const leadRow = a.locator(`div:has(> div p:has-text("Journey Visitor"))`).first();
-  (await a.locator(`text=${leadEmail}`).count())
+  (await a.locator(`text=${leadPhone}`).count())
     ? ok('REAL-TIME SYNC: visitor lead visible in admin pipeline')
     : fail('visitor lead not in admin UI');
   await shot(a, 'admin-leads-with-visitor');
   // change status via the UI select next to that lead
-  const select = a.locator(`div.rounded-3xl:has-text("${leadEmail}") select`).first();
+  const select = a.locator(`div.rounded-3xl:has-text("${leadPhone}") select`).first();
   if (await select.count()) {
     await select.selectOption('contacted');
     await wait(2500);
@@ -312,10 +312,14 @@ async function main() {
   console.log('\n▶ Cleanup');
   let removed = 0;
   for (const coll of ['newsletter', 'leads']) {
-    for (const v of [nlEmail, leadEmail, userEmail]) {
+    for (const v of [nlEmail, userEmail]) {
       const snap = await db.collection(coll).where('email', '==', v).get();
       for (const d of snap.docs) { await d.ref.delete(); removed++; }
     }
+  }
+  {
+    const snap = await db.collection('leads').where('phone', '==', leadPhone).get();
+    for (const d of snap.docs) { await d.ref.delete(); removed++; }
   }
   if (visitorUid) {
     await db.collection('users').doc(visitorUid).delete().catch(() => {});

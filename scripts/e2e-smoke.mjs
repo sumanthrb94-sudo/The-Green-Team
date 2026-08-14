@@ -7,7 +7,7 @@
  *
  * Flows exercised as a real browser user:
  *   1. Newsletter signup (inline form)        → `newsletter` collection
- *   2. Adviser membership application         → `leads` (name/phone/designation/budget) + newsletter
+ *   2. Adviser call request                   → `leads` (name/phone/budget bracket)
  *   3. Email/password account signup          → Firebase Auth user + `users` profile + signup lead
  *   4. Profile capture modal                  → users/{uid} name/occupation/city
  *   5. WhatsApp CTAs                          → correct number + prefilled text
@@ -94,38 +94,31 @@ async function main() {
     ? ok('newsletter doc in Firestore', `source=${nlDocs[0].data().source}`)
     : fail('newsletter doc NOT found in Firestore');
 
-  // ── 2. Adviser membership application ───────────────────────────────────
-  console.log('\n▶ 2. Adviser membership application (full CRM fields)');
-  await page.goto(`${BASE}/membership`, { waitUntil: 'load' });
-  const leadEmail = `lead-${MARK}`;
-  await page.locator('#m-name').fill('E2E Test Lead');
-  await page.locator('#m-phone').fill('+91 90000 00001');
-  await page.locator('#m-email').fill(leadEmail);
-  await page.locator('#m-designation').fill('Chief Test Officer');
-  await page.locator('#m-company').fill('E2E Ventures');
+  // ── 2. Adviser call request (the ONE conversion form) ───────────────────
+  console.log('\n▶ 2. Adviser call request (name + phone + budget chip)');
+  await page.goto(`${BASE}/adviser-call`, { waitUntil: 'load' });
+  const leadPhone = '+91 90000 00001';
+  await page.locator('#ac-name').fill('E2E Test Lead');
+  await page.locator('#ac-phone').fill(leadPhone);
   await page.locator('button:has-text("₹1 Cr – ₹2 Cr")').click();
-  await page.locator('#m-intent').fill('Automated end-to-end verification run.');
   await page.locator('button:has-text("Request Adviser Call")').click();
-  await page.locator('text=Application Logged').waitFor({ timeout: 15000 }).then(
-    () => ok('membership UI confirms application'),
-    () => fail('membership confirmation missing')
+  await page.locator("text=Done. We'll call you.").waitFor({ timeout: 15000 }).then(
+    () => ok('adviser-call UI confirms request'),
+    () => fail('adviser-call confirmation missing')
   );
-  const leadDocs = await findDocs('leads', 'email', leadEmail);
+  const leadDocs = await findDocs('leads', 'phone', leadPhone);
   if (leadDocs.length) {
     const d = leadDocs[0].data();
     const checks = [
-      [d.phone === '+91 90000 00001', `phone persisted (${d.phone})`],
-      [(d.intent ?? '').includes('Chief Test Officer at E2E Ventures'), 'designation+company in intent'],
+      [d.phone === leadPhone, `phone persisted (${d.phone})`],
       [(d.intent ?? '').includes('Budget: ₹1 Cr – ₹2 Cr'), 'budget bracket in intent'],
       [d.status === 'new', 'pipeline status = new'],
-      [d.source === 'membership', `source tagged (${d.source})`],
+      [d.source === 'adviser-call', `source tagged (${d.source})`],
     ];
     for (const [pass, label] of checks) (pass ? ok : fail)(`lead ${label}`);
   } else {
     fail('lead doc NOT found in Firestore');
   }
-  const nlAuto = await findDocs('newsletter', 'email', leadEmail, 5);
-  nlAuto.length ? ok('membership auto-enrols newsletter') : fail('membership newsletter enrolment missing');
 
   // ── 3+4. Email signup → profile capture ─────────────────────────────────
   // The browser UI is driven first; if the sandbox proxy stalls the browser→
@@ -137,34 +130,24 @@ async function main() {
   const userEmail = `user-${MARK}`;
   await page.goto(`${BASE}/`, { waitUntil: 'load' });
   await page.locator('nav button[aria-label="Sign in"]').click();
-  await page.locator('button:has-text("Continue with Email")').click();
-  await page.locator('button:has-text("Sign Up")').click();
-  await page.locator('#auth-email').fill(userEmail);
-  await page.locator('#auth-password').fill('E2e-test-password-1');
-  await page.locator('button:has-text("Create Account")').click();
-
-  let browserSignup = await page
-    .locator('text=One quick thing')
-    .waitFor({ timeout: 15000 })
-    .then(() => true)
-    .catch(() => false);
+  // Auth is Google-only now — assert the modal offers exactly that and nothing else.
+  await page.locator('button:has-text("Continue with Google")').waitFor({ timeout: 8000 }).then(
+    () => ok('auth modal shows Google sign-in'),
+    () => fail('Google sign-in button missing')
+  );
+  (await page.locator('button:has-text("Continue with Email")').count()) === 0 &&
+  (await page.locator('button:has-text("Continue with Phone")').count()) === 0
+    ? ok('auth modal is Google-ONLY (email/phone paths removed)')
+    : fail('legacy email/phone sign-in still present');
+  await page.keyboard.press('Escape');
 
   let idToken = null;
   let testUid = null;
 
-  if (browserSignup) {
-    ok('signup via browser → profile capture modal shown');
-    await page.locator('#pf-name').fill('E2E Test User');
-    await page.locator('#pf-occupation').fill('QA Automation');
-    await page.locator('#pf-city').fill('Hyderabad');
-    await page.locator('button:has-text("Complete Profile")').click();
-    await wait(2500);
-    await page.locator('nav button[aria-label="Account"]').waitFor({ timeout: 8000 }).then(
-      () => ok('navbar reflects signed-in session'),
-      () => fail('navbar avatar not signed-in')
-    );
-  } else {
-    ok('browser→Firebase hop blocked by sandbox proxy — switching to REST simulation', 'not an app defect');
+  {
+    // A real Google popup cannot be driven headlessly, so the post-sign-in
+    // server chain is exercised with a REST-minted account instead — the app
+    // sees an identical idToken → /api/profile → /api/session flow.
     const API_KEY = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
     const r = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${API_KEY}`, {
       method: 'POST',
@@ -231,7 +214,7 @@ async function main() {
   // ── 5. WhatsApp CTAs use the current number ─────────────────────────────
   console.log('\n▶ 5. WhatsApp contact CTAs');
   await page.goto(`${BASE}/sanctuaries/agartha`, { waitUntil: 'load' });
-  await page.locator('button[role="tab"]:has-text("Invest")').click();
+  // Property pages are single-scroll now — the invest panel is always in the DOM.
   await wait(800);
   const href = await page.locator('a:has-text("WhatsApp · Enquire Now")').first().getAttribute('href');
   href?.includes('wa.me/919700144003')
@@ -272,11 +255,15 @@ async function main() {
   let removed = 0;
   for (const coll of ['newsletter', 'leads']) {
     for (const field of ['email']) {
-      for (const value of [nlEmail, leadEmail, userEmail]) {
+      for (const value of [nlEmail, userEmail]) {
         const snap = await db.collection(coll).where(field, '==', value).get();
         for (const doc of snap.docs) { await doc.ref.delete(); removed++; }
       }
     }
+  }
+  {
+    const snap = await db.collection('leads').where('phone', '==', leadPhone).get();
+    for (const doc of snap.docs) { await doc.ref.delete(); removed++; }
   }
   if (testUid) {
     await db.collection('users').doc(testUid).delete().catch(() => {});
