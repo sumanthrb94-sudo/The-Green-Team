@@ -253,3 +253,26 @@
   }
   html { scroll-behavior: auto; }
 }
+
+/* ── Marquee (signature effect #1) ───────────────────────────────────────── */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 38s linear infinite;
+}
+.marquee-track:hover { animation-play-state: paused; }
+
+@keyframes marquee-slow {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.marquee-slow { animation: marquee-slow 70s linear infinite; }
+
+/* Dark ground under map tiles while they load (and for blocked-tile fallback) */
+.leaflet-container {
+  background: #0d1409;
+}

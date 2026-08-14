@@ -1,7 +1,7 @@
 import { Hero } from '@/components/home/Hero';
+import { Manifesto } from '@/components/home/Manifesto';
+import { BentoPortfolio } from '@/components/home/BentoPortfolio';
 import { WhatWeDo } from '@/components/home/WhatWeDo';
-import { WhyItMatters } from '@/components/home/WhyItMatters';
-import { SanctuariesGrid } from '@/components/home/SanctuariesGrid';
 import { TrustSignals } from '@/components/home/TrustSignals';
 import { JournalPreview } from '@/components/home/JournalPreview';
 import { EcosystemPillars } from '@/components/home/EcosystemPillars';
@@ -17,9 +17,9 @@ export default async function HomePage() {
   return (
     <>
       <Hero />
+      <Manifesto />
+      <BentoPortfolio sanctuaries={[...SANCTUARIES, ...extra]} />
       <WhatWeDo />
-      <WhyItMatters />
-      <SanctuariesGrid sanctuaries={[...SANCTUARIES, ...extra]} />
       <TrustSignals />
       <JournalPreview />
       <EcosystemPillars />

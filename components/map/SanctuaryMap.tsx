@@ -157,7 +157,25 @@ const METRIC_STRIP = [
 
 export default function SanctuaryMap() {
   const [ready, setReady] = useState(false);
-  const [isSatellite, setIsSatellite] = useState(true);
+  type BaseMode = 'dark' | 'satellite' | 'light';
+  const BASE_TILES: Record<BaseMode, { url: string; attribution: string; label: string; filter?: string }> = {
+    dark: {
+      url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
+      attribution: '© OpenStreetMap contributors © CARTO',
+      label: 'Dark',
+    },
+    satellite: {
+      url: 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
+      attribution: '© Google Maps',
+      label: 'Satellite',
+    },
+    light: {
+      url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png',
+      attribution: '© OpenStreetMap contributors © CARTO',
+      label: 'Light',
+    },
+  };
+  const [baseMode, setBaseMode] = useState<BaseMode>('dark');
   const [zoom, setZoom] = useState(10);
   const [pulse, setPulse] = useState(0);
   const [target, setTarget] = useState<{ center: LatLng; zoom: number } | null>(null);
@@ -239,10 +257,12 @@ export default function SanctuaryMap() {
           </span>
           <span className="w-px h-4 bg-white/10" />
           <button
-            onClick={() => setIsSatellite(s => !s)}
+            onClick={() =>
+              setBaseMode(m => (m === 'dark' ? 'satellite' : m === 'satellite' ? 'light' : 'dark'))
+            }
             className="flex items-center gap-1.5 text-[9px] uppercase tracking-[0.3em] font-bold text-white/60 hover:text-white transition-colors"
           >
-            <Layers className="w-3.5 h-3.5" /> {isSatellite ? 'Satellite' : 'Road'}
+            <Layers className="w-3.5 h-3.5" /> {BASE_TILES[baseMode].label}
           </button>
         </div>
 
@@ -285,13 +305,9 @@ export default function SanctuaryMap() {
         <RRRVeil />
 
         <TileLayer
-          url={
-            isSatellite
-              ? 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}'
-              : 'https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}'
-          }
-          attribution="© Google Maps"
-          className={isSatellite ? undefined : 'map-olive-filter'}
+          key={baseMode}
+          url={BASE_TILES[baseMode].url}
+          attribution={BASE_TILES[baseMode].attribution}
         />
 
         {/* AQI heat field */}
