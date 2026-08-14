@@ -35,7 +35,7 @@ export async function getSessionUser(): Promise<SessionUser | null> {
   const session = jar.get(SESSION_COOKIE)?.value;
   if (!session) return null;
   try {
-    const d = await adminAuth().verifySessionCookie(session, true);
+    const d = await adminAuth().verifySessionCookie(session); // no checkRevoked network roundtrip — 14-day cookie expiry bounds risk
     return {
       uid: d.uid,
       email: d.email ?? null,

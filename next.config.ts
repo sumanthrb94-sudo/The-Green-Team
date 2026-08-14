@@ -9,9 +9,9 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  images: {
-    formats: ['image/avif', 'image/webp'],
-  },
+  // Gallery is pre-compressed WebP; serving originals avoids any dependency on
+  // the platform image optimizer (which was 402/failing on the production plan).
+  images: { unoptimized: true },
   async headers() {
     return [{ source: '/(.*)', headers: securityHeaders }];
   },

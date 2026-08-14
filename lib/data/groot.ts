@@ -77,7 +77,7 @@ SECOND PROPERTY: MODCON SYL RESIDENCES
 - Current Phase: Pre-Investor Phase — NOW RUNNING. This is the lowest pricing available. Once booking targets are hit, price moves to pre-launch rate (higher). Then public launch rate (higher still).
 - Investor Advantage: Pre-investor pricing locked at ₹4,499/SFT · First pick of best units/floors/views · Full appreciation from ground up
 - FOMO Angle: Agartha investors gained +37% in 18 months. SYL at Tukkuguda's 4th City corridor is the same opportunity — but early. If someone asks why now, explain the phase structure.
-- Contact: +91 9700144003 (WhatsApp) · Modconbuilderpvt.ltd@gmail.com · modconbuilders.com
+- Contact: +91 7799934943 (WhatsApp) · Modconbuilderpvt.ltd@gmail.com · modconbuilders.com
 - TGT Role: Channel partner — we introduce interested buyers directly to MODCON Builders
 
 WHAT GROOT SHOULD DO:

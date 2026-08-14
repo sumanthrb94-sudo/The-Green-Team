@@ -1,5 +1,6 @@
 import { Download, Mail } from 'lucide-react';
 import { fetchNewsletter } from '@/lib/server/admin-data';
+import { NewsletterComposer } from '@/components/admin/NewsletterComposer';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,6 +18,9 @@ export default async function AdminNewsletterPage() {
         >
           <Download className="w-3.5 h-3.5" /> CSV
         </a>
+      </div>
+      <div className="mb-8">
+        <NewsletterComposer subscriberCount={subs.length} />
       </div>
       <div className="space-y-2.5">
         {subs.map(n => (
