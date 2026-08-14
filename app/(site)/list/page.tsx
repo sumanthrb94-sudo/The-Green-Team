@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
 import { SanctuariesGrid } from '@/components/home/SanctuariesGrid';
 import { Footer } from '@/components/Footer';
-import { getLiveProperties } from '@/lib/server/properties';
-import { SANCTUARIES } from '@/lib/data/sanctuaries';
+import { getPortfolio } from '@/lib/server/portfolio';
 import { SITE_URL } from '@/lib/data/contact';
 
 export const metadata: Metadata = {
@@ -15,7 +14,7 @@ export const metadata: Metadata = {
 export const revalidate = 300;
 
 export default async function ListPage() {
-  const extra = await getLiveProperties();
+  const portfolio = await getPortfolio();
   return (
     <>
       <div className="px-6 md:px-24 pt-16 max-w-7xl mx-auto">
@@ -26,7 +25,7 @@ export default async function ListPage() {
           Curated <span className="font-serif italic text-primary">Portfolio.</span>
         </h1>
       </div>
-      <SanctuariesGrid sanctuaries={[...SANCTUARIES, ...extra]} heading={false} />
+      <SanctuariesGrid sanctuaries={portfolio} heading={false} />
       <Footer />
     </>
   );

@@ -72,7 +72,7 @@ SECOND PROPERTY: MODCON SYL RESIDENCES
 - Commercial Component: MODCON ONE — 1.5 acres mixed-use retail, offices, F&B in same campus
 - Commercial Pricing: Available at exclusive one-time investor (OTP) prices — direct enquiry only, do not quote a rate
 - Villament sizes: 2,500 SFT to 4,500 SFT
-- Access: Newsletter subscribers only (gated)
+- Access: free — one Google sign-in or newsletter signup unlocks details of all three sanctuaries
 - Growth Corridor: Tukkuguda is in Hyderabad's 4th City expansion corridor — early-stage investment with strong appreciation potential
 - Current Phase: Pre-Investor Phase — NOW RUNNING. This is the lowest pricing available. Once booking targets are hit, price moves to pre-launch rate (higher). Then public launch rate (higher still).
 - Investor Advantage: Pre-investor pricing locked at ₹4,499/SFT · First pick of best units/floors/views · Full appreciation from ground up

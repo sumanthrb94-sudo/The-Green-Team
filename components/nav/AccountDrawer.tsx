@@ -12,7 +12,7 @@ const NAV_ITEMS = [
   { name: 'Map', href: '/map', icon: MapPin },
   { name: 'Edge + Nature', href: '/analytics', icon: TrendingDown },
   { name: 'Blog', href: '/blog', icon: MessageSquare },
-  { name: 'Pre-Investor Gold', href: '/preinvestor-gold', icon: Award },
+  { name: 'Pre-Investor Offer', href: '/preinvestor-gold', icon: Award },
   { name: 'Membership', href: '/membership', icon: Shield },
 ];
 

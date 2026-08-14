@@ -7,18 +7,17 @@ import { JournalPreview } from '@/components/home/JournalPreview';
 import { EcosystemPillars } from '@/components/home/EcosystemPillars';
 import { NewsletterHighlight } from '@/components/home/NewsletterHighlight';
 import { Footer } from '@/components/Footer';
-import { getLiveProperties } from '@/lib/server/properties';
-import { SANCTUARIES } from '@/lib/data/sanctuaries';
+import { getPortfolio } from '@/lib/server/portfolio';
 
 export const revalidate = 300;
 
 export default async function HomePage() {
-  const extra = await getLiveProperties();
+  const portfolio = await getPortfolio();
   return (
     <>
       <Hero />
       <Manifesto />
-      <BentoPortfolio sanctuaries={[...SANCTUARIES, ...extra]} />
+      <BentoPortfolio sanctuaries={portfolio} />
       <WhatWeDo />
       <TrustSignals />
       <JournalPreview />

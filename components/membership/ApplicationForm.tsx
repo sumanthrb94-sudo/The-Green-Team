@@ -65,7 +65,7 @@ export function ApplicationForm() {
     'w-full bg-white/5 border border-white/12 rounded-2xl px-5 py-4 text-white placeholder:text-white/25 outline-none focus:border-[#c8a951]/60 transition-all';
 
   return (
-    <section id="apply" className="bg-olive-900 dark:bg-forest-section relative py-24 px-6 md:px-16 overflow-hidden">
+    <section id="apply" className="relative py-24 px-6 md:px-16 overflow-hidden bg-[#141c0f]">
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#c8a951]/50 to-transparent" />
       <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#c8a951]/50 to-transparent" />
 

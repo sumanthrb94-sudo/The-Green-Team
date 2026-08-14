@@ -3,6 +3,7 @@ import { BottomTabBar } from '@/components/nav/BottomTabBar';
 import { AuthModal } from '@/components/auth/AuthModal';
 import { ProfileModal } from '@/components/auth/ProfileModal';
 import { Groot } from '@/components/chat/Groot';
+import { WelcomeGate } from '@/components/home/WelcomeGate';
 
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -11,6 +12,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
       <main className="pb-16 md:pb-0">{children}</main>
       <BottomTabBar />
       <Groot />
+      <WelcomeGate />
       <AuthModal />
       <ProfileModal />
     </>

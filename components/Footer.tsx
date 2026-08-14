@@ -7,10 +7,10 @@ const AGENDA: { label: string; sub: string; href: string }[] = [
   { label: 'The Intelligence Gap', sub: 'Why early entry wins', href: '/analytics' },
   { label: 'Living Ecosystems', sub: 'Nature-first design philosophy', href: '/analytics#pillars' },
   { label: 'Sanctuary Map', sub: 'Environmental heatmap · AQI · Noise', href: '/map' },
-  { label: 'MODCON Agartha', sub: 'Narsapur Forest · Open access', href: '/sanctuaries/agartha' },
+  { label: 'MODCON Agartha', sub: 'Narsapur Forest · 36 farm plots', href: '/sanctuaries/agartha' },
   { label: 'MODCON SYL Residences', sub: 'Tukkuguda, ORR Exit-14', href: '/sanctuaries/syl' },
   { label: 'Dates County by Planet Green', sub: 'Kandukur · 4,000-acre reserve', href: '/sanctuaries/dates-county' },
-  { label: 'Adviser Membership', sub: 'Reserved investor circle · By invitation', href: '/membership' },
+  { label: 'Adviser Call', sub: 'Free · We respond within 24 hours', href: '/membership' },
 ];
 
 export function Footer() {
