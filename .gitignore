@@ -11,3 +11,7 @@ coverage/
 
 # Internal docs (security audits, deploy notes) — not committed
 docs/internal/
+
+# Next.js
+.next/
+next-env.d.ts
