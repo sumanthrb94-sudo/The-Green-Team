@@ -5,7 +5,9 @@ import { notFound } from 'next/navigation';
 import { Wind, VolumeX, Clock, ExternalLink, Check } from 'lucide-react';
 import { SANCTUARIES, getSanctuary } from '@/lib/data/sanctuaries';
 import { getPropertyById } from '@/lib/server/portfolio';
-import { PropertyTabs } from '@/components/property/PropertyTabs';
+import { Gallery } from '@/components/property/Gallery';
+import { LayoutPlan } from '@/components/property/LayoutPlan';
+import { InvestPanel } from '@/components/property/InvestPanel';
 import { Footer } from '@/components/Footer';
 import { SITE_URL } from '@/lib/data/contact';
 
@@ -149,7 +151,23 @@ export default async function SanctuaryPage({ params }: Props) {
           </div>
         ) : null}
 
-        <PropertyTabs sanctuary={s} />
+        {/* Single scroll — no tabs, no hidden content, fewer clicks. */}
+        <div className="space-y-16">
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.5em] font-bold text-on-surface/60 mb-5">Gallery</p>
+            <Gallery images={s.plotImages ?? [s.image]} title={s.title} />
+          </div>
+          {s.sitePlanSrc ? (
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.5em] font-bold text-on-surface/60 mb-5">Layout Plan</p>
+              <LayoutPlan sanctuary={s} />
+            </div>
+          ) : null}
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.5em] font-bold text-on-surface/60 mb-5">Invest</p>
+            <InvestPanel sanctuary={s} />
+          </div>
+        </div>
 
         <div className="mt-16 pt-10 border-t border-outline/10 flex flex-wrap gap-4 items-center justify-between">
           <p className="text-sm text-secondary">Explore the other curated sanctuaries:</p>

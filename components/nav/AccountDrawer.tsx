@@ -3,17 +3,13 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'motion/react';
-import { X, Home, MapPin, TrendingDown, MessageSquare, Award, Shield, LogOut, ShieldCheck } from 'lucide-react';
+import { X, Home, MessageSquare, LogOut, ShieldCheck, Phone } from 'lucide-react';
 import { Logo } from '@/components/brand/Logo';
 import { useAuth } from '@/components/auth/AuthProvider';
 
 const NAV_ITEMS = [
   { name: 'Home', href: '/', icon: Home },
-  { name: 'Map', href: '/map', icon: MapPin },
-  { name: 'Edge + Nature', href: '/analytics', icon: TrendingDown },
-  { name: 'Blog', href: '/blog', icon: MessageSquare },
-  { name: 'Pre-Investor Offer', href: '/preinvestor-gold', icon: Award },
-  { name: 'Membership', href: '/membership', icon: Shield },
+  { name: 'Journal', href: '/blog', icon: MessageSquare },
 ];
 
 const SANCTUARY_ITEMS = [
@@ -125,11 +121,11 @@ export function AccountDrawer({ onClose, isDark }: { onClose: () => void; isDark
                 </Link>
               )}
               <Link
-                href="/map"
+                href="/adviser-call"
                 onClick={onClose}
-                className="w-full py-3.5 rounded-xl bg-primary text-on-primary text-[9px] uppercase tracking-[0.4em] font-bold text-center hover:shadow-lg hover:shadow-primary/20 transition-all"
+                className="w-full py-3.5 rounded-xl bg-primary text-on-primary text-[9px] uppercase tracking-[0.4em] font-bold flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-primary/20 transition-all"
               >
-                Explore Map
+                <Phone className="w-3.5 h-3.5" /> Request Adviser Call
               </Link>
               <button
                 onClick={() => { void signOutUser(); onClose(); }}

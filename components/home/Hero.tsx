@@ -10,7 +10,8 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'motion/react';
-import { ArrowUpRight, Wind, VolumeX, Clock } from 'lucide-react';
+import { ArrowUpRight, Wind, VolumeX, Clock, Phone } from 'lucide-react';
+import { WHATSAPP } from '@/lib/data/contact';
 
 const HEADLINE: { text: string; cls: string }[] = [
   { text: 'The forest', cls: 'text-white' },
@@ -143,18 +144,20 @@ export function Hero() {
             className="flex flex-col sm:flex-row gap-3"
           >
             <Link
-              href="/list"
-              className="group px-9 py-4 rounded-full bg-[#a3b18a] text-[#0a1208] text-[10px] uppercase tracking-[0.4em] font-bold hover:bg-[#b8c8a0] transition-all flex items-center justify-center gap-2"
+              href="/#adviser-call"
+              className="group px-9 py-4 rounded-full bg-[#c8a951] text-[#1a1a0a] text-[10px] uppercase tracking-[0.4em] font-bold hover:bg-[#d9bb62] transition-all flex items-center justify-center gap-2"
             >
-              Explore the Portfolio
-              <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-            </Link>
-            <Link
-              href="/membership"
-              className="px-9 py-4 rounded-full border border-white/20 text-white/65 text-[10px] uppercase tracking-[0.4em] font-bold hover:border-[#c8a951]/60 hover:text-[#c8a951] transition-all text-center"
-            >
+              <Phone className="w-3.5 h-3.5" />
               Request Adviser Call
             </Link>
+            <a
+              href={WHATSAPP.generic}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-9 py-4 rounded-full border border-white/20 text-white/65 text-[10px] uppercase tracking-[0.4em] font-bold hover:border-[#25D366]/60 hover:text-white transition-all text-center"
+            >
+              WhatsApp Us
+            </a>
           </motion.div>
         </div>
 

@@ -1,40 +1,29 @@
 'use client';
 
 /**
- * Sign-in modal — Google (popup with in-app-browser redirect fallback),
- * email/password (sign in ⇄ create), and phone OTP via invisible reCAPTCHA.
+ * Sign-in modal — Google only. One button, one identity. Popup first, with a
+ * redirect fallback for in-app browsers (Instagram/Facebook/LinkedIn webviews)
+ * and blocked popups.
  */
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signInWithPhoneNumber,
   signInWithPopup,
   signInWithRedirect,
-  RecaptchaVerifier,
-  type ConfirmationResult,
   type User,
   type UserCredential,
 } from 'firebase/auth';
-import { X, Send, ArrowRight } from 'lucide-react';
+import { X } from 'lucide-react';
 import { auth, googleProvider } from '@/lib/firebase/client';
 import { useAuth } from './AuthProvider';
 import { Logo } from '@/components/brand/Logo';
 
 const FRIENDLY: Record<string, string> = {
-  'auth/user-not-found': 'No account found for that email. Try signing up instead.',
-  'auth/wrong-password': 'Incorrect password. Please try again.',
-  'auth/invalid-credential': 'Incorrect email or password. Please try again.',
-  'auth/email-already-in-use': 'Email already registered. Sign in instead.',
-  'auth/weak-password': 'Password should be at least 6 characters.',
-  'auth/invalid-email': 'That email address looks invalid.',
   'auth/popup-closed-by-user': 'Sign-in was cancelled.',
   'auth/popup-blocked': 'Pop-up blocked — trying a redirect instead…',
   'auth/too-many-requests': 'Too many attempts. Please wait a moment and retry.',
   'auth/network-request-failed': 'Network error — check your connection.',
   'auth/unauthorized-domain': 'This domain is not authorised for sign-in.',
-  'auth/invalid-verification-code': 'That OTP is incorrect. Please re-check.',
   'auth/operation-not-allowed': 'This sign-in method is disabled.',
 };
 const friendly = (code?: string) => (code && FRIENDLY[code]) || 'Something went wrong. Please try again.';
@@ -47,18 +36,8 @@ const wasNew = (u: User) => u.metadata.creationTime === u.metadata.lastSignInTim
 
 export function AuthModal() {
   const { authModalOpen, closeAuth, onSignedIn } = useAuth();
-
-  const [method, setMethod] = useState<'root' | 'email' | 'phone'>('root');
-  const [emailMode, setEmailMode] = useState<'signin' | 'signup'>('signin');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [phone, setPhone] = useState('');
-  const [otp, setOtp] = useState('');
-  const [otpSent, setOtpSent] = useState(false);
-  const [loading, setLoading] = useState<'google' | 'email' | 'phone' | null>(null);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const confirmRef = useRef<ConfirmationResult | null>(null);
-  const recaptchaRef = useRef<RecaptchaVerifier | null>(null);
 
   useEffect(() => {
     if (!authModalOpen) return;
@@ -69,16 +48,8 @@ export function AuthModal() {
 
   useEffect(() => {
     if (!authModalOpen) {
-      setMethod('root');
-      setEmailMode('signin');
-      setEmail('');
-      setPassword('');
-      setPhone('');
-      setOtp('');
-      setOtpSent(false);
       setError('');
-      setLoading(null);
-      confirmRef.current = null;
+      setLoading(false);
     }
   }, [authModalOpen]);
 
@@ -89,7 +60,7 @@ export function AuthModal() {
 
   const handleGoogle = async () => {
     setError('');
-    setLoading('google');
+    setLoading(true);
     try {
       if (isInAppBrowser()) {
         await signInWithRedirect(auth, googleProvider);
@@ -108,67 +79,9 @@ export function AuthModal() {
       }
       setError(friendly(code));
     } finally {
-      setLoading(null);
+      setLoading(false);
     }
   };
-
-  const handleEmail = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading('email');
-    try {
-      const cred =
-        emailMode === 'signup'
-          ? await createUserWithEmailAndPassword(auth, email, password)
-          : await signInWithEmailAndPassword(auth, email, password);
-      finish(cred);
-    } catch (err) {
-      setError(friendly((err as { code?: string }).code));
-    } finally {
-      setLoading(null);
-    }
-  };
-
-  const sendOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading('phone');
-    try {
-      if (!recaptchaRef.current) {
-        recaptchaRef.current = new RecaptchaVerifier(auth, 'recaptcha-container', { size: 'invisible' });
-      }
-      let formatted = phone.trim().replace(/\s/g, '');
-      if (!formatted.startsWith('+')) {
-        const digits = formatted.replace(/\D/g, '');
-        formatted = digits.length === 10 ? `+91${digits}` : `+${digits}`;
-      }
-      confirmRef.current = await signInWithPhoneNumber(auth, formatted, recaptchaRef.current);
-      setOtpSent(true);
-      setOtp('');
-    } catch (err) {
-      setError(friendly((err as { code?: string }).code));
-    } finally {
-      setLoading(null);
-    }
-  };
-
-  const verifyOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!confirmRef.current) return;
-    setError('');
-    setLoading('phone');
-    try {
-      finish(await confirmRef.current.confirm(otp));
-    } catch (err) {
-      setError(friendly((err as { code?: string }).code));
-    } finally {
-      setLoading(null);
-    }
-  };
-
-  const inputCls =
-    'w-full bg-surface-container-low border border-outline/25 rounded-2xl px-5 py-4 text-sm text-on-surface placeholder:text-on-surface/30 outline-none focus:border-primary transition-all';
-  const labelCls = 'block text-[9px] uppercase tracking-[0.4em] font-bold text-on-surface/50 mb-2';
 
   return (
     <AnimatePresence>
@@ -186,44 +99,32 @@ export function AuthModal() {
             exit={{ y: 40, scale: 0.98, opacity: 0 }}
             transition={{ type: 'spring', damping: 26, stiffness: 300 }}
             onClick={e => e.stopPropagation()}
-            className="w-full sm:max-w-4xl bg-surface rounded-t-3xl sm:rounded-3xl overflow-hidden shadow-2xl grid md:grid-cols-[1fr_1.1fr] max-h-[92vh]"
+            className="w-full sm:max-w-md bg-surface rounded-t-3xl sm:rounded-3xl overflow-hidden shadow-2xl"
           >
-            {/* Brand panel */}
-            <div className="hidden md:flex flex-col justify-between bg-forest-section p-10 text-white relative overflow-hidden">
+            <div className="bg-forest-section p-8 text-white relative overflow-hidden">
               <div className="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-primary/20 blur-3xl" />
-              <Logo onDark />
-              <div>
-                <p className="font-serif italic text-4xl leading-tight text-white/95">
-                  Where the forest
-                  <br />
-                  becomes home.
-                </p>
-                <p className="mt-6 text-[10px] uppercase tracking-[0.45em] text-white/40 font-bold">
-                  Independent Sanctuary Curators
-                </p>
-              </div>
-              <p className="text-[9px] uppercase tracking-[0.35em] text-white/30">
-                One Google sign-in · Full access to all three sanctuaries
-              </p>
-            </div>
-
-            {/* Methods */}
-            <div className="p-7 sm:p-10 overflow-y-auto">
-              <div className="flex items-start justify-between mb-8">
-                <div>
-                  <p className="text-[9px] uppercase tracking-[0.5em] text-primary/70 font-bold mb-1">
-                    Unlock the Sanctuaries
-                  </p>
-                  <h2 className="text-2xl font-bold text-on-surface">Sign in to The Green Team</h2>
-                </div>
+              <div className="flex items-start justify-between relative">
+                <Logo onDark />
                 <button
                   onClick={closeAuth}
                   aria-label="Close"
-                  className="p-2 rounded-full hover:bg-primary/10 transition-all"
+                  className="p-2 -mr-2 -mt-2 rounded-full hover:bg-white/10 transition-all"
                 >
-                  <X className="w-5 h-5 text-on-surface/70" />
+                  <X className="w-5 h-5 text-white/70" />
                 </button>
               </div>
+              <p className="mt-8 font-serif italic text-3xl leading-tight text-white/95">
+                Where the forest
+                <br />
+                becomes home.
+              </p>
+            </div>
+
+            <div className="p-7 sm:p-8">
+              <h2 className="text-xl font-bold text-on-surface mb-1">Sign in to The Green Team</h2>
+              <p className="text-sm text-on-surface/50 mb-6">
+                One Google sign-in. Full access to every sanctuary.
+              </p>
 
               {error && (
                 <p className="mb-5 text-sm text-error bg-error/10 border border-error/20 rounded-xl px-4 py-3">
@@ -233,7 +134,7 @@ export function AuthModal() {
 
               <button
                 onClick={handleGoogle}
-                disabled={loading !== null}
+                disabled={loading}
                 className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl border border-outline/30 bg-surface-container-low hover:border-primary/50 hover:shadow-md transition-all text-sm font-medium text-on-surface disabled:opacity-60"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24" aria-hidden>
@@ -242,154 +143,16 @@ export function AuthModal() {
                   <path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84Z" />
                   <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1A11 11 0 0 0 2.18 7.06l3.66 2.84C6.71 7.3 9.14 5.38 12 5.38Z" />
                 </svg>
-                <span>{loading === 'google' ? 'Connecting…' : 'Continue with Google'}</span>
+                <span>{loading ? 'Connecting…' : 'Continue with Google'}</span>
               </button>
 
-              <div className="flex items-center gap-4 my-6">
-                <span className="flex-1 h-px bg-outline/20" />
-                <span className="text-[9px] uppercase tracking-[0.4em] text-on-surface/30 font-bold">or</span>
-                <span className="flex-1 h-px bg-outline/20" />
-              </div>
-
-              {method !== 'email' ? (
-                <button
-                  onClick={() => setMethod('email')}
-                  className="w-full py-3.5 rounded-2xl border border-outline/25 text-on-surface/70 text-sm hover:border-primary/40 hover:text-on-surface transition-all"
-                >
-                  Continue with Email
-                </button>
-              ) : (
-                <motion.form
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  onSubmit={handleEmail}
-                  className="space-y-4 overflow-hidden"
-                >
-                  <div>
-                    <label htmlFor="auth-email" className={labelCls}>Email</label>
-                    <input
-                      id="auth-email"
-                      name="email"
-                      type="email"
-                      required
-                      value={email}
-                      onChange={e => setEmail(e.target.value)}
-                      placeholder="email@domain.com"
-                      className={inputCls}
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="auth-password" className={labelCls}>Password</label>
-                    <input
-                      id="auth-password"
-                      name="password"
-                      type="password"
-                      required
-                      minLength={6}
-                      value={password}
-                      onChange={e => setPassword(e.target.value)}
-                      placeholder="••••••••••••"
-                      className={inputCls}
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    disabled={loading !== null}
-                    className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-primary text-on-primary text-sm font-bold hover:opacity-95 transition-all disabled:opacity-60"
-                  >
-                    <ArrowRight className="w-4 h-4" />
-                    {loading === 'email' ? 'Please wait…' : emailMode === 'signin' ? 'Sign In' : 'Create Account'}
-                  </button>
-                  <p className="text-center text-xs text-on-surface/50">
-                    {emailMode === 'signin' ? "Don't have an account?" : 'Have an account?'}{' '}
-                    <button
-                      type="button"
-                      onClick={() => setEmailMode(m => (m === 'signin' ? 'signup' : 'signin'))}
-                      className="font-bold text-primary underline-offset-2 hover:underline"
-                    >
-                      {emailMode === 'signin' ? 'Sign Up' : 'Sign In'}
-                    </button>
-                  </p>
-                </motion.form>
-              )}
-
-              <div className="h-4" />
-
-              {method !== 'phone' ? (
-                <button
-                  onClick={() => setMethod('phone')}
-                  className="w-full py-3.5 rounded-2xl border border-outline/25 text-on-surface/70 text-sm hover:border-primary/40 hover:text-on-surface transition-all"
-                >
-                  Continue with Phone
-                </button>
-              ) : (
-                <motion.form
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  onSubmit={otpSent ? verifyOtp : sendOtp}
-                  className="space-y-4 overflow-hidden"
-                >
-                  {!otpSent ? (
-                    <div>
-                      <label htmlFor="auth-phone" className={labelCls}>Phone Number</label>
-                      <input
-                        id="auth-phone"
-                        name="phone"
-                        type="tel"
-                        required
-                        value={phone}
-                        onChange={e => setPhone(e.target.value)}
-                        placeholder="+91 98765 43210"
-                        className={inputCls}
-                      />
-                      <p className="mt-2 text-[10px] text-on-surface/40">We&apos;ll send you an OTP to verify</p>
-                    </div>
-                  ) : (
-                    <div>
-                      <label htmlFor="auth-otp" className={labelCls}>Enter OTP</label>
-                      <input
-                        id="auth-otp"
-                        name="otp"
-                        inputMode="numeric"
-                        required
-                        maxLength={6}
-                        value={otp}
-                        onChange={e => setOtp(e.target.value.replace(/\D/g, ''))}
-                        placeholder="6-digit code"
-                        className={`${inputCls} tracking-[0.6em] text-center font-bold`}
-                      />
-                    </div>
-                  )}
-                  <button
-                    type="submit"
-                    disabled={loading !== null}
-                    className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-primary text-on-primary text-sm font-bold hover:opacity-95 transition-all disabled:opacity-60"
-                  >
-                    <Send className="w-4 h-4" />
-                    {loading === 'phone'
-                      ? otpSent ? 'Verifying…' : 'Sending OTP…'
-                      : otpSent ? 'Verify OTP' : 'Send OTP'}
-                  </button>
-                  {otpSent && (
-                    <button
-                      type="button"
-                      onClick={() => { setOtpSent(false); setOtp(''); }}
-                      className="w-full text-center text-xs text-on-surface/50 hover:text-on-surface transition-colors"
-                    >
-                      Change number / resend
-                    </button>
-                  )}
-                </motion.form>
-              )}
-
-              <p className="mt-8 text-center text-[9px] uppercase tracking-[0.3em] text-on-surface/25 leading-relaxed">
+              <p className="mt-6 text-center text-[9px] uppercase tracking-[0.3em] text-on-surface/25 leading-relaxed">
                 By continuing, you agree to our terms.
                 <br />
                 We never spam — only sanctuary intelligence.
               </p>
             </div>
           </motion.div>
-          <div id="recaptcha-container" />
         </motion.div>
       )}
     </AnimatePresence>
