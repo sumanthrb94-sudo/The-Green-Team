@@ -1,0 +1,255 @@
+@import 'tailwindcss';
+@import 'leaflet/dist/leaflet.css';
+
+@theme {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-headline: var(--font-manrope), var(--font-inter), sans-serif;
+  --font-serif: var(--font-cormorant), Georgia, serif;
+
+  --color-primary: var(--primary);
+  --color-on-primary: var(--on-primary);
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-on-surface: var(--on-surface);
+  --color-secondary: var(--secondary);
+  --color-tertiary: var(--tertiary);
+  --color-surface-container: var(--surface-container);
+  --color-surface-container-low: var(--surface-container-low);
+  --color-surface-container-highest: var(--surface-container-highest);
+  --color-outline: var(--outline);
+
+  --color-olive-900: var(--olive-900);
+  --color-olive-800: var(--olive-800);
+  --color-olive-700: var(--olive-700);
+  --color-cashew: var(--cashew);
+  --color-cream: var(--cream);
+  --color-gold: var(--gold);
+  --color-gold-bright: var(--gold-bright);
+  --color-charcoal: var(--charcoal);
+  --color-error: var(--error);
+}
+
+@layer base {
+  :root {
+    --primary: #2d3a1d;
+    --on-primary: #ffffff;
+    --background: #faf9f6;
+    --surface: #faf9f6;
+    --on-surface: #1a1c1a;
+    --secondary: #586062;
+    --tertiary: #8a3d36;
+    --surface-container: #f2f4f2;
+    --surface-container-low: #f8faf8;
+    --surface-container-highest: #e0e4e0;
+    --outline: #8c9c8c;
+
+    --olive-900: #1a2410;
+    --olive-800: #2d3a1d;
+    --olive-700: #4a5c3d;
+    --cashew: #f2f4f2;
+    --cream: #faf9f6;
+    --gold: #b8860b;
+    --gold-bright: #d4a72c;
+    --charcoal: #1a1a1a;
+    --error: #b3362b;
+
+    /* Section-level dark bg: Hero, EcosystemPillars, Footer, credential strips */
+    --forest-section: #1a2410;
+
+    /* Glass / elevation */
+    --glass-bg: rgba(250, 249, 246, 0.82);
+    --glass-border: rgba(45, 58, 29, 0.08);
+  }
+
+  .dark {
+    --primary: #a3b18a;
+    --on-primary: #0c1809;
+    --background: #141a11;
+    --surface: #141a11;
+    --on-surface: #eae6da;
+    --secondary: #8da284;
+    --tertiary: #f5b8b0;
+    --surface-container: #1a2417;
+    --surface-container-low: #161f13;
+    --surface-container-highest: #243320;
+    --outline: #5a6c54;
+
+    --olive-900: #eae6da;
+    --olive-800: #d0cbbf;
+    --olive-700: #b4b0a8;
+    --cashew: #1a2417;
+    --cream: #141a11;
+    --gold: #ccac58;
+    --gold-bright: #e2c46e;
+    --charcoal: #e8e4de;
+    --error: #f0776b;
+
+    --forest-section: #0c1409;
+
+    --glass-bg: rgba(20, 26, 17, 0.82);
+    --glass-border: rgba(255, 255, 255, 0.06);
+  }
+
+  html {
+    scrollbar-gutter: stable;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-surface text-on-surface font-sans antialiased selection:bg-primary/20;
+  }
+
+  body.modal-open {
+    overflow: hidden;
+    touch-action: none;
+  }
+
+  h1, h2, h3 {
+    @apply font-headline tracking-tight leading-[1.08];
+  }
+}
+
+/* ── Components ──────────────────────────────────────────────────────────── */
+
+.glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.bg-forest-section {
+  background-color: var(--forest-section);
+}
+
+.input-cashew {
+  @apply w-full bg-transparent border-b border-olive-800/30 py-5 outline-none
+         focus:border-primary transition-all font-light text-xl
+         text-olive-900 placeholder:text-olive-800/30;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── Leaflet overrides (sanctuary map) ───────────────────────────────────── */
+
+.custom-popup .leaflet-popup-content-wrapper {
+  background: transparent;
+  border: none;
+  padding: 0;
+  box-shadow: none;
+  border-radius: 24px;
+  overflow: visible;
+}
+
+.custom-popup .leaflet-popup-tip {
+  background: #0c1208;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.5);
+}
+
+.custom-popup .leaflet-popup-content {
+  margin: 0;
+  width: auto !important;
+}
+
+.custom-popup .leaflet-popup-close-button {
+  position: absolute !important;
+  top: 10px !important;
+  right: 10px !important;
+  width: 26px !important;
+  height: 26px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: rgba(5, 8, 4, 0.7) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 50% !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+  font: 400 16px/1 var(--font-inter), system-ui, sans-serif !important;
+  text-align: center !important;
+  text-decoration: none !important;
+  text-indent: 0 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  transition: background 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
+  z-index: 10;
+}
+
+.custom-popup .leaflet-popup-close-button:hover {
+  color: #fff !important;
+  background: rgba(5, 8, 4, 0.92) !important;
+  border-color: rgba(255, 255, 255, 0.24) !important;
+  transform: scale(1.06);
+}
+
+.custom-div-icon {
+  background: transparent;
+  border: none;
+}
+
+.custom-div-icon div {
+  transition: all 0.3s ease;
+}
+
+.custom-div-icon:hover div {
+  transform: scale(1.1);
+}
+
+.custom-tooltip {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.custom-tooltip::before {
+  display: none !important;
+}
+
+/* Olive-cream tone map — matches site palette: olive roads, cream land */
+.map-olive-filter {
+  filter: sepia(18%) saturate(0.65) hue-rotate(18deg) brightness(0.97) contrast(1.06);
+}
+
+.trichome-glass-mesh {
+  mix-blend-mode: hard-light;
+  stroke-dasharray: 4 8;
+}
+
+/* ── Animations ──────────────────────────────────────────────────────────── */
+
+@keyframes tgt-pulse {
+  0%   { transform: scale(0.85); opacity: 0.55; }
+  70%  { transform: scale(1.25); opacity: 0; }
+  100% { transform: scale(0.85); opacity: 0; }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@layer utilities {
+  .animate-fade-up {
+    animation: fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+}
+
+/* ── Accessibility guardrail: respect reduced-motion everywhere ──────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  html { scroll-behavior: auto; }
+}

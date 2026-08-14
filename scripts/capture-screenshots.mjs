@@ -1,31 +1,25 @@
 /**
- * Documentation screenshot runner.
+ * Documentation screenshot runner for v2 (Next.js).
  *
- *   npm run dev:demo          # terminal 1 — starts the demo build on :4173
- *   npm run screenshots       # terminal 2 — writes docs/screenshots/*.jpg
+ *   DEMO_ADMIN=1 DEMO_DATA=1 npm run dev     # terminal 1 (dev-only demo flags)
+ *   npm run screenshots                       # terminal 2 → docs/screenshots/
  *
- * The demo build (vite.demo.config.ts) aliases every `firebase/*` import to the
- * in-memory stand-ins in scripts/demo-firebase/, so the app boots already signed
- * in and every screenshot below is an authenticated session — admin wherever the
- * dashboard is involved, member elsewhere. Only the three auth-flow shots at the
- * end start signed out, because that is what they document.
+ * DEMO_ADMIN / DEMO_DATA only work under `next dev` and swap the admin session
+ * and admin datasets for fictional records, so no real client data ever lands
+ * in the repo. Public pages are the real application.
  *
- * Env overrides:
- *   BASE_URL         default http://localhost:4173
- *   CHROMIUM_PATH    explicit Chromium binary (needed when the sandbox ships a
- *                    browser build that differs from the installed Playwright)
+ * Env: BASE_URL (default http://localhost:3000), CHROMIUM_PATH.
  */
 import { chromium } from 'playwright';
-import { mkdir, writeFile, rm, readFile } from 'node:fs/promises';
-import { existsSync, readdirSync } from 'node:fs';
+import { mkdir, writeFile, rm } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import { deflateSync } from 'node:zlib';
 import path from 'node:path';
 
-const BASE = process.env.BASE_URL ?? 'http://localhost:4173';
+const BASE = process.env.BASE_URL ?? 'http://localhost:3000';
 const OUT = path.resolve(process.cwd(), 'docs/screenshots');
 const DESKTOP = { width: 1440, height: 900 };
 const MOBILE = { width: 390, height: 844 };
-const QUALITY = 82;
 
 function chromiumPath() {
   if (process.env.CHROMIUM_PATH) return process.env.CHROMIUM_PATH;
@@ -38,348 +32,221 @@ function chromiumPath() {
   return undefined;
 }
 
-/* ── Offline basemap tile ──────────────────────────────────────────────────
-   Raster map tiles are not reachable from the documentation sandbox. Rather
-   than shipping map screenshots with empty gaps, tile requests are served this
-   neutral 256×256 grid so the Leaflet overlays the app actually renders — AQI
-   field, RRR corridor ring, sanctuary markers — stay readable. Captions say so
-   wherever it appears. */
+/* Neutral basemap tile for sandboxes that block the tile CDN. */
 function placeholderTile() {
-  const S = 256;
-  const rows = [];
+  const S = 256, rows = [];
   for (let y = 0; y < S; y++) {
     const row = Buffer.alloc(S * 3 + 1);
     for (let x = 0; x < S; x++) {
       const grid = x % 64 === 0 || y % 64 === 0;
-      const [r, g, b] = grid ? [222, 226, 217] : [233, 236, 229];
-      row[1 + x * 3] = r;
-      row[2 + x * 3] = g;
-      row[3 + x * 3] = b;
+      const [r, g, b] = grid ? [50, 62, 46] : [32, 42, 30];
+      row[1 + x * 3] = r; row[2 + x * 3] = g; row[3 + x * 3] = b;
     }
     rows.push(row);
   }
-  const crcTable = Array.from({ length: 256 }, (_, n) => {
+  const crcT = Array.from({ length: 256 }, (_, n) => {
     let c = n;
     for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
     return c >>> 0;
   });
-  const crc = buf => {
-    let c = 0xffffffff;
-    for (const byte of buf) c = crcTable[(c ^ byte) & 0xff] ^ (c >>> 8);
-    return (c ^ 0xffffffff) >>> 0;
-  };
-  const chunk = (type, data) => {
-    const len = Buffer.alloc(4);
-    len.writeUInt32BE(data.length);
-    const body = Buffer.concat([Buffer.from(type, 'ascii'), data]);
-    const crcBuf = Buffer.alloc(4);
-    crcBuf.writeUInt32BE(crc(body));
-    return Buffer.concat([len, body, crcBuf]);
+  const crc = b => { let c = 0xffffffff; for (const x of b) c = crcT[(c ^ x) & 0xff] ^ (c >>> 8); return (c ^ 0xffffffff) >>> 0; };
+  const chunk = (t, d) => {
+    const len = Buffer.alloc(4); len.writeUInt32BE(d.length);
+    const body = Buffer.concat([Buffer.from(t), d]);
+    const cb = Buffer.alloc(4); cb.writeUInt32BE(crc(body));
+    return Buffer.concat([len, body, cb]);
   };
   const ihdr = Buffer.alloc(13);
-  ihdr.writeUInt32BE(S, 0);
-  ihdr.writeUInt32BE(S, 4);
-  ihdr[8] = 8;
-  ihdr[9] = 2;
+  ihdr.writeUInt32BE(S, 0); ihdr.writeUInt32BE(S, 4); ihdr[8] = 8; ihdr[9] = 2;
   return Buffer.concat([
     Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
-    chunk('IHDR', ihdr),
-    chunk('IDAT', deflateSync(Buffer.concat(rows), { level: 9 })),
-    chunk('IEND', Buffer.alloc(0)),
+    chunk('IHDR', ihdr), chunk('IDAT', deflateSync(Buffer.concat(rows), { level: 9 })), chunk('IEND', Buffer.alloc(0)),
   ]);
 }
-
-/* ── Remote gallery mirror ─────────────────────────────────────────────────
-   The Agartha gallery is served from static.wixstatic.com in production, which
-   the capture sandbox cannot reach. public/gallery/agartha/ holds compressed
-   local copies of exactly those assets (see scripts/compress_gallery.py), so
-   remote requests are answered from that mirror — same images, offline. */
-const MIRROR_DIR = path.resolve(process.cwd(), 'public/gallery/agartha');
-const MIRROR = existsSync(MIRROR_DIR) ? readdirSync(MIRROR_DIR) : [];
-
-function mirrorFor(url) {
-  const remote = decodeURIComponent(url.split('/').pop().split('?')[0]);
-  const key = remote.split('~mv2')[0];
-  return MIRROR.find(f => f.startsWith(key));
-}
-
 const TILE = placeholderTile();
-const TILE_HOSTS = /(mt\d?\.google\.com|tile\.openstreetmap\.org|basemaps\.|server\.arcgisonline\.com)/;
 
 let step = 0;
 const shots = [];
 const warnings = [];
 
-async function shot(page, name, caption, { expect } = {}) {
+async function shot(page, name, caption, { expect, fullPage = false } = {}) {
   if (expect) {
-    const ok = await page
-      .locator(expect)
-      .first()
-      .waitFor({ state: 'visible', timeout: 8000 })
-      .then(() => true)
-      .catch(() => false);
+    const ok = await page.locator(expect).first().waitFor({ state: 'visible', timeout: 9000 }).then(() => true).catch(() => false);
     if (!ok) warnings.push(`${name}: expected "${expect}" not visible`);
   }
   const file = `${String(++step).padStart(2, '0')}-${name}.jpg`;
-  await page.screenshot({ path: path.join(OUT, file), type: 'jpeg', quality: QUALITY });
+  await page.screenshot({ path: path.join(OUT, file), type: 'jpeg', quality: 82, fullPage });
   shots.push({ file, caption });
   console.log(`  ✓ ${file}`);
 }
 
-async function newSession(browser, { role, viewport = DESKTOP, dark = false }) {
-  const isMobile = viewport === MOBILE;
-  const ctx = await browser.newContext({
-    viewport,
-    isMobile,
-    hasTouch: isMobile,
-    locale: 'en-IN',
-    timezoneId: 'Asia/Kolkata',
-    permissions: ['geolocation'],
-    geolocation: { latitude: 17.4401, longitude: 78.3489 }, // Gachibowli, Hyderabad
-  });
-  await ctx.addInitScript(
-    ([r, d]) => {
-      if (r) localStorage.setItem('gt_demo_auth', JSON.stringify({ role: r }));
-      else localStorage.removeItem('gt_demo_auth');
-      localStorage.setItem('gt_dark', String(d));
-    },
-    [role, dark]
-  );
-  await ctx.route(TILE_HOSTS, r => r.fulfill({ contentType: 'image/png', body: TILE }));
-  await ctx.route(/static\.wixstatic\.com/, async r => {
-    const file = mirrorFor(r.request().url());
-    if (!file) return r.abort();
-    return r.fulfill({ contentType: 'image/webp', body: await readFile(path.join(MIRROR_DIR, file)) });
-  });
-  const page = await ctx.newPage();
-  page.on('pageerror', e => warnings.push(`page error: ${e.message}`));
-  return { ctx, page };
-}
-
-/** The app scrolls an inner <main>, not the document, so fullPage is a no-op. */
-async function scrollTo(page, y, wait = 1200) {
-  await page.evaluate(top => {
-    const main = document.querySelector('main');
-    if (main) main.scrollTo({ top, behavior: 'instant' });
-  }, y);
-  await page.waitForTimeout(wait);
-}
-
-/** Wait for above-the-fold images to decode — gallery grids lazy-load on open. */
-async function waitForImages(page, timeout = 8000) {
+async function waitImages(page, timeout = 10000) {
   await page
     .waitForFunction(
-      () =>
-        [...document.images]
-          .filter(i => {
-            const r = i.getBoundingClientRect();
-            return r.top < window.innerHeight + 200 && r.width > 0;
-          })
-          .every(i => i.complete),
-      null,
-      { timeout }
+      () => [...document.images].filter(i => {
+        const r = i.getBoundingClientRect();
+        return r.top < innerHeight + 300 && r.width > 0;
+      }).every(i => i.complete),
+      null, { timeout }
     )
-    .catch(() => warnings.push('waitForImages: timed out'));
-  await page.waitForTimeout(600);
+    .catch(() => warnings.push('waitImages timeout'));
+  await page.waitForTimeout(500);
 }
 
-async function go(page, route, wait = 2500) {
-  await page.goto(`${BASE}${route}`, { waitUntil: 'load', timeout: 60000 });
+async function go(page, route, wait = 2200) {
+  await page.goto(`${BASE}${route}`, { waitUntil: 'load', timeout: 90000 });
   await page.waitForTimeout(wait);
+  await waitImages(page);
 }
 
-async function click(page, selector, { wait = 1200, index = 0, last = false } = {}) {
-  const all = page.locator(selector);
-  const el = last ? all.last() : all.nth(index);
-  if ((await el.count()) === 0) {
-    warnings.push(`click: no match for ${selector}`);
-    return false;
-  }
-  const ok = await el
-    .click({ timeout: 10000 })
-    .then(() => true)
-    .catch(e => {
-      warnings.push(`click failed on ${selector}: ${e.message.split('\n')[0]}`);
-      return false;
-    });
+async function scrollTo(page, y, wait = 1300) {
+  await page.evaluate(t => window.scrollTo({ top: t, behavior: 'instant' }), y);
   await page.waitForTimeout(wait);
-  return ok;
+  await waitImages(page);
 }
 
-/** The account avatar is always the last control in the top bar. */
-const ACCOUNT_BTN = 'nav button';
-const ACCOUNT = { last: true };
-const ADMIN_BTN = 'nav button:has-text("Admin")';
+/** Scroll so the property tab bar sits at the top of the viewport. */
+async function focusTabs(page) {
+  await page.evaluate(() => {
+    const el = document.querySelector('[role="tablist"]');
+    if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 66, behavior: 'instant' });
+  });
+  await page.waitForTimeout(700);
+  await waitImages(page);
+}
 
 async function main() {
   await rm(OUT, { recursive: true, force: true });
   await mkdir(OUT, { recursive: true });
-
   const browser = await chromium.launch({ executablePath: chromiumPath() });
 
-  // ── Admin session: public surfaces + the full admin dashboard ─────────────
+  const mk = async viewport => {
+    const ctx = await browser.newContext({ viewport, isMobile: viewport === MOBILE, hasTouch: viewport === MOBILE, locale: 'en-IN', timezoneId: 'Asia/Kolkata' });
+    await ctx.route(/mt\d?\.google\.com/, r => r.fulfill({ contentType: 'image/png', body: TILE }));
+    const page = await ctx.newPage();
+    page.on('pageerror', e => warnings.push(`pageerror: ${e.message.slice(0, 120)}`));
+    return { ctx, page };
+  };
+
+  // ── Desktop: public pages ─────────────────────────────────────────────────
   {
-    const { ctx, page } = await newSession(browser, { role: 'admin' });
+    const { ctx, page } = await mk(DESKTOP);
 
     await go(page, '/');
-    await shot(page, 'home-signed-in', 'Landing page inside an authenticated admin session — the navbar carries the ADMIN badge and the account avatar instead of a sign-in prompt.', { expect: ADMIN_BTN });
+    await shot(page, 'home-hero', 'Home — serif hero over the forest backdrop with the KPI strip (server-rendered, real per-route SEO).', { expect: 'h1' });
+    await scrollTo(page, 900);
+    await shot(page, 'home-what-we-do', 'How it works — find, verify, connect.');
+    await scrollTo(page, 2600);
+    await shot(page, 'home-sanctuaries', 'Curated portfolio cards — each links to a real /sanctuaries/[id] page (the dead “View Details” of v1 is gone).');
+    await scrollTo(page, 4800);
+    await shot(page, 'home-trust-journal', 'Trust signals (unmounted dead code in v1, now live) and the journal preview.');
+    await scrollTo(page, 999999);
+    await shot(page, 'home-footer', 'Newsletter capture and the footer agenda grid — the v1 dead “gallery” link is fixed.');
 
-    await scrollTo(page, 1100);
-    await shot(page, 'home-ecosystem-pillars', 'Home, scrolled: the ecosystem pillars section that frames the AQI / noise / commute thesis.');
+    await go(page, '/sanctuaries/agartha');
+    await shot(page, 'agartha-header', 'MODCON Agartha property page — a real URL with its own metadata and Product JSON-LD.', { expect: 'h1:has-text("Agartha")' });
+    await focusTabs(page);
+    await shot(page, 'agartha-gallery', 'Gallery tab — all 23 photos served from the repo’s own compressed mirror (Wix CDN dependency removed).');
+    await page.locator('button[role="tab"]:has-text("Layout Plan")').click();
+    await page.waitForTimeout(1200);
+    await focusTabs(page);
+    await shot(page, 'agartha-layout', 'Interactive site plan — 36 plot dots on the official layout.');
+    const dot = page.locator('button[aria-label^="Plot 3,"]');
+    if (await dot.count()) { await dot.click(); await page.waitForTimeout(900); }
+    await scrollTo(page, (await page.evaluate(() => window.scrollY)) + 620, 700);
+    await shot(page, 'agartha-plot-snapshot', 'Tapping a plot shows its investment snapshot — pre-launch vs today’s rate and the 18-month gain.');
+    await page.locator('button[role="tab"]:has-text("Invest")').click();
+    await page.waitForTimeout(900);
+    await focusTabs(page);
+    await shot(page, 'agartha-invest', 'Invest tab — telemetry, the ₹8,500/sq yd price ladder, biomorphic add-on and WhatsApp CTAs.');
 
-    await scrollTo(page, 3200);
-    await shot(page, 'home-curated-sanctuaries', 'Home, curated sanctuaries. A signed-in user counts as subscribed, so member pricing renders unblurred with no newsletter gate.');
+    await go(page, '/sanctuaries/syl');
+    await page.locator('button[role="tab"]:has-text("Invest")').click();
+    await page.waitForTimeout(900);
+    await focusTabs(page);
+    await shot(page, 'syl-invest', 'SYL Residences Invest tab — pre-investor banner and the ₹4,499/SFT villament ladder. The /syl URL 301s here.');
 
-    await scrollTo(page, 99999);
-    await shot(page, 'home-footer', 'Home footer — sitemap-style route links, contact channels and the newsletter capture that writes into the newsletter collection.');
+    await go(page, '/sanctuaries/dates-county');
+    await page.locator('button[role="tab"]:has-text("Invest")').click();
+    await page.waitForTimeout(900);
+    await focusTabs(page);
+    await shot(page, 'dates-county-invest', 'Dates County Invest tab — RERA banner and the ₹18,000/sq yd table with the ₹90 L signature plot.');
 
-    await scrollTo(page, 0, 600);
-    await click(page, ACCOUNT_BTN, ACCOUNT);
-    await shot(page, 'account-drawer-admin', 'Account drawer for the signed-in admin: identity block with the “Admin” role line, the Admin Dashboard entry, sanctuary shortcuts and sign-out.', { expect: 'text=Admin Dashboard' });
-    await page.keyboard.press('Escape');
-    await page.waitForTimeout(700);
-
-    await go(page, '/list');
-    await shot(page, 'sanctuaries-list', 'The /list route — all curated sanctuaries with their verified metrics, member price and CTA into the detail overlay.');
-
-    // The detail overlay is opened from the account drawer's sanctuary shortcuts —
-    // on /list the card's "View Details" handler is still a stub (see docs).
-    await click(page, ACCOUNT_BTN, ACCOUNT);
-    await click(page, 'button:has-text("MODCON Agartha")', { wait: 3000 });
-    await waitForImages(page);
-    await page.mouse.move(720, 500);
-    await page.mouse.wheel(0, 620); // past the hero photo, into the grid
-    await waitForImages(page);
-    await shot(page, 'property-detail-gallery', 'Property detail overlay for MODCON Agartha — header with member pricing, and the Gallery / Layout Plan / Invest tabs. 22 photos are served from the app’s own /public/gallery directory.', { expect: 'h2:has-text("MODCON Agartha")' });
-
-    await click(page, 'button:has-text("Invest")', { wait: 2000, last: true });
-    await waitForImages(page);
-    await shot(page, 'property-detail-invest', 'The Invest tab of the same overlay — plot economics, price per sq yd and the member band, unblurred because the session is authenticated.');
-
-    await click(page, 'button:has-text("Layout Plan")', { wait: 2500 });
-    await waitForImages(page);
-    await shot(page, 'property-detail-layout', 'The Layout Plan tab — the interactive site layout with selectable plots rendered over the master plan.');
-
-    await go(page, '/map', 4500);
-    await shot(page, 'map-live', 'The /map route: Leaflet with the live AQI field, the RRR corridor ring, key junction markers and the three sanctuaries. The grey grid is a placeholder basemap — raster tiles are blocked in the capture sandbox.', { expect: '.leaflet-container' });
-
-    await click(page, '.leaflet-marker-icon', { wait: 2000 });
-    await shot(page, 'map-marker-popup', 'A sanctuary marker popup on the map — summary card with a direct hand-off into the full property overlay.');
+    await go(page, '/map', 5200);
+    await shot(page, 'map', 'The environmental-intelligence map: AQI field, ORR/RRR, sanctuary markers. Basemap tiles are a placeholder grid — the tile CDN is blocked in this sandbox.', { expect: '.leaflet-container' });
+    await page.locator('button:has-text("Forests & Lakes")').click();
+    await page.waitForTimeout(1500);
+    await shot(page, 'map-forests', 'The forests & lakes layer — 18 reserve-forest and protected-lake polygons that were dead code in v1, now behind a working filter pill.');
+    const marker = page.locator('.leaflet-marker-icon').first();
+    if (await marker.count()) { await marker.click({ force: true }); await page.waitForTimeout(1500); }
+    await shot(page, 'map-popup', 'Sanctuary marker popup with a direct route into the property page.');
 
     await go(page, '/analytics');
-    await shot(page, 'analytics-edge-nature', 'The /analytics route (“Edge + Nature”) — the channel-partner positioning and the pre-investor phase explainer.');
-
-    await scrollTo(page, 1400);
-    await shot(page, 'analytics-scrolled', 'Analytics, scrolled — “Four things every property must pass”: forest adjacency, AQI under 25, design quality and a 45-minute commute, the bar every listing is screened against.');
-
-    await go(page, '/syl');
-    await shot(page, 'syl-residences', 'The /syl route — the dedicated MODCON SYL Residences page with its own gallery and interactive layout.');
+    await shot(page, 'analytics', 'Edge + Nature — channel-partner positioning and the pre-investor explainer.');
 
     await go(page, '/preinvestor-gold');
-    await shot(page, 'preinvestor-gold', 'The /preinvestor-gold route — the pre-investor tier and what early entry buys.');
+    await shot(page, 'preinvestor-gold', 'Pre-Investor Gold — the SYL phase roadmap.');
 
     await go(page, '/membership');
-    await shot(page, 'membership', 'The /membership route — tiers and the benefits attached to a signed-in membership.');
+    await shot(page, 'membership', 'Adviser membership application — phone number now actually persists with the lead (v1 dropped it).');
 
     await go(page, '/blog');
-    await shot(page, 'blog-index', 'The /blog route — the SEO article index rendered from the in-app content collection.');
+    await shot(page, 'blog-index', 'The Journal index — 10 articles, each a real page now.');
 
-    // ── Admin dashboard ─────────────────────────────────────────────────────
+    await go(page, '/blog/aqi-as-an-investment-signal');
+    await shot(page, 'blog-article', 'A journal article at its own URL with Article JSON-LD — v1 rendered posts only in a modal with no link, no SEO.');
+
+    // Auth modal
     await go(page, '/');
-    await click(page, ADMIN_BTN, { wait: 2000 });
-    await shot(page, 'admin-properties', 'Admin dashboard, Properties tab — Firestore-backed listings with live/draft toggles, edit and delete. Tab counters show how many documents sit behind each collection.', { expect: 'text=Admin Panel' });
+    await page.locator('nav button[aria-label="Sign in"]').click();
+    await page.waitForTimeout(1200);
+    await shot(page, 'auth-modal', 'The rebuilt sign-in modal — Google, email/password, phone OTP against the same live Firebase project.', { expect: 'text=Continue with Google' });
 
-    await click(page, 'button:text-matches("^Leads \\\\(\\\\d+\\\\)$")');
-    await shot(page, 'admin-leads', 'Admin dashboard, Leads tab — every capture point (property overlay, chatbot, map popup, sign-up) writes here through saveLead(), streamed live via onSnapshot.');
-
-    await click(page, 'button:text-matches("^News \\\\(\\\\d+\\\\)$")');
-    await shot(page, 'admin-newsletter', 'Admin dashboard, Newsletter tab — subscribers tagged by the surface that captured them (modal, inline, mobile_quick).');
-
-    await click(page, 'button:text-matches("^Users \\\\(\\\\d+\\\\)$")');
-    await shot(page, 'admin-users', 'Admin dashboard, Users tab — profiles written on first sign-in, including the silently captured geolocation and a Google Maps deep link per user.');
-
-    await click(page, 'button:text-matches("^Props \\\\(\\\\d+\\\\)$")', { wait: 800 });
-    await click(page, 'button:has-text("Add Property")', { wait: 1400 });
-    await shot(page, 'admin-property-form', 'Admin dashboard, property editor — the PropertyInput form that writes a new document into the properties collection and, once marked live, onto the public pages.');
+    // Groot
+    await page.locator('button[aria-label="Close"]').first().click();
+    await page.waitForTimeout(800);
+    await page.locator('button[aria-label="Chat with Groot"]').click();
+    await page.waitForTimeout(1400);
+    await shot(page, 'groot', 'Groot, the sanctuary AI advisor — replies now proxied through /api/chat so the knowledge base stays server-side.');
 
     await ctx.close();
   }
 
-  // ── Member session: non-admin chrome, concierge chatbot ───────────────────
+  // ── Desktop: admin (dev-only demo data — fictional records) ───────────────
   {
-    const { ctx, page } = await newSession(browser, { role: 'member' });
-
-    await go(page, '/');
-    await click(page, ACCOUNT_BTN, ACCOUNT);
-    await shot(page, 'account-drawer-member', 'The same account drawer for a non-admin member — the role line reads “Member” and the Admin Dashboard entry is gone, because it is gated on the signed-in email.');
-
-    await go(page, '/'); // reload rather than dismiss — the drawer overlays the chat launcher
-    await click(page, 'button.fixed.bottom-20', { wait: 1600 });
-    await shot(page, 'chatbot-member', 'The concierge chatbot open in a member session — answers are matched against the same sanctuary dataset the pages render from, and enquiries drop into the leads collection.');
-
+    const { ctx, page } = await mk(DESKTOP);
+    await go(page, '/admin', 3200);
+    await shot(page, 'admin-overview', 'Admin overview — live stat cards, 10-week capture chart and lead-source breakdown. All records shown are fictional demo data (DEMO_DATA dev flag).', { expect: 'text=Capture — last 10 weeks' });
+    await go(page, '/admin/leads', 2600);
+    await shot(page, 'admin-leads', 'Lead pipeline — status tracking (new → contacted → site visit → closed), filters and CSV export. Fictional demo records.');
+    await go(page, '/admin/properties', 2600);
+    await shot(page, 'admin-properties', 'Property manager — create, edit, publish/unpublish, delete. Live entries join the public portfolio.');
+    await go(page, '/admin/newsletter', 2600);
+    await shot(page, 'admin-newsletter', 'Newsletter subscribers with capture-source tags and CSV export. Fictional demo records.');
+    await go(page, '/admin/users', 2600);
+    await shot(page, 'admin-users', 'Registered users — profile, occupation/city, geolocation with a Maps deep link. Fictional demo records.');
     await ctx.close();
   }
 
-  // ── Member session, dark theme ────────────────────────────────────────────
+  // ── Mobile ────────────────────────────────────────────────────────────────
   {
-    const { ctx, page } = await newSession(browser, { role: 'member', dark: true });
-    await go(page, '/list');
-    await shot(page, 'dark-mode-sanctuaries', 'Dark theme, signed in — the preference persists in localStorage and toggles a class on <html>, so every token-driven colour flips at once.');
-    await ctx.close();
-  }
-
-  // ── Mobile member session ─────────────────────────────────────────────────
-  {
-    const { ctx, page } = await newSession(browser, { role: 'member', viewport: MOBILE });
+    const { ctx, page } = await mk(MOBILE);
     await go(page, '/');
-    await shot(page, 'mobile-home-signed-in', 'Mobile (390×844), signed in — the bottom tab bar replaces desktop navigation and the avatar stays in the top bar.');
-    await go(page, '/list');
-    await shot(page, 'mobile-sanctuaries', 'Mobile sanctuaries list — the same cards reflowed to a single column, member pricing still unlocked.');
-    await go(page, '/map', 4500);
-    await shot(page, 'mobile-map', 'Mobile map — sanctuary markers plus the metric strip pinned above the tab bar.');
-    await ctx.close();
-  }
-
-  // ── Signed-out session: the authentication entry points ───────────────────
-  {
-    const { ctx, page } = await newSession(browser, { role: null });
-
-    await go(page, '/');
-    await click(page, ACCOUNT_BTN, ACCOUNT);
-    await shot(page, 'account-drawer-signed-out', 'The signed-out account drawer — the state every screenshot above starts from, with the Sign In call to action.');
-
-    await click(page, 'button:has-text("Sign In")', { wait: 1600 });
-    await shot(page, 'auth-modal', 'The sign-in modal: Google, email/password and phone OTP, all three wired to Firebase Authentication.', { expect: 'text=Continue with Google' });
-
-    await click(page, 'button:has-text("Continue with Phone")', { wait: 1200 });
-    await shot(page, 'auth-phone-otp', 'Phone sign-in — the number is normalised to E.164 (+91 assumed for 10-digit input) before signInWithPhoneNumber, backed by an invisible reCAPTCHA verifier.');
-
-    await click(page, 'button:has-text("Continue with Email")', { wait: 1000 });
-    await click(page, 'button:has-text("Sign Up")', { wait: 800 });
-    const email = page.locator('#auth-email');
-    if (await email.count()) {
-      await email.fill('nikhil.varma@example.in');
-      const pwd = page.locator('#auth-password');
-      if (await pwd.count()) await pwd.fill('demo-password');
-      await shot(page, 'auth-email-signup', 'Email sign-up filled in — createUserWithEmailAndPassword runs, then the app immediately upserts a user profile and records a “New Sign-up” lead.');
-      await click(page, 'button:has-text("Create Account")', { wait: 3000 });
-    }
-    await shot(page, 'profile-capture-new-user', 'Straight after sign-up: the profile capture modal that writes name / occupation / city into the users collection and triggers the silent geolocation write.');
-
+    await shot(page, 'mobile-home', 'Mobile home — bottom tab bar and the responsive hero.');
+    await go(page, '/sanctuaries/agartha');
+    await shot(page, 'mobile-agartha', 'Mobile property page.');
+    await go(page, '/blog');
+    await shot(page, 'mobile-blog', 'Mobile journal index.');
     await ctx.close();
   }
 
   await browser.close();
-
   await writeFile(path.join(OUT, 'index.json'), JSON.stringify(shots, null, 2) + '\n');
-  console.log(`\n${shots.length} screenshots written to docs/screenshots/`);
+  console.log(`\n${shots.length} screenshots → docs/screenshots/`);
   if (warnings.length) {
-    console.log('\nWarnings:');
+    console.log('Warnings:');
     for (const w of [...new Set(warnings)]) console.log('  ! ' + w);
   }
 }
 
-main().catch(err => {
-  console.error(err);
-  process.exit(1);
-});
+main().catch(e => { console.error(e); process.exit(1); });

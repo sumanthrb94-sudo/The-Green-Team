@@ -1,4 +1,9 @@
-# The Green Team — Application Documentation
+# The Green Team — Application Documentation (v1)
+
+> **Historical document — this describes v1.** The application was rebuilt on
+> Next.js 15 in August 2026; v1's source now lives in [`legacy/`](../legacy/).
+> For the current architecture see the [README](../README.md). The screenshots
+> in `docs/screenshots/` have been regenerated for v2.
 
 Implementation walkthrough and screenshot record for **thegreenteam.in**, the
 channel-partner platform for forest-adjacent property near Hyderabad.

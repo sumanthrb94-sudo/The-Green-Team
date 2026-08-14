@@ -1,0 +1,16 @@
+rules_version = '2';
+
+// The Green Team — v2 security model.
+//
+// The web app no longer touches Firestore from the browser: every read and
+// write (leads, newsletter, profiles, properties, admin) goes through Next.js
+// server routes using the Admin SDK, which bypasses these rules. Client access
+// can therefore be denied outright — publish these rules in Firebase Console →
+// Firestore → Rules once v2 is deployed.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

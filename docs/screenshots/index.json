@@ -1,134 +1,122 @@
 [
   {
-    "file": "01-home-signed-in.jpg",
-    "caption": "Landing page inside an authenticated admin session — the navbar carries the ADMIN badge and the account avatar instead of a sign-in prompt."
+    "file": "01-home-hero.jpg",
+    "caption": "Home — serif hero over the forest backdrop with the KPI strip (server-rendered, real per-route SEO)."
   },
   {
-    "file": "02-home-ecosystem-pillars.jpg",
-    "caption": "Home, scrolled: the ecosystem pillars section that frames the AQI / noise / commute thesis."
+    "file": "02-home-what-we-do.jpg",
+    "caption": "How it works — find, verify, connect."
   },
   {
-    "file": "03-home-curated-sanctuaries.jpg",
-    "caption": "Home, curated sanctuaries. A signed-in user counts as subscribed, so member pricing renders unblurred with no newsletter gate."
+    "file": "03-home-sanctuaries.jpg",
+    "caption": "Curated portfolio cards — each links to a real /sanctuaries/[id] page (the dead “View Details” of v1 is gone)."
   },
   {
-    "file": "04-home-footer.jpg",
-    "caption": "Home footer — sitemap-style route links, contact channels and the newsletter capture that writes into the newsletter collection."
+    "file": "04-home-trust-journal.jpg",
+    "caption": "Trust signals (unmounted dead code in v1, now live) and the journal preview."
   },
   {
-    "file": "05-account-drawer-admin.jpg",
-    "caption": "Account drawer for the signed-in admin: identity block with the “Admin” role line, the Admin Dashboard entry, sanctuary shortcuts and sign-out."
+    "file": "05-home-footer.jpg",
+    "caption": "Newsletter capture and the footer agenda grid — the v1 dead “gallery” link is fixed."
   },
   {
-    "file": "06-sanctuaries-list.jpg",
-    "caption": "The /list route — all curated sanctuaries with their verified metrics, member price and CTA into the detail overlay."
+    "file": "06-agartha-header.jpg",
+    "caption": "MODCON Agartha property page — a real URL with its own metadata and Product JSON-LD."
   },
   {
-    "file": "07-property-detail-gallery.jpg",
-    "caption": "Property detail overlay for MODCON Agartha — header with member pricing, and the Gallery / Layout Plan / Invest tabs. 22 photos are served from the app’s own /public/gallery directory."
+    "file": "07-agartha-gallery.jpg",
+    "caption": "Gallery tab — all 23 photos served from the repo’s own compressed mirror (Wix CDN dependency removed)."
   },
   {
-    "file": "08-property-detail-invest.jpg",
-    "caption": "The Invest tab of the same overlay — plot economics, price per sq yd and the member band, unblurred because the session is authenticated."
+    "file": "08-agartha-layout.jpg",
+    "caption": "Interactive site plan — 36 plot dots on the official layout."
   },
   {
-    "file": "09-property-detail-layout.jpg",
-    "caption": "The Layout Plan tab — the interactive site layout with selectable plots rendered over the master plan."
+    "file": "09-agartha-plot-snapshot.jpg",
+    "caption": "Tapping a plot shows its investment snapshot — pre-launch vs today’s rate and the 18-month gain."
   },
   {
-    "file": "10-map-live.jpg",
-    "caption": "The /map route: Leaflet with the live AQI field, the RRR corridor ring, key junction markers and the three sanctuaries. The grey grid is a placeholder basemap — raster tiles are blocked in the capture sandbox."
+    "file": "10-agartha-invest.jpg",
+    "caption": "Invest tab — telemetry, the ₹8,500/sq yd price ladder, biomorphic add-on and WhatsApp CTAs."
   },
   {
-    "file": "11-map-marker-popup.jpg",
-    "caption": "A sanctuary marker popup on the map — summary card with a direct hand-off into the full property overlay."
+    "file": "11-syl-invest.jpg",
+    "caption": "SYL Residences Invest tab — pre-investor banner and the ₹4,499/SFT villament ladder. The /syl URL 301s here."
   },
   {
-    "file": "12-analytics-edge-nature.jpg",
-    "caption": "The /analytics route (“Edge + Nature”) — the channel-partner positioning and the pre-investor phase explainer."
+    "file": "12-dates-county-invest.jpg",
+    "caption": "Dates County Invest tab — RERA banner and the ₹18,000/sq yd table with the ₹90 L signature plot."
   },
   {
-    "file": "13-analytics-scrolled.jpg",
-    "caption": "Analytics, scrolled — “Four things every property must pass”: forest adjacency, AQI under 25, design quality and a 45-minute commute, the bar every listing is screened against."
+    "file": "13-map.jpg",
+    "caption": "The environmental-intelligence map: AQI field, ORR/RRR, sanctuary markers. Basemap tiles are a placeholder grid — the tile CDN is blocked in this sandbox."
   },
   {
-    "file": "14-syl-residences.jpg",
-    "caption": "The /syl route — the dedicated MODCON SYL Residences page with its own gallery and interactive layout."
+    "file": "14-map-forests.jpg",
+    "caption": "The forests & lakes layer — 18 reserve-forest and protected-lake polygons that were dead code in v1, now behind a working filter pill."
   },
   {
-    "file": "15-preinvestor-gold.jpg",
-    "caption": "The /preinvestor-gold route — the pre-investor tier and what early entry buys."
+    "file": "15-map-popup.jpg",
+    "caption": "Sanctuary marker popup with a direct route into the property page."
   },
   {
-    "file": "16-membership.jpg",
-    "caption": "The /membership route — tiers and the benefits attached to a signed-in membership."
+    "file": "16-analytics.jpg",
+    "caption": "Edge + Nature — channel-partner positioning and the pre-investor explainer."
   },
   {
-    "file": "17-blog-index.jpg",
-    "caption": "The /blog route — the SEO article index rendered from the in-app content collection."
+    "file": "17-preinvestor-gold.jpg",
+    "caption": "Pre-Investor Gold — the SYL phase roadmap."
   },
   {
-    "file": "18-admin-properties.jpg",
-    "caption": "Admin dashboard, Properties tab — Firestore-backed listings with live/draft toggles, edit and delete. Tab counters show how many documents sit behind each collection."
+    "file": "18-membership.jpg",
+    "caption": "Adviser membership application — phone number now actually persists with the lead (v1 dropped it)."
   },
   {
-    "file": "19-admin-leads.jpg",
-    "caption": "Admin dashboard, Leads tab — every capture point (property overlay, chatbot, map popup, sign-up) writes here through saveLead(), streamed live via onSnapshot."
+    "file": "19-blog-index.jpg",
+    "caption": "The Journal index — 10 articles, each a real page now."
   },
   {
-    "file": "20-admin-newsletter.jpg",
-    "caption": "Admin dashboard, Newsletter tab — subscribers tagged by the surface that captured them (modal, inline, mobile_quick)."
+    "file": "20-blog-article.jpg",
+    "caption": "A journal article at its own URL with Article JSON-LD — v1 rendered posts only in a modal with no link, no SEO."
   },
   {
-    "file": "21-admin-users.jpg",
-    "caption": "Admin dashboard, Users tab — profiles written on first sign-in, including the silently captured geolocation and a Google Maps deep link per user."
+    "file": "21-auth-modal.jpg",
+    "caption": "The rebuilt sign-in modal — Google, email/password, phone OTP against the same live Firebase project."
   },
   {
-    "file": "22-admin-property-form.jpg",
-    "caption": "Admin dashboard, property editor — the PropertyInput form that writes a new document into the properties collection and, once marked live, onto the public pages."
+    "file": "22-groot.jpg",
+    "caption": "Groot, the sanctuary AI advisor — replies now proxied through /api/chat so the knowledge base stays server-side."
   },
   {
-    "file": "23-account-drawer-member.jpg",
-    "caption": "The same account drawer for a non-admin member — the role line reads “Member” and the Admin Dashboard entry is gone, because it is gated on the signed-in email."
+    "file": "23-admin-overview.jpg",
+    "caption": "Admin overview — live stat cards, 10-week capture chart and lead-source breakdown. All records shown are fictional demo data (DEMO_DATA dev flag)."
   },
   {
-    "file": "24-chatbot-member.jpg",
-    "caption": "The concierge chatbot open in a member session — answers are matched against the same sanctuary dataset the pages render from, and enquiries drop into the leads collection."
+    "file": "24-admin-leads.jpg",
+    "caption": "Lead pipeline — status tracking (new → contacted → site visit → closed), filters and CSV export. Fictional demo records."
   },
   {
-    "file": "25-dark-mode-sanctuaries.jpg",
-    "caption": "Dark theme, signed in — the preference persists in localStorage and toggles a class on <html>, so every token-driven colour flips at once."
+    "file": "25-admin-properties.jpg",
+    "caption": "Property manager — create, edit, publish/unpublish, delete. Live entries join the public portfolio."
   },
   {
-    "file": "26-mobile-home-signed-in.jpg",
-    "caption": "Mobile (390×844), signed in — the bottom tab bar replaces desktop navigation and the avatar stays in the top bar."
+    "file": "26-admin-newsletter.jpg",
+    "caption": "Newsletter subscribers with capture-source tags and CSV export. Fictional demo records."
   },
   {
-    "file": "27-mobile-sanctuaries.jpg",
-    "caption": "Mobile sanctuaries list — the same cards reflowed to a single column, member pricing still unlocked."
+    "file": "27-admin-users.jpg",
+    "caption": "Registered users — profile, occupation/city, geolocation with a Maps deep link. Fictional demo records."
   },
   {
-    "file": "28-mobile-map.jpg",
-    "caption": "Mobile map — sanctuary markers plus the metric strip pinned above the tab bar."
+    "file": "28-mobile-home.jpg",
+    "caption": "Mobile home — bottom tab bar and the responsive hero."
   },
   {
-    "file": "29-account-drawer-signed-out.jpg",
-    "caption": "The signed-out account drawer — the state every screenshot above starts from, with the Sign In call to action."
+    "file": "29-mobile-agartha.jpg",
+    "caption": "Mobile property page."
   },
   {
-    "file": "30-auth-modal.jpg",
-    "caption": "The sign-in modal: Google, email/password and phone OTP, all three wired to Firebase Authentication."
-  },
-  {
-    "file": "31-auth-phone-otp.jpg",
-    "caption": "Phone sign-in — the number is normalised to E.164 (+91 assumed for 10-digit input) before signInWithPhoneNumber, backed by an invisible reCAPTCHA verifier."
-  },
-  {
-    "file": "32-auth-email-signup.jpg",
-    "caption": "Email sign-up filled in — createUserWithEmailAndPassword runs, then the app immediately upserts a user profile and records a “New Sign-up” lead."
-  },
-  {
-    "file": "33-profile-capture-new-user.jpg",
-    "caption": "Straight after sign-up: the profile capture modal that writes name / occupation / city into the users collection and triggers the silent geolocation write."
+    "file": "30-mobile-blog.jpg",
+    "caption": "Mobile journal index."
   }
 ]
