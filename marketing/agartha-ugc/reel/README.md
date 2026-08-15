@@ -15,39 +15,43 @@ audio — different clip, different voiceover, different purpose. Both are
 
 ## `agartha-reel-directed.mp4` / `-captioned.mp4` — the main reel
 
-25.5s, built from **5 real Gemini-generated clips run at generous, natural
-lengths** (roughly 3.6–5.9s each) cut together as straight transitions,
-synced to the original 23.96s voiceover
-(`naturepropertybuntystylevoiceoverenIN.wav`) plus a 1.9s brand outro.
+25.5s, synced to the original 23.96s voiceover
+(`naturepropertybuntystylevoiceoverenIN.wav`) plus a 1.9s brand outro. Every
+shot and cut point is content-matched to the line playing over it.
 
-| Time | Shot | Source |
-| --- | --- | --- |
-| 0.0–4.73s | Arrival — thatched villa | real motion |
-| 4.73–8.30s | Wide establishing | real motion |
-| 8.30–12.67s | Bamboo arch path | real motion |
-| 12.67–18.60s | Aerial drone reveal | real motion |
-| 18.60–23.60s | Pergola courtyard | real motion |
-| 23.60–25.50s | Brand outro | — |
+| Time | Line | Shot | Source |
+| --- | --- | --- | --- |
+| 0.0–2.6s | "I keep coming back to this one." | Arrival — thatched villa | real motion |
+| 2.6–4.73s | "Forty minutes out of Hyderabad," | Wide establishing | real motion |
+| 4.73–8.30s | "loudest thing here is the birds." | Bamboo arch path | real motion |
+| 8.30–12.67s | "This forest was already here — they built around it." | Aerial drone reveal | real motion |
+| 12.67–18.60s | "roof is actually alive... grass growing on top of the house." | Living roof (photo, zoomed) | still |
+| 18.60–21.37s | "Come see it yourself, at this hour." | Golden-hour fire pit (photo, zoomed) | still |
+| 21.37–23.60s | "Message us, we'll walk you through it." | Pergola courtyard | real motion |
+| 23.60–25.50s | (voice out) | Brand outro | — |
 
-An earlier version sliced these same 5 clips into short, line-matched
-slivers (2–6s each, picked so each shot's exact duration matched one
-specific spoken line). That was rejected — the clips are each ~10s of real
-footage, more than enough to run as generous, natural-feeling transitions
-without slicing them down to match every sentence. This version does that:
-every shot is real motion end to end, no shot is confined to a single line,
-and there's no fabricated content standing in for a shot that doesn't
-exist. Two lines in the audio ("that roof is actually alive, that's grass
-growing on top of the house") no longer have a shot built specifically for
-them — whichever real clip is playing when that line lands is what's on
-screen, same as any other line in the same shot's span. That's a
-deliberate trade for "real footage only, generously used" over "a bespoke
-shot for every line."
+Four real Gemini clips, at generous line-length durations, plus a slow zoom
+on the two reference photos for the two lines no real clip covers — the
+living roof and the golden-hour fire pit. There's a fifth real clip (a
+person talking to camera in front of the green-roof house) and it is
+**deliberately excluded** — no human-on-camera footage goes in this reel,
+per standing instruction; the photo-zoom fills that gap instead of the
+excluded clip.
 
-The `motion/` folder (HTML/CSS motion graphics for the living-roof and
-golden-hour beats, built earlier when there was no real footage for those
-angles) is no longer used in this cut — kept on disk since it's still a
-valid technique if a future edit wants a bespoke shot for a beat with no
-real video.
+**Arrival clip fix:** earlier builds converted this from its landscape
+source by scaling it down and filling the empty top/bottom with a blurred
+copy of itself — technically 1080×1920, but visibly a smaller landscape
+video pillarboxed inside a portrait frame. Rebuilt as a direct vertical
+crop of the landscape source instead (`crop=405:720`, centered, then
+scaled up) — full-bleed sharp portrait content, no blur bars. The crop
+window also happens to fall entirely to the left of where this source's
+Gemini watermark sits, so no logo badge is needed on this shot at all.
+
+The two photo-zoom beats are a plain, confident Ken Burns push (scale
+1.0→~1.15 over the shot, `zoompan`) — no grain, no vignette pass. An
+earlier version of these two shots used a fancier HTML/CSS motion-graphic
+treatment (grain, warm-gradient pulse); that's still in `motion/` if a
+future edit wants it back, but it's not what's in the current cut.
 
 ## `agartha-aerial-reveal.mp4` — the aerial shot, on its own
 
@@ -67,9 +71,8 @@ so the shot keeps breathing until the 1.9s brand outro closes it out at
 ## Both videos
 
 Every real clip carries a Green Team logo badge over its Gemini watermark,
-sized and positioned to match the watermark's own footprint. The arrival
-clip's badge sits at a different screen position than the other four
-(925,1105 vs. 865,1683) — it's a blur-composited landscape source with its
-watermark in a different spot, not an inconsistency.
+sized and positioned to match the watermark's own footprint — except the
+arrival clip, whose watermark falls entirely outside its crop window (see
+above), so it needs no badge at all.
 
 No pricing, currency figures, or RERA numbers anywhere in either video.
