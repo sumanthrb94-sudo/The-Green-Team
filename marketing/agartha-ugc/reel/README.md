@@ -5,25 +5,55 @@ audio — different clip, different voiceover, different purpose. Both are
 1080×1920 (portrait), 30fps, and both now carry: real 0.2s cross-dissolve
 transitions between shots (not hard cuts), an HTML/CSS motion-graphics
 treatment (Web Animations API + headless-Chromium capture, not a flat
-`zoompan`) wherever there's no real video to show, and a mixed SFX bed
-(wind ambience + transition whooshes, both CC0, sourced from GitHub).
+`zoompan`) wherever there's no real video to show, a mixed SFX bed (all CC0,
+sourced from GitHub), and a 4s animated CTA outro.
 
 ## Files
 
 | File | What it is |
 | --- | --- |
-| `agartha-reel-directed.mp4` | The main 25.5s reel — no captions. |
+| `agartha-reel-directed.mp4` | The main 27.6s reel — no captions. |
 | `agartha-reel-directed-captioned.mp4` | Same reel with captions burned in. |
-| `agartha-aerial-reveal.mp4` | Standalone 18.1s piece: the aerial drone shot + its own voiceover + outro. |
+| `agartha-aerial-reveal.mp4` | Standalone 20.2s piece: the aerial drone shot + its own voiceover + outro. |
+| `outro-animated.mp4` | The 4s animated CTA outro on its own, for reuse on any future film. |
 | `captions-exact.srt` | Exact-timed captions for the main reel only. |
 | `motion/` | HTML/CSS motion-graphics sources + the Playwright capture script. |
-| `sfx/` | The two CC0 source SFX files, licenses noted below. |
+| `sfx/` | The CC0 source SFX files, licenses noted below. |
+
+## The outro — `motion/outro-motion.html`
+
+4 seconds, appended to both films, and the only thing in either that asks for
+anything. Built the same way as the other motion graphics: every element is
+driven from one clock via the Web Animations API and captured frame-by-frame,
+so a frame grabbed mid-entrance shows a real half state.
+
+Beats, each with its own sound cue fired at that element's own animation
+delay rather than at the scene start:
+
+| t | Element | Motion | SFX |
+| --- | --- | --- | --- |
+| 0.10s | Logo mark | scale 0.42→1 with overshoot, −9° settle | swoosh |
+| 0.55s | Leaf veins | stroke draws itself in | twip |
+| 0.75s | "The Green Team" | letterspacing 0.52em→0.18em, fades up | blip |
+| 1.15s | Rule | draws outward from centre | swash |
+| 1.45s | CTA pill | scale-in, then a slow glow-pulse that never stops | pop |
+| 2.05s | "or DM us to book a site visit" | fades up | blip |
+| 2.55s | `thegreenteam.in` | letterspacing settles, fades up | ping |
+
+The pill's glow keeps pulsing through the hold so the eye returns to the CTA
+rather than settling. **No price, rate or figure appears anywhere on the card**
+— the whole point is that the number is the reply, not the creative. Two
+routes out: comment for pricing, or DM for a site visit.
+
+To change the CTA wording, edit the `.pill` / `.sub` text in
+`motion/outro-motion.html`, re-render 120 frames at 30fps, and re-encode —
+the SFX cue times only need touching if you move an element's delay.
 
 ## `agartha-reel-directed.mp4` / `-captioned.mp4` — the main reel
 
-25.5s, synced to the original 23.96s voiceover
-(`naturepropertybuntystylevoiceoverenIN.wav`) plus a 1.9s brand outro. Every
-shot and cut point is content-matched to the line playing over it.
+27.6s — 23.6s of content plus the 4s animated outro — synced to the 23.96s
+voiceover (`naturepropertybuntystylevoiceoverenIN.wav`). Every shot and cut
+point is content-matched to the line playing over it.
 
 | Time | Line | Shot | Source |
 | --- | --- | --- | --- |
@@ -34,7 +64,7 @@ shot and cut point is content-matched to the line playing over it.
 | 12.67–18.60s | "roof is actually alive... grass growing on top of the house." | Living roof (HTML motion graphic) | still + animation |
 | 18.60–21.37s | "Come see it yourself, at this hour." | Golden-hour fire pit (HTML motion graphic) | still + animation |
 | 21.37–23.60s | "Message us, we'll walk you through it." | Pergola courtyard | real motion |
-| 23.60–25.50s | (voice out) | Brand outro | — |
+| 23.60–27.60s | (voice out) | Animated CTA outro | motion graphic |
 
 Four real Gemini clips, at generous line-length durations, plus the two
 lines no real clip covers — living roof, golden-hour fire pit — filled by
@@ -77,11 +107,12 @@ that source's Gemini watermark sits, so this shot carries no logo badge.
 
 ## `agartha-aerial-reveal.mp4` — the aerial shot, on its own
 
-18.1s. One continuous real Gemini clip — an overhead drone shot pulling
-back from a fire-pit courtyard to reveal the full twin-cottage property
-inside its forest clearing — paired with its own voiceover
-(`naturepropertyfourshotbuntystyleenIN_1.wav`, 16.2s), written specifically
-to narrate this shot. Standalone piece, not part of the main reel above.
+20.2s — 16.2s of content plus the 4s animated outro. One continuous real
+Gemini clip, an overhead drone shot pulling back from a fire-pit courtyard
+to reveal the full twin-cottage property inside its forest clearing, paired
+with its own voiceover (`naturepropertyfourshotbuntystyleenIN_1.wav`,
+16.2s), written specifically to narrate this shot. Standalone piece, not
+part of the main reel above.
 
 The real clip is 10.0s; the voiceover runs 16.2s. The remaining 6.2s is
 `motion/aerial-ext-motion.html` — the clip's own last frame, animated with
@@ -93,25 +124,47 @@ motion rather than a freeze. Verified frame-by-frame that the handoff at
 
 ## SFX — both videos
 
-A low ambient wind bed under the full runtime (fades in/out, ~-20dB
-under the voice) plus a short whoosh right at the hard cut into the brand
-outro. Both sources are CC0, found by searching GitHub specifically (not
-freesound.org, which isn't directly fetchable here without API auth):
+A low ambient wind bed under the full runtime (fades in/out, well under the
+voice) plus the seven element-cued sounds in the outro. All sources are CC0,
+found by searching GitHub specifically (not freesound.org, which isn't
+directly fetchable here without API auth):
 
 - `sfx/wind.ogg` — from
   [`github.com/Muges/ambientsounds`](https://github.com/Muges/ambientsounds),
   originally by felix.blume on Freesound, CC0, no attribution required.
-- `sfx/ambi_swoosh.flac` — from Sonic Pi's sample library
+- `sfx/ambi_swoosh.flac`, `perc_swash.flac`, `elec_blip.flac`,
+  `elec_ping.flac`, `elec_twip.flac`, `elec_pop.flac` — from Sonic Pi's
+  sample library
   ([`sonic-pi-net/sonic-pi`](https://github.com/sonic-pi-net/sonic-pi)),
   public domain per that repo's own licensing.
 
 Looked specifically for CC0 birdsong on GitHub to match "the loudest thing
 here is the birds" — didn't find a verifiably-licensed one there, so it's
 not in the mix. Wind is the only ambient bed; don't add unlicensed audio
-later without checking it as carefully as these two were.
+later without checking it as carefully as these were.
 
-Mixed with `amix` + `alimiter`; both final files peak under -10dBFS, no
-clipping.
+### `amix` averages — always pass `normalize=0`
+
+The first SFX pass shipped with the voiceover roughly 10 dB too quiet, and
+it was not obvious from looking at the filtergraph. `amix` **divides every
+input by the number of inputs** unless told otherwise, so adding a wind bed
+and an SFX track as inputs 2 and 3 silently pulled the voice down to a third
+of its level — the raw voice file peaks at −1.0 dBFS but was landing at
+−16.2 dBFS in the delivered MP4, and the outro sounds were down at −30 dBFS,
+effectively inaudible.
+
+Every mix here now uses `amix=...:normalize=0` so inputs sum at the level
+set, with `alimiter` catching the peaks. Current levels, measured from the
+encoded files:
+
+| | main reel | aerial |
+| --- | --- | --- |
+| voice region peak | −6.7 dBFS | — |
+| outro region peak | −5.3 dBFS | — |
+| overall peak | −0.7 dBFS | −4.4 dBFS |
+
+If you add another element to a mix, re-measure — don't assume the voice
+survived it.
 
 ## Both videos
 
