@@ -1,55 +1,46 @@
-# Agartha 20s reel — assembled cut
+# Agartha reel — assembled cuts
 
-Built from the two Gemini-generated clips you supplied, combined into a single
-20-second vertical (1080×1920) ad with a brand outro.
+Built from the two Gemini-generated clips you supplied, combined into a
+vertical (1080×1920) ad with a brand outro. There are two generations here —
+use the voiceover set, it supersedes the first pass.
 
-## Files
+## Use these — real voiceover, retimed to it (24.6s)
 
 | File | What it is |
 | --- | --- |
-| `agartha-reel-20s.mp4` | The assembled 20s reel, no captions. Clip 1 (0–9s) + Clip 2 (9–18s) + 2s brand outro (18–20s). Original ambient audio from both source clips is kept and cross-faded. |
-| `agartha-reel-20s-captioned.mp4` | Same cut with burned-in captions of the voiceover script, safe-margined for Reels/TikTok/Shorts UI. |
-| `captions.srt` | The caption file on its own, editable in any editor. |
+| `agartha-reel-voiceover.mp4` | Clip 1 (0–10s) + Clip 2 (10–20s) + brand outro (20–24.6s), audio track is **your real recorded voiceover** — no captions. |
+| `agartha-reel-voiceover-captioned.mp4` | Same cut with captions burned in at **exact** timing, taken from the real audio's silence gaps, not an estimate. Safe-margined for Reels/TikTok/Shorts UI. |
+| `captions-exact.srt` | The exact-timed caption file on its own. |
 
-## How it was built
+The outro grew from 2s to 4.6s to give the CTA line ("Message us, we'll walk
+you through it") room to land over the brand card, matching how the real
+recording actually paces out — the original 18s budget was a guess before any
+real audio existed; the real file ran 23.96s.
 
-1. Your two uploads were each normalized to 1080×1920 and trimmed to 9s:
-   - the landscape clip got a blurred-fill background so nothing was cropped
-     or stretched;
-   - the portrait clip was scaled and center-cropped to fill the frame.
-2. A 2-second brand outro was generated from `logo-the-green-team-original.svg`
-   — the leaf mark scales and fades in on the site's actual primary green
-   (`#2d3a1d`) — and appended.
-3. Captions were burned in at an **estimated** timing: durations are
-   distributed across the script by character count, which approximates
-   natural speech pacing but is not a real transcript alignment.
+### How the exact timing was built
 
-## The one honest limitation
+`ffmpeg silencedetect` was run directly on your uploaded `.wav` to find every
+real pause in the recording. Long gaps (≥0.85s) reliably line up with the
+periods in the script; shorter gaps line up with commas and the dash. Gaps
+under 0.35s inside a line are breaths, not caption breaks, and are folded into
+whichever line they sit inside. Every caption boundary below is a timestamp
+that actually exists in your audio — this is not the character-count estimate
+from the first pass.
 
-This container's network access is proxied and blocks the model-hosting
-endpoints, so no local transcription tool could load — the captions here are
-timed by estimate, not by aligning to the real spoken audio.
+## First pass — superseded, kept for reference
 
-**Two ways to get exact sync**, both quick:
-
-1. **Fastest** — drop `agartha-reel-20s.mp4` (or the ElevenLabs voiceover
-   take) into CapCut / Premiere / any editor with auto-captions. Both
-   transcribe and time-align in under a minute and let you nudge word-by-word.
-2. Re-export the ElevenLabs voiceover from its flow, run it through any
-   transcription service you have access to (browser-based Whisper, an
-   external API), and I can rebuild `captions.srt` from the real timestamps
-   if you paste them back.
+| File | What it is |
+| --- | --- |
+| `agartha-reel-20s.mp4` | Original 20s cut, original clip ambience, no voiceover. |
+| `agartha-reel-20s-captioned.mp4` | Same cut with captions at **estimated** timing (character-count spread over a guessed 18s window). |
+| `captions.srt` | The estimated caption file. |
 
 ## Voiceover
 
-The spoken track was generated separately via ElevenLabs (voice: *Halle —
-Natural Lifestyle Influencer*, chosen for its lifestyle-reel register) from
-the exact script burned into the captions here. Open the flow to listen,
-regenerate with a different voice, or download the audio: it renders as an
-editable canvas rather than a plain file, so grab it from there and drop it
-under `agartha-reel-20s.mp4` in your editor — the visual cut has no
-voiceover baked in on purpose, so you can swap voices without re-rendering
-video.
+Spoken track is your own uploaded recording — `naturepropertybuntystylevoiceoverenIN.wav`,
+23.96s, 24kHz mono. Muxed in as the sole audio track (original clip ambience
+was dropped for the voiceover cuts, so the voice sits clean with nothing
+competing against it).
 
 No pricing, currency figures, or RERA numbers appear anywhere in frame or in
 the script — the only number in the whole reel is the spoken "forty minutes."
