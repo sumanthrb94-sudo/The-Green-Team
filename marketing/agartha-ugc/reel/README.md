@@ -11,6 +11,27 @@ laid end to end. No Ken Burns over a still anywhere in this version.
 | `agartha-reel-directed.mp4` | The reel — no captions. |
 | `agartha-reel-directed-captioned.mp4` | Same reel with captions burned in at exact timing (see below). |
 | `captions-exact.srt` | The exact-timed caption file on its own. |
+| `agartha-reel-16s.mp4` | **Stopgap only** — see below. Not content-matched. |
+
+## `agartha-reel-16s.mp4` — mechanical compression, not a re-direct
+
+A new voiceover (`naturepropertyfourshotbuntystyleenIN_1.wav`, 16.2s) came in
+without its script text, and there's no working transcription tool in this
+sandbox to read it back (Hugging Face, which faster-whisper needs, isn't
+reachable through the proxy here). Without knowing what's actually being
+said, the shots can't be re-matched to the lines the way the 25.5s cut above
+was — so this file is *not* that. It's the same 7 property shots + outro,
+each one trimmed down proportionally (roughly ×0.69) and the cut points
+snapped to the nearest real silence gap detected in the new audio's
+waveform (`silencedetect`, same method as the captions), so at least no cut
+lands mid-word. But shot identity and order are unchanged from the 25.5s
+edit — this file doesn't know whether that's still the right order for
+whatever this new recording actually says.
+
+Once the script text is available (paste it, or confirm it's a trimmed
+version of the original 9-line script), this should be rebuilt properly:
+re-picked shots per line, cuts at the real gaps that actually separate those
+lines, the same way `agartha-reel-directed.mp4` was built.
 
 ## The edit — shot chosen because the line names it
 
