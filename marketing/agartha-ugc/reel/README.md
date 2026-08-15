@@ -15,8 +15,11 @@ sourced from GitHub), and a 4s animated CTA outro.
 | `agartha-reel-directed.mp4` | The main 27.6s reel — no captions. |
 | `agartha-reel-directed-captioned.mp4` | Same reel with captions burned in. |
 | `agartha-aerial-reveal.mp4` | Standalone 20.2s piece: the aerial drone shot + its own voiceover + outro. |
-| `outro-animated.mp4` | The 4s animated CTA outro on its own, for reuse on any future film. |
-| `captions-exact.srt` | Exact-timed captions for the main reel only. |
+| `agartha-forest-boundary.mp4` | Campaign Film 5, 37s — no captions. |
+| `agartha-forest-boundary-captioned.mp4` | Same film with captions burned in. |
+| `outros/` | The 4s animated CTA outro in six CTA words — drop-in swappable. |
+| `captions-exact.srt` | Exact-timed captions for the main reel. |
+| `captions-forest.srt` | Exact-timed captions for Film 5. |
 | `motion/` | HTML/CSS motion-graphics sources + the Playwright capture script. |
 | `sfx/` | The CC0 source SFX files, licenses noted below. |
 
@@ -45,9 +48,54 @@ rather than settling. **No price, rate or figure appears anywhere on the card**
 — the whole point is that the number is the reply, not the creative. Two
 routes out: comment for pricing, or DM for a site visit.
 
-To change the CTA wording, edit the `.pill` / `.sub` text in
-`motion/outro-motion.html`, re-render 120 frames at 30fps, and re-encode —
-the SFX cue times only need touching if you move an element's delay.
+### Six CTA variants — `outros/`
+
+`outros/outro-{planted,farmed,water,edible,forest,price}.mp4`. Identical
+card, identical animation, identical SFX bed — only the word inside the pill
+differs, so they're drop-in swappable in an edit without re-timing anything.
+Five match the campaign films' comment words; `price` is the generic
+high-intent one for any film outside the campaign.
+
+Built by `build_outros.sh` (in the scratchpad, reproducible from
+`motion/outro-motion.html`): the script sed-swaps only the pill word, asserts
+the swap actually landed before rendering, then renders 120 frames and muxes
+the shared SFX. To add a seventh word, add it to that loop.
+
+To change anything else about the card, edit `motion/outro-motion.html`,
+re-render 120 frames at 30fps, and re-encode — the SFX cue times only need
+touching if you move an element's delay.
+
+## `agartha-forest-boundary.mp4` — campaign Film 5
+
+37s: 33s of voice plus the 4s FOREST outro. First film built from
+`campaign/PERMACULTURE-CAMPAIGN.md`. Five scenes, five different real clips,
+0.2s cross-dissolve between each, hard cut to the outro.
+
+| Time | Line | Clip |
+| --- | --- | --- |
+| 0.0–5.8s | "Most projects clear the forest, then plant saplings and call it green." | Bamboo path — dense wild forest, nothing built |
+| 5.8–14.0s | "Agartha sits on the Narsapur forest boundary. Native dry deciduous, already standing." | Aerial drone — the property inside its forest |
+| 14.0–23.1s | "The permaculture design works with that forest instead of replacing it. Paths bend around what was already growing." | Arrival — curving stone path, trees left standing |
+| 23.1–28.7s | "Stand in it and the loudest thing all day is birds." | Wide establishing — still, quiet |
+| 28.7–33.0s | "So — trees, or a forest?" | Pergola courtyard — ordered, warm, the visual opposite of scene 1 |
+| 33.0–37.0s | (voice out) | FOREST outro |
+
+**The cut points were not chosen — they were found.** `silencedetect` on the
+recording returns four pauses far longer than the rest (1.06s, 1.00s, 1.14s,
+1.25s), and they fall exactly on the script's four blank lines. The read
+matched the written scene structure on its own, so every cut sits in the
+middle of a real pause. Caption cues in `captions-forest.srt` come from the
+same pass.
+
+The read came in at 33s for 58 words — about 1.8 words/sec, much slower than
+the 2.25 measured from earlier files, because this one is delivered with long
+deliberate pauses. Worth knowing when writing the next script: **at this pace
+a 58-word script makes a 37s film, not a 30s one.** Either write shorter or
+accept the longer runtime.
+
+Scene 3 (arrival) is the landscape-sourced clip, cropped vertically. Its
+crop window excludes that source's Gemini watermark, verified at three
+timestamps, so it carries no badge — the other four do.
 
 ## `agartha-reel-directed.mp4` / `-captioned.mp4` — the main reel
 
