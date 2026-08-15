@@ -1,42 +1,52 @@
-# Agartha reel — property only, no human on camera
+# Agartha reel — directed cut, matched to the voiceover
 
-24.6s vertical (1080×1920), your real voiceover, zero live-action human. Every
-earlier cut that included a person is deleted from this folder, not just
-superseded — the second Gemini clip showed a man standing static in frame
-while unrelated audio played over him, which read as broken lip-sync because
-it was: nothing was ever syncing his mouth to anything. Rather than try to
-fake that, the human clip is gone and replaced with property-only motion.
+25.5s vertical (1080×1920). Every cut lands on what the line playing at that
+moment is actually about — this is an edit, not a montage of pretty shots
+laid end to end.
 
 ## Files
 
 | File | What it is |
 | --- | --- |
-| `agartha-reel-nohuman.mp4` | The reel — no captions. |
-| `agartha-reel-nohuman-captioned.mp4` | Same reel with captions burned in at exact timing (see below). |
+| `agartha-reel-directed.mp4` | The reel — no captions. |
+| `agartha-reel-directed-captioned.mp4` | Same reel with captions burned in at exact timing (see below). |
 | `captions-exact.srt` | The exact-timed caption file on its own. |
 
-## Timeline (24.6s total)
+## The edit — shot chosen because the line names it
 
-| Time | Content |
-| --- | --- |
-| 0–10s | Clip 1 as originally supplied — the arrival/property render, no person in it. |
-| 10–20s | **New** — a 6-shot "hyper motion" Ken Burns sequence over your Agartha stills (`marketing/agartha-ugc/01–06*.jpg`), alternating zoom-in/zoom-out with a slight pan on each, ~1.67s per still. Property only. |
-| 20–24.6s | Brand outro — the Green Team leaf mark scaling in on the site's actual primary green (`#2d3a1d`). |
+| Time | Line | On screen | Why this shot |
+| --- | --- | --- | --- |
+| 0.0–2.6s | "I keep coming back to this one." | Clip 1 — real motion, arrival | Opens on actual camera movement, not a still — strongest hook |
+| 2.6–4.7s | "Forty minutes out of Hyderabad," | Wide establishing | Location beat |
+| 4.7–10.7s | "...loudest thing is the birds." / "This forest was already here —" | Bamboo arch path | Both lines are about the forest — one shot held through both, not two arbitrary cuts |
+| 10.7–18.6s | "they built around it." / "That roof is actually alive," / "...grass growing on top of the house." | **Hero shot — the living roof** | Three consecutive lines all describe this exact image. Held ~8s with a continuous slow push-in — this is the reveal, it earns the screen time |
+| 18.6–21.4s | "Come see it yourself, at this hour." | Golden-hour fire pit | "This hour" is the line's whole joke — has to be golden hour on screen when it lands |
+| 21.4–23.6s | "Message us, we'll walk you through it." | Pergola courtyard | Intimate closing beat |
+| 23.6–25.5s | (voice out) | Brand outro | Tail lands after the CTA, not competing with it |
+
+Cut points sit in the real silence gaps between lines (from the same
+`silencedetect` pass used for the captions) — cuts happen where the voice
+actually pauses, not on an arbitrary clock.
+
+## Earlier attempts, now removed
+
+Two prior generations lived in this folder and are gone, not just
+superseded:
+
+1. A cut that included a second Gemini clip — a man standing static in
+   frame while the voiceover played over him. Removed entirely; nothing
+   about that clip was ever going to sync.
+2. A "hyper motion" cut that swapped his slot for six stills at fixed,
+   even durations, alternating zoom in/out with no relationship to the
+   audio. Property-only, but still just wallpaper — the shot changed
+   because a clock ran out, not because the sentence changed. This file
+   replaces it: every shot length here comes from how long its line
+   actually takes to say, not a fixed grid.
 
 ## Audio
 
 Your real uploaded recording (`naturepropertybuntystylevoiceoverenIN.wav`,
-23.96s) is the sole audio track, padded with silence to the tail. Nothing was
-time-stretched or reworked to fit a video — the video was rebuilt to fit the
-real audio.
-
-## Captions — exact, not estimated
-
-Timing comes from `ffmpeg silencedetect` run directly on your `.wav`: long
-gaps (≥0.85s) line up with the periods in the script, shorter ones with the
-commas and the dash, and anything under 0.35s is a breath folded into
-whichever line it sits inside. Every boundary in `captions-exact.srt` is a
-timestamp that exists in the real recording.
+23.96s) is the sole audio track, padded with silence to the 25.5s tail.
 
 No pricing, currency figures, or RERA numbers anywhere in frame or in the
 script — the only number in the whole reel is the spoken "forty minutes."
