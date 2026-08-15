@@ -39,25 +39,50 @@ function rateLimited(ip: string): boolean {
   return recent.length > RATE_LIMIT.max;
 }
 
+/**
+ * Rejects cross-origin callers without guessing which hostname the site is
+ * served on. The primary test is origin-host === request-host, which is true for
+ * every same-origin fetch on any domain — apex, www, a preview URL or a future
+ * rebrand. An earlier version compared against SITE_URL alone and 403'd every
+ * visitor on www.thegreenteam.in.
+ */
 function allowedOrigin(req: NextRequest): boolean {
   const origin = req.headers.get('origin');
   if (!origin) return true; // same-origin fetches and server-side callers omit it
+
+  let originHost: string;
   try {
-    const host = new URL(origin).host;
-    return (
-      host === new URL(SITE_URL).host ||
-      host.endsWith('.vercel.app') ||
-      host.startsWith('localhost') ||
-      host.startsWith('127.0.0.1')
-    );
+    originHost = new URL(origin).host.toLowerCase();
   } catch {
     return false;
   }
+
+  const selfHost = req.headers.get('host')?.toLowerCase();
+  if (selfHost && originHost === selfHost) return true;
+
+  let siteHost = '';
+  try {
+    siteHost = new URL(SITE_URL).host.toLowerCase();
+  } catch {
+    /* SITE_URL is a constant; this cannot realistically throw */
+  }
+  const bare = siteHost.replace(/^www\./, '');
+
+  return (
+    originHost === bare ||
+    originHost === `www.${bare}` ||
+    originHost.endsWith('.vercel.app') ||
+    originHost.startsWith('localhost') ||
+    originHost.startsWith('127.0.0.1')
+  );
 }
 
 export async function POST(req: NextRequest) {
   if (!allowedOrigin(req)) {
-    return Response.json({ error: 'forbidden' }, { status: 403 });
+    return Response.json(
+      { error: 'forbidden', message: GROOT_FALLBACK, href: WHATSAPP.generic },
+      { status: 403 }
+    );
   }
 
   const ip =
@@ -67,7 +92,11 @@ export async function POST(req: NextRequest) {
 
   if (rateLimited(ip)) {
     return Response.json(
-      { error: 'Too many messages. Please continue on WhatsApp.', href: WHATSAPP.generic },
+      {
+        error: 'rate_limited',
+        message: 'That is a lot of questions in a short window. An adviser can pick this up on WhatsApp right away.',
+        href: WHATSAPP.generic,
+      },
       { status: 429 }
     );
   }
@@ -76,7 +105,7 @@ export async function POST(req: NextRequest) {
   try {
     body = await req.json();
   } catch {
-    return Response.json({ error: 'bad request' }, { status: 400 });
+    return Response.json({ error: 'bad_request', message: GROOT_FALLBACK }, { status: 400 });
   }
 
   const raw = (body ?? {}) as Record<string, unknown>;
@@ -98,7 +127,7 @@ export async function POST(req: NextRequest) {
       : undefined;
 
   const question = [...history].reverse().find(m => m.role === 'user')?.text ?? '';
-  if (!question) return Response.json({ error: 'no question' }, { status: 400 });
+  if (!question) return Response.json({ error: 'no_question', message: GROOT_FALLBACK }, { status: 400 });
 
   const encoder = new TextEncoder();
   const stream = new ReadableStream<Uint8Array>({

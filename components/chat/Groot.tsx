@@ -188,8 +188,14 @@ export function Groot() {
         });
 
         if (!res.ok || !res.body) {
-          const body = (await res.json().catch(() => ({}))) as { error?: string; href?: string };
-          apply({ type: 'error', text: body.error ?? GROOT_FALLBACK }, replyId);
+          const body = (await res.json().catch(() => ({}))) as {
+            error?: string;
+            message?: string;
+            href?: string;
+          };
+          // `error` is a machine code ('forbidden', 'rate_limited') — never show
+          // it to a visitor. Only `message` is written for human eyes.
+          apply({ type: 'error', text: body.message ?? GROOT_FALLBACK }, replyId);
           apply(
             {
               type: 'action',
