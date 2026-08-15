@@ -38,12 +38,31 @@ If a spec changes in those files, the affected script changes too.
 - Clip prompts: no people, no faces, no hands, no text, no logos, no readable
   screens. Objects and spaces only.
 
-## Read pace
+## Read pace and length
 
 The client reads at **~2.25 words/sec**, measured from their two delivered
 files (56 words / 23.96s and ~36 words / 16.2s) — noticeably faster than the
-skill's 2.05 default. Scripts below are 70–75 words, landing ~31–33s. Recheck
-this against each new recording and adjust.
+skill's 2.05 default. Recheck against each new recording and adjust.
+
+**Target ~58–62 words ≈ 26–28s of voice.** The animated outro adds 4s, so a
+finished film lands at ~30–32s. Writing to the skill's raw 70-word target
+would push these past 35s.
+
+## The outro carries the CTA — scripts must not
+
+`marketing/agartha-ugc/reel/outro-animated.mp4` ends every film with
+**COMMENT "PRICE"** and *or DM us to book a site visit* on screen, held for
+4s with a pulsing button. So none of the scripts below end with a spoken
+"Comment X" line — the voice saying what the card already says is exactly
+the never-show-the-same-words-twice failure the format is built to avoid.
+
+Every script therefore **ends on its question** and hands off to the outro.
+The question is still the engagement driver; the card is still the
+conversion. They just don't overlap.
+
+Per-film comment tracking is lost by using one shared CTA word. If that
+matters more than the duplication, re-render the outro per film with a
+different word in the `.pill` — cheap, it's one text edit and a re-render.
 
 ## Shared palette line — append to every clip prompt
 
@@ -67,15 +86,12 @@ The trees go in before you sign.
 Over a hundred varieties per plot.
 Drip lines already running. Roots already holding the soil.
 
-That's not landscaping. That's permaculture — the farm gets designed before
-it gets sold.
+That's permaculture — the farm gets designed before it gets sold.
 
 Plant a farm, or inherit one?
-
-Comment PLANTED — I'll send you the layout.
 ```
 
-~70 words · ~31s
+~61 words · ~27s voice · ~31s with outro
 
 | Slot | Job | Clip |
 | --- | --- | --- |
@@ -103,15 +119,14 @@ Someone there on the days you're not.
 The land keeps working whether or not you make it out that weekend.
 
 Farmed, or just owned?
-
-Comment FARMED — I'll send you how the estate runs it.
 ```
 
-~72 words · ~32s
+~63 words · ~28s voice · ~32s with outro
 
-**Compliance note:** the CTA deliberately says "how the estate runs it" —
-the reply is where the paid-service terms get explained. The script never
-says the management is included or free.
+**Compliance note:** the script says the land "keeps working" and never that
+the management is included or free. `faq.ts` is explicit that it carries
+developer-set terms and cost — that conversation belongs in the DM reply,
+not in the film.
 
 | Slot | Job | Clip |
 | --- | --- | --- |
@@ -134,17 +149,14 @@ Water decides whether farmland stays farmland.
 
 At Agartha the drip lines are laid before handover.
 Every plot. Not a borewell and good luck.
-Water to the roots, not into the air.
 
-It's the least romantic part of permaculture and the part that decides
-everything else.
+The least romantic part of permaculture — and the part that decides
+everything.
 
 A water plan, or a water hope?
-
-Comment WATER — I'll send you the site plan.
 ```
 
-~74 words · ~33s
+~59 words · ~26s voice · ~30s with outro
 
 | Slot | Job | Clip |
 | --- | --- | --- |
@@ -164,19 +176,16 @@ A garden you look at is a hobby. A garden you eat from is something else.
 
 Agartha plots come with vegetable beds and a spiral herbal garden.
 
-Herbs at the door.
 Vegetables you didn't drive anywhere for.
 A farm-to-table kitchen for the evenings you don't cook.
 
-Permaculture calls it an edible forest. It just means the land feeds the
+Permaculture calls that an edible forest. It just means the land feeds the
 people living on it.
 
 Do you grow anything you actually eat?
-
-Comment EDIBLE — I'll send you the planting list.
 ```
 
-~75 words · ~33s
+~64 words · ~28s voice · ~32s with outro
 
 | Slot | Job | Clip |
 | --- | --- | --- |
@@ -195,21 +204,22 @@ this one is about what was *left alone*.
 ```
 Most projects clear the forest, then plant saplings and call it green.
 
-Agartha sits on the Narsapur forest boundary — native dry deciduous,
+Agartha sits on the Narsapur forest boundary. Native dry deciduous,
 already standing.
 
 The permaculture design works with that forest instead of replacing it.
 Paths bend around what was already growing.
 
-Every other film in this series is about what we planted.
-This one is about what we didn't touch.
+Stand in it and the loudest thing all day is birds.
 
-Trees, or a forest?
-
-Comment FOREST — I'll send you the walkthrough.
+So — trees, or a forest?
 ```
 
-~72 words · ~32s
+~58 words · ~26s voice · ~30s with outro
+
+**This is the one to record first.** All three clip slots are already
+covered by existing footage, so it can go from voiceover to finished film
+without waiting on any generation.
 
 | Slot | Job | Clip |
 | --- | --- | --- |
@@ -234,13 +244,24 @@ Recommended, if they don't all ship at once:
 4. **Film 3** — water; hardest clip to make look good, needs macro work.
 5. **Film 4** — edible; the warmest, best as a closer if 5 runs earlier.
 
-The five CTA words are all different (PLANTED · FARMED · WATER · EDIBLE ·
-FOREST), so comment volume per film is separately measurable. That's the
-point of varying them.
+All five currently share the outro's one CTA word, so comment volume tells
+you the campaign is working but not which film did the work. If you want
+per-film attribution, re-render the outro with a different word per film
+(PLANTED · FARMED · WATER · EDIBLE · FOREST) — it's a one-line text edit in
+`motion/outro-motion.html` plus a re-render, and the SFX cues don't move.
 
 ## Per-film build loop
 
-Per the skill: record the voiceover against the exact script text above,
-generate the two or three new clips, send both back. Then transcribe → align
-→ render → mix → encode → verify, and ship with the check numbers (A/B/D/E/F/G
-+ peak level) measured from the encoded MP4.
+Record the voiceover against the exact script text above, generate whatever
+new clips that film needs, send both back. Then: transcribe → align → render
+→ mix → encode → verify, append `reel/outro-animated.mp4`, and ship with the
+check numbers measured from the encoded MP4.
+
+Two things to carry into every build, both learned the hard way here:
+
+- **`amix` needs `normalize=0`.** Without it, every input is divided by the
+  input count, so adding an SFX bed silently drops the voice ~10 dB. Measure
+  the voice region of the finished MP4, not just the overall peak.
+- **Chain crossfade offsets off fixed target durations**, not off each merge
+  step's measured duration, or the total drifts long and needs a corrective
+  trim. Both traps are written up in `reel/README.md`.
