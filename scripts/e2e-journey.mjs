@@ -190,25 +190,36 @@ async function main() {
     ? ok('ADMIN-SIDE DATA: lead created with phone + budget bracket')
     : fail('lead missing or missing budget/source');
 
-  // 6. Groot chat
+  // 6. Groot chat — must answer from the index, not from memory. The old version
+  // of this check passed on the canned fallback, so it could not tell a working
+  // bot from a broken one.
   await u.goto(`${BASE}/`, { waitUntil: 'load' });
   await u.locator('button[aria-label="Chat with Groot"]').click();
   await wait(1200);
-  await u.locator('input[placeholder="Ask Groot about sanctuaries…"]').fill('What is the price of Agartha plots and how do I book a site visit?');
+  await u.locator('input[placeholder="Ask Groot about sanctuaries…"]').fill('What is the price of Agartha plots per square yard?');
   await u.locator('button[aria-label="Send"]').click();
-  const grootReplied = await u
-    .locator('.max-w-\\[85\\%\\] >> nth=2')
-    .waitFor({ timeout: 40000 })
+
+  const panel = u.getByRole('dialog');
+  const answered = await panel
+    .getByText(/8,?500|68\.7/)
+    .first()
+    .waitFor({ timeout: 60000 })
     .then(() => true)
     .catch(() => false);
-  await wait(800);
+  await wait(600);
   await shot(u, 'user-groot-chat');
-  if (grootReplied) {
-    const lastMsg = await u.locator('[class*="rounded-tl-sm"]').last().innerText().catch(() => '');
-    lastMsg.includes('I am Groot')
-      ? ok('Groot replied in persona', lastMsg.slice(0, 60) + '…')
-      : ok('Groot replied (fallback path — upstream LLM unreachable from sandbox)');
-  } else fail('Groot did not reply');
+
+  if (!answered) {
+    const shown = await panel.innerText().catch(() => '');
+    fail('Groot did not produce a grounded answer', shown.slice(-160));
+  } else {
+    ok('Groot answered with a real figure from the knowledge index');
+    const shown = await panel.innerText().catch(() => '');
+    /I am Groot\./.test(shown) ? fail('old persona tic still present') : ok('adviser voice, no persona tic');
+    /can'?t reach my knowledge base/i.test(shown)
+      ? fail('served the degraded fallback')
+      : ok('answered from Gemini, not the fallback path');
+  }
 
   // ════════════════ PERSONA B — THE ADMIN ════════════════
   console.log('\n════ PERSONA B — Admin (real minted session) ════');

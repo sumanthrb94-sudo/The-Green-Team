@@ -1,6 +1,7 @@
 import 'server-only';
 import { Timestamp } from 'firebase-admin/firestore';
 import { adminDb } from '@/lib/firebase/admin';
+import type { ConversationDoc, ToolName } from '@/lib/rag/types';
 import { demoEnabled, DEMO_LEADS, DEMO_NEWSLETTER, DEMO_USERS, DEMO_PROPERTIES } from './demo-data';
 
 /** Serialized (RSC-safe) admin views over the live Firestore collections. */
@@ -116,4 +117,42 @@ export async function fetchProperties(): Promise<AdminProperty[]> {
       return { ...x, id: d.id, createdAt: iso(x.createdAt) } as AdminProperty;
     })
     .sort((a, b) => (b.createdAt ?? '').localeCompare(a.createdAt ?? ''));
+}
+
+export type AdminConversation = ConversationDoc & { id: string };
+
+/** The chat writer may stamp times as Timestamps or as ISO strings; both must leave here as strings. */
+const isoOr = (v: unknown, fallback: string): string =>
+  v instanceof Timestamp ? v.toDate().toISOString() : typeof v === 'string' ? v : fallback;
+
+export async function getConversations(limit = 100): Promise<AdminConversation[]> {
+  if (demoEnabled()) return []; // no fictional transcripts exist, and demo runs without Firestore credentials
+  const snap = await adminDb().collection('conversations').orderBy('updatedAt', 'desc').limit(limit).get();
+  return snap.docs.map(d => {
+    const x = d.data();
+    const startedAt = isoOr(x.startedAt, '');
+    const messages: Record<string, unknown>[] = Array.isArray(x.messages) ? x.messages : [];
+    const actions: Record<string, unknown>[] = Array.isArray(x.actions) ? x.actions : [];
+    return {
+      id: d.id,
+      startedAt,
+      updatedAt: isoOr(x.updatedAt, startedAt),
+      userName: x.userName ?? undefined,
+      uid: x.uid ?? undefined,
+      messages: messages.map(m => ({
+        role: m.role === 'model' ? ('model' as const) : ('user' as const),
+        text: typeof m.text === 'string' ? m.text : '',
+        at: isoOr(m.at, startedAt),
+      })),
+      actions: actions.map(a => ({
+        tool: a.tool as ToolName,
+        ok: a.ok !== false,
+        args: (a.args ?? {}) as Record<string, string>,
+        at: isoOr(a.at, startedAt),
+      })),
+      leadIds: Array.isArray(x.leadIds) ? (x.leadIds as string[]) : [],
+      status: (x.status as ConversationDoc['status']) ?? 'ok',
+      turns: typeof x.turns === 'number' ? x.turns : messages.filter(m => m.role === 'user').length,
+    };
+  });
 }

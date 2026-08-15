@@ -8,7 +8,10 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "lint": "next lint",
-    "screenshots": "node scripts/capture-screenshots.mjs"
+    "screenshots": "node scripts/capture-screenshots.mjs",
+    "kb:index": "tsx --conditions=react-server --env-file=.env.local scripts/build-kb-index.ts",
+    "e2e:chat": "node --env-file=.env.local scripts/e2e-chat.mjs",
+    "kb:eval": "tsx --conditions=react-server --env-file=.env.local scripts/eval-retrieval.ts"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -23,6 +26,7 @@
     "react-hook-form": "^7.72.0",
     "react-leaflet": "^5.0.0",
     "recharts": "^2.15.0",
+    "server-only": "^0.0.1",
     "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
@@ -33,6 +37,7 @@
     "@types/react-dom": "^19.0.0",
     "playwright": "^1.62.1",
     "tailwindcss": "^4.1.14",
+    "tsx": "^4.23.12",
     "typescript": "~5.8.2"
   }
 }

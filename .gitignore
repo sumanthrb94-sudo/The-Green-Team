@@ -16,3 +16,4 @@ docs/internal/
 .next/
 next-env.d.ts
 .e2e-shots/
+*.tsbuildinfo
