@@ -8,9 +8,17 @@
 import { useState } from 'react';
 import { Check, Phone } from 'lucide-react';
 import { INVESTMENT_BRACKETS } from '@/lib/data/contact';
+import { track, markConverted } from '@/lib/analytics';
 import { cn } from '@/lib/utils';
 
-export function AdviserCallForm({ compact = false }: { compact?: boolean }) {
+export function AdviserCallForm({
+  compact = false,
+  ctaLabel = 'Request Adviser Call',
+}: {
+  compact?: boolean;
+  /** Overridden by the adviser_cta experiment; see lib/experiments.ts. */
+  ctaLabel?: string;
+}) {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [bracket, setBracket] = useState('');
@@ -34,6 +42,10 @@ export function AdviserCallForm({ compact = false }: { compact?: boolean }) {
         }),
       });
       if (!res.ok) throw new Error();
+      // Only after the lead is actually persisted — a conversion fired on
+      // click would inflate the number with failed submits.
+      track.lead('adviser-call', bracket || undefined);
+      markConverted('lead');
       setDone(true);
     } catch {
       setError('Something went wrong — please try again or WhatsApp us.');
@@ -104,7 +116,7 @@ export function AdviserCallForm({ compact = false }: { compact?: boolean }) {
         className="w-full flex items-center justify-center gap-2.5 py-5 rounded-2xl bg-[#c8a951] text-[#1a1a0a] text-[10px] uppercase tracking-[0.45em] font-bold hover:bg-[#d9bb62] transition-all disabled:opacity-60"
       >
         <Phone className="w-4 h-4" />
-        {loading ? 'Sending…' : 'Request Adviser Call'}
+        {loading ? 'Sending…' : ctaLabel}
       </button>
       <p className="text-center text-[10px] text-white/30">
         Free · We call within 24 hours · No spam
@@ -113,8 +125,14 @@ export function AdviserCallForm({ compact = false }: { compact?: boolean }) {
   );
 }
 
-/** Full-width dark section wrapper used on home and /adviser-call. */
-export function AdviserCallSection() {
+/**
+ * Full-width dark section wrapper used on home and /adviser-call.
+ *
+ * `variant` comes from the adviser_cta experiment, resolved server-side by the
+ * page so the correct label is in the first HTML response — no flicker.
+ */
+export function AdviserCallSection({ variant = 'control' }: { variant?: string }) {
+  const outcome = variant === 'outcome';
   return (
     <section id="adviser-call" className="bg-[#141c0f] py-24 px-6 scroll-mt-14">
       <div className="max-w-xl mx-auto text-center mb-10">
@@ -122,14 +140,22 @@ export function AdviserCallSection() {
           One call. Every answer.
         </span>
         <h2 className="font-serif text-4xl md:text-6xl font-light text-white leading-tight">
-          Request your <em className="text-[#c8a951]">adviser call.</em>
+          {outcome ? (
+            <>
+              Get the <em className="text-[#c8a951]">real numbers.</em>
+            </>
+          ) : (
+            <>
+              Request your <em className="text-[#c8a951]">adviser call.</em>
+            </>
+          )}
         </h2>
         <p className="mt-5 text-white/45 font-light">
           Pricing, plots, site visits — a private call within 24 hours.
         </p>
       </div>
       <div className="max-w-xl mx-auto">
-        <AdviserCallForm />
+        <AdviserCallForm ctaLabel={outcome ? 'Get Pricing & Availability' : 'Request Adviser Call'} />
       </div>
     </section>
   );

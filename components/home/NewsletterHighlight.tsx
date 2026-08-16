@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Check } from 'lucide-react';
+import { track, markConverted } from '@/lib/analytics';
 
 export function NewsletterHighlight() {
   const [email, setEmail] = useState('');
@@ -20,6 +21,8 @@ export function NewsletterHighlight() {
         body: JSON.stringify({ email, source: 'inline' }),
       });
       if (!res.ok) throw new Error();
+      track.subscribe('inline');
+      markConverted('subscribe');
       setDone(true);
       try {
         localStorage.setItem('gt_subscribed', 'true');

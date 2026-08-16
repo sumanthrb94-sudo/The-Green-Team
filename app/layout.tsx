@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter, Manrope, Cormorant_Garamond } from 'next/font/google';
 import { AuthProvider } from '@/components/auth/AuthProvider';
+import { Analytics } from '@/components/analytics/Analytics';
 import { SITE_URL, BUSINESS } from '@/lib/data/contact';
 import './globals.css';
 
@@ -51,6 +52,11 @@ export const metadata: Metadata = {
     images: [`${SITE_URL}/agartha-render.jpg`],
   },
   icons: { icon: '/favicon.svg' },
+  // Set NEXT_PUBLIC_GSC_VERIFICATION to the token Search Console gives you for
+  // the HTML-tag method. Omit it entirely if the property is verified by DNS.
+  ...(process.env.NEXT_PUBLIC_GSC_VERIFICATION
+    ? { verification: { google: process.env.NEXT_PUBLIC_GSC_VERIFICATION } }
+    : {}),
   manifest: '/site.webmanifest',
   other: {
     'geo.region': 'IN-TG',
@@ -81,6 +87,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <AuthProvider>{children}</AuthProvider>
+        <Analytics />
       </body>
     </html>
   );

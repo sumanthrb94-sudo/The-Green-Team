@@ -9,6 +9,8 @@ import { Gallery } from '@/components/property/Gallery';
 import { LayoutPlan } from '@/components/property/LayoutPlan';
 import { InvestPanel } from '@/components/property/InvestPanel';
 import { Footer } from '@/components/Footer';
+import { ReviewList } from '@/components/reviews/ReviewList';
+import { getApprovedReviews, aggregateRating } from '@/lib/server/reviews';
 import { SITE_URL } from '@/lib/data/contact';
 
 interface Props {
@@ -43,6 +45,9 @@ export default async function SanctuaryPage({ params }: Props) {
   const s = await getPropertyById(id);
   if (!s) notFound();
 
+  const reviews = await getApprovedReviews(id);
+  const rating = aggregateRating(reviews);
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -56,6 +61,8 @@ export default async function SanctuaryPage({ params }: Props) {
       availability: 'https://schema.org/InStock',
       seller: { '@type': 'RealEstateAgent', name: 'The Green Team' },
     },
+    // Only present when real approved reviews exist — see lib/server/reviews.ts
+    ...(rating ? { aggregateRating: rating } : {}),
     additionalProperty: [
       { '@type': 'PropertyValue', name: 'AQI', value: s.aqi },
       { '@type': 'PropertyValue', name: 'Ambient noise', value: `${s.noise} dB` },
@@ -184,6 +191,8 @@ export default async function SanctuaryPage({ params }: Props) {
           </div>
         </div>
       </section>
+
+      <ReviewList reviews={reviews} />
 
       <Footer />
     </>
