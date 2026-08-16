@@ -157,24 +157,51 @@ const METRIC_STRIP = [
 
 export default function SanctuaryMap() {
   const [ready, setReady] = useState(false);
-  type BaseMode = 'dark' | 'satellite' | 'light';
-  const BASE_TILES: Record<BaseMode, { url: string; attribution: string; label: string; filter?: string }> = {
+  type BaseMode = 'dark' | 'satellite' | 'terrain' | 'light';
+
+  /**
+   * Base layers, all free and correctly attributed.
+   *
+   * The satellite layer used to point at `mt1.google.com/vt/` — Google's
+   * undocumented internal tile server. That is not a public API: scraping it
+   * breaks the Maps terms of service and can be cut off without notice, and
+   * labelling it "© Google Maps" did not make it licensed. Replaced with Esri
+   * World Imagery, which is free to use with attribution and is the standard
+   * satellite basemap in the Leaflet ecosystem.
+   *
+   * Terrain is new — for a brand selling forest-adjacent land, showing canopy
+   * and elevation is more use than a plain road map.
+   */
+  const BASE_TILES: Record<
+    BaseMode,
+    { url: string; attribution: string; label: string; maxZoom: number }
+  > = {
     dark: {
       url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
-      attribution: '© OpenStreetMap contributors © CARTO',
+      attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
       label: 'Dark',
+      maxZoom: 20,
     },
     satellite: {
-      url: 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
-      attribution: '© Google Maps',
+      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+      attribution: 'Imagery &copy; Esri, Maxar, Earthstar Geographics',
       label: 'Satellite',
+      maxZoom: 19,
+    },
+    terrain: {
+      url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+      attribution: '&copy; OpenStreetMap contributors, SRTM | &copy; OpenTopoMap (CC-BY-SA)',
+      label: 'Terrain',
+      maxZoom: 17,
     },
     light: {
       url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png',
-      attribution: '© OpenStreetMap contributors © CARTO',
+      attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
       label: 'Light',
+      maxZoom: 20,
     },
   };
+  const BASE_ORDER: BaseMode[] = ['dark', 'satellite', 'terrain', 'light'];
   const [baseMode, setBaseMode] = useState<BaseMode>('dark');
   const [zoom, setZoom] = useState(10);
   const [pulse, setPulse] = useState(0);
@@ -258,8 +285,9 @@ export default function SanctuaryMap() {
           <span className="w-px h-4 bg-white/10" />
           <button
             onClick={() =>
-              setBaseMode(m => (m === 'dark' ? 'satellite' : m === 'satellite' ? 'light' : 'dark'))
+              setBaseMode(m => BASE_ORDER[(BASE_ORDER.indexOf(m) + 1) % BASE_ORDER.length])
             }
+            aria-label={`Base map: ${BASE_TILES[baseMode].label}. Tap to change.`}
             className="flex items-center gap-1.5 text-[9px] uppercase tracking-[0.3em] font-bold text-white/60 hover:text-white transition-colors"
           >
             <Layers className="w-3.5 h-3.5" /> {BASE_TILES[baseMode].label}
@@ -308,6 +336,10 @@ export default function SanctuaryMap() {
           key={baseMode}
           url={BASE_TILES[baseMode].url}
           attribution={BASE_TILES[baseMode].attribution}
+          // Each provider stops at a different level; without this Leaflet
+          // requests tiles that do not exist and the map goes blank on zoom-in.
+          maxNativeZoom={BASE_TILES[baseMode].maxZoom}
+          maxZoom={20}
         />
 
         {/* AQI heat field */}

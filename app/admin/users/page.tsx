@@ -41,7 +41,7 @@ export default async function AdminUsersPage() {
               </div>
               {u.lat !== undefined && u.lng !== undefined && (
                 <a
-                  href={`https://maps.google.com/?q=${u.lat},${u.lng}`}
+                  href={`https://www.openstreetmap.org/?mlat=${u.lat}&mlon=${u.lng}#map=14/${u.lat}/${u.lng}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex-shrink-0 flex items-center gap-1 px-2.5 py-1.5 bg-primary/10 text-primary text-[8px] font-bold uppercase tracking-widest rounded-full hover:bg-primary/20 transition-all"

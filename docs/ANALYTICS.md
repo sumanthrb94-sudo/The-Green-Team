@@ -130,3 +130,41 @@ Source files in `public/` went 41.5 MB → 12.6 MB.
 **Run `npm run optimize:images:write` after adding any image.** A new file
 without variants still works — the loader passes anything missing from the
 manifest straight through — but it ships at full size to every device.
+
+## Map tiles
+
+`components/map/SanctuaryMap.tsx` is Leaflet, with four base layers. All free,
+all correctly attributed, none requiring an API key or a billing account.
+
+| Layer | Source | Licence | Native max zoom |
+| --- | --- | --- | --- |
+| Dark | CARTO dark_all | OSM contributors © CARTO | 20 |
+| Satellite | Esri World Imagery | © Esri, Maxar, Earthstar Geographics | 19 |
+| Terrain | OpenTopoMap | CC-BY-SA, OSM + SRTM | 17 |
+| Light | CARTO Voyager | OSM contributors © CARTO | 20 |
+
+The satellite layer previously pointed at `mt1.google.com/vt/lyrs=s`, which is
+**Google's undocumented internal tile server, not a public API**. Scraping it
+breaks the Maps terms of service and can be cut off without warning; the
+`© Google Maps` attribution string did not make it licensed. It is now Esri
+World Imagery — free with attribution, and the standard satellite basemap in
+the Leaflet ecosystem.
+
+Terrain was added because for a brand selling forest-adjacent land, canopy and
+elevation say more than a road map does.
+
+`maxNativeZoom` is set per layer because each provider stops at a different
+level. Without it Leaflet requests tiles that do not exist and the map goes
+blank when a visitor zooms past the provider's limit; with it, Leaflet upscales
+the last real tile instead.
+
+Leaflet's attribution control is left enabled deliberately — Esri and
+OpenTopoMap both require visible attribution.
+
+The admin Users tab links out to OpenStreetMap rather than Google Maps.
+
+**Not verifiable from the build sandbox:** its proxy blocks every tile host,
+including the CARTO ones already live in production. Layer switching, request
+URLs and hosts were verified in a headless browser (correct hosts requested, no
+call to any Google endpoint), but the imagery itself has to be eyeballed on a
+real deploy.
