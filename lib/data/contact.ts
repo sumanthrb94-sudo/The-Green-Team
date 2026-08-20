@@ -48,6 +48,16 @@ export const INVESTMENT_BRACKETS = [
   'Prefer not to say',
 ] as const;
 
-/** Agartha pricing history (₹/sq yd) — used in invest panels and Groot. */
-export const AGARTHA_OLD_RATE = 6199; // VIP pre-launch rate (2 yrs ago)
-export const AGARTHA_NOW_RATE = 8500; // current rate
+/**
+ * Agartha pricing (₹/sq yd) — used in invest panels and Groot.
+ * Per MODCON's 2026 price-projection deck: launched 2024 at ₹6,200, now
+ * ₹8,500, developer-projected ₹10,000 by 2028.
+ *
+ * The same deck prints "90.48% in 18 months" next to those two numbers, but
+ * ₹6,200 → ₹8,500 is +37.1%. We publish the figure its own numbers support,
+ * not the headline — a wrong appreciation claim is the one number a buyer
+ * will check.
+ */
+export const AGARTHA_OLD_RATE = 6200; // 2024 launch rate
+export const AGARTHA_NOW_RATE = 8500; // current rate (2026)
+export const AGARTHA_PROJECTED_RATE = 10000; // developer projection for 2028

@@ -1,6 +1,15 @@
 /**
- * MODCON Agartha interactive site-plan data — hotspots and the 36 plot dots,
- * positioned (x%, y%) against the official FINAL-LAYOUT site plan image.
+ * MODCON Agartha interactive site-plan data — hotspots and the 37 plot dots,
+ * positioned (x%, y%) against `public/agartha-master-plan.webp`.
+ *
+ * Source of truth: the client's `Agartha_Final_layout.pdf` master plan
+ * (ARQEN Design Studio, drawing A001), exported to WebP by cropping the
+ * drawing area out of the A3 sheet. Every plot number and area below is read
+ * off that drawing — do not adjust a size without a newer layout to read it
+ * from.
+ *
+ * This replaced an earlier 36-plot schedule whose sizes and arrangement no
+ * longer matched the issued plan.
  */
 
 export interface HotspotStat { label: string; value: string }
@@ -16,102 +25,126 @@ export interface Hotspot {
 }
 export interface PlotDot { id: number; sqYds: number; x: number; y: number }
 
+/** 1 acre as stated on the master plan for plots 3 and 31. */
+export const ACRE_SQ_YDS = 4840;
+
 export const AGARTHA_HOTSPOTS: Hotspot[] = [
   {
-    id: 'amenity-core', num: 1, x: 52, y: 68,
-    label: '36,000 Sq Ft Clubhouse',
-    tag: '5 Premium Amenities',
-    detail: "The 36,000 sq ft heart of Agartha. 5 premium amenities: a resort-style aquatic pool, fully-equipped gym, kayaking lake, farm-to-table restaurant, and children's play area. Staycation villas for weekend escapes — without leaving the forest.",
-    stats: [{ label: 'Clubhouse', value: '36,000 sq ft' }, { label: 'Amenities', value: '5 Premium' }, { label: 'Access', value: 'Residents + guests' }],
+    id: 'amenity-core', num: 1, x: 56, y: 62,
+    label: 'Agartha Resort & Clubhouse',
+    tag: '2 Acres of Amenity',
+    detail:
+      'Two of the twenty-five acres are given over to the resort and clubhouse: earthen retreats, a farm-to-table restaurant, a yoga and wellness centre, a Tulum-style gym in wood and stone, a banquet hall, and a natural bio-pool cleaned by biological filtration rather than chemicals.',
+    stats: [
+      { label: 'Resort Area', value: '2 of 25 acres' },
+      { label: 'Pool', value: 'Natural bio-filtered' },
+      { label: 'Dining', value: 'Farm-to-table' },
+    ],
   },
   {
-    id: 'forest-buffer', num: 2, x: 8, y: 40,
-    label: 'Narsapur Forest Buffer',
+    id: 'forest-buffer', num: 2, x: 5, y: 33,
+    label: 'Narsapur Forest Boundary',
     tag: 'AQI 12',
-    detail: 'Direct boundary with the Narsapur forest reserve. AQI 12 — one of the cleanest micro-climates in the Hyderabad metro. Native bird corridors, natural white noise, and a living green lung at your doorstep.',
-    stats: [{ label: 'AQI', value: '12 — Pristine' }, { label: 'Noise', value: '18 dB' }, { label: 'Forest', value: 'Native Dry Deciduous' }],
+    detail:
+      'Direct boundary with the Narsapur forest reserve — native dry deciduous woodland that was standing before the layout was drawn. Native bird corridors, natural white noise, and 15 minutes to Narsapur Urban Park.',
+    stats: [
+      { label: 'AQI', value: '12 — Pristine' },
+      { label: 'Noise', value: '18 dB' },
+      { label: 'Urban Park', value: '15 min' },
+    ],
   },
   {
-    id: 'goshala', num: 3, x: 36, y: 82,
+    id: 'goshala', num: 3, x: 34, y: 8,
     label: 'Goshala & Organic Farm',
     tag: 'Farm-to-Table',
-    detail: 'An on-site Goshala with integrated animal husbandry for holistic farming. Each plot is pre-planted with 100+ tree varieties, advanced drip irrigation, vegetable beds, and a spiral herbal garden — your private edible forest.',
-    stats: [{ label: 'Trees / Plot', value: '100+ varieties' }, { label: 'Irrigation', value: 'Drip system' }, { label: 'Farming', value: 'Permaculture' }],
+    detail:
+      'An on-site Goshala with integrated animal husbandry feeding the soil back. Edible landscapes are developed on permaculture principles — a food forest of fruit, vegetables and herbs in your own backyard, designed to work with natural systems so it needs less maintenance and fewer inputs.',
+    stats: [
+      { label: 'Farming', value: 'Permaculture' },
+      { label: 'Backyards', value: 'Edible food forest' },
+      { label: 'Livestock', value: 'On-site Goshala' },
+    ],
   },
   {
-    id: 'premium-corner', num: 4, x: 15, y: 33,
-    label: 'Premium Corner — Plot 3',
-    tag: '4,800 Sq Yds · ₹4.08 Cr',
-    detail: 'The largest plot in Agartha. Corner positioning on the forest boundary gives maximum green frontage and the greatest separation from neighbours. At ₹8,500/sq yd: ₹4.08 Cr.',
-    stats: [{ label: 'Size', value: '~4,800 sq yds' }, { label: 'Price', value: '~₹4.08 Cr' }, { label: 'Frontage', value: 'Forest boundary' }],
+    id: 'premium-corner', num: 4, x: 6, y: 23,
+    label: 'Plot 3 — One Acre',
+    tag: '1 Acre · Forest Edge',
+    detail:
+      'One of two full-acre parcels on the plan (the other is Plot 31). Its western edge is the forest boundary itself, which gives it the greatest green frontage and the most separation from any neighbour.',
+    stats: [
+      { label: 'Size', value: '1 acre (~4,840 sq yds)' },
+      { label: 'Frontage', value: 'Forest boundary' },
+      { label: 'Full acres', value: 'Plots 3 & 31' },
+    ],
   },
   {
-    id: 'plot-community', num: 5, x: 62, y: 48,
-    label: '36-Plot Private Community',
-    tag: 'From ₹68.7 L',
-    detail: '36 unique farm plots across 25 acres — each pre-planted and drip-irrigated. Sizes from 808 to 4,800 sq yds at ₹8,500/sq yd. Near RRR, 40 mins from Financial District. Winner: Best Eco-Friendly Project 2024.',
-    stats: [{ label: 'Total Area', value: '25 Acres' }, { label: 'Starting', value: '₹68.7 L' }, { label: 'Rate', value: '₹8,500/sq yd' }],
+    id: 'plot-community', num: 5, x: 47, y: 37,
+    label: '37-Plot Farmhouse Community',
+    tag: 'From ₹78 L',
+    detail:
+      '37 farm plots across 25 acres, from 726 sq yds up to a full acre, at ₹8,500/sq yd. Homes are built to order in natural materials — the Bamora Retreat in bamboo with a mezzanine, or the Earthlyn Retreat in CSCB brick with lime plaster — as 1, 2 or 3 BHK.',
+    stats: [
+      { label: 'Plots', value: '37' },
+      { label: 'Sizes', value: '726 sq yds – 1 acre' },
+      { label: 'Rate', value: '₹8,500/sq yd' },
+    ],
   },
 ];
 
+/**
+ * Plot schedule, read directly off the master plan.
+ * Plots 3 and 31 are marked "1. acre" on the drawing rather than a sq-yd figure.
+ */
 export const AGARTHA_PLOTS: PlotDot[] = [
-  // ── Top row (above main grid) ──
-  { id: 1, sqYds: 1003, x: 53, y: 18 },
-  { id: 2, sqYds: 968, x: 42, y: 22 },
-  // ── PLOT 3 — Large irregular corner (forest boundary) ──
-  { id: 3, sqYds: 4800, x: 15, y: 33 },
-  // ── Row 2 (left → right) ──
-  { id: 4, sqYds: 1690, x: 37, y: 35 },
-  { id: 5, sqYds: 1249, x: 48, y: 32 },
-  // ── Row 3 (left → right) ──
-  { id: 7, sqYds: 1140, x: 21, y: 44 },
-  { id: 6, sqYds: 1167, x: 33, y: 44 },
-  { id: 10, sqYds: 1200, x: 44, y: 45 },
-  // ── Row 4 (left → right) ──
-  { id: 8, sqYds: 1120, x: 21, y: 53 },
-  { id: 9, sqYds: 1080, x: 33, y: 53 },
-  // ── Row 5 (left → right) ──
-  { id: 11, sqYds: 1050, x: 21, y: 62 },
-  { id: 12, sqYds: 1100, x: 32, y: 62 },
-  { id: 13, sqYds: 1150, x: 44, y: 62 },
-  // ── Row 6 ──
-  { id: 14, sqYds: 1300, x: 21, y: 71 },
-  // ── Row 7 ──
-  { id: 15, sqYds: 1400, x: 21, y: 79 },
-  { id: 16, sqYds: 1350, x: 33, y: 79 },
-  // ── Row 8 ──
-  { id: 17, sqYds: 1250, x: 21, y: 87 },
-  { id: 18, sqYds: 1200, x: 33, y: 87 },
-  // ── Bottom row ──
-  { id: 19, sqYds: 1100, x: 21, y: 93 },
-  { id: 20, sqYds: 1050, x: 36, y: 93 },
-  // ── Right section, row 2 ──
-  { id: 21, sqYds: 1210, x: 59, y: 33 },
-  { id: 23, sqYds: 1450, x: 68, y: 32 },
-  { id: 24, sqYds: 1600, x: 78, y: 27 },
-  // ── Right section, row 3 ──
-  { id: 22, sqYds: 1320, x: 59, y: 44 },
-  { id: 25, sqYds: 1550, x: 78, y: 38 },
-  { id: 33, sqYds: 1500, x: 83, y: 45 },
-  // ── Right section, row 4 ──
-  { id: 26, sqYds: 1869, x: 59, y: 54 },
-  { id: 27, sqYds: 1700, x: 70, y: 51 },
-  { id: 34, sqYds: 1550, x: 83, y: 54 },
-  // ── Right section, row 5 ──
-  { id: 28, sqYds: 2057, x: 70, y: 62 },
-  { id: 32, sqYds: 1650, x: 80, y: 62 },
-  { id: 35, sqYds: 1600, x: 83, y: 63 },
-  // ── Right section, row 6 ──
-  { id: 29, sqYds: 1800, x: 70, y: 71 },
-  { id: 31, sqYds: 1900, x: 80, y: 71 },
-  // ── Right section, rows 7-8 ──
-  { id: 30, sqYds: 1750, x: 70, y: 82 },
-  { id: 36, sqYds: 1700, x: 83, y: 79 },
+  // ── North-west cluster, by the entrance and amenity core ──
+  { id: 1, sqYds: 1003.5, x: 36.1, y: 16.2 },
+  { id: 2, sqYds: 968, x: 28.9, y: 17.9 },
+  { id: 3, sqYds: ACRE_SQ_YDS, x: 6.3, y: 22.9 },
+  { id: 4, sqYds: 1690.44, x: 31.5, y: 26.7 },
+  { id: 5, sqYds: 1248.6, x: 36.7, y: 31.9 },
+  { id: 6, sqYds: 1167, x: 28.4, y: 33.6 },
+  // ── West spine, along the forest boundary ──
+  { id: 7, sqYds: 1140, x: 17.0, y: 36.6 },
+  { id: 8, sqYds: 917, x: 17.8, y: 44.8 },
+  { id: 11, sqYds: 917, x: 19.0, y: 51.6 },
+  { id: 14, sqYds: 914, x: 19.7, y: 58.5 },
+  { id: 15, sqYds: 978, x: 20.7, y: 67.0 },
+  { id: 17, sqYds: 1053, x: 21.8, y: 73.7 },
+  { id: 19, sqYds: 1044.24, x: 22.8, y: 81.2 },
+  // ── Central-west block ──
+  { id: 9, sqYds: 847, x: 30.1, y: 44.6 },
+  { id: 10, sqYds: 847, x: 38.0, y: 44.8 },
+  { id: 12, sqYds: 769, x: 31.1, y: 53.0 },
+  { id: 13, sqYds: 968, x: 37.5, y: 53.0 },
+  { id: 16, sqYds: 1230, x: 32.8, y: 64.3 },
+  { id: 18, sqYds: 1126.79, x: 34.2, y: 71.5 },
+  { id: 20, sqYds: 726, x: 35.9, y: 79.6 },
+  // ── North-central row ──
+  { id: 21, sqYds: 1210, x: 47.7, y: 32.0 },
+  { id: 22, sqYds: 1210, x: 47.7, y: 37.8 },
+  { id: 23, sqYds: 1279.71, x: 61.5, y: 31.9 },
+  { id: 24, sqYds: 1572.7, x: 71.2, y: 30.3 },
+  { id: 25, sqYds: 1326.35, x: 71.5, y: 37.5 },
+  // ── Plots flanking the resort core ──
+  { id: 26, sqYds: 1868.67, x: 47.2, y: 45.1 },
+  { id: 27, sqYds: 1862.68, x: 64.4, y: 75.9 },
+  // ── East block ──
+  { id: 28, sqYds: 2057, x: 71.7, y: 45.2 },
+  { id: 29, sqYds: 786.5, x: 70.9, y: 54.3 },
+  { id: 30, sqYds: 726, x: 71.5, y: 61.8 },
+  { id: 31, sqYds: ACRE_SQ_YDS, x: 71.8, y: 70.8 },
+  { id: 32, sqYds: 726, x: 78.3, y: 61.8 },
+  { id: 33, sqYds: 786.5, x: 78.5, y: 54.3 },
+  // ── Far-east strip ──
+  { id: 34, sqYds: 1232.86, x: 88.7, y: 44.9 },
+  { id: 35, sqYds: 1165.05, x: 88.7, y: 51.2 },
+  { id: 36, sqYds: 1001.43, x: 88.5, y: 56.9 },
+  { id: 37, sqYds: 740.57, x: 88.5, y: 63.0 },
 ];
 
-/** dot diameter: scales linearly from 6px (968 sq yd) to 18px (4800 sq yd) */
+/** dot diameter: scales linearly across the real range on the plan (726 → 4,840 sq yds) */
 export const plotDotSize = (sqYds: number) =>
-  6 + Math.min(1, Math.max(0, (sqYds - 968) / (4800 - 968))) * 12;
+  6 + Math.min(1, Math.max(0, (sqYds - 726) / (ACRE_SQ_YDS - 726))) * 12;
 
 /** sanctuary id → plot dots / hotspots (add new properties here when they get a site plan) */
 export const SANCTUARY_PLOTS: Record<string, PlotDot[]> = { agartha: AGARTHA_PLOTS };

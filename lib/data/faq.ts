@@ -72,7 +72,7 @@ export const SALES_FAQ: Array<{ q: string; a: string; tags?: string[] }> = [
   },
   {
     q: 'What is the smallest amount I can enter with?',
-    a: 'MODCON Agartha starts from ₹68.7 L for the smallest plot at 808 sq yds, the entry point under ₹1 Cr across the portfolio. The Dates County signature plot is 500 sq yds at ₹18,000 per sq yd, or ₹90 L, and SYL villaments begin at 2,500 SFT at ₹4,499 per SFT. Our enquiry form starts at the ₹50 L – ₹1 Cr bracket, so tell us your bracket and we will only put things in front of you that fit it.',
+    a: 'MODCON Agartha starts from ₹78 L for the smallest plot at 726 sq yds, the entry point under ₹1 Cr across the portfolio. The Dates County signature plot is 500 sq yds at ₹18,000 per sq yd, or ₹90 L, and SYL villaments begin at 2,500 SFT at ₹4,499 per SFT. Our enquiry form starts at the ₹50 L – ₹1 Cr bracket, so tell us your bracket and we will only put things in front of you that fit it.',
     tags: ['pricing', 'ticket-size', 'entry'],
   },
   {
@@ -87,7 +87,7 @@ export const SALES_FAQ: Array<{ q: string; a: string; tags?: string[] }> = [
   },
   {
     q: 'What do the amenities include, and what will I pay to maintain them?',
-    a: 'MODCON Agartha carries a 36,000 sq ft clubhouse with five amenities — aquatic pool, gym, kayaking lake, farm-to-table dining and staycation villas — and every plot arrives pre-planted with 100+ tree varieties, drip irrigation, vegetable beds and a spiral herbal garden. MODCON SYL Residences has a 22,000 SFT clubhouse built around a chemical-free natural bio pool and a yoga pavilion, and Dates County holds 40% of its 300+ acres as open and recreational space. Maintenance is billed separately by the developer or the owners association; your adviser gives you the current rate and exactly what it covers.',
+    a: 'MODCON Agartha gives two of its twenty-five acres to a resort and clubhouse — earthen retreats, a farm-to-table restaurant, a yoga and wellness centre, a Tulum-style gym, a banquet hall, and a natural bio-pool filtered biologically rather than chemically — and every plot arrives with an edible permaculture backyard, a food forest of fruit, vegetables and herbs. MODCON SYL Residences has a 22,000 SFT clubhouse built around a chemical-free natural bio pool and a yoga pavilion, and Dates County holds 40% of its 300+ acres as open and recreational space. Maintenance is billed separately by the developer or the owners association; your adviser gives you the current rate and exactly what it covers.',
     tags: ['amenities', 'maintenance'],
   },
   {
@@ -112,7 +112,7 @@ export const SALES_FAQ: Array<{ q: string; a: string; tags?: string[] }> = [
   },
   {
     q: 'How do the three sanctuaries differ, and which one suits me?',
-    a: 'MODCON Agartha is a 25-acre farm estate on the Narsapur forest boundary — 36 plots from 808 to 4,800 sq yds, for someone who wants land, a working permaculture farm and the cleanest air of the three. MODCON SYL Residences at Tukkuguda is built living: villaments from 2,500 to 4,500 SFT, ten minutes from the airport, for someone who wants a ready home inside the Fourth City corridor. Dates County at Kandukur is 300+ acres of villa plots beside a 4,000-acre reserve forest — land you can build on later, inside a large planned township.',
+    a: 'MODCON Agartha is a 25-acre farmhouse community on the Narsapur forest boundary — 37 plots from 726 sq yds to a full acre, for someone who wants land, a working permaculture farm and the cleanest air of the three. MODCON SYL Residences at Tukkuguda is built living: villaments from 2,500 to 4,500 SFT, ten minutes from the airport, for someone who wants a ready home inside the Fourth City corridor. Dates County at Kandukur is 300+ acres of villa plots beside a 4,000-acre reserve forest — land you can build on later, inside a large planned township.',
     tags: ['comparison', 'portfolio', 'fit'],
   },
   {

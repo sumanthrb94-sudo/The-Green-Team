@@ -79,12 +79,14 @@ export function InvestPanel({ sanctuary }: { sanctuary: Sanctuary }) {
   );
 
   if (sanctuary.id === 'agartha') {
+    // Real sizes off the issued master plan, not round numbers — see
+    // lib/data/agartha-layout.ts.
     const sizes = [
-      { label: 'Plot 01 (Smallest)', yds: 808 },
-      { label: 'Typical Plot', yds: 1300 },
-      { label: 'Large Plot', yds: 2000 },
-      { label: 'Premium Plot', yds: 3000 },
-      { label: 'Plot 3 (Largest)', yds: 4800 },
+      { label: 'Plot 20 (Smallest)', yds: 726 },
+      { label: 'Plot 13', yds: 968 },
+      { label: 'Plot 21 (Typical)', yds: 1210 },
+      { label: 'Plot 28 (Largest sq-yd)', yds: 2057 },
+      { label: 'Plot 3 / 31 (1 Acre)', yds: 4840 },
     ];
     return (
       <div>
@@ -99,7 +101,7 @@ export function InvestPanel({ sanctuary }: { sanctuary: Sanctuary }) {
             price: formatRs(s.yds * AGARTHA_NOW_RATE),
           }))}
         />
-        <p className="mt-3 text-[10px] text-secondary/50">Rate: ₹8,500/sq yd · Plots from 808 to 4,800 sq yds</p>
+        <p className="mt-3 text-[10px] text-secondary/50">Rate: ₹8,500/sq yd · 37 plots from 726 sq yds to 1 acre</p>
 
         <div className="mt-8 p-7 rounded-3xl border border-outline/15 bg-surface-container-low">
           <p className="flex items-center gap-2 text-[9px] uppercase tracking-[0.45em] font-bold text-primary mb-4">

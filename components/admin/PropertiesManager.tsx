@@ -150,7 +150,7 @@ export function PropertiesManager({ initial }: { initial: AdminProperty[] }) {
             </div>
             <div>
               <label className={label}>Member Price</label>
-              <input value={form.memberPrice} onChange={e => set('memberPrice', e.target.value)} placeholder="From ₹68.7 L" className={input} />
+              <input value={form.memberPrice} onChange={e => set('memberPrice', e.target.value)} placeholder="From ₹78 L" className={input} />
             </div>
           </div>
           <div>

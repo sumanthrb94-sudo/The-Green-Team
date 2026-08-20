@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     template: '%s | The Green Team',
   },
   description:
-    'We curate forest-adjacent homes near Hyderabad — AQI under 25, 45-min city commute. Channel partners for MODCON Agartha (Narsapur), MODCON SYL Residences (Tukkuguda), and Dates County by Planet Green (Kandukur). Plots from ₹20L. Villas, apartments & plots verified.',
+    'We curate forest-adjacent homes near Hyderabad — AQI under 25, under an hour from the city. Channel partners for MODCON Agartha (Narsapur), MODCON SYL Residences (Tukkuguda), and Dates County by Planet Green (Kandukur). Farm plots from ₹78 L. Villas, apartments & plots verified.',
   keywords:
     'forest property Hyderabad, eco friendly homes Hyderabad, MODCON Agartha, MODCON SYL Residences, Dates County Planet Green, Kandukur villa plots, Tukkuguda residences, ORR Exit-14 property, farm plots near Hyderabad, Narsapur forest plots, Srisailam Highway plots, low AQI property Hyderabad, channel partner Agartha, green real estate Hyderabad, RRR corridor property',
   authors: [{ name: BUSINESS.name }],
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     siteName: BUSINESS.name,
     locale: 'en_IN',
     url: SITE_URL,
-    title: 'The Green Team | Forest Homes Near Hyderabad | From ₹20L',
+    title: 'The Green Team | Forest Homes Near Hyderabad | From ₹78 L',
     description:
       'Independent channel partners who curate forest-adjacent homes near Hyderabad. AQI 12, 18 dB noise, under 45-min commute. Three sanctuaries — verified before we show you.',
     images: [
