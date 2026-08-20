@@ -17,3 +17,6 @@ docs/internal/
 next-env.d.ts
 .e2e-shots/
 *.tsbuildinfo
+
+# Temporary QA / test scratch scripts (Playwright probes, one-off checks)
+*.tmp.cjs
