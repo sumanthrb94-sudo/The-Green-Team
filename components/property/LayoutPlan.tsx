@@ -1,21 +1,39 @@
 'use client';
 
 /**
- * Interactive site plan — the official layout image overlaid with the 36 plot
- * dots (tap for an investment snapshot) and numbered hotspots.
+ * Interactive site plan — the sanctioned layout drawing overlaid with tappable
+ * unit dots (each opens an investment snapshot) and numbered feature hotspots.
+ *
+ * Property-agnostic: Agartha maps 37 plots priced per sq yd, SYL maps 15
+ * villaments priced per SFT. Everything that differs lives in
+ * SITE_PLAN_CONFIG / SANCTUARY_PLOTS / SANCTUARY_HOTSPOTS.
  */
 import { useState } from 'react';
 import Image from 'next/image';
 import { AnimatePresence, motion } from 'motion/react';
 import { X } from 'lucide-react';
-import { AGARTHA_HOTSPOTS, SANCTUARY_PLOTS, plotDotSize, type Hotspot, type PlotDot } from '@/lib/data/agartha-layout';
-import { AGARTHA_NOW_RATE, AGARTHA_OLD_RATE, WHATSAPP } from '@/lib/data/contact';
+import {
+  SANCTUARY_PLOTS,
+  SANCTUARY_HOTSPOTS,
+  SITE_PLAN_CONFIG,
+  plotDotSize,
+  type Hotspot,
+  type PlotDot,
+} from '@/lib/data/agartha-layout';
+import { WHATSAPP } from '@/lib/data/contact';
 import { formatRs } from '@/lib/utils';
 import type { Sanctuary } from '@/lib/data/sanctuaries';
 
 export function LayoutPlan({ sanctuary }: { sanctuary: Sanctuary }) {
   const plots = SANCTUARY_PLOTS[sanctuary.id] ?? [];
-  const hotspots = sanctuary.id === 'agartha' ? AGARTHA_HOTSPOTS : [];
+  const hotspots = SANCTUARY_HOTSPOTS[sanctuary.id] ?? [];
+  // Agartha is priced per sq yd, SYL per SFT — the plan is otherwise identical,
+  // so everything property-specific comes from here rather than an id check.
+  const cfg = SITE_PLAN_CONFIG[sanctuary.id] ?? { noun: 'Plot', areaLabel: 'sq yds', rateNow: 0 };
+  const areas = plots.map(p => p.area);
+  const minArea = areas.length ? Math.min(...areas) : 0;
+  const maxArea = areas.length ? Math.max(...areas) : 1;
+  const enquireUrl = sanctuary.id === 'syl' ? WHATSAPP.sylEnquire : WHATSAPP.agarthaEnquire;
   const [mode, setMode] = useState<'plots' | 'features'>('plots');
   const [selPlot, setSelPlot] = useState<PlotDot | null>(null);
   const [selSpot, setSelSpot] = useState<Hotspot | null>(null);
@@ -26,14 +44,14 @@ export function LayoutPlan({ sanctuary }: { sanctuary: Sanctuary }) {
     <div>
       <div className="flex items-center justify-between mb-5">
         <p className="text-[10px] uppercase tracking-[0.5em] font-bold text-on-surface/60">
-          Site Plan — {plots.length || sanctuary.plots} Plots
+          Site Plan — {plots.length || sanctuary.plots} {cfg.noun}s
         </p>
         <div className="flex rounded-full border border-outline/25 overflow-hidden text-[9px] uppercase tracking-widest font-bold">
           <button
             onClick={() => setMode('plots')}
             className={`px-4 py-2 transition-colors ${mode === 'plots' ? 'bg-primary text-on-primary' : 'text-secondary/60'}`}
           >
-            Plots
+            {cfg.noun}s
           </button>
           <button
             onClick={() => setMode('features')}
@@ -46,7 +64,7 @@ export function LayoutPlan({ sanctuary }: { sanctuary: Sanctuary }) {
 
       <div className="relative rounded-3xl overflow-hidden border border-outline/15">
         <span className="absolute top-4 left-4 z-20 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur text-white text-[8px] uppercase tracking-[0.25em] font-bold">
-          {mode === 'plots' ? 'Tap a plot to see its investment snapshot' : 'Tap a numbered feature'}
+          {mode === 'plots' ? `Tap a ${cfg.noun.toLowerCase()} to see its snapshot` : 'Tap a numbered feature'}
         </span>
         <Image
           src={sanctuary.sitePlanSrc}
@@ -58,12 +76,12 @@ export function LayoutPlan({ sanctuary }: { sanctuary: Sanctuary }) {
 
         {mode === 'plots' &&
           plots.map(p => {
-            const size = plotDotSize(p.sqYds);
+            const size = plotDotSize(p.area, minArea, maxArea);
             return (
               <button
                 key={p.id}
                 onClick={() => { setSelPlot(p); setSelSpot(null); }}
-                aria-label={`Plot ${p.id}, ${p.sqYds} sq yds`}
+                aria-label={`${cfg.noun} ${p.id}, ${p.area} ${cfg.areaLabel}`}
                 className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full bg-gold-bright ring-2 ring-white/70 shadow-md hover:scale-125 transition-transform"
                 style={{ left: `${p.x}%`, top: `${p.y}%`, width: size, height: size }}
               />
@@ -96,14 +114,21 @@ export function LayoutPlan({ sanctuary }: { sanctuary: Sanctuary }) {
               <X className="w-4 h-4 text-on-surface/60" />
             </button>
             <p className="text-[9px] uppercase tracking-[0.5em] font-bold text-gold mb-2">
-              Plot {selPlot.id} · Investment Snapshot
+              {cfg.noun} {selPlot.id} · Investment Snapshot
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
               {[
-                { l: 'Size', v: `${selPlot.sqYds.toLocaleString('en-IN')} sq yds` },
-                { l: 'Pre-launch (2024)', v: formatRs(selPlot.sqYds * AGARTHA_OLD_RATE) },
-                { l: 'Today @ ₹8,500', v: formatRs(selPlot.sqYds * AGARTHA_NOW_RATE) },
-                { l: '18-month gain', v: `+${formatRs(selPlot.sqYds * (AGARTHA_NOW_RATE - AGARTHA_OLD_RATE))}` },
+                { l: 'Size', v: `${selPlot.area.toLocaleString('en-IN')} ${cfg.areaLabel}` },
+                ...(cfg.rateOld
+                  ? [
+                      { l: 'Launch (2024)', v: formatRs(selPlot.area * cfg.rateOld) },
+                      { l: `Today @ ₹${cfg.rateNow.toLocaleString('en-IN')}`, v: formatRs(selPlot.area * cfg.rateNow) },
+                      { l: 'Gain since launch', v: `+${formatRs(selPlot.area * (cfg.rateNow - cfg.rateOld))}` },
+                    ]
+                  : [
+                      { l: 'Rate', v: `₹${cfg.rateNow.toLocaleString('en-IN')} / ${cfg.areaLabel}` },
+                      { l: 'Indicative price', v: formatRs(selPlot.area * cfg.rateNow) },
+                    ]),
               ].map(x => (
                 <div key={x.l}>
                   <p className="text-[8px] uppercase tracking-[0.3em] text-secondary/50 font-bold">{x.l}</p>
@@ -112,12 +137,12 @@ export function LayoutPlan({ sanctuary }: { sanctuary: Sanctuary }) {
               ))}
             </div>
             <a
-              href={WHATSAPP.agarthaEnquire}
+              href={enquireUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-block mt-6 px-6 py-3 rounded-xl bg-primary text-on-primary text-[9px] uppercase tracking-[0.35em] font-bold hover:opacity-90 transition-all"
             >
-              Enquire About Plot {selPlot.id}
+              Enquire About {cfg.noun} {selPlot.id}
             </a>
           </motion.div>
         )}

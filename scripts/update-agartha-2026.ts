@@ -35,6 +35,8 @@ const db = getFirestore();
 
 /** Only these fields are touched. Anything else in the document is left alone. */
 const FIELDS = [
+  'image',
+  'plotImages',
   'memberPrice',
   'plots',
   'plotRange',

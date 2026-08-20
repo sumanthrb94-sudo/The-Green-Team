@@ -12,6 +12,7 @@ import { Footer } from '@/components/Footer';
 import { ReviewList } from '@/components/reviews/ReviewList';
 import { getApprovedReviews, aggregateRating } from '@/lib/server/reviews';
 import { SITE_URL } from '@/lib/data/contact';
+import { SITE_PLAN_CONFIG } from '@/lib/data/agartha-layout';
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -131,7 +132,10 @@ export default async function SanctuaryPage({ params }: Props) {
                 ['Sizes', s.plotRange],
                 ['Amenity', s.amenityAcres],
                 ['Developer', s.architect],
-                ...(s.plots ? [['Plots', String(s.plots)] as [string, string]] : []),
+                // SYL sells villaments, not plots — the noun follows the property.
+                ...(s.plots
+                  ? [[`${SITE_PLAN_CONFIG[s.id]?.noun ?? 'Plot'}s`, String(s.plots)] as [string, string]]
+                  : []),
               ]
                 .filter((r): r is [string, string] => Boolean(r[1]))
                 .map(([k, v]) => (

@@ -61,3 +61,6 @@ export const INVESTMENT_BRACKETS = [
 export const AGARTHA_OLD_RATE = 6200; // 2024 launch rate
 export const AGARTHA_NOW_RATE = 8500; // current rate (2026)
 export const AGARTHA_PROJECTED_RATE = 10000; // developer projection for 2028
+
+/** MODCON SYL villament rate (₹/SFT), current as of 2026. */
+export const SYL_RATE = 6999;

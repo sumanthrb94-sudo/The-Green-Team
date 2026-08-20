@@ -34,7 +34,9 @@ export interface Sanctuary {
   order?: number;
 }
 
-const AGARTHA_GALLERY = Array.from({ length: 23 }, (_, i) => `/gallery/agartha/${i}.webp`);
+// 0–22 are the original mirror; 23–27 are new renders lifted from the client's
+// 2026 e-brochure (earthen retreats, the biomorphic clubhouse, thatched villas).
+const AGARTHA_GALLERY = Array.from({ length: 28 }, (_, i) => `/gallery/agartha/${i}.webp`);
 
 export const SANCTUARIES: Sanctuary[] = [
   {
@@ -81,19 +83,20 @@ export const SANCTUARIES: Sanctuary[] = [
     noise: 24,
     commute: '10 mins to Airport · 30-45 mins to Financial District',
     valuation: '',
-    memberPrice: '₹4,499 / SFT',
-    image: '/gallery/syl/1776279315359.webp',
+    memberPrice: '₹6,999 / SFT',
+    image: '/gallery/syl/syl-exterior-dusk.webp',
     tagline: 'A modern address where luxury meets nature.',
     description:
       "MODCON SYL Residences is the residential half of a 4.5-acre integrated commercial-and-residential project at Tukkuguda, ORR Exit-14 — villament living in a low-density, biophilic enclave overlooking forest, with large balconies, abundant light and sunrise views. The 22,000 sq ft G+2 clubhouse is built entirely around health, wellness and nature: infinity pool, fully equipped gym with Pilates, yoga pavilion, steam and sauna, library, co-working spaces, banquet and guest rooms, indoor and outdoor play. Alongside it sits an integrated commercial hub — retail, cafés and banking at ground, co-working on the first floor, clinics and diagnostics on the second, and business suites with a hospitality stay concept above. Every balcony is landscaped on biophilic principles. Two to five minutes from ORR Exit-14 and Fab City, 10–15 minutes from the airport.",
-    plots: 0,
-    plotRange: 'Villaments 2,500 – 4,500 SFT · Integrated Commercial Available',
+    plots: 15,
+    plotRange: 'Villaments 3,882 – 7,000 SFT · Integrated Commercial',
     amenityAcres: '22,000 SFT G+2 Clubhouse · Health • Wellness • Nature',
     architect: 'MODCON Builders',
+    sitePlanSrc: '/syl-site-plan.webp',
     brochureUrl: 'https://www.modconbuilders.com',
     features: [
       'Integrated Commercial Hub (Enquire)',
-      'Villaments 2,500 – 4,500 SFT · Low-Density Planning',
+      '15 Villaments · 3,882 – 7,000 SFT',
       'Infinity Pool',
       'Gym with Pilates · Steam & Sauna',
       'Yoga Pavilion · Library',
@@ -106,6 +109,11 @@ export const SANCTUARIES: Sanctuary[] = [
       'ORR Exit-14 · 2–5 Min · Airport 10–15 Min',
     ],
     plotImages: [
+      // Exteriors from the 2026 MODCON deck; the rest are the clubhouse interiors.
+      '/gallery/syl/syl-exterior-dusk.webp',
+      '/gallery/syl/syl-street-dusk.webp',
+      '/gallery/syl/syl-facade-sky.webp',
+      '/gallery/syl/syl-balcony-detail.webp',
       '/gallery/syl/1776279315359.webp',
       '/gallery/syl/1776279320251.webp',
       '/gallery/syl/1776279329483.webp',

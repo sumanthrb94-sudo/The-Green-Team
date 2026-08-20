@@ -2,13 +2,19 @@ import 'server-only';
 
 import { createHash } from 'node:crypto';
 
-import { AGARTHA_HOTSPOTS, AGARTHA_PLOTS } from '@/lib/data/agartha-layout';
+import {
+  AGARTHA_HOTSPOTS,
+  AGARTHA_PLOTS,
+  SYL_HOTSPOTS,
+  SYL_UNITS,
+} from '@/lib/data/agartha-layout';
 import {
   AGARTHA_NOW_RATE,
   AGARTHA_OLD_RATE,
   BUSINESS,
   INVESTMENT_BRACKETS,
   SITE_URL,
+  SYL_RATE,
 } from '@/lib/data/contact';
 import { SALES_FAQ } from '@/lib/data/faq';
 import { JOURNAL_POSTS } from '@/lib/data/journal';
@@ -247,12 +253,12 @@ function layoutChunks(out: KbChunk[]): void {
     });
   }
 
-  const sizes = AGARTHA_PLOTS.map(p => p.sqYds);
+  const sizes = AGARTHA_PLOTS.map(p => p.area);
   const bands = SIZE_BANDS.map(b => {
-    const inBand = AGARTHA_PLOTS.filter(p => p.sqYds >= b.min && p.sqYds <= b.max);
+    const inBand = AGARTHA_PLOTS.filter(p => p.area >= b.min && p.area <= b.max);
     if (!inBand.length) return '';
-    const lo = Math.min(...inBand.map(p => p.sqYds));
-    const hi = Math.max(...inBand.map(p => p.sqYds));
+    const lo = Math.min(...inBand.map(p => p.area));
+    const hi = Math.max(...inBand.map(p => p.area));
     const span = lo === hi ? `${inr(lo)} sq yds` : `${inr(lo)} – ${inr(hi)} sq yds`;
     const cost =
       lo === hi
@@ -272,6 +278,51 @@ function layoutChunks(out: KbChunk[]): void {
       `scales directly with size; the largest is Plot 3, the corner plot on the Narsapur forest boundary. ` +
       `These sizes are the plan positions used by the interactive layout — the developer's published plot range ` +
       `and current availability for MODCON Agartha are the figures on the property page, and they take precedence.`,
+  });
+
+  sylLayoutChunks(out);
+}
+
+/** SYL's sanctioned site plan: 15 villaments across two blocks, priced per SFT. */
+function sylLayoutChunks(out: KbChunk[]): void {
+  const base = { source: 'layout' as const, url: '/sanctuaries/syl', propertyId: 'syl' };
+
+  for (const h of SYL_HOTSPOTS) {
+    add(out, {
+      ...base,
+      id: `layout:syl:hotspot:${h.id}`,
+      title: `MODCON SYL Residences Site Plan — ${h.label}`,
+      text:
+        `On the MODCON SYL Residences site plan, hotspot ${h.num} is "${h.label}" (${h.tag}). ${h.detail} ` +
+        `Key figures for ${h.label} at MODCON SYL: ${h.stats.map(s => `${s.label} — ${s.value}`).join('; ')}.`,
+    });
+  }
+
+  // Group identical unit sizes — buyers ask "what sizes are there", not "what is
+  // unit 9", and the sanctioned plan only has six distinct sizes.
+  const bySize = new Map<number, number>();
+  for (const u of SYL_UNITS) bySize.set(u.area, (bySize.get(u.area) ?? 0) + 1);
+  const sizes = [...bySize.entries()].sort((a, b) => a[0] - b[0]);
+  const lines = sizes.map(
+    ([area, n]) =>
+      `${n} villament${n === 1 ? '' : 's'} of ${inr(area)} SFT (about ${formatRs(area * SYL_RATE)} at ₹${inr(SYL_RATE)} per SFT)`
+  );
+  const areas = SYL_UNITS.map(u => u.area);
+
+  add(out, {
+    ...base,
+    id: 'layout:syl:unit-inventory',
+    title: 'MODCON SYL Residences — Villament Sizes & Pricing',
+    text:
+      `The MODCON SYL Residences sanctioned site plan lays out ${SYL_UNITS.length} villaments in two blocks — ` +
+      `Block B with 7 units to the north and Block A with 8 units to the south — separated by a central park, ` +
+      `with the integrated commercial block on the western half of the 4.5-acre site. Unit sizes range from ` +
+      `${inr(Math.min(...areas))} SFT to ${inr(Math.max(...areas))} SFT: ${lines.join('; ')}. ` +
+      `MODCON SYL Residences is priced at ₹${inr(SYL_RATE)} per SFT. Each block is served by its own staircase ` +
+      `lobby, internal roads are 16 m wide, and the single ${inr(Math.max(...areas))} SFT unit is the corner ` +
+      `villament at the eastern end of Block A. The clubhouse is a separate 22,000 SFT G+2 building and is not ` +
+      `one of these 15 villaments. Current availability and the final price for MODCON SYL should be confirmed ` +
+      `with an adviser — the figures on the property page take precedence.`,
   });
 }
 

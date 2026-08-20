@@ -111,6 +111,21 @@ export const SALES_FAQ: Array<{ q: string; a: string; tags?: string[] }> = [
     tags: ['aqi', 'noise', 'commute', 'verification'],
   },
   {
+    q: 'What kind of home can I actually build on an Agartha plot?',
+    a: 'MODCON builds two house types to order, both in natural materials. The Bamora Retreat is a bamboo structure with a mezzanine floor, finished in natural mud plaster — light, thermally comfortable, and the more open of the two. The Earthlyn Retreat is built in CSCB brick and finished in traditional lime plaster, which holds temperature better and reads more solid. Both come as 1, 2 or 3 BHK, and both are designed to sit inside an edible permaculture backyard rather than a lawn. Your adviser can walk you through which type suits the plot you are looking at.',
+    tags: ['agartha', 'construction', 'homes'],
+  },
+  {
+    q: 'What is at the Agartha clubhouse, and how much land is it on?',
+    a: 'Two of the twenty-five acres are given to the resort and clubhouse. It holds earthen retreats, a farm-to-table restaurant, a yoga and wellness centre, a Tulum-style gym built in wood and stone, and a banquet hall. The pool is a natural bio-pool, cleaned by biological filtration instead of chlorine, and a hand-built natural stream runs through the landscape for the sound of moving water. It is a resort you have access to rather than a clubhouse block.',
+    tags: ['agartha', 'amenities'],
+  },
+  {
+    q: 'What sizes and prices are the SYL villaments, and what is the commercial component?',
+    a: 'MODCON SYL Residences is the residential half of a 4.5-acre integrated project at Tukkuguda. The issued site plan shows 15 villaments across Block A and Block B, either side of a central park, from 3,882 to 7,000 SFT, at ₹6,999 per SFT. The commercial block sits to the west: retail, cafés and banking at ground level, co-working on the first floor, clinics and diagnostics on the second, and business suites with a hospitality stay concept above — aimed at airport and corporate visitors. Commercial pricing is quoted on enquiry rather than published.',
+    tags: ['syl', 'pricing', 'commercial'],
+  },
+  {
     q: 'How do the three sanctuaries differ, and which one suits me?',
     a: 'MODCON Agartha is a 25-acre farmhouse community on the Narsapur forest boundary — 37 plots from 726 sq yds to a full acre, for someone who wants land, a working permaculture farm and the cleanest air of the three. MODCON SYL Residences at Tukkuguda is built living: villaments from 2,500 to 4,500 SFT, ten minutes from the airport, for someone who wants a ready home inside the Fourth City corridor. Dates County at Kandukur is 300+ acres of villa plots beside a 4,000-acre reserve forest — land you can build on later, inside a large planned township.',
     tags: ['comparison', 'portfolio', 'fit'],

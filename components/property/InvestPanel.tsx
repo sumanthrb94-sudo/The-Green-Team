@@ -2,7 +2,7 @@
 
 /** Per-property investment economics + WhatsApp CTAs — parity with v1's Invest tab. */
 import { Wind, VolumeX, Clock, MapPin, Leaf, Star } from 'lucide-react';
-import { WHATSAPP, AGARTHA_NOW_RATE } from '@/lib/data/contact';
+import { WHATSAPP, AGARTHA_NOW_RATE, SYL_RATE } from '@/lib/data/contact';
 import { formatRs } from '@/lib/utils';
 import type { Sanctuary } from '@/lib/data/sanctuaries';
 
@@ -141,10 +141,12 @@ export function InvestPanel({ sanctuary }: { sanctuary: Sanctuary }) {
 
   if (sanctuary.id === 'syl') {
     const sizes = [
-      { label: 'Compact Villament', sft: 2500 },
-      { label: 'Standard Villament', sft: 3000 },
-      { label: 'Large Villament', sft: 3500 },
-      { label: 'Premium Villament', sft: 4500 },
+      // Real unit areas printed on the issued SITE_PLAN.pdf (Blocks A & B).
+      { label: 'Block A — Smallest', sft: 3882 },
+      { label: 'Block B — Typical', sft: 3950 },
+      { label: 'Block A — Corner', sft: 4165 },
+      { label: 'Block B — Large', sft: 4720 },
+      { label: 'Block A — Largest', sft: 7000 },
     ];
     return (
       <div>
@@ -153,17 +155,17 @@ export function InvestPanel({ sanctuary }: { sanctuary: Sanctuary }) {
           <p className="text-[9px] uppercase tracking-[0.5em] font-bold text-gold mb-3">Pre-Investor Phase · Now Running</p>
           <p className="text-sm text-on-surface/80 leading-relaxed">
             Agartha investors gained <strong>+37% in 18 months</strong>. SYL sits in the same corridor logic — and
-            you&apos;re still in the lowest-priced window: <strong>₹4,499/SFT → Higher at pre-launch → Market rate</strong>.
+            you&apos;re still in the lowest-priced window: <strong>₹6,999/SFT — current rate</strong>.
           </p>
         </div>
         <p className="text-[10px] uppercase tracking-[0.5em] font-bold text-on-surface/60 mb-4">
-          Price Estimate — ₹4,499 / SFT
+          Price Estimate — ₹6,999 / SFT
         </p>
         <PriceTable
           rows={sizes.map(s => ({
             label: s.label,
             qty: `${s.sft.toLocaleString('en-IN')} SFT`,
-            price: formatRs(s.sft * 4499),
+            price: formatRs(s.sft * SYL_RATE),
           }))}
         />
         <p className="mt-3 text-[10px] text-secondary/50">
