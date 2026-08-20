@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
 import { adminDb } from '@/lib/firebase/admin';
+import { allowedOrigin, clientIp, rateLimited } from '@/lib/server/rate-limit';
 
 /**
  * Review submission.
@@ -14,6 +15,10 @@ import { adminDb } from '@/lib/firebase/admin';
  * access, same as `leads` and `newsletter`.
  */
 export async function POST(req: NextRequest) {
+  if (!allowedOrigin(req)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
+  if (rateLimited('reviews', clientIp(req), { max: 5, windowMs: 10 * 60 * 1000 })) {
+    return NextResponse.json({ error: 'too many requests' }, { status: 429 });
+  }
   try {
     const body = await req.json();
     const name = String(body.name ?? '').trim().slice(0, 120);

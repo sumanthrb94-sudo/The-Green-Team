@@ -26,15 +26,25 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const s = getSanctuary(id);
   if (!s) return {};
+  const description = s.metaDescription ?? s.description?.slice(0, 155);
+  const image = `${SITE_URL}${s.image}`;
   return {
     title: `${s.title} — ${s.memberPrice}`,
-    description: s.description?.slice(0, 300),
+    description,
     alternates: { canonical: `${SITE_URL}/sanctuaries/${s.id}` },
     openGraph: {
+      type: 'website',
+      siteName: 'The Green Team',
       title: `${s.title} | The Green Team`,
       description: s.tagline,
       url: `${SITE_URL}/sanctuaries/${s.id}`,
-      images: [{ url: `${SITE_URL}${s.image}` }],
+      images: [{ url: image }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${s.title} | The Green Team`,
+      description: s.tagline,
+      images: [image],
     },
   };
 }

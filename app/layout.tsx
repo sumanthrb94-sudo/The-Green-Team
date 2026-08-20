@@ -75,6 +75,34 @@ export const viewport: Viewport = {
 
 const darkModeScript = `try{if(localStorage.getItem('gt_dark')==='true')document.documentElement.classList.add('dark')}catch(e){}`;
 
+/**
+ * Organisation identity for search engines. RealEstateAgent is the schema.org
+ * type for a channel partner / brokerage; all values come from the single
+ * BUSINESS source of truth so the structured data never drifts from the footer.
+ */
+const organizationLd = {
+  '@context': 'https://schema.org',
+  '@type': 'RealEstateAgent',
+  '@id': `${SITE_URL}/#organization`,
+  name: BUSINESS.name,
+  description: BUSINESS.legalDescriptor,
+  url: SITE_URL,
+  telephone: BUSINESS.phone,
+  email: BUSINESS.email,
+  image: `${SITE_URL}/agartha-render.jpg`,
+  logo: `${SITE_URL}/logos/modcon-logo-hires.png`,
+  areaServed: `${BUSINESS.city}, ${BUSINESS.region}`,
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: BUSINESS.city,
+    addressRegion: BUSINESS.region,
+    postalCode: BUSINESS.postalCode,
+    addressCountry: 'IN',
+  },
+  geo: { '@type': 'GeoCoordinates', latitude: BUSINESS.geo.lat, longitude: BUSINESS.geo.lng },
+  sameAs: [BUSINESS.instagram, BUSINESS.linkedin],
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
@@ -84,6 +112,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: darkModeScript }} />
+        <script
+          type="application/ld+json"
+          // Escape `<` so a value can't close the script tag; identifies the
+          // business to search engines (name, Hyderabad NAP, geo, socials).
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationLd).replace(/</g, '\\u003c') }}
+        />
       </head>
       <body>
         <AuthProvider>{children}</AuthProvider>

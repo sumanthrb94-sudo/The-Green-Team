@@ -4,7 +4,7 @@ import { Logo } from '@/components/brand/Logo';
 import { BUSINESS } from '@/lib/data/contact';
 
 const AGENDA: { label: string; sub: string; href: string }[] = [
-  { label: 'MODCON Agartha', sub: 'Narsapur Forest · 36 farm plots', href: '/sanctuaries/agartha' },
+  { label: 'MODCON Agartha', sub: 'Narsapur Forest · 37 farm plots', href: '/sanctuaries/agartha' },
   { label: 'MODCON SYL Residences', sub: 'Tukkuguda, ORR Exit-14', href: '/sanctuaries/syl' },
   { label: 'Dates County by Planet Green', sub: 'Kandukur · 4,000-acre reserve', href: '/sanctuaries/dates-county' },
   { label: 'The Journal', sub: 'Field notes & sanctuary intelligence', href: '/blog' },

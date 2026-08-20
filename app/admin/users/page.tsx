@@ -1,5 +1,6 @@
 import { Download, MapPin } from 'lucide-react';
 import { fetchUsers } from '@/lib/server/admin-data';
+import { getSessionUser } from '@/lib/server/session';
 
 export const dynamic = 'force-dynamic';
 
@@ -7,6 +8,7 @@ const fmt = (iso: string | null) =>
   iso ? new Date(iso).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: '2-digit' }) : '—';
 
 export default async function AdminUsersPage() {
+  if (!(await getSessionUser())?.isAdmin) return null;
   const users = await fetchUsers();
   return (
     <div>

@@ -37,7 +37,7 @@ export const SALES_FAQ: Array<{ q: string; a: string; tags?: string[] }> = [
   },
   {
     q: 'What is not included in the quoted price?',
-    a: 'Quoted rates — ₹8,500 per sq yd at MODCON Agartha, ₹4,499 per SFT at MODCON SYL Residences, ₹18,000 per sq yd at Dates County — are the property price only. Stamp duty and registration, GST where it applies, any corpus or maintenance deposit, and optional add-ons such as a built home on your plot are all extra. Your adviser gives you the all-in number for the specific unit before you commit to anything.',
+    a: 'Quoted rates — ₹8,500 per sq yd at MODCON Agartha, ₹6,999 per SFT at MODCON SYL Residences, ₹18,000 per sq yd at Dates County — are the property price only. Stamp duty and registration, GST where it applies, any corpus or maintenance deposit, and optional add-ons such as a built home on your plot are all extra. Your adviser gives you the all-in number for the specific unit before you commit to anything.',
     tags: ['pricing', 'costs'],
   },
   {
@@ -62,7 +62,7 @@ export const SALES_FAQ: Array<{ q: string; a: string; tags?: string[] }> = [
   },
   {
     q: 'What does "pre-investor phase" mean?',
-    a: 'Pre-investor is the earliest and lowest-priced window a project opens, which at MODCON SYL Residences is ₹4,499 per SFT. Early bookings de-risk the project for the developer, and early buyers are paid for that in price and in first pick of units, floors and views. When booking targets are met the rate moves to pre-launch, and later again to market rate.',
+    a: 'Pre-investor is the earliest and lowest-priced window a project opens, before the published rate. MODCON SYL Residences carries a standard rate of ₹6,999 per SFT, and the pre-investor window sits below that for a limited number of units. Early bookings de-risk the project for the developer, and early buyers are paid for that in price and in first pick of units, floors and views. When booking targets are met the rate moves to pre-launch, and later again to market rate — ask your adviser for the current pre-investor rate and how many units are left in it.',
     tags: ['pre-investor', 'pricing', 'syl'],
   },
   {
@@ -72,7 +72,7 @@ export const SALES_FAQ: Array<{ q: string; a: string; tags?: string[] }> = [
   },
   {
     q: 'What is the smallest amount I can enter with?',
-    a: 'MODCON Agartha starts from ₹78 L for the smallest plot at 726 sq yds, the entry point under ₹1 Cr across the portfolio. The Dates County signature plot is 500 sq yds at ₹18,000 per sq yd, or ₹90 L, and SYL villaments begin at 2,500 SFT at ₹4,499 per SFT. Our enquiry form starts at the ₹50 L – ₹1 Cr bracket, so tell us your bracket and we will only put things in front of you that fit it.',
+    a: 'MODCON Agartha starts from ₹78 L for the smallest plot at 726 sq yds, the entry point under ₹1 Cr across the portfolio. The Dates County signature plot is 500 sq yds at ₹18,000 per sq yd, or ₹90 L, and SYL villaments begin at 3,882 SFT at ₹6,999 per SFT. Our enquiry form starts at the ₹50 L – ₹1 Cr bracket, so tell us your bracket and we will only put things in front of you that fit it.',
     tags: ['pricing', 'ticket-size', 'entry'],
   },
   {

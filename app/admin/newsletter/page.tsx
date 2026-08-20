@@ -1,10 +1,12 @@
 import { Download, Mail } from 'lucide-react';
 import { fetchNewsletter } from '@/lib/server/admin-data';
+import { getSessionUser } from '@/lib/server/session';
 import { NewsletterComposer } from '@/components/admin/NewsletterComposer';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminNewsletterPage() {
+  if (!(await getSessionUser())?.isAdmin) return null;
   const subs = await fetchNewsletter();
   return (
     <div>

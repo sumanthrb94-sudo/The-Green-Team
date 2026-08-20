@@ -1,9 +1,11 @@
 import { getConversations } from '@/lib/server/admin-data';
+import { getSessionUser } from '@/lib/server/session';
 import { ChatsExplorer } from '@/components/admin/ChatsExplorer';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminChatsPage() {
+  if (!(await getSessionUser())?.isAdmin) return null;
   const conversations = await getConversations();
   return (
     <div>

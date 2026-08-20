@@ -25,6 +25,9 @@ export default async function AdviserCallPage() {
   return (
     <>
       <ExperimentImpression id={EXPERIMENTS.adviserCta.id} variant={variant} />
+      {/* The form section leads with an h2; give the page one real h1 for SEO
+          without disturbing the A/B-tested visual headline. */}
+      <h1 className="sr-only">Request a free adviser call about forest-adjacent sanctuaries near Hyderabad</h1>
       <AdviserCallSection variant={variant} />
       <Footer />
     </>
