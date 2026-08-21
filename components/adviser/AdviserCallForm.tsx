@@ -74,9 +74,13 @@ export function AdviserCallForm({
   return (
     <form onSubmit={submit} className="space-y-4">
       <div className={cn('grid gap-4', compact ? '' : 'sm:grid-cols-2')}>
+        {/* aria-label, not just placeholder: the placeholder disappears as soon
+            as the visitor types, leaving a screen reader with an unnamed field. */}
         <input
           id="ac-name"
           required
+          aria-label="Your name"
+          autoComplete="name"
           value={name}
           onChange={e => setName(e.target.value)}
           placeholder="Your name *"
@@ -86,6 +90,8 @@ export function AdviserCallForm({
           id="ac-phone"
           type="tel"
           required
+          aria-label="Your phone number"
+          autoComplete="tel"
           value={phone}
           onChange={e => setPhone(e.target.value)}
           placeholder="+91 phone number *"

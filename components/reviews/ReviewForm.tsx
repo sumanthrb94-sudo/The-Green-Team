@@ -80,6 +80,8 @@ export function ReviewForm({ propertyId }: { propertyId?: string }) {
       </div>
       <input
         required
+        aria-label="Your name"
+        autoComplete="name"
         value={name}
         onChange={e => setName(e.target.value)}
         placeholder="Your name *"
@@ -88,6 +90,7 @@ export function ReviewForm({ propertyId }: { propertyId?: string }) {
       <textarea
         required
         rows={4}
+        aria-label="Your review"
         value={text}
         onChange={e => setText(e.target.value)}
         placeholder="What was your experience? *"

@@ -202,7 +202,31 @@ export default function SanctuaryMap() {
     },
   };
   const BASE_ORDER: BaseMode[] = ['dark', 'satellite', 'terrain', 'light'];
+
+  /**
+   * Last-resort basemap. Every provider above is a third party that can rate-
+   * limit, block a referrer or go down, and when that happens Leaflet renders
+   * nothing — the map goes silently blank with no JS error. OpenStreetMap's own
+   * tile server is the most durable no-key fallback, so a repeated tile error
+   * on the chosen provider swaps to it rather than leaving an empty canvas.
+   */
+  const FALLBACK_TILES = {
+    url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    attribution: '&copy; OpenStreetMap contributors',
+    maxZoom: 19,
+  };
+
   const [baseMode, setBaseMode] = useState<BaseMode>('dark');
+  const [tilesFailed, setTilesFailed] = useState(false);
+  const tileErrors = useRef(0);
+  const fellBack = useRef(false);
+
+  // A new provider deserves a fresh probe — reset when the user switches.
+  useEffect(() => {
+    tileErrors.current = 0;
+    fellBack.current = false;
+    setTilesFailed(false);
+  }, [baseMode]);
   const [zoom, setZoom] = useState(10);
   const [pulse, setPulse] = useState(0);
   const [target, setTarget] = useState<{ center: LatLng; zoom: number } | null>(null);
@@ -333,13 +357,26 @@ export default function SanctuaryMap() {
         <RRRVeil />
 
         <TileLayer
-          key={baseMode}
-          url={BASE_TILES[baseMode].url}
-          attribution={BASE_TILES[baseMode].attribution}
+          key={tilesFailed ? `${baseMode}-fallback` : baseMode}
+          url={tilesFailed ? FALLBACK_TILES.url : BASE_TILES[baseMode].url}
+          attribution={tilesFailed ? FALLBACK_TILES.attribution : BASE_TILES[baseMode].attribution}
           // Each provider stops at a different level; without this Leaflet
           // requests tiles that do not exist and the map goes blank on zoom-in.
-          maxNativeZoom={BASE_TILES[baseMode].maxZoom}
+          maxNativeZoom={tilesFailed ? FALLBACK_TILES.maxZoom : BASE_TILES[baseMode].maxZoom}
           maxZoom={20}
+          eventHandlers={{
+            // A handful of failures means the provider is unreachable, not that
+            // one tile 404'd at the edge of coverage. Refs, not state, so the
+            // threshold survives re-renders without re-binding the handler.
+            tileerror: () => {
+              if (fellBack.current) return;
+              tileErrors.current += 1;
+              if (tileErrors.current >= 6) {
+                fellBack.current = true;
+                setTilesFailed(true);
+              }
+            },
+          }}
         />
 
         {/* AQI heat field */}

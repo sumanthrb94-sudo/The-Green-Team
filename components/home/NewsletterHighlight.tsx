@@ -63,6 +63,8 @@ export function NewsletterHighlight() {
               id="nl-highlight-email"
               type="email"
               required
+              aria-label="Your email address"
+              autoComplete="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder="your@email.com"

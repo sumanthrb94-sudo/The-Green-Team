@@ -106,6 +106,8 @@ export function WelcomeGate() {
                 <input
                   type="email"
                   required
+                  aria-label="Your email address"
+                  autoComplete="email"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   placeholder="you@gmail.com"

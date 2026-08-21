@@ -10,6 +10,7 @@ import { LayoutPlan } from '@/components/property/LayoutPlan';
 import { InvestPanel } from '@/components/property/InvestPanel';
 import { Footer } from '@/components/Footer';
 import { ReviewList } from '@/components/reviews/ReviewList';
+import { ReviewForm } from '@/components/reviews/ReviewForm';
 import { getApprovedReviews, aggregateRating } from '@/lib/server/reviews';
 import { SITE_URL } from '@/lib/data/contact';
 import { SITE_PLAN_CONFIG } from '@/lib/data/agartha-layout';
@@ -207,6 +208,22 @@ export default async function SanctuaryPage({ params }: Props) {
       </section>
 
       <ReviewList reviews={reviews} />
+
+      {/* Property-scoped review capture. Without this mount nothing could ever
+          set `propertyId`, so per-property reviews (and the aggregateRating
+          above) could only be populated by calling the API directly.
+          Submissions land as `pending` and appear only after moderation. */}
+      <section className="pb-20 px-6 md:px-24">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="font-serif text-2xl md:text-3xl font-light mb-2">
+            Visited {s.title}? Tell us how it went.
+          </h2>
+          <p className="text-sm text-secondary/60 mb-6">
+            Reviews are read by a person before they go live.
+          </p>
+          <ReviewForm propertyId={s.id} />
+        </div>
+      </section>
 
       <Footer />
     </>
