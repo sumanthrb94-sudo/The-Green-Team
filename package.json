@@ -12,6 +12,7 @@
     "kb:index": "tsx --conditions=react-server --env-file=.env.local scripts/build-kb-index.ts",
     "e2e:chat": "node --env-file=.env.local scripts/e2e-chat.mjs",
     "kb:eval": "tsx --conditions=react-server --env-file=.env.local scripts/eval-retrieval.ts",
+    "analytics:prune": "tsx --env-file=.env.local scripts/prune-analytics.ts",
     "optimize:images": "node scripts/optimize-images.mjs",
     "optimize:images:write": "node scripts/optimize-images.mjs --write",
     "speed": "node scripts/speed-test.mjs"

@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { GROOT_FALLBACK, GROOT_GREETING, GROOT_SUGGESTIONS } from '@/lib/data/groot';
 import { WHATSAPP } from '@/lib/data/contact';
+import { track } from '@/lib/analytics';
 import type { ActionPayload, ChatEvent, ChatMessage, SourceRef } from '@/lib/rag/types';
 
 interface UiMessage extends ChatMessage {
@@ -307,7 +308,10 @@ export function Groot() {
     <>
       <button
         ref={launcherRef}
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          setOpen(true);
+          track.chatOpen();
+        }}
         aria-label="Chat with Groot"
         aria-expanded={open}
         className="fixed bottom-20 right-5 md:bottom-8 md:right-8 z-[999] w-12 h-12 bg-olive-800 text-cream dark:bg-primary dark:text-on-primary rounded-full shadow-lg flex items-center justify-center hover:scale-105 hover:shadow-xl transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface"

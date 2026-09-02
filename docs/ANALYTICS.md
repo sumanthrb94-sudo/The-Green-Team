@@ -3,6 +3,68 @@
 What was added in the post-launch pass, and the two env vars that have to be
 set before any of the measurement actually reports.
 
+## First-party analytics (Admin → Analytics)
+
+**This needs no keys and no third-party account. It works the moment it ships.**
+
+GA4 and Clarity both send data to someone else's dashboard, and roughly a third
+of desktop research traffic blocks `google-analytics.com` outright — so on a
+site selling ₹1 Cr+ land, the visitors most worth counting are the ones GA4
+misses. The first-party pipeline stores its own numbers in Firestore and reads
+them straight into the admin.
+
+| Piece | File |
+| --- | --- |
+| Browser tracker (engaged time, scroll depth, clicks) | `components/analytics/PageTracker.tsx` |
+| Identity + delivery (sendBeacon) | `lib/analytics/beacon.ts` |
+| Ingest, validation, enrichment | `app/api/track/route.ts`, `lib/analytics/enrich.ts` |
+| Aggregation (admin-gated) | `lib/server/analytics-data.ts` |
+| Dashboard | `components/admin/AnalyticsDashboard.tsx` |
+| Retention | `npm run analytics:prune` |
+
+### What it measures
+
+- **Time on page is *engaged* time** — the clock runs only while the tab is
+  visible and the visitor has interacted in the last 30s. Wall-clock time on
+  page is close to meaningless: a tab left open overnight reads as an
+  eight-hour visit. Engaged seconds tell you whether someone actually read the
+  Agartha page.
+- Scroll depth, per page.
+- Traffic source grouped into channels that matter here — Instagram (where the
+  reels run), WhatsApp, Google, Direct — plus raw referrer and UTM campaign.
+- City / country, from the CDN edge (`x-vercel-ip-*`).
+- Device, browser, OS.
+- Every WhatsApp tap, outbound link, phone/email tap — caught by a single
+  delegated click listener, so no button needs editing to be tracked.
+- A buyer funnel counted **in people, not clicks**: one person tapping WhatsApp
+  five times is one interested buyer.
+- Live visitor count (5-minute window) and a recent-activity feed.
+
+### Privacy
+
+No raw IP is ever stored. Visitors are counted by a random first-party id in
+localStorage (not a fingerprint), and the IP is reduced to a salted SHA-256
+hash whose salt **rotates daily**, so a hash cannot follow anyone across days
+while still de-duplicating within one. Location is city-level only. Known bots
+are excluded. Set `ANALYTICS_SALT` in Vercel to something private — there is a
+default, but it is a placeholder.
+
+Admin browsing is excluded at the beacon, so your own use of `/admin` never
+pollutes the numbers.
+
+### Cost and retention
+
+The dashboard aggregates by reading every event in the window, which is the one
+expensive part of the design; a 60-second server-side cache (applied *after*
+the admin check) absorbs refreshes and range toggles. `analytics_events` grows
+one document per pageview and per interaction and nothing prunes it
+automatically — Firestore has no free-tier TTL — so run
+`npm run analytics:prune -- --write` periodically (defaults to a 180-day
+window, dry-run unless `--write`).
+
+The range query deliberately uses only `at`, filtering bots in memory, so **no
+composite Firestore index has to be created by hand** before the tab works.
+
 ## Turn it on
 
 Three keys, all optional — every one of them degrades to a silent no-op when

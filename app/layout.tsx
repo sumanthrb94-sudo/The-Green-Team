@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Inter, Manrope, Cormorant_Garamond } from 'next/font/google';
 import { AuthProvider } from '@/components/auth/AuthProvider';
 import { Analytics } from '@/components/analytics/Analytics';
+import { PageTracker } from '@/components/analytics/PageTracker';
 import { SITE_URL, BUSINESS } from '@/lib/data/contact';
 import './globals.css';
 
@@ -122,6 +123,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <AuthProvider>{children}</AuthProvider>
         <Analytics />
+        <PageTracker />
       </body>
     </html>
   );
