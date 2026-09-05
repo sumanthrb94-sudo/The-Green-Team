@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
 import { adminAuth, adminDb } from '@/lib/firebase/admin';
 import { upsertContact, splitName, SEGMENT } from '@/lib/server/resend';
+import { sendWelcomeEmail } from '@/lib/server/email';
 
 /**
  * Authenticated profile upsert. The bearer ID token names the user — a caller
@@ -60,6 +61,9 @@ export async function POST(req: NextRequest) {
           source: 'sign-in',
         },
       });
+      // Welcome email once, on the first sign-in only. Fire-and-forget for the
+      // same reason as the contact sync — it must never fail the profile write.
+      if (isNew) void sendWelcomeEmail(decoded.email, splitName(name).firstName);
     }
 
     return NextResponse.json({ ok: true, isNew });

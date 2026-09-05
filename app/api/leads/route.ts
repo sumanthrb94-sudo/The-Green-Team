@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
 import { adminDb } from '@/lib/firebase/admin';
 import { allowedOrigin, clientIp, rateLimited } from '@/lib/server/rate-limit';
+import { sendLeadConfirmation } from '@/lib/server/email';
 
 /**
  * Lead capture — writes via the Admin SDK so Firestore rules can deny all
@@ -42,6 +43,11 @@ export async function POST(req: NextRequest) {
         status: 'new',
         createdAt: FieldValue.serverTimestamp(),
       });
+    // Confirm receipt while the buyer is still on the page wondering if the form
+    // worked. Transactional (they asked to be contacted), not marketing, so the
+    // lead is deliberately NOT added to a mailing segment without consent.
+    // Fire-and-forget: the lead is captured above regardless.
+    if (email) void sendLeadConfirmation(email, name || undefined, intent || undefined);
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: 'failed' }, { status: 500 });
