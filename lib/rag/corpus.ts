@@ -18,6 +18,7 @@ import {
 } from '@/lib/data/contact';
 import { SALES_FAQ } from '@/lib/data/faq';
 import { DISQUALIFIERS, LISTING_STANDARD, SERVICE_AREA } from '@/lib/data/standard';
+import { CATEGORIES, stageLabel } from '@/lib/data/categories';
 import { JOURNAL_POSTS } from '@/lib/data/journal';
 import { KEY_ZONES, MAP_LOCATIONS, NATURAL_FEATURES } from '@/lib/data/map';
 import { getPortfolio } from '@/lib/server/portfolio';
@@ -424,11 +425,52 @@ function standardChunks(out: KbChunk[]): void {
   });
 }
 
+/**
+ * How the portfolio is organised, so Groot can answer "do you have villas?" or
+ * "what is under construction?" with a link to the right browse page rather
+ * than reciting every property.
+ */
+function portalChunks(out: KbChunk[], portfolio: Sanctuary[]): void {
+  for (const c of CATEGORIES) {
+    const members = portfolio.filter(c.match);
+    add(out, {
+      id: `portal:${c.slug}`,
+      title: `Browse — ${c.title}`,
+      source: 'portal',
+      url: `/explore/${c.slug}`,
+      text:
+        `The Green Team's portfolio is browsable by category at /explore/${c.slug}: "${c.title}" — ${c.tagline} ` +
+        `${c.intro} ` +
+        (members.length
+          ? `Currently in this category: ${members.map(m => `${m.title} (${m.location}, ${stageLabel(m.stage)})`).join('; ')}.`
+          : `Nothing is listed in this category yet, because nothing has cleared the six-part standard for it.`),
+    });
+  }
+  const byStage = new Map<string, string[]>();
+  for (const p of portfolio) {
+    const k = stageLabel(p.stage);
+    byStage.set(k, [...(byStage.get(k) ?? []), p.title]);
+  }
+  add(out, {
+    id: 'portal:stages',
+    title: 'Browse — delivery stage',
+    source: 'portal',
+    url: '/list',
+    text:
+      `Every property on thegreenteam.in carries a delivery stage — Ongoing (under development, bookings open), ` +
+      `Completed (delivered, ready to occupy) or Upcoming (pre-launch). The browse pages filter by it. Today: ` +
+      [...byStage.entries()].map(([k, v]) => `${k}: ${v.join(', ')}`).join('; ') +
+      `. There are no completed projects listed at present; The Green Team does not list a completed project ` +
+      `until it has physically walked through it.`,
+  });
+}
+
 export async function buildCorpus(): Promise<KbChunk[]> {
   const out: KbChunk[] = [];
 
   const portfolio = await getPortfolio();
   portfolio.forEach(propertyChunks(out));
+  portalChunks(out, portfolio);
 
   journalChunks(out);
   mapChunks(out);

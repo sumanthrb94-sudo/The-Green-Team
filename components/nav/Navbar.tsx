@@ -11,7 +11,9 @@ import { useAuth } from '@/components/auth/AuthProvider';
 import { AccountDrawer } from './AccountDrawer';
 
 const NAV = [
-  { name: 'Sanctuaries', href: '/#sanctuaries' },
+  { name: 'Villas', href: '/explore/villas' },
+  { name: 'Plots', href: '/explore/plots' },
+  { name: 'Investments', href: '/explore/investments' },
   { name: 'Journal', href: '/blog' },
   { name: 'Adviser Call', href: '/adviser-call', gold: true },
 ];

@@ -6,6 +6,8 @@
  * (public/gallery/agartha/) rather than the Wix CDN the v1 app depended on.
  */
 
+import type { Category, Stage } from '@/lib/data/categories';
+
 export interface Sanctuary {
   id: string;
   title: string;
@@ -33,6 +35,14 @@ export interface Sanctuary {
   brochureUrl?: string;
   mapUrl?: string;
   gallery?: string[];
+  /**
+   * Portal discovery fields — see lib/data/categories.ts. `category` is the
+   * primary asset class, `stage` is where delivery stands, `investment` flags
+   * an appreciation story worth telling (never a promised return).
+   */
+  category?: Category;
+  stage?: Stage;
+  investment?: boolean;
   /** Firestore-managed properties carry these */
   status?: 'live' | 'draft';
   order?: number;
@@ -46,6 +56,9 @@ export const SANCTUARIES: Sanctuary[] = [
   {
     id: 'agartha',
     title: 'MODCON Agartha',
+    category: 'plots',
+    stage: 'ongoing',
+    investment: true,
     location: 'Janakampet, Narsapur · Hyderabad',
     aqi: 12,
     noise: 18,
@@ -84,6 +97,9 @@ export const SANCTUARIES: Sanctuary[] = [
   {
     id: 'syl',
     title: 'MODCON SYL Residences',
+    category: 'villas',
+    stage: 'ongoing',
+    investment: true,
     location: 'Tukkuguda, ORR Exit-14 · Hyderabad',
     aqi: 22,
     noise: 24,
@@ -135,6 +151,9 @@ export const SANCTUARIES: Sanctuary[] = [
   {
     id: 'dates-county',
     title: 'Dates County by Planet Green',
+    category: 'plots',
+    stage: 'ongoing',
+    investment: true,
     location: 'Kandukur, Srisailam Highway · Hyderabad',
     aqi: 18,
     noise: 22,

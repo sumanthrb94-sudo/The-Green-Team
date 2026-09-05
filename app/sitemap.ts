@@ -2,6 +2,7 @@ import type { MetadataRoute } from 'next';
 import { SITE_URL } from '@/lib/data/contact';
 import { SANCTUARIES } from '@/lib/data/sanctuaries';
 import { JOURNAL_POSTS } from '@/lib/data/journal';
+import { CATEGORIES } from '@/lib/data/categories';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
@@ -14,6 +15,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/blog`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
     { url: `${SITE_URL}/reviews`, lastModified: now, changeFrequency: 'weekly', priority: 0.6 },
   ];
+  for (const c of CATEGORIES) {
+    routes.push({
+      url: `${SITE_URL}/explore/${c.slug}`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.85,
+    });
+  }
   for (const s of SANCTUARIES) {
     routes.push({
       url: `${SITE_URL}/sanctuaries/${s.id}`,

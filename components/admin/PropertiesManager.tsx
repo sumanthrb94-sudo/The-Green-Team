@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Plus, Pencil, Trash2, Eye, EyeOff, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { AdminProperty } from '@/lib/server/admin-data';
+import { CATEGORIES, STAGES, type Category, type Stage } from '@/lib/data/categories';
 
 const EMPTY = {
   title: '',
@@ -26,6 +27,10 @@ const EMPTY = {
   sitePlanSrc: '',
   order: 0,
   status: 'draft' as 'draft' | 'live',
+  // Portal discovery — where this property is browsable. See lib/data/categories.ts.
+  category: 'plots' as Category,
+  stage: 'ongoing' as Stage,
+  investment: true,
   features: [] as string[],
   plotImages: [] as string[],
 };
@@ -224,6 +229,37 @@ export function PropertiesManager({ initial }: { initial: AdminProperty[] }) {
                 placeholder="Add a feature and press Enter"
                 className={input}
               />
+            </div>
+          </div>
+          <div className="grid sm:grid-cols-3 gap-4">
+            <div>
+              <label className={label}>Category</label>
+              <select value={form.category} onChange={e => set('category', e.target.value as Category)} className={input}>
+                {CATEGORIES.filter(c => c.slug !== 'investments').map(c => (
+                  <option key={c.slug} value={c.slug}>{c.title}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className={label}>Stage</label>
+              <select value={form.stage} onChange={e => set('stage', e.target.value as Stage)} className={input}>
+                {STAGES.map(st => (
+                  <option key={st.value} value={st.value}>{st.label} — {st.hint}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className={label}>Investment page</label>
+              <button
+                type="button"
+                onClick={() => set('investment', !form.investment)}
+                className={cn(
+                  'w-full px-4 py-3 rounded-2xl text-[9px] uppercase tracking-widest font-bold border transition-all',
+                  form.investment ? 'bg-primary text-on-primary border-primary' : 'border-outline/30 text-secondary/60'
+                )}
+              >
+                {form.investment ? 'Shown under Investments' : 'Not an investment listing'}
+              </button>
             </div>
           </div>
           <div className="flex items-center gap-3">

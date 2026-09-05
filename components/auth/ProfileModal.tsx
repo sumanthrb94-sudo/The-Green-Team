@@ -1,6 +1,6 @@
 'use client';
 
-/** Post-sign-up profile capture — name / occupation / city, optional. */
+/** Post-sign-up profile capture — name / phone / occupation / city, optional. */
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { Check, X } from 'lucide-react';
@@ -9,6 +9,7 @@ import { useAuth } from './AuthProvider';
 export function ProfileModal() {
   const { user, profileModalOpen, closeProfile } = useAuth();
   const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
   const [occupation, setOccupation] = useState('');
   const [city, setCity] = useState('');
   const [saving, setSaving] = useState(false);
@@ -23,6 +24,7 @@ export function ProfileModal() {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
         body: JSON.stringify({
           ...(name.trim() ? { name: name.trim() } : {}),
+          ...(phone.trim() ? { phone: phone.trim() } : {}),
           ...(occupation.trim() ? { occupation: occupation.trim() } : {}),
           ...(city.trim() ? { city: city.trim() } : {}),
         }),
@@ -74,6 +76,11 @@ export function ProfileModal() {
                 <label htmlFor="pf-name" className={labelCls}>Full Name</label>
                 <input id="pf-name" value={name} onChange={e => setName(e.target.value)}
                   placeholder={user.displayName ?? 'Your name'} className={inputCls} />
+              </div>
+              <div>
+                <label htmlFor="pf-phone" className={labelCls}>Phone (for your adviser)</label>
+                <input id="pf-phone" type="tel" inputMode="tel" autoComplete="tel" value={phone}
+                  onChange={e => setPhone(e.target.value)} placeholder="+91 98xxx xxxxx" className={inputCls} />
               </div>
               <div>
                 <label htmlFor="pf-occupation" className={labelCls}>What do you do?</label>

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
 import { adminDb } from '@/lib/firebase/admin';
 import { allowedOrigin, clientIp, rateLimited } from '@/lib/server/rate-limit';
+import { upsertContact, SEGMENT } from '@/lib/server/resend';
 
 const SOURCES = new Set(['modal', 'inline', 'mobile_quick', 'footer']);
 
@@ -22,6 +23,8 @@ export async function POST(req: NextRequest) {
       source,
       createdAt: FieldValue.serverTimestamp(),
     });
+    // Firestore is the record; Resend is where the broadcast goes out from.
+    void upsertContact({ email, segments: [SEGMENT.newsletter()], properties: { source } });
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: 'failed' }, { status: 500 });

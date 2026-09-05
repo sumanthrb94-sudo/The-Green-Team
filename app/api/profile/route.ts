@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
 import { adminAuth, adminDb } from '@/lib/firebase/admin';
+import { upsertContact, splitName, SEGMENT } from '@/lib/server/resend';
 
 /**
  * Authenticated profile upsert. The bearer ID token names the user — a caller
@@ -16,6 +17,13 @@ export async function POST(req: NextRequest) {
     const allowed: Record<string, unknown> = {};
     for (const k of ['name', 'occupation', 'city'] as const) {
       if (typeof body[k] === 'string' && body[k].trim()) allowed[k] = body[k].trim().slice(0, 200);
+    }
+    // Phone is the one field a channel partner actually needs to follow up.
+    // Kept loose on purpose (digits, +, spaces, dashes) — the adviser confirms
+    // it on the call; a strict regex here would only reject real numbers.
+    if (typeof body.phone === 'string') {
+      const ph = body.phone.replace(/[^\d+\s\-()]/g, '').trim().slice(0, 40);
+      if (ph.replace(/\D/g, '').length >= 8) allowed.phone = ph;
     }
     for (const k of ['lat', 'lng', 'locationAccuracy'] as const) {
       if (typeof body[k] === 'number' && Number.isFinite(body[k])) allowed[k] = body[k];
@@ -36,6 +44,24 @@ export async function POST(req: NextRequest) {
       },
       { merge: true }
     );
+    // Mirror to Resend so a sign-in is a contact the moment it happens. Fire and
+    // forget: the profile write above is the source of truth and must not wait
+    // on, or fail because of, an email provider.
+    if (decoded.email) {
+      const name = (allowed.name as string | undefined) ?? (decoded.name as string | undefined);
+      void upsertContact({
+        email: decoded.email,
+        ...splitName(name),
+        segments: [SEGMENT.members()],
+        properties: {
+          phone: allowed.phone as string | undefined,
+          city: allowed.city as string | undefined,
+          occupation: allowed.occupation as string | undefined,
+          source: 'sign-in',
+        },
+      });
+    }
+
     return NextResponse.json({ ok: true, isNew });
   } catch {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
