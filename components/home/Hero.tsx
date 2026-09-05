@@ -92,7 +92,24 @@ export function Hero() {
     <section className="relative bg-[#0a1208] overflow-hidden">
       {/* Backdrop */}
       <div className="absolute inset-0">
-        <Image src="/hero-backdrop.jpg" alt="" fill priority sizes="100vw" className="object-cover object-center opacity-55" />
+        {/*
+          Crop anchor differs by breakpoint on purpose. The backdrop is lit from
+          the right — measured, its brightness centre-of-mass sits at ~72% width
+          while the left half reads 6-18 luminance out of 255. A phone crops this
+          wide image to a narrow slice, so the default `object-center` anchors on
+          the 50% mark, which is the darkest part of the frame and why the hero
+          looked washed out on mobile. Anchoring at 72% puts the lit band in
+          frame instead. Desktop is wide enough to show the full width, so it
+          keeps the centre anchor and the intended dark-left / lit-right layout.
+        */}
+        <Image
+          src="/hero-backdrop.jpg"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-[72%_center] opacity-55 md:object-center"
+        />
         <div className="absolute inset-0 bg-gradient-to-r from-[#0a1208] via-[#0a1208]/75 to-[#0a1208]/25" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a1208] via-transparent to-[#0a1208]/60" />
       </div>
