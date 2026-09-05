@@ -17,6 +17,7 @@ import {
   SYL_RATE,
 } from '@/lib/data/contact';
 import { SALES_FAQ } from '@/lib/data/faq';
+import { DISQUALIFIERS, LISTING_STANDARD, SERVICE_AREA } from '@/lib/data/standard';
 import { JOURNAL_POSTS } from '@/lib/data/journal';
 import { KEY_ZONES, MAP_LOCATIONS, NATURAL_FEATURES } from '@/lib/data/map';
 import { getPortfolio } from '@/lib/server/portfolio';
@@ -381,6 +382,48 @@ function faqChunks(out: KbChunk[]): void {
   });
 }
 
+/**
+ * The listing standard. Retrieved when a buyer asks why the portfolio is small,
+ * what we refuse, or which areas we cover — the questions that decide whether
+ * a curated shortlist reads as selective or as thin.
+ */
+function standardChunks(out: KbChunk[]): void {
+  add(out, {
+    id: 'standard:scope',
+    title: 'The Green Team — areas covered',
+    source: 'standard',
+    url: '/standard',
+    text:
+      `The Green Team lists property in ${SERVICE_AREA.region} and its ORR–RRR growth corridor only, and nowhere ` +
+      `else at present. ${SERVICE_AREA.detail} A buyer looking outside Hyderabad is told plainly that The Green ` +
+      `Team is the wrong firm for that search rather than being taken on as an enquiry.`,
+  });
+
+  add(out, {
+    id: 'standard:refusals',
+    title: 'The Green Team — what we refuse to list',
+    source: 'standard',
+    url: '/standard',
+    text:
+      `The Green Team publishes what it turns down as part of its listing standard. It will not list: ` +
+      `${DISQUALIFIERS.join('; ')}. In particular, assured-return, guaranteed-buyback and rental-guarantee ` +
+      `structures are refused outright in any form, and a visualisation is never presented as a built home.`,
+  });
+
+  LISTING_STANDARD.forEach(pillar => {
+    add(out, {
+      id: `standard:${pillar.id}`,
+      title: `Listing standard — ${pillar.title}`,
+      source: 'standard',
+      url: '/standard',
+      text:
+        `One of the six tests The Green Team applies before listing a property is "${pillar.title}". ` +
+        `${pillar.summary} Specifically, the property must satisfy: ${pillar.tests.join('; ')}. ` +
+        `A project that fails this test is not listed on thegreenteam.in, however good it looks.`,
+    });
+  });
+}
+
 export async function buildCorpus(): Promise<KbChunk[]> {
   const out: KbChunk[] = [];
 
@@ -392,6 +435,7 @@ export async function buildCorpus(): Promise<KbChunk[]> {
   layoutChunks(out);
   contactChunks(out);
   faqChunks(out);
+  standardChunks(out);
 
   return out;
 }

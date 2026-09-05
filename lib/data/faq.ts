@@ -16,6 +16,21 @@ export const SALES_FAQ: Array<{ q: string; a: string; tags?: string[] }> = [
     tags: ['channel-partner', 'about'],
   },
   {
+    q: 'Why do you only list three projects?',
+    a: 'Because only three cleared the standard. We measure every project against six things before it goes on the site: a real environmental advantage (AQI 30 or under and 30 dB or under, measured on site, against a Hyderabad average near 148), title and approvals that survive a lawyer, an approach road that already exists and that we have driven, a developer with at least one delivered project you can walk through, design that keeps the green it is selling, and numbers we are willing to be quoted on. We also refuse assured-return and guaranteed-buyback schemes outright, and anything we have not physically stood on. The full standard, including what we turn down, is published at /standard.',
+    tags: ['standard', 'curation', 'trust', 'about'],
+  },
+  {
+    q: 'Which areas do you cover?',
+    a: 'Hyderabad and its ORR–RRR growth corridor, and nowhere else for now. Every claim we publish — air quality, ambient noise, drive times, the condition of the access road — is something we can go and re-check in an afternoon, and that is only true in a region we can drive to. We would rather cover one city honestly than list a country we have never stood in. If you are looking outside Hyderabad we will tell you we are the wrong people rather than take the enquiry.',
+    tags: ['coverage', 'location', 'hyderabad', 'about'],
+  },
+  {
+    q: 'I am a developer or landowner — how do I get a project listed?',
+    a: 'Send it to us on WhatsApp or through the adviser-call form and we will assess it against the same six-part standard we apply to everything else: environment, legal, access, developer track record, design, and honest numbers. We will tell you plainly which of the six it fails and whether that is fixable. We only take on projects in Hyderabad and its corridor at the moment, and we do not list assured-return or guaranteed-buyback structures in any form.',
+    tags: ['developer', 'listing', 'partnership', 'standard'],
+  },
+  {
     q: 'Does buying through you cost more than going to the developer directly?',
     a: 'No. The developer pays the channel partner, so the price you pay is the developer price and it does not change because we introduced you. In practice a channel partner usually gets better terms, because we negotiate across many buyers instead of one. At MODCON Agartha, better pricing than the listed rate of ₹8,500 per sq yd is available on an in-person visit and we negotiate that on your behalf.',
     tags: ['channel-partner', 'pricing', 'objection'],

@@ -7,6 +7,7 @@ const AGENDA: { label: string; sub: string; href: string }[] = [
   { label: 'MODCON Agartha', sub: 'Narsapur Forest · 37 farm plots', href: '/sanctuaries/agartha' },
   { label: 'MODCON SYL Residences', sub: 'Tukkuguda, ORR Exit-14', href: '/sanctuaries/syl' },
   { label: 'Dates County by Planet Green', sub: 'Kandukur · 4,000-acre reserve', href: '/sanctuaries/dates-county' },
+  { label: 'Our Standard', sub: 'The bar a property must clear to be listed', href: '/standard' },
   { label: 'The Journal', sub: 'Field notes & sanctuary intelligence', href: '/blog' },
   { label: 'Sanctuary Map', sub: 'Environmental heatmap · AQI · Noise', href: '/map' },
   { label: 'Adviser Call', sub: 'Free · We respond within 24 hours', href: '/adviser-call' },
