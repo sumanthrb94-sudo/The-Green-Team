@@ -3,6 +3,7 @@ import { FieldValue } from 'firebase-admin/firestore';
 import { adminDb } from '@/lib/firebase/admin';
 import { allowedOrigin, clientIp, rateLimited } from '@/lib/server/rate-limit';
 import { upsertContact, SEGMENT } from '@/lib/server/resend';
+import { sendWelcomeEmail } from '@/lib/server/email';
 
 const SOURCES = new Set(['modal', 'inline', 'mobile_quick', 'footer']);
 
@@ -25,6 +26,9 @@ export async function POST(req: NextRequest) {
     });
     // Firestore is the record; Resend is where the broadcast goes out from.
     void upsertContact({ email, segments: [SEGMENT.newsletter()], properties: { source } });
+    // Confirm the subscription immediately so the new member gets something in
+    // their inbox, not silence. Fire-and-forget: the signup is saved regardless.
+    void sendWelcomeEmail(email);
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: 'failed' }, { status: 500 });
