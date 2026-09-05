@@ -1,15 +1,26 @@
 'use client';
 
+/**
+ * The slide-in menu — the primary navigation on mobile (where the top-bar links
+ * are hidden) and the account panel on every size. It opens for everyone, not
+ * only signed-in users: a logged-out visitor gets the full nav plus a clear
+ * "Sign in / Join" call, which is what was missing before — a phone had no menu
+ * and no visible way to log in.
+ */
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'motion/react';
-import { X, Home, MessageSquare, LogOut, ShieldCheck, Phone } from 'lucide-react';
+import { X, Home, BookOpen, LogOut, ShieldCheck, Phone, LogIn, Trees, Building2, TrendingUp, MapPin } from 'lucide-react';
 import { Logo } from '@/components/brand/Logo';
 import { useAuth } from '@/components/auth/AuthProvider';
 
 const NAV_ITEMS = [
   { name: 'Home', href: '/', icon: Home },
-  { name: 'Journal', href: '/blog', icon: MessageSquare },
+  { name: 'Villas', href: '/explore/villas', icon: Building2 },
+  { name: 'Plots & Farmland', href: '/explore/plots', icon: Trees },
+  { name: 'Investments', href: '/explore/investments', icon: TrendingUp },
+  { name: 'Sanctuary Map', href: '/map', icon: MapPin },
+  { name: 'Journal', href: '/blog', icon: BookOpen },
 ];
 
 const SANCTUARY_ITEMS = [
@@ -19,7 +30,7 @@ const SANCTUARY_ITEMS = [
 ];
 
 export function AccountDrawer({ onClose, isDark }: { onClose: () => void; isDark: boolean }) {
-  const { user, isAdmin, signOutUser } = useAuth();
+  const { user, isAdmin, signOutUser, openAuth } = useAuth();
   const avatarLetter = (user?.displayName?.[0] || user?.email?.[0] || user?.phoneNumber?.[1] || '?').toUpperCase();
   const divider = isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(45,58,29,0.07)';
 
@@ -38,6 +49,9 @@ export function AccountDrawer({ onClose, isDark }: { onClose: () => void; isDark
         exit={{ x: '100%' }}
         transition={{ type: 'spring', damping: 30, stiffness: 300 }}
         className="fixed top-0 right-0 bottom-0 z-[9996] w-[min(360px,100vw)] flex flex-col bg-surface shadow-2xl overflow-y-auto"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Menu"
       >
         <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: divider }}>
           <Logo />
@@ -45,6 +59,21 @@ export function AccountDrawer({ onClose, isDark }: { onClose: () => void; isDark
             <X className="w-5 h-5 text-on-surface/70" />
           </button>
         </div>
+
+        {/* Signed-out sign-in prompt — first thing a logged-out visitor sees */}
+        {!user && (
+          <div className="px-5 pt-5 pb-5" style={{ borderBottom: divider }}>
+            <button
+              onClick={() => { openAuth(); onClose(); }}
+              className="w-full py-3.5 rounded-xl bg-primary text-on-primary text-[10px] uppercase tracking-[0.35em] font-bold flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-primary/20 transition-all"
+            >
+              <LogIn className="w-4 h-4" /> Sign in / Join
+            </button>
+            <p className="mt-2.5 text-center text-[10px] text-secondary/60 leading-relaxed">
+              Members see unit-level pricing and save shortlists.
+            </p>
+          </div>
+        )}
 
         <div className="px-5 pt-5 pb-5" style={{ borderBottom: divider }}>
           <p className="text-[7px] uppercase tracking-[0.55em] text-secondary/40 font-bold mb-3 px-1">Navigate</p>
@@ -57,7 +86,7 @@ export function AccountDrawer({ onClose, isDark }: { onClose: () => void; isDark
                 className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-primary/6 transition-all group"
               >
                 <Icon className="w-4 h-4 text-primary/50 group-hover:text-primary transition-colors" />
-                <span className="text-[11px] uppercase tracking-[0.35em] font-bold text-on-surface/60 group-hover:text-on-surface transition-colors">
+                <span className="text-[11px] uppercase tracking-[0.32em] font-bold text-on-surface/60 group-hover:text-on-surface transition-colors">
                   {name}
                 </span>
               </Link>
@@ -91,7 +120,7 @@ export function AccountDrawer({ onClose, isDark }: { onClose: () => void; isDark
 
         <div className="px-5 pt-5 pb-6 mt-auto">
           <p className="text-[7px] uppercase tracking-[0.55em] text-secondary/40 font-bold mb-3 px-1">Account</p>
-          {user && (
+          {user ? (
             <div className="flex flex-col gap-2.5">
               <div className="flex items-center gap-3 px-3 py-3 rounded-xl bg-primary/5">
                 {user.photoURL ? (
@@ -121,11 +150,11 @@ export function AccountDrawer({ onClose, isDark }: { onClose: () => void; isDark
                 </Link>
               )}
               <Link
-                href="/adviser-call"
+                href="/contact"
                 onClick={onClose}
                 className="w-full py-3.5 rounded-xl bg-primary text-on-primary text-[9px] uppercase tracking-[0.4em] font-bold flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-primary/20 transition-all"
               >
-                <Phone className="w-3.5 h-3.5" /> Request Adviser Call
+                <Phone className="w-3.5 h-3.5" /> Talk to an adviser
               </Link>
               <button
                 onClick={() => { void signOutUser(); onClose(); }}
@@ -134,6 +163,14 @@ export function AccountDrawer({ onClose, isDark }: { onClose: () => void; isDark
                 <LogOut className="w-3.5 h-3.5" /> Sign Out
               </button>
             </div>
+          ) : (
+            <Link
+              href="/contact"
+              onClick={onClose}
+              className="w-full py-3.5 rounded-xl bg-primary text-on-primary text-[9px] uppercase tracking-[0.4em] font-bold flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-primary/20 transition-all"
+            >
+              <Phone className="w-3.5 h-3.5" /> Talk to an adviser
+            </Link>
           )}
           <p className="mt-5 text-center text-[8px] uppercase tracking-[0.3em] text-secondary/30">
             © {new Date().getFullYear()} The Green Team · Hyderabad

@@ -125,7 +125,7 @@ export function ListingCard({ sanctuary: s }: { sanctuary: Sanctuary }) {
             View details <ArrowUpRight className="w-3.5 h-3.5" />
           </Link>
           <Link
-            href={`/adviser-call?property=${s.id}`}
+            href={`/contact?interest=${s.category ?? 'general'}&property=${s.id}`}
             className="flex-1 text-center px-4 py-2.5 rounded-full border border-outline/25 text-[10px] uppercase tracking-[0.2em] font-bold text-on-surface/70 hover:border-primary hover:text-primary transition-all"
           >
             Enquire

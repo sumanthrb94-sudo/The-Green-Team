@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { AnimatePresence, motion } from 'motion/react';
-import { Moon, Sun, ShieldCheck, User as UserIcon } from 'lucide-react';
+import { Moon, Sun, ShieldCheck, User as UserIcon, Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Logo } from '@/components/brand/Logo';
 import { useAuth } from '@/components/auth/AuthProvider';
@@ -15,7 +15,7 @@ const NAV = [
   { name: 'Plots', href: '/explore/plots' },
   { name: 'Investments', href: '/explore/investments' },
   { name: 'Journal', href: '/blog' },
-  { name: 'Adviser Call', href: '/adviser-call', gold: true },
+  { name: 'Contact', href: '/contact', gold: true },
 ];
 
 export function Navbar() {
@@ -80,6 +80,23 @@ export function Navbar() {
               className="w-9 h-9 rounded-full flex items-center justify-center text-secondary/50 hover:text-primary hover:bg-primary/5 transition-all"
             >
               {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
+            {/* Signed-out desktop: an explicit Sign in, not just an icon */}
+            {!user && (
+              <button
+                onClick={openAuth}
+                className="hidden md:inline-flex items-center px-4 py-2 rounded-full border border-outline/30 text-[9px] uppercase tracking-[0.3em] font-bold text-on-surface/70 hover:border-primary hover:text-primary transition-all"
+              >
+                Sign in
+              </button>
+            )}
+            {/* Mobile menu (nav links live here on small screens) */}
+            <button
+              onClick={() => setDrawerOpen(true)}
+              aria-label="Open menu"
+              className="md:hidden w-9 h-9 rounded-full flex items-center justify-center text-secondary/60 hover:text-primary hover:bg-primary/5 transition-all"
+            >
+              <Menu className="w-5 h-5" />
             </button>
             <button
               onClick={() => (user ? setDrawerOpen(true) : openAuth())}
