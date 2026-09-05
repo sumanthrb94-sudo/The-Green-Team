@@ -95,15 +95,20 @@ export function BentoPortfolio({ sanctuaries }: { sanctuaries: Sanctuary[] }) {
             <h2 className="font-serif text-5xl md:text-7xl font-light text-on-surface leading-none">
               Three sanctuaries.
               <br />
-              <em className="text-primary">Zero compromises.</em>
+              <em className="text-primary">Chosen to be lived in.</em>
             </h2>
           </div>
-          <Link
-            href="/list"
-            className="self-start md:self-auto px-7 py-3.5 rounded-full border border-outline/30 text-[10px] uppercase tracking-[0.4em] font-bold text-on-surface/60 hover:border-primary hover:text-primary transition-all"
-          >
-            View All
-          </Link>
+          <div className="max-w-xl">
+            <p className="text-on-surface/60 text-base md:text-lg leading-relaxed mb-5">
+              Every listing is visited, checked, and described in plain language. Compare the setting, access, air, noise, title, and development stage before you spend a weekend on a site visit.
+            </p>
+            <Link
+              href="/list"
+              className="inline-flex px-7 py-3.5 rounded-full border border-outline/30 text-[10px] uppercase tracking-[0.4em] font-bold text-on-surface/60 hover:border-primary hover:text-primary transition-all"
+            >
+              Explore all sanctuaries
+            </Link>
+          </div>
         </div>
 
         <div className="grid md:grid-cols-3 md:grid-rows-2 gap-4 md:gap-5">

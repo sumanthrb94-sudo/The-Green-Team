@@ -93,22 +93,26 @@ export function Hero() {
       {/* Backdrop */}
       <div className="absolute inset-0">
         {/*
-          Crop anchor differs by breakpoint on purpose. The backdrop is lit from
-          the right — measured, its brightness centre-of-mass sits at ~72% width
-          while the left half reads 6-18 luminance out of 255. A phone crops this
-          wide image to a narrow slice, so the default `object-center` anchors on
-          the 50% mark, which is the darkest part of the frame and why the hero
-          looked washed out on mobile. Anchoring at 72% puts the lit band in
-          frame instead. Desktop is wide enough to show the full width, so it
-          keeps the centre anchor and the intended dark-left / lit-right layout.
+          Serve the pipeline-processed /hero-backdrop.jpg, not a raw source PNG:
+          only files registered in lib/image-manifest.json get responsive
+          variants from the custom loader, so referencing an unprocessed image
+          ships the full-size original to every phone.
+
+          `object-center` is correct for THIS backdrop specifically. A phone
+          crops a 16:9 image to a narrow slice, so the anchor has to sit on the
+          part worth showing — measured, this one runs bright across the left
+          and middle (124-135 of 255) and falls away to 56-74 on the right, so
+          the centre holds both the light and the path. Re-measure when swapping
+          the image; the previous backdrop was lit from the opposite side and
+          needed a 72% anchor for the same reason.
         */}
         <Image
           src="/hero-backdrop.jpg"
-          alt=""
+          alt="Sunlit meadow meeting a dense forest near Hyderabad"
           fill
           priority
           sizes="100vw"
-          className="object-cover object-[72%_center] opacity-55 md:object-center"
+          className="object-cover object-center opacity-55"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-[#0a1208] via-[#0a1208]/75 to-[#0a1208]/25" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a1208] via-transparent to-[#0a1208]/60" />
@@ -150,8 +154,7 @@ export function Hero() {
             transition={{ delay: 0.55, duration: 0.8 }}
             className="text-base md:text-lg font-light text-white/55 leading-relaxed max-w-md mb-10"
           >
-            Forest-adjacent homes near Hyderabad — verified air, verified silence, city still within 45 minutes.
-            We curate. You decide.
+            Forest-adjacent plots, homes, and retreats near Hyderabad — selected for cleaner air, quieter surroundings, real access, and paperwork you can verify. We do the first round of checking. You decide where to go.
           </motion.p>
 
           <motion.div
@@ -167,14 +170,12 @@ export function Hero() {
               <Phone className="w-3.5 h-3.5" />
               Request Adviser Call
             </Link>
-            <a
-              href={WHATSAPP.generic}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-9 py-4 rounded-full border border-white/20 text-white/65 text-[10px] uppercase tracking-[0.4em] font-bold hover:border-[#25D366]/60 hover:text-white transition-all text-center"
+            <Link
+              href="/list"
+              className="px-9 py-4 rounded-full border border-white/20 text-white/65 text-[10px] uppercase tracking-[0.4em] font-bold hover:border-[#a3b18a]/60 hover:text-white transition-all text-center"
             >
-              WhatsApp Us
-            </a>
+              Explore the sanctuaries
+            </Link>
           </motion.div>
         </div>
 

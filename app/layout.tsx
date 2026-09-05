@@ -19,13 +19,13 @@ const cormorant = Cormorant_Garamond({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: 'The Green Team | Forest Homes Near Hyderabad | Agartha · SYL · Dates County',
+    default: 'Forest-Adjacent Homes and Land Near Hyderabad | The Green Team',
     template: '%s | The Green Team',
   },
   description:
-    'We curate forest-adjacent homes near Hyderabad — AQI under 25, under an hour from the city. Channel partners for MODCON Agartha (Narsapur), MODCON SYL Residences (Tukkuguda), and Dates County by Planet Green (Kandukur). Farm plots from ₹78 L. Villas, apartments & plots verified.',
+    'Discover verified forest-adjacent plots, homes, and retreats near Hyderabad. Compare air, access, noise, paperwork, and development stage across curated sanctuaries including Agartha, SYL Residences, and Dates County.',
   keywords:
-    'forest property Hyderabad, eco friendly homes Hyderabad, MODCON Agartha, MODCON SYL Residences, Dates County Planet Green, Kandukur villa plots, Tukkuguda residences, ORR Exit-14 property, farm plots near Hyderabad, Narsapur forest plots, Srisailam Highway plots, low AQI property Hyderabad, channel partner Agartha, green real estate Hyderabad, RRR corridor property',
+    'forest-adjacent homes Hyderabad, forest plots near Hyderabad, eco-friendly homes Hyderabad, MODCON Agartha, MODCON SYL Residences, Dates County, Kandukur plots, Tukkuguda residences, Narsapur forest property, RRR corridor property, verified land Hyderabad',
   authors: [{ name: BUSINESS.name }],
   robots: { index: true, follow: true, 'max-snippet': -1, 'max-image-preview': 'large' },
   openGraph: {
@@ -33,9 +33,9 @@ export const metadata: Metadata = {
     siteName: BUSINESS.name,
     locale: 'en_IN',
     url: SITE_URL,
-    title: 'The Green Team | Forest Homes Near Hyderabad | From ₹78 L',
+    title: 'Forest-Adjacent Homes and Land Near Hyderabad | The Green Team',
     description:
-      'Independent channel partners who curate forest-adjacent homes near Hyderabad. AQI 12, 18 dB noise, under 45-min commute. Three sanctuaries — verified before we show you.',
+      'Independent curators of forest-adjacent plots, homes, and retreats near Hyderabad. Compare the setting, access, air, noise, paperwork, and development stage before you visit.',
     images: [
       {
         url: `${SITE_URL}/agartha-render.jpg`,
@@ -47,9 +47,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'The Green Team | Forest Homes Near Hyderabad',
+    title: 'Forest-Adjacent Homes Near Hyderabad | The Green Team',
     description:
-      'We curate forest-adjacent homes near Hyderabad — AQI 12, 18 dB noise, 45-min commute. Channel partners for MODCON Agartha, SYL Residences, and Dates County.',
+      'Verified forest-adjacent plots, homes, and retreats near Hyderabad — curated by The Green Team.',
     images: [`${SITE_URL}/agartha-render.jpg`],
   },
   icons: { icon: '/favicon.svg' },
