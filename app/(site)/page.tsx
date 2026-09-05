@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Hero } from '@/components/home/Hero';
+import { ActivityStrip } from '@/components/social/ActivityStrip';
 import { BentoPortfolio } from '@/components/home/BentoPortfolio';
 import { ProofStrip } from '@/components/home/ProofStrip';
 import { AdviserCallSection } from '@/components/adviser/AdviserCallForm';
@@ -20,6 +21,9 @@ export default async function HomePage() {
   return (
     <>
       <Hero />
+      {/* Real momentum — the component renders nothing (no bar) until there is
+          something true to show, so there is never an empty strip. */}
+      <ActivityStrip />
       <BentoPortfolio sanctuaries={portfolio} />
       <ProofStrip />
       <AdviserCallSection />

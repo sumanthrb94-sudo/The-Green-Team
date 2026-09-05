@@ -4,7 +4,7 @@ const FIELDS = [
   'title', 'location', 'aqi', 'noise', 'commute', 'valuation', 'memberPrice', 'image',
   'tagline', 'description', 'plots', 'plotRange', 'amenityAcres', 'architect',
   'pricePerSqYd', 'sitePlanSrc', 'brochureUrl', 'status', 'order', 'features', 'plotImages', 'mapUrl',
-  'category', 'stage', 'investment',
+  'category', 'stage', 'investment', 'reserved',
 ] as const;
 
 /** Whitelist + normalize an admin property payload. */
@@ -17,5 +17,12 @@ export function sanitizePropertyInput(body: Record<string, unknown>) {
   if (out.category !== undefined && out.category !== 'villas' && out.category !== 'plots') delete out.category;
   if (out.stage !== undefined && !['completed', 'ongoing', 'upcoming'].includes(String(out.stage))) delete out.stage;
   if (out.investment !== undefined) out.investment = Boolean(out.investment);
+  // Reserved units — real scarcity the admin enters. Clamp to a non-negative
+  // integer; never above the plot count if we know it.
+  if (out.reserved !== undefined) {
+    const n = Math.max(0, Math.floor(Number(out.reserved) || 0));
+    const cap = Number(out.plots);
+    out.reserved = Number.isFinite(cap) && cap > 0 ? Math.min(n, cap) : n;
+  }
   return out;
 }

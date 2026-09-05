@@ -31,6 +31,7 @@ const EMPTY = {
   category: 'plots' as Category,
   stage: 'ongoing' as Stage,
   investment: true,
+  reserved: 0,
   features: [] as string[],
   plotImages: [] as string[],
 };
@@ -247,6 +248,17 @@ export function PropertiesManager({ initial }: { initial: AdminProperty[] }) {
                   <option key={st.value} value={st.value}>{st.label} — {st.hint}</option>
                 ))}
               </select>
+            </div>
+            <div>
+              <label className={label}>Reserved units (real)</label>
+              <input
+                type="number"
+                min={0}
+                value={form.reserved}
+                onChange={e => set('reserved', Math.max(0, Number(e.target.value) || 0))}
+                placeholder="e.g. 18"
+                className={input}
+              />
             </div>
             <div>
               <label className={label}>Investment page</label>

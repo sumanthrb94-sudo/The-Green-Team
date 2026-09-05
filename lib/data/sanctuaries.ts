@@ -43,6 +43,8 @@ export interface Sanctuary {
   category?: Category;
   stage?: Stage;
   investment?: boolean;
+  /** Real units reserved/sold, admin-entered — powers the momentum strip. */
+  reserved?: number;
   /** Firestore-managed properties carry these */
   status?: 'live' | 'draft';
   order?: number;
