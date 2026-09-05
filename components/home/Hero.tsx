@@ -12,6 +12,7 @@ import Image from 'next/image';
 import { motion } from 'motion/react';
 import { ArrowUpRight, Wind, VolumeX, Clock, Phone } from 'lucide-react';
 import { WHATSAPP } from '@/lib/data/contact';
+import { HeroSearch } from '@/components/home/HeroSearch';
 
 const HEADLINE: { text: string; cls: string }[] = [
   { text: 'The forest', cls: 'text-white' },
@@ -160,7 +161,16 @@ export function Hero() {
           <motion.div
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7, duration: 0.8 }}
+            transition={{ delay: 0.68, duration: 0.8 }}
+            className="mb-5"
+          >
+            <HeroSearch />
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8, duration: 0.8 }}
             className="flex flex-col sm:flex-row gap-3"
           >
             <Link
@@ -174,7 +184,7 @@ export function Hero() {
               href="/list"
               className="px-9 py-4 rounded-full border border-white/20 text-white/65 text-[10px] uppercase tracking-[0.4em] font-bold hover:border-[#a3b18a]/60 hover:text-white transition-all text-center"
             >
-              Explore the sanctuaries
+              Browse all listings
             </Link>
           </motion.div>
         </div>

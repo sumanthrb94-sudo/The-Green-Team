@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Footer } from '@/components/Footer';
-import { PortalGrid } from '@/components/portal/PortalGrid';
+import { PortalBrowser } from '@/components/portal/PortalBrowser';
 import { CATEGORIES, getCategory } from '@/lib/data/categories';
 import { SITE_URL } from '@/lib/data/contact';
 import { getPortfolio } from '@/lib/server/portfolio';
@@ -50,7 +51,6 @@ export default async function CategoryPage({ params }: Props) {
 
   const portfolio = await getPortfolio();
   const items = portfolio.filter(cat.match);
-  const others = CATEGORIES.filter(c => c.slug !== cat.slug);
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -115,40 +115,11 @@ export default async function CategoryPage({ params }: Props) {
         </div>
       </section>
 
-      <section className="px-6 md:px-24 pb-20">
-        <div className="max-w-7xl mx-auto">
-          <PortalGrid sanctuaries={items} />
-        </div>
-      </section>
-
       <section className="px-6 md:px-24 pb-24">
-        <div className="max-w-7xl mx-auto border-t border-outline/12 pt-10">
-          <p className="text-[10px] uppercase tracking-[0.5em] font-bold text-secondary/50 mb-5">
-            Also browse
-          </p>
-          <div className="flex flex-wrap gap-3">
-            {others.map(c => (
-              <Link
-                key={c.slug}
-                href={`/explore/${c.slug}`}
-                className="group px-6 py-4 rounded-2xl border border-outline/15 hover:border-primary/40 transition-all"
-              >
-                <span className="block font-headline font-bold text-on-surface group-hover:text-primary transition-colors">
-                  {c.title}
-                </span>
-                <span className="block text-xs text-secondary/60 mt-1">{c.tagline}</span>
-              </Link>
-            ))}
-            <Link
-              href="/standard"
-              className="group px-6 py-4 rounded-2xl border border-outline/15 hover:border-primary/40 transition-all"
-            >
-              <span className="block font-headline font-bold text-on-surface group-hover:text-primary transition-colors">
-                How we choose
-              </span>
-              <span className="block text-xs text-secondary/60 mt-1">The six-part bar every listing clears</span>
-            </Link>
-          </div>
+        <div className="max-w-7xl mx-auto">
+          <Suspense fallback={<div className="h-40" />}>
+            <PortalBrowser all={portfolio} lockedCategory={cat.slug} />
+          </Suspense>
         </div>
       </section>
 
