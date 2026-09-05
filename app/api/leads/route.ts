@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
     // worked. Transactional (they asked to be contacted), not marketing, so the
     // lead is deliberately NOT added to a mailing segment without consent.
     // Fire-and-forget: the lead is captured above regardless.
-    if (email) void sendLeadConfirmation(email, name || undefined, intent || undefined);
+    if (email) void sendLeadConfirmation(email, name || undefined, intent || undefined, source);
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: 'failed' }, { status: 500 });

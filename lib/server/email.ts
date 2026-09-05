@@ -2,6 +2,7 @@ import 'server-only';
 import { BUSINESS } from '@/lib/data/contact';
 import { renderWelcome, WELCOME_SUBJECT } from '@/emails/welcome';
 import { renderLeadConfirmation, LEAD_SUBJECT } from '@/emails/lead-confirmation';
+import { renderSiteVisit, SITE_VISIT_SUBJECT } from '@/emails/site-visit';
 
 /**
  * Transactional email — one message to one person, triggered by something they
@@ -44,7 +45,25 @@ export async function sendWelcomeEmail(to: string, name?: string): Promise<void>
   await send(to, WELCOME_SUBJECT, await renderWelcome(name));
 }
 
-/** Enquiry / adviser-call confirmation. */
-export async function sendLeadConfirmation(to: string, name?: string, intent?: string): Promise<void> {
+/** Site-visit booking confirmation. */
+export async function sendSiteVisitConfirmation(to: string, name?: string, detail?: string): Promise<void> {
+  await send(to, SITE_VISIT_SUBJECT, await renderSiteVisit({ name, detail }));
+}
+
+/**
+ * Confirmation for a captured lead, choosing the template by source: a site-
+ * visit booking gets the visit email, everything else the general enquiry one.
+ * One entry point so the leads route does not branch on strings itself.
+ */
+export async function sendLeadConfirmation(
+  to: string,
+  name?: string,
+  intent?: string,
+  source?: string
+): Promise<void> {
+  if (source && /site-visit/i.test(source)) {
+    await sendSiteVisitConfirmation(to, name, intent);
+    return;
+  }
   await send(to, LEAD_SUBJECT, await renderLeadConfirmation({ name, intent }));
 }
