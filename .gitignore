@@ -20,3 +20,6 @@ next-env.d.ts
 
 # Temporary QA / test scratch scripts (Playwright probes, one-off checks)
 *.tmp.cjs
+
+# Backup written by scripts/set-hero.mjs when swapping the hero image
+public/hero-backdrop.previous*
