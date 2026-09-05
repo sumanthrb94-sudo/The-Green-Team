@@ -1,9 +1,9 @@
 'use client';
 
 /** Per-property investment economics + WhatsApp CTAs — parity with v1's Invest tab. */
-import { Wind, VolumeX, Clock, MapPin, Leaf, Star } from 'lucide-react';
-import { WHATSAPP, AGARTHA_NOW_RATE, SYL_RATE } from '@/lib/data/contact';
-import { formatRs } from '@/lib/utils';
+import { Wind, VolumeX, Clock, MapPin, Leaf } from 'lucide-react';
+import { WHATSAPP } from '@/lib/data/contact';
+import { UnitPricing } from '@/components/property/UnitPricing';
 import type { Sanctuary } from '@/lib/data/sanctuaries';
 
 function WhatsAppButtons({ enquire, visit, visitLabel }: { enquire: string; visit: string; visitLabel: string }) {
@@ -32,34 +32,6 @@ function WhatsAppButtons({ enquire, visit, visitLabel }: { enquire: string; visi
   );
 }
 
-function PriceTable({
-  rows,
-  highlightIndex,
-}: {
-  rows: { label: string; qty: string; price: string; star?: boolean }[];
-  highlightIndex?: number;
-}) {
-  return (
-    <div className="rounded-2xl border border-outline/15 overflow-hidden divide-y divide-outline/10">
-      {rows.map((r, i) => (
-        <div
-          key={r.label}
-          className={`grid grid-cols-[1.2fr_1fr_auto] items-center gap-3 px-5 py-4 text-sm ${
-            i === highlightIndex ? 'bg-gold/10' : i % 2 ? 'bg-surface-container-low/60' : ''
-          }`}
-        >
-          <span className="text-on-surface/60 flex items-center gap-1.5">
-            {r.star && <Star className="w-3.5 h-3.5 text-gold fill-gold" />}
-            {r.label}
-          </span>
-          <span className="font-medium text-on-surface/80">{r.qty}</span>
-          <span className="font-headline font-bold text-on-surface">{r.price}</span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 export function InvestPanel({ sanctuary }: { sanctuary: Sanctuary }) {
   const telemetry = (
     <div className="grid grid-cols-3 gap-px bg-outline/10 border border-outline/10 rounded-2xl overflow-hidden mb-10">
@@ -79,29 +51,14 @@ export function InvestPanel({ sanctuary }: { sanctuary: Sanctuary }) {
   );
 
   if (sanctuary.id === 'agartha') {
-    // Real sizes off the issued master plan, not round numbers — see
-    // lib/data/agartha-layout.ts.
-    const sizes = [
-      { label: 'Plot 20 (Smallest)', yds: 726 },
-      { label: 'Plot 13', yds: 968 },
-      { label: 'Plot 21 (Typical)', yds: 1210 },
-      { label: 'Plot 28 (Largest sq-yd)', yds: 2057 },
-      { label: 'Plot 3 / 31 (1 Acre)', yds: 4840 },
-    ];
     return (
       <div>
         {telemetry}
         <p className="text-[10px] uppercase tracking-[0.5em] font-bold text-on-surface/60 mb-4">
           Price Estimate — ₹8,500 / sq yd
         </p>
-        <PriceTable
-          rows={sizes.map(s => ({
-            label: s.label,
-            qty: `${s.yds.toLocaleString('en-IN')} sq yds`,
-            price: formatRs(s.yds * AGARTHA_NOW_RATE),
-          }))}
-        />
-        <p className="mt-3 text-[10px] text-secondary/50">Rate: ₹8,500/sq yd · 37 plots from 726 sq yds to 1 acre</p>
+        <UnitPricing sanctuaryId="agartha" rateLabel="₹8,500 / sq yd" noun="plot" />
+        <p className="mt-3 text-[10px] text-secondary/50">37 plots from 726 sq yds to 1 acre</p>
 
         <div className="mt-8 p-7 rounded-3xl border border-outline/15 bg-surface-container-low">
           <p className="flex items-center gap-2 text-[9px] uppercase tracking-[0.45em] font-bold text-primary mb-4">
@@ -140,14 +97,6 @@ export function InvestPanel({ sanctuary }: { sanctuary: Sanctuary }) {
   }
 
   if (sanctuary.id === 'syl') {
-    const sizes = [
-      // Real unit areas printed on the issued SITE_PLAN.pdf (Blocks A & B).
-      { label: 'Block A — Smallest', sft: 3882 },
-      { label: 'Block B — Typical', sft: 3950 },
-      { label: 'Block A — Corner', sft: 4165 },
-      { label: 'Block B — Large', sft: 4720 },
-      { label: 'Block A — Largest', sft: 7000 },
-    ];
     return (
       <div>
         {telemetry}
@@ -161,13 +110,7 @@ export function InvestPanel({ sanctuary }: { sanctuary: Sanctuary }) {
         <p className="text-[10px] uppercase tracking-[0.5em] font-bold text-on-surface/60 mb-4">
           Price Estimate — ₹6,999 / SFT
         </p>
-        <PriceTable
-          rows={sizes.map(s => ({
-            label: s.label,
-            qty: `${s.sft.toLocaleString('en-IN')} SFT`,
-            price: formatRs(s.sft * SYL_RATE),
-          }))}
-        />
+        <UnitPricing sanctuaryId="syl" rateLabel="₹6,999 / SFT" noun="villament" />
         <p className="mt-3 text-[10px] text-secondary/50">
           Commercial spaces in MODCON ONE available at one-time investor pricing — direct enquiry only.
         </p>
@@ -177,12 +120,6 @@ export function InvestPanel({ sanctuary }: { sanctuary: Sanctuary }) {
   }
 
   // dates-county
-  const sizes = [
-    { label: 'Starter Plot', yds: 200 },
-    { label: 'Standard Plot', yds: 300 },
-    { label: 'Signature Plot', yds: 500, star: true },
-    { label: 'Estate Plot', yds: 600 },
-  ];
   return (
     <div>
       {telemetry}
@@ -198,16 +135,8 @@ export function InvestPanel({ sanctuary }: { sanctuary: Sanctuary }) {
       <p className="text-[10px] uppercase tracking-[0.5em] font-bold text-on-surface/60 mb-4">
         Price Estimate — ₹18,000 / sq yd
       </p>
-      <PriceTable
-        rows={sizes.map(s => ({
-          label: s.label,
-          qty: `${s.yds} sq yds`,
-          price: formatRs(s.yds * 18000),
-          star: s.star,
-        }))}
-        highlightIndex={2}
-      />
-      <p className="mt-3 text-[10px] text-secondary/50">★ 500 sq yds at ₹18,000/sq yd — ₹90 L signature plot.</p>
+      <UnitPricing sanctuaryId="dates-county" rateLabel="₹18,000 / sq yd" noun="plot" />
+      <p className="mt-3 text-[10px] text-secondary/50">★ The 500 sq yd signature plot is the ₹90 L entry point.</p>
       <WhatsAppButtons enquire={WHATSAPP.datesEnquire} visit={WHATSAPP.datesVisit} visitLabel="Book Site Visit · WhatsApp" />
     </div>
   );

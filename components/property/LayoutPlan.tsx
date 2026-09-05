@@ -11,7 +11,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { AnimatePresence, motion } from 'motion/react';
-import { X } from 'lucide-react';
+import { X, Lock } from 'lucide-react';
 import {
   SANCTUARY_PLOTS,
   SANCTUARY_HOTSPOTS,
@@ -22,9 +22,12 @@ import {
 } from '@/lib/data/agartha-layout';
 import { WHATSAPP } from '@/lib/data/contact';
 import { formatRs } from '@/lib/utils';
+import { useAuth } from '@/components/auth/AuthProvider';
+import { sendEvent } from '@/lib/analytics/beacon';
 import type { Sanctuary } from '@/lib/data/sanctuaries';
 
 export function LayoutPlan({ sanctuary }: { sanctuary: Sanctuary }) {
+  const { user, openAuth } = useAuth();
   const plots = SANCTUARY_PLOTS[sanctuary.id] ?? [];
   const hotspots = SANCTUARY_HOTSPOTS[sanctuary.id] ?? [];
   // Agartha is priced per sq yd, SYL per SFT — the plan is otherwise identical,
@@ -116,19 +119,25 @@ export function LayoutPlan({ sanctuary }: { sanctuary: Sanctuary }) {
             <p className="text-[9px] uppercase tracking-[0.5em] font-bold text-gold mb-2">
               {cfg.noun} {selPlot.id} · Investment Snapshot
             </p>
+            {/*
+              Size and the headline rate stay public — both are already in the
+              page copy and the meta description. What waits for a sign-in is the
+              worked-out figure for this specific unit, so the site plan behaves
+              the same way as the price sheet in InvestPanel. Without this, tapping
+              a dot walked straight around that gate.
+            */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
               {[
                 { l: 'Size', v: `${selPlot.area.toLocaleString('en-IN')} ${cfg.areaLabel}` },
-                ...(cfg.rateOld
-                  ? [
-                      { l: 'Launch (2024)', v: formatRs(selPlot.area * cfg.rateOld) },
-                      { l: `Today @ ₹${cfg.rateNow.toLocaleString('en-IN')}`, v: formatRs(selPlot.area * cfg.rateNow) },
-                      { l: 'Gain since launch', v: `+${formatRs(selPlot.area * (cfg.rateNow - cfg.rateOld))}` },
-                    ]
-                  : [
-                      { l: 'Rate', v: `₹${cfg.rateNow.toLocaleString('en-IN')} / ${cfg.areaLabel}` },
-                      { l: 'Indicative price', v: formatRs(selPlot.area * cfg.rateNow) },
-                    ]),
+                { l: 'Rate', v: `₹${cfg.rateNow.toLocaleString('en-IN')} / ${cfg.areaLabel}` },
+                ...(user
+                  ? cfg.rateOld
+                    ? [
+                        { l: 'Launch (2024)', v: formatRs(selPlot.area * cfg.rateOld) },
+                        { l: 'Today', v: formatRs(selPlot.area * cfg.rateNow) },
+                      ]
+                    : [{ l: 'Indicative price', v: formatRs(selPlot.area * cfg.rateNow) }]
+                  : []),
               ].map(x => (
                 <div key={x.l}>
                   <p className="text-[8px] uppercase tracking-[0.3em] text-secondary/50 font-bold">{x.l}</p>
@@ -136,6 +145,22 @@ export function LayoutPlan({ sanctuary }: { sanctuary: Sanctuary }) {
                 </div>
               ))}
             </div>
+
+            {!user && (
+              <button
+                onClick={() => {
+                  sendEvent('pricing_gate_signin_click', {
+                    propertyId: sanctuary.id,
+                    meta: { from: 'site-plan' },
+                  });
+                  openAuth();
+                }}
+                className="mt-5 inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] font-bold text-primary hover:opacity-80 transition-opacity"
+              >
+                <Lock className="w-3.5 h-3.5" />
+                Sign in to see this {cfg.noun.toLowerCase()}&apos;s price
+              </button>
+            )}
             <a
               href={enquireUrl}
               target="_blank"
