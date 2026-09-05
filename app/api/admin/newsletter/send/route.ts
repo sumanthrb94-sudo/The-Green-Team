@@ -79,6 +79,11 @@ export async function POST(req: NextRequest) {
     const batch = recipients.slice(i, i + BATCH).map(to => ({
       from: FROM,
       to: [to],
+      // Sent from dispatch@ (Resend-signed, no inbox), but a reader who hits
+      // reply should reach a mailbox someone actually watches — the published
+      // contact address. Requires that address to receive mail: either a real
+      // mailbox or catch-all pointed at admin@thegreenteam.in.
+      reply_to: BUSINESS.email,
       subject: String(subject),
       html,
     }));
