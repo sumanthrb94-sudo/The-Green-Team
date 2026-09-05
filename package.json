@@ -15,9 +15,12 @@
     "analytics:prune": "tsx --env-file=.env.local scripts/prune-analytics.ts",
     "optimize:images": "node scripts/optimize-images.mjs",
     "optimize:images:write": "node scripts/optimize-images.mjs --write",
-    "speed": "node scripts/speed-test.mjs"
+    "speed": "node scripts/speed-test.mjs",
+    "email": "email dev --dir emails --port 3030"
   },
   "dependencies": {
+    "@react-email/components": "^1.0.12",
+    "@react-email/render": "^2.1.0",
     "clsx": "^2.1.1",
     "firebase": "^12.11.0",
     "firebase-admin": "^13.0.0",
@@ -40,6 +43,7 @@
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "playwright": "^1.62.1",
+    "react-email": "^6.9.3",
     "tailwindcss": "^4.1.14",
     "tsx": "^4.23.12",
     "typescript": "~5.8.2"
