@@ -47,8 +47,12 @@ if (meta.width < 1600) {
 }
 
 // Keep the outgoing hero recoverable — this is the most visible image on the site.
+// The backup goes OUTSIDE public/ deliberately: optimize-images.mjs walks that
+// directory, so a backup left inside it gets its own responsive variants and an
+// entry in the image manifest, quietly shipping a duplicate of the old hero.
 if (fs.existsSync(TARGET)) {
-  const backup = `public/hero-backdrop.previous.jpg`;
+  fs.mkdirSync('.hero-backups', { recursive: true });
+  const backup = path.join('.hero-backups', `hero-backdrop.${Date.now()}.jpg`);
   fs.copyFileSync(TARGET, backup);
   console.log(`Backed up current hero → ${backup}`);
 }
