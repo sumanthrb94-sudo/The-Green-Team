@@ -10,7 +10,10 @@ import { BUSINESS, SITE_URL } from '@/lib/data/contact';
  * signed-in admin so an issue can be proofed before the real send.
  */
 
-const FROM = `The Green Team <dispatch@thegreenteam.in>`;
+// Sent from the one real mailbox, which is also where replies land — no
+// catch-all needed. Resend's domain-level DKIM authorises any From on the
+// verified domain, so this works once thegreenteam.in is verified.
+const FROM = `The Green Team <${BUSINESS.email}>`;
 const BATCH = 100;
 
 function renderHtml(subject: string, body: string): string {

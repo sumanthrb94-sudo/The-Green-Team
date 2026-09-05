@@ -152,7 +152,7 @@ export const SALES_FAQ: Array<{ q: string; a: string; tags?: string[] }> = [
   },
   {
     q: 'How does a site visit work?',
-    a: 'Tell your adviser which sanctuary and roughly when, and we coordinate the slot with the developer site team. Agartha and Dates County are proper site visits — allow a half day including travel from the city; SYL is usually seen at the office first and then on site. Going in person matters commercially as well as emotionally, because better pricing is available on in-person visits. Message +91 97001 44003 on WhatsApp or write to hello@thegreenteam.in to fix a slot.',
+    a: 'Tell your adviser which sanctuary and roughly when, and we coordinate the slot with the developer site team. Agartha and Dates County are proper site visits — allow a half day including travel from the city; SYL is usually seen at the office first and then on site. Going in person matters commercially as well as emotionally, because better pricing is available on in-person visits. Message +91 97001 44003 on WhatsApp or write to admin@thegreenteam.in to fix a slot.',
     tags: ['site-visit', 'process', 'contact'],
   },
   {

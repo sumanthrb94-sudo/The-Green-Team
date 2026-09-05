@@ -6,7 +6,7 @@ export const BUSINESS = {
   legalDescriptor: 'Channel Partners · Hyderabad',
   phone: '+91 97001 44003',
   whatsappNumber: '919700144003',
-  email: 'hello@thegreenteam.in',
+  email: 'admin@thegreenteam.in',
   instagram: 'https://www.instagram.com/the.green.team__',
   linkedin: 'https://linkedin.com/company/the-green-team-india',
   city: 'Hyderabad',
