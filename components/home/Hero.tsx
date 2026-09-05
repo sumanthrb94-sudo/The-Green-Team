@@ -19,8 +19,8 @@ const HEADLINE: { text: string; cls: string }[] = [
 ];
 
 const TICKETS = [
-  { id: 'agartha', name: 'MODCON Agartha', meta: 'Narsapur · AQI 12', price: 'From ₹68.7 L', img: '/gallery/agartha/11.webp' },
-  { id: 'syl', name: 'SYL Residences', meta: 'ORR Exit-14 · Pre-Investor', price: '₹4,499/SFT', img: '/gallery/syl/1776279315359.webp' },
+  { id: 'agartha', name: 'MODCON Agartha', meta: 'Narsapur · AQI 12', price: 'From ₹78 L', img: '/gallery/agartha/11.webp' },
+  { id: 'syl', name: 'SYL Residences', meta: 'ORR Exit-14 · Villaments', price: '₹6,999/SFT', img: '/gallery/syl/syl-exterior-dusk.webp' },
   { id: 'dates-county', name: 'Dates County', meta: 'Kandukur · 4,000-acre forest', price: '₹90 L', img: '/gallery/dates-county/temple.jpg' },
 ];
 

@@ -17,3 +17,9 @@ docs/internal/
 next-env.d.ts
 .e2e-shots/
 *.tsbuildinfo
+
+# Temporary QA / test scratch scripts (Playwright probes, one-off checks)
+*.tmp.cjs
+
+# Backups written by scripts/set-hero.mjs when swapping the hero image
+.hero-backups/

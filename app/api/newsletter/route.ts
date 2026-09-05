@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
 import { adminDb } from '@/lib/firebase/admin';
+import { allowedOrigin, clientIp, rateLimited } from '@/lib/server/rate-limit';
 
 const SOURCES = new Set(['modal', 'inline', 'mobile_quick', 'footer']);
 
 export async function POST(req: NextRequest) {
+  if (!allowedOrigin(req)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
+  if (rateLimited('newsletter', clientIp(req), { max: 10, windowMs: 10 * 60 * 1000 })) {
+    return NextResponse.json({ error: 'too many requests' }, { status: 429 });
+  }
   try {
     const body = await req.json();
     const email = String(body.email ?? '').trim().toLowerCase().slice(0, 200);

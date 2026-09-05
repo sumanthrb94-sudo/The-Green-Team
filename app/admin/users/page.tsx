@@ -1,5 +1,6 @@
 import { Download, MapPin } from 'lucide-react';
 import { fetchUsers } from '@/lib/server/admin-data';
+import { getSessionUser } from '@/lib/server/session';
 
 export const dynamic = 'force-dynamic';
 
@@ -7,6 +8,7 @@ const fmt = (iso: string | null) =>
   iso ? new Date(iso).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: '2-digit' }) : '—';
 
 export default async function AdminUsersPage() {
+  if (!(await getSessionUser())?.isAdmin) return null;
   const users = await fetchUsers();
   return (
     <div>
@@ -41,7 +43,7 @@ export default async function AdminUsersPage() {
               </div>
               {u.lat !== undefined && u.lng !== undefined && (
                 <a
-                  href={`https://maps.google.com/?q=${u.lat},${u.lng}`}
+                  href={`https://www.openstreetmap.org/?mlat=${u.lat}&mlon=${u.lng}#map=14/${u.lat}/${u.lng}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex-shrink-0 flex items-center gap-1 px-2.5 py-1.5 bg-primary/10 text-primary text-[8px] font-bold uppercase tracking-widest rounded-full hover:bg-primary/20 transition-all"

@@ -13,7 +13,7 @@ const NAV_ITEMS = [
 ];
 
 const SANCTUARY_ITEMS = [
-  { name: 'MODCON Agartha', id: 'agartha', sub: 'Narsapur Forest · From ₹68.7 L', img: '/gallery/agartha/11.webp' },
+  { name: 'MODCON Agartha', id: 'agartha', sub: 'Narsapur Forest · From ₹78 L', img: '/gallery/agartha/11.webp' },
   { name: 'MODCON SYL Residences', id: 'syl', sub: 'Tukkuguda, ORR Exit-14 · Villaments', img: '/gallery/syl/1776279315359.webp' },
   { name: 'Dates County by Planet Green', id: 'dates-county', sub: 'Kandukur · ₹18,000/sq yd', img: '/gallery/dates-county/temple.jpg' },
 ];

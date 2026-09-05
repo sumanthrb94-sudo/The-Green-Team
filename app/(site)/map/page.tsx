@@ -10,5 +10,14 @@ export const metadata: Metadata = {
 };
 
 export default function MapPage() {
-  return <MapClient />;
+  return (
+    <>
+      {/* The map UI is entirely client-rendered with no heading; give the page
+          a real, crawlable h1 without changing the visual design. */}
+      <h1 className="sr-only">
+        Sanctuary Map — Live Air Quality, Forests and the RRR Corridor around Hyderabad
+      </h1>
+      <MapClient />
+    </>
+  );
 }

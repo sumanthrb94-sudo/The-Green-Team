@@ -6,7 +6,12 @@ function toCsv(rows: Record<string, unknown>[]): string {
   if (!rows.length) return '';
   const cols = [...new Set(rows.flatMap(r => Object.keys(r)))];
   const esc = (v: unknown) => {
-    const s = v == null ? '' : String(v);
+    let s = v == null ? '' : String(v);
+    // CSV formula-injection guard: a cell that begins with = + - @ (or a control
+    // char Excel strips to reach one) is executed as a formula when the export
+    // is opened in Excel/Sheets. Lead name/intent are attacker-controlled via
+    // the public /api/leads form, so prefix a single quote to neutralise it.
+    if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`;
     return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
   };
   return [cols.join(','), ...rows.map(r => cols.map(c => esc(r[c])).join(','))].join('\n');

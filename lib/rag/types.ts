@@ -22,7 +22,7 @@ export interface KbChunk {
   contentHash: string;
 }
 
-export type KbSource = 'property' | 'journal' | 'map' | 'layout' | 'contact' | 'faq';
+export type KbSource = 'property' | 'journal' | 'map' | 'layout' | 'contact' | 'faq' | 'standard';
 
 /** A chunk plus its similarity to the query. */
 export interface ScoredChunk extends KbChunk {

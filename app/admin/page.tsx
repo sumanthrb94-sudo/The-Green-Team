@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Users, Mail, Inbox, Building2 } from 'lucide-react';
 import { fetchLeads, fetchNewsletter, fetchUsers, fetchProperties } from '@/lib/server/admin-data';
+import { getSessionUser } from '@/lib/server/session';
 import { LeadsOverTime, SourceBreakdown } from '@/components/admin/Charts';
 
 export const dynamic = 'force-dynamic';
@@ -14,6 +15,7 @@ function weekKey(iso: string | null): string | null {
 }
 
 export default async function AdminOverview() {
+  if (!(await getSessionUser())?.isAdmin) return null;
   const [leads, newsletter, users, properties] = await Promise.all([
     fetchLeads(),
     fetchNewsletter(),

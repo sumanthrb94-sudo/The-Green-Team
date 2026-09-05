@@ -107,7 +107,7 @@ production credentials or real customer records are involved — see
 | ![Admin properties](./screenshots/18-admin-properties.jpg) | **18** — Properties tab: Firestore-backed listings with live/draft toggles, edit and delete. Tab counters show how many documents sit behind each collection. |
 | ![Admin leads](./screenshots/19-admin-leads.jpg) | **19** — Leads tab: every capture point (property overlay, chatbot, map popup, sign-up) writes here through `saveLead()`, streamed live via `onSnapshot`. |
 | ![Admin newsletter](./screenshots/20-admin-newsletter.jpg) | **20** — Newsletter tab: subscribers tagged by the surface that captured them (`modal`, `inline`, `mobile_quick`). |
-| ![Admin users](./screenshots/21-admin-users.jpg) | **21** — Users tab: profiles written on first sign-in, including the silently captured geolocation and a Google Maps deep link per user. |
+| ![Admin users](./screenshots/21-admin-users.jpg) | **21** — Users tab: profiles written on first sign-in, including the silently captured geolocation and an OpenStreetMap deep link per user. |
 | ![Admin form](./screenshots/22-admin-property-form.jpg) | **22** — The property editor — the full `PropertyInput` form that writes a new document into `properties` and, once marked live, onto the public pages. |
 
 ### 2.7 Concierge, theme and mobile

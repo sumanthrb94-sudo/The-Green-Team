@@ -19,6 +19,10 @@ export interface Sanctuary {
   features?: string[];
   tagline?: string;
   description?: string;
+  /** Hand-written ≤160-char search/social description. The full `description`
+   *  is prose for the page; slicing it for meta cuts mid-word and buries the
+   *  headline facts, so metadata uses this when present. */
+  metaDescription?: string;
   plots?: number;
   plotRange?: string;
   amenityAcres?: string;
@@ -34,7 +38,9 @@ export interface Sanctuary {
   order?: number;
 }
 
-const AGARTHA_GALLERY = Array.from({ length: 23 }, (_, i) => `/gallery/agartha/${i}.webp`);
+// 0–22 are the original mirror; 23–27 are new renders lifted from the client's
+// 2026 e-brochure (earthen retreats, the biomorphic clubhouse, thatched villas).
+const AGARTHA_GALLERY = Array.from({ length: 28 }, (_, i) => `/gallery/agartha/${i}.webp`);
 
 export const SANCTUARIES: Sanctuary[] = [
   {
@@ -43,30 +49,36 @@ export const SANCTUARIES: Sanctuary[] = [
     location: 'Janakampet, Narsapur · Hyderabad',
     aqi: 12,
     noise: 18,
-    commute: '40 mins to Financial District',
+    commute: '50 mins to Gachibowli · 100 m from upcoming RRR',
     pricePerSqYd: 8500,
     valuation: '',
-    memberPrice: 'From ₹68.7 L',
+    memberPrice: 'From ₹78 L',
     image: '/gallery/agartha/11.webp',
     tagline: 'Where the forest becomes home.',
+    metaDescription:
+      'MODCON Agartha — 37 forest plots (726 sq yds to 1 acre) from ₹78 L on the Narsapur forest boundary, with a 2-acre resort and clubhouse. Book a site visit.',
     description:
-      'MODCON Agartha is a 25-acre regenerative permaculture farm estate on the Narsapur forest boundary, near the RRR. 36 unique farm plots — each pre-planted with 100+ tree varieties, drip irrigation, vegetable beds, and a spiral herbal garden — surround a 36,000 sq ft clubhouse with 5 premium amenities: aquatic pool, kayaking lake, gym, farm-to-table dining, and staycation villas. An on-site Goshala with integrated animal husbandry completes the self-sustaining ecosystem. Winner: Best Sustainable Eco-Friendly Project of the Year 2024.',
-    plots: 36,
-    plotRange: '808 – 4,800 sq yds',
-    amenityAcres: '36,000 sq ft Clubhouse',
+      'MODCON Agartha is a 25-acre bespoke farmhouse community on the Narsapur forest boundary, 100 m from the upcoming RRR. Two of those acres are given to a resort and clubhouse — earthen retreats, a farm-to-table restaurant, a yoga and wellness centre, a Tulum-style gym, a banquet hall, and a natural bio-pool filtered biologically rather than chemically, fed by a hand-built natural stream. The 37 farm plots run from 726 sq yds to a full acre, each with an edible permaculture backyard, and homes are built to order in natural materials: the Bamora Retreat in bamboo with a mezzanine floor, or the Earthlyn Retreat in CSCB brick finished in lime plaster, as 1, 2 or 3 BHK. Designed by ARQEN Design Studio. Winner: Best Sustainable Eco-Friendly Project of the Year 2024 (Outlook Business Spotlight Entity Awards); nominated for the Times of India Ecopreneur Awards 2026.',
+    plots: 37,
+    plotRange: '726 sq yds – 1 acre',
+    amenityAcres: '2-Acre Resort & Clubhouse',
     architect: 'MODCON Builders',
-    sitePlanSrc: '/FINAL-LAYOUT.jpeg',
+    sitePlanSrc: '/agartha-master-plan.webp',
     brochureUrl: 'https://www.modconbuilders.com/agartha',
     plotImages: AGARTHA_GALLERY,
     features: [
-      '36,000 sq ft Clubhouse',
-      'Kayaking & Aquatic Pool',
-      'Farm-to-Table Dining',
-      'Drip Irrigation (Each Plot)',
-      '100+ Tree Varieties / Plot',
+      '2-Acre Resort & Clubhouse',
+      'Natural Bio-Pool (Chemical-Free)',
+      'Hand-Built Natural Stream',
+      'Farm-to-Table Restaurant',
+      'Yoga & Wellness Centre',
+      'Tulum-Style Jungle Gym',
+      'Banquet Hall',
+      'Edible Permaculture Backyards',
       'Goshala & Animal Husbandry',
-      'Spiral Herbal Garden',
-      'Near RRR · 40 Min City Access',
+      'Bamboo / CSCB Earthen Homes · 1–3 BHK',
+      '100 m from Upcoming RRR',
+      '15 Min to Narsapur Urban Park',
     ],
   },
   {
@@ -77,31 +89,39 @@ export const SANCTUARIES: Sanctuary[] = [
     noise: 24,
     commute: '10 mins to Airport · 30-45 mins to Financial District',
     valuation: '',
-    memberPrice: '₹4,499 / SFT',
-    image: '/gallery/syl/1776279315359.webp',
+    memberPrice: '₹6,999 / SFT',
+    image: '/gallery/syl/syl-exterior-dusk.webp',
     tagline: 'A modern address where luxury meets nature.',
+    metaDescription:
+      'MODCON SYL Residences — 15 biophilic villaments, 3,882–7,000 SFT at ₹6,999/SFT at Tukkuguda, ORR Exit-14, with a 22,000 SFT clubhouse. 10 min to the airport.',
     description:
-      "MODCON SYL Residences is a 4.5-acre biophilic development at Tukkuguda, ORR Exit-14 — offering luxury villaments from 2,500 to 4,500 SFT with large forest-view balconies, natural light, and sunrise views. The 22,000 sq ft clubhouse is a wellness retreat with a chemical-free Natural Bio Pool and Yoga Pavilion. Commercial spaces are also available at exclusive one-time investor prices — contact us for details. Located 10 minutes from the international airport and at the threshold of Hyderabad's Fourth City growth corridor.",
-    plots: 0,
-    plotRange: 'Villaments 2,500 – 4,500 SFT · Commercial Available',
-    amenityAcres: '22,000 SFT Clubhouse · Health • Wellness • Nature',
+      "MODCON SYL Residences is the residential half of a 4.5-acre integrated commercial-and-residential project at Tukkuguda, ORR Exit-14 — villament living in a low-density, biophilic enclave overlooking forest, with large balconies, abundant light and sunrise views. The 22,000 sq ft G+2 clubhouse is built entirely around health, wellness and nature: infinity pool, fully equipped gym with Pilates, yoga pavilion, steam and sauna, library, co-working spaces, banquet and guest rooms, indoor and outdoor play. Alongside it sits an integrated commercial hub — retail, cafés and banking at ground, co-working on the first floor, clinics and diagnostics on the second, and business suites with a hospitality stay concept above. Every balcony is landscaped on biophilic principles. Two to five minutes from ORR Exit-14 and Fab City, 10–15 minutes from the airport.",
+    plots: 15,
+    plotRange: 'Villaments 3,882 – 7,000 SFT · Integrated Commercial',
+    amenityAcres: '22,000 SFT G+2 Clubhouse · Health • Wellness • Nature',
     architect: 'MODCON Builders',
+    sitePlanSrc: '/syl-site-plan.webp',
     brochureUrl: 'https://www.modconbuilders.com',
     features: [
-      'Commercial Spaces — OTP Investor Pricing (Enquire)',
-      'Villaments 2,500 – 4,500 SFT',
-      'Natural Bio Pool (Chemical-Free)',
-      'Yoga & Meditation Pavilion',
-      'Large Forest-View Balconies',
-      'Biophilic Green Corridors',
-      'Wellness & Fitness Spaces',
-      'EV Charging Points',
-      '100% Power Backup',
-      '4 High-Speed Passenger Lifts',
-      'Gated Community · 24/7 Security',
-      'ORR Exit-14 · 10 Min to Airport',
+      'Integrated Commercial Hub (Enquire)',
+      '15 Villaments · 3,882 – 7,000 SFT',
+      'Infinity Pool',
+      'Gym with Pilates · Steam & Sauna',
+      'Yoga Pavilion · Library',
+      'Co-Working & Business Suites',
+      'Banquet & Guest Rooms',
+      'Biophilic Balcony Landscaping',
+      'Large Forest & Sunrise-View Balconies',
+      'GROHE Fittings · EV Charging Points',
+      '100% Power Backup · 4 High-Speed Lifts',
+      'ORR Exit-14 · 2–5 Min · Airport 10–15 Min',
     ],
     plotImages: [
+      // Exteriors from the 2026 MODCON deck; the rest are the clubhouse interiors.
+      '/gallery/syl/syl-exterior-dusk.webp',
+      '/gallery/syl/syl-street-dusk.webp',
+      '/gallery/syl/syl-facade-sky.webp',
+      '/gallery/syl/syl-balcony-detail.webp',
       '/gallery/syl/1776279315359.webp',
       '/gallery/syl/1776279320251.webp',
       '/gallery/syl/1776279329483.webp',
@@ -124,6 +144,8 @@ export const SANCTUARIES: Sanctuary[] = [
     memberPrice: '₹90 L',
     image: '/gallery/dates-county/temple.jpg',
     tagline: 'Eco-luxury villa plots at the edge of a 4,000-acre forest.',
+    metaDescription:
+      'Dates County by Planet Green — eco-luxury 500 sq yd villa plots at ₹18,000/sq yd beside a 4,000-acre reserve forest in Kandukur. 15 min to the airport.',
     description:
       "Dates County by Planet Green is a 300+ acre eco-luxury villa-plot community in Kandukur — the epicentre of Hyderabad's emerging Future City on Srisailam Highway. Adjacent to a 4,000-acre reserve forest, the township reserves 40% of its land for open and recreational spaces, woven through with date palm plantations, themed parks, sports courts and natural fishing ponds. 15 minutes to the Hyderabad International Airport and 15 minutes to ORR Exit-14 (Tukkuguda). RERA P02400002648 · P02400003813.",
     plots: 0,

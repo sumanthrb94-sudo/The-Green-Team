@@ -1,10 +1,22 @@
 import 'server-only';
 import { Timestamp } from 'firebase-admin/firestore';
 import { adminDb } from '@/lib/firebase/admin';
+import { requireAdmin } from '@/lib/server/session';
 import type { ConversationDoc, ToolName } from '@/lib/rag/types';
 import { demoEnabled, DEMO_LEADS, DEMO_NEWSLETTER, DEMO_USERS, DEMO_PROPERTIES } from './demo-data';
 
-/** Serialized (RSC-safe) admin views over the live Firestore collections. */
+/**
+ * Serialized (RSC-safe) admin views over the live Firestore collections.
+ *
+ * Every reader here calls requireAdmin() FIRST. This is the real authorization
+ * boundary — not the admin layout. In the App Router a layout and its child
+ * page render concurrently, so a layout that swaps in an auth wall does NOT
+ * stop the child page's data fetch: the page still executes and its result is
+ * streamed to the client in the RSC flight payload, visible to `curl` even
+ * though the browser hides it. Gating at the data source means admin PII can
+ * never leave the server without a verified admin session, regardless of what
+ * any current or future page component does.
+ */
 
 export type LeadStatus = 'new' | 'contacted' | 'site-visit' | 'closed';
 
@@ -58,6 +70,7 @@ export interface AdminProperty {
 const iso = (v: unknown): string | null => (v instanceof Timestamp ? v.toDate().toISOString() : null);
 
 export async function fetchLeads(): Promise<AdminLead[]> {
+  await requireAdmin();
   if (demoEnabled()) return DEMO_LEADS;
   const snap = await adminDb().collection('leads').orderBy('createdAt', 'desc').get();
   return snap.docs.map(d => {
@@ -76,6 +89,7 @@ export async function fetchLeads(): Promise<AdminLead[]> {
 }
 
 export async function fetchNewsletter(): Promise<AdminNewsletterEntry[]> {
+  await requireAdmin();
   if (demoEnabled()) return DEMO_NEWSLETTER;
   const snap = await adminDb().collection('newsletter').orderBy('createdAt', 'desc').get();
   return snap.docs.map(d => {
@@ -85,6 +99,7 @@ export async function fetchNewsletter(): Promise<AdminNewsletterEntry[]> {
 }
 
 export async function fetchUsers(): Promise<AdminUser[]> {
+  await requireAdmin();
   if (demoEnabled()) return DEMO_USERS;
   const snap = await adminDb().collection('users').get();
   return snap.docs
@@ -109,6 +124,7 @@ export async function fetchUsers(): Promise<AdminUser[]> {
 }
 
 export async function fetchProperties(): Promise<AdminProperty[]> {
+  await requireAdmin();
   if (demoEnabled()) return DEMO_PROPERTIES;
   const snap = await adminDb().collection('properties').get();
   return snap.docs
@@ -126,6 +142,7 @@ const isoOr = (v: unknown, fallback: string): string =>
   v instanceof Timestamp ? v.toDate().toISOString() : typeof v === 'string' ? v : fallback;
 
 export async function getConversations(limit = 100): Promise<AdminConversation[]> {
+  await requireAdmin();
   if (demoEnabled()) return []; // no fictional transcripts exist, and demo runs without Firestore credentials
   const snap = await adminDb().collection('conversations').orderBy('updatedAt', 'desc').limit(limit).get();
   return snap.docs.map(d => {

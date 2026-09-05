@@ -16,6 +16,21 @@ export const SALES_FAQ: Array<{ q: string; a: string; tags?: string[] }> = [
     tags: ['channel-partner', 'about'],
   },
   {
+    q: 'Why do you only list three projects?',
+    a: 'Because only three cleared the standard. We measure every project against six things before it goes on the site: a real environmental advantage (AQI 30 or under and 30 dB or under, measured on site, against a Hyderabad average near 148), title and approvals that survive a lawyer, an approach road that already exists and that we have driven, a developer with at least one delivered project you can walk through, design that keeps the green it is selling, and numbers we are willing to be quoted on. We also refuse assured-return and guaranteed-buyback schemes outright, and anything we have not physically stood on. The full standard, including what we turn down, is published at /standard.',
+    tags: ['standard', 'curation', 'trust', 'about'],
+  },
+  {
+    q: 'Which areas do you cover?',
+    a: 'Hyderabad and its ORR–RRR growth corridor, and nowhere else for now. Every claim we publish — air quality, ambient noise, drive times, the condition of the access road — is something we can go and re-check in an afternoon, and that is only true in a region we can drive to. We would rather cover one city honestly than list a country we have never stood in. If you are looking outside Hyderabad we will tell you we are the wrong people rather than take the enquiry.',
+    tags: ['coverage', 'location', 'hyderabad', 'about'],
+  },
+  {
+    q: 'I am a developer or landowner — how do I get a project listed?',
+    a: 'Send it to us on WhatsApp or through the adviser-call form and we will assess it against the same six-part standard we apply to everything else: environment, legal, access, developer track record, design, and honest numbers. We will tell you plainly which of the six it fails and whether that is fixable. We only take on projects in Hyderabad and its corridor at the moment, and we do not list assured-return or guaranteed-buyback structures in any form.',
+    tags: ['developer', 'listing', 'partnership', 'standard'],
+  },
+  {
     q: 'Does buying through you cost more than going to the developer directly?',
     a: 'No. The developer pays the channel partner, so the price you pay is the developer price and it does not change because we introduced you. In practice a channel partner usually gets better terms, because we negotiate across many buyers instead of one. At MODCON Agartha, better pricing than the listed rate of ₹8,500 per sq yd is available on an in-person visit and we negotiate that on your behalf.',
     tags: ['channel-partner', 'pricing', 'objection'],
@@ -37,7 +52,7 @@ export const SALES_FAQ: Array<{ q: string; a: string; tags?: string[] }> = [
   },
   {
     q: 'What is not included in the quoted price?',
-    a: 'Quoted rates — ₹8,500 per sq yd at MODCON Agartha, ₹4,499 per SFT at MODCON SYL Residences, ₹18,000 per sq yd at Dates County — are the property price only. Stamp duty and registration, GST where it applies, any corpus or maintenance deposit, and optional add-ons such as a built home on your plot are all extra. Your adviser gives you the all-in number for the specific unit before you commit to anything.',
+    a: 'Quoted rates — ₹8,500 per sq yd at MODCON Agartha, ₹6,999 per SFT at MODCON SYL Residences, ₹18,000 per sq yd at Dates County — are the property price only. Stamp duty and registration, GST where it applies, any corpus or maintenance deposit, and optional add-ons such as a built home on your plot are all extra. Your adviser gives you the all-in number for the specific unit before you commit to anything.',
     tags: ['pricing', 'costs'],
   },
   {
@@ -62,7 +77,7 @@ export const SALES_FAQ: Array<{ q: string; a: string; tags?: string[] }> = [
   },
   {
     q: 'What does "pre-investor phase" mean?',
-    a: 'Pre-investor is the earliest and lowest-priced window a project opens, which at MODCON SYL Residences is ₹4,499 per SFT. Early bookings de-risk the project for the developer, and early buyers are paid for that in price and in first pick of units, floors and views. When booking targets are met the rate moves to pre-launch, and later again to market rate.',
+    a: 'Pre-investor is the earliest and lowest-priced window a project opens, before the published rate. MODCON SYL Residences carries a standard rate of ₹6,999 per SFT, and the pre-investor window sits below that for a limited number of units. Early bookings de-risk the project for the developer, and early buyers are paid for that in price and in first pick of units, floors and views. When booking targets are met the rate moves to pre-launch, and later again to market rate — ask your adviser for the current pre-investor rate and how many units are left in it.',
     tags: ['pre-investor', 'pricing', 'syl'],
   },
   {
@@ -72,7 +87,7 @@ export const SALES_FAQ: Array<{ q: string; a: string; tags?: string[] }> = [
   },
   {
     q: 'What is the smallest amount I can enter with?',
-    a: 'MODCON Agartha starts from ₹68.7 L for the smallest plot at 808 sq yds, the entry point under ₹1 Cr across the portfolio. The Dates County signature plot is 500 sq yds at ₹18,000 per sq yd, or ₹90 L, and SYL villaments begin at 2,500 SFT at ₹4,499 per SFT. Our enquiry form starts at the ₹50 L – ₹1 Cr bracket, so tell us your bracket and we will only put things in front of you that fit it.',
+    a: 'MODCON Agartha starts from ₹78 L for the smallest plot at 726 sq yds, the entry point under ₹1 Cr across the portfolio. The Dates County signature plot is 500 sq yds at ₹18,000 per sq yd, or ₹90 L, and SYL villaments begin at 3,882 SFT at ₹6,999 per SFT. Our enquiry form starts at the ₹50 L – ₹1 Cr bracket, so tell us your bracket and we will only put things in front of you that fit it.',
     tags: ['pricing', 'ticket-size', 'entry'],
   },
   {
@@ -87,7 +102,7 @@ export const SALES_FAQ: Array<{ q: string; a: string; tags?: string[] }> = [
   },
   {
     q: 'What do the amenities include, and what will I pay to maintain them?',
-    a: 'MODCON Agartha carries a 36,000 sq ft clubhouse with five amenities — aquatic pool, gym, kayaking lake, farm-to-table dining and staycation villas — and every plot arrives pre-planted with 100+ tree varieties, drip irrigation, vegetable beds and a spiral herbal garden. MODCON SYL Residences has a 22,000 SFT clubhouse built around a chemical-free natural bio pool and a yoga pavilion, and Dates County holds 40% of its 300+ acres as open and recreational space. Maintenance is billed separately by the developer or the owners association; your adviser gives you the current rate and exactly what it covers.',
+    a: 'MODCON Agartha gives two of its twenty-five acres to a resort and clubhouse — earthen retreats, a farm-to-table restaurant, a yoga and wellness centre, a Tulum-style gym, a banquet hall, and a natural bio-pool filtered biologically rather than chemically — and every plot arrives with an edible permaculture backyard, a food forest of fruit, vegetables and herbs. MODCON SYL Residences has a 22,000 SFT clubhouse built around a chemical-free natural bio pool and a yoga pavilion, and Dates County holds 40% of its 300+ acres as open and recreational space. Maintenance is billed separately by the developer or the owners association; your adviser gives you the current rate and exactly what it covers.',
     tags: ['amenities', 'maintenance'],
   },
   {
@@ -111,8 +126,23 @@ export const SALES_FAQ: Array<{ q: string; a: string; tags?: string[] }> = [
     tags: ['aqi', 'noise', 'commute', 'verification'],
   },
   {
+    q: 'What kind of home can I actually build on an Agartha plot?',
+    a: 'MODCON builds two house types to order, both in natural materials. The Bamora Retreat is a bamboo structure with a mezzanine floor, finished in natural mud plaster — light, thermally comfortable, and the more open of the two. The Earthlyn Retreat is built in CSCB brick and finished in traditional lime plaster, which holds temperature better and reads more solid. Both come as 1, 2 or 3 BHK, and both are designed to sit inside an edible permaculture backyard rather than a lawn. Your adviser can walk you through which type suits the plot you are looking at.',
+    tags: ['agartha', 'construction', 'homes'],
+  },
+  {
+    q: 'What is at the Agartha clubhouse, and how much land is it on?',
+    a: 'Two of the twenty-five acres are given to the resort and clubhouse. It holds earthen retreats, a farm-to-table restaurant, a yoga and wellness centre, a Tulum-style gym built in wood and stone, and a banquet hall. The pool is a natural bio-pool, cleaned by biological filtration instead of chlorine, and a hand-built natural stream runs through the landscape for the sound of moving water. It is a resort you have access to rather than a clubhouse block.',
+    tags: ['agartha', 'amenities'],
+  },
+  {
+    q: 'What sizes and prices are the SYL villaments, and what is the commercial component?',
+    a: 'MODCON SYL Residences is the residential half of a 4.5-acre integrated project at Tukkuguda. The issued site plan shows 15 villaments across Block A and Block B, either side of a central park, from 3,882 to 7,000 SFT, at ₹6,999 per SFT. The commercial block sits to the west: retail, cafés and banking at ground level, co-working on the first floor, clinics and diagnostics on the second, and business suites with a hospitality stay concept above — aimed at airport and corporate visitors. Commercial pricing is quoted on enquiry rather than published.',
+    tags: ['syl', 'pricing', 'commercial'],
+  },
+  {
     q: 'How do the three sanctuaries differ, and which one suits me?',
-    a: 'MODCON Agartha is a 25-acre farm estate on the Narsapur forest boundary — 36 plots from 808 to 4,800 sq yds, for someone who wants land, a working permaculture farm and the cleanest air of the three. MODCON SYL Residences at Tukkuguda is built living: villaments from 2,500 to 4,500 SFT, ten minutes from the airport, for someone who wants a ready home inside the Fourth City corridor. Dates County at Kandukur is 300+ acres of villa plots beside a 4,000-acre reserve forest — land you can build on later, inside a large planned township.',
+    a: 'MODCON Agartha is a 25-acre farmhouse community on the Narsapur forest boundary — 37 plots from 726 sq yds to a full acre, for someone who wants land, a working permaculture farm and the cleanest air of the three. MODCON SYL Residences at Tukkuguda is built living: villaments from 2,500 to 4,500 SFT, ten minutes from the airport, for someone who wants a ready home inside the Fourth City corridor. Dates County at Kandukur is 300+ acres of villa plots beside a 4,000-acre reserve forest — land you can build on later, inside a large planned township.',
     tags: ['comparison', 'portfolio', 'fit'],
   },
   {

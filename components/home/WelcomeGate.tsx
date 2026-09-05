@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { X, Check } from 'lucide-react';
 import { useAuth } from '@/components/auth/AuthProvider';
+import { track, markConverted } from '@/lib/analytics';
 
 const SEEN_KEY = 'gt_welcome_v2';
 
@@ -45,6 +46,8 @@ export function WelcomeGate() {
         body: JSON.stringify({ email, source: 'modal' }),
       });
       if (!res.ok) throw new Error();
+      track.subscribe('modal');
+      markConverted('subscribe');
       setDone(true);
       try {
         localStorage.setItem('gt_subscribed', 'true');
@@ -103,6 +106,8 @@ export function WelcomeGate() {
                 <input
                   type="email"
                   required
+                  aria-label="Your email address"
+                  autoComplete="email"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   placeholder="you@gmail.com"

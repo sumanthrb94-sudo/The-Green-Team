@@ -9,7 +9,11 @@ import { Gallery } from '@/components/property/Gallery';
 import { LayoutPlan } from '@/components/property/LayoutPlan';
 import { InvestPanel } from '@/components/property/InvestPanel';
 import { Footer } from '@/components/Footer';
+import { ReviewList } from '@/components/reviews/ReviewList';
+import { ReviewForm } from '@/components/reviews/ReviewForm';
+import { getApprovedReviews, aggregateRating } from '@/lib/server/reviews';
 import { SITE_URL } from '@/lib/data/contact';
+import { SITE_PLAN_CONFIG } from '@/lib/data/agartha-layout';
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -23,15 +27,25 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const s = getSanctuary(id);
   if (!s) return {};
+  const description = s.metaDescription ?? s.description?.slice(0, 155);
+  const image = `${SITE_URL}${s.image}`;
   return {
     title: `${s.title} — ${s.memberPrice}`,
-    description: s.description?.slice(0, 300),
+    description,
     alternates: { canonical: `${SITE_URL}/sanctuaries/${s.id}` },
     openGraph: {
+      type: 'website',
+      siteName: 'The Green Team',
       title: `${s.title} | The Green Team`,
       description: s.tagline,
       url: `${SITE_URL}/sanctuaries/${s.id}`,
-      images: [{ url: `${SITE_URL}${s.image}` }],
+      images: [{ url: image }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${s.title} | The Green Team`,
+      description: s.tagline,
+      images: [image],
     },
   };
 }
@@ -42,6 +56,9 @@ export default async function SanctuaryPage({ params }: Props) {
   const { id } = await params;
   const s = await getPropertyById(id);
   if (!s) notFound();
+
+  const reviews = await getApprovedReviews(id);
+  const rating = aggregateRating(reviews);
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -56,6 +73,8 @@ export default async function SanctuaryPage({ params }: Props) {
       availability: 'https://schema.org/InStock',
       seller: { '@type': 'RealEstateAgent', name: 'The Green Team' },
     },
+    // Only present when real approved reviews exist — see lib/server/reviews.ts
+    ...(rating ? { aggregateRating: rating } : {}),
     additionalProperty: [
       { '@type': 'PropertyValue', name: 'AQI', value: s.aqi },
       { '@type': 'PropertyValue', name: 'Ambient noise', value: `${s.noise} dB` },
@@ -124,7 +143,10 @@ export default async function SanctuaryPage({ params }: Props) {
                 ['Sizes', s.plotRange],
                 ['Amenity', s.amenityAcres],
                 ['Developer', s.architect],
-                ...(s.plots ? [['Plots', String(s.plots)] as [string, string]] : []),
+                // SYL sells villaments, not plots — the noun follows the property.
+                ...(s.plots
+                  ? [[`${SITE_PLAN_CONFIG[s.id]?.noun ?? 'Plot'}s`, String(s.plots)] as [string, string]]
+                  : []),
               ]
                 .filter((r): r is [string, string] => Boolean(r[1]))
                 .map(([k, v]) => (
@@ -182,6 +204,24 @@ export default async function SanctuaryPage({ params }: Props) {
               </Link>
             ))}
           </div>
+        </div>
+      </section>
+
+      <ReviewList reviews={reviews} />
+
+      {/* Property-scoped review capture. Without this mount nothing could ever
+          set `propertyId`, so per-property reviews (and the aggregateRating
+          above) could only be populated by calling the API directly.
+          Submissions land as `pending` and appear only after moderation. */}
+      <section className="pb-20 px-6 md:px-24">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="font-serif text-2xl md:text-3xl font-light mb-2">
+            Visited {s.title}? Tell us how it went.
+          </h2>
+          <p className="text-sm text-secondary/60 mb-6">
+            Reviews are read by a person before they go live.
+          </p>
+          <ReviewForm propertyId={s.id} />
         </div>
       </section>
 
