@@ -19,7 +19,15 @@ export async function POST(req: NextRequest) {
     const email = String(body.email ?? '').trim().slice(0, 200);
     const phone = String(body.phone ?? '').trim().slice(0, 40);
     const intent = String(body.intent ?? '').trim().slice(0, 1500);
-    const source = String(body.source ?? 'unspecified').trim().slice(0, 60);
+    // Canonicalise the source. `adviser-call` and `adviser_call` both reached
+    // Firestore from different versions of the form and split one channel into
+    // two rows in every report — including the analytics attribution. Lowercase
+    // + hyphens is the single spelling from here on.
+    const source = String(body.source ?? 'unspecified')
+      .trim()
+      .toLowerCase()
+      .replace(/[\s_]+/g, '-')
+      .slice(0, 60);
     if (!name && !email && !phone) {
       return NextResponse.json({ error: 'empty lead' }, { status: 400 });
     }
