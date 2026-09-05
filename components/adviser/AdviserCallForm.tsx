@@ -145,14 +145,14 @@ export function AdviserCallSection({ variant = 'control' }: { variant?: string }
         <span className="text-[#c8a951] text-[10px] font-bold uppercase tracking-[0.7em] mb-5 block">
           One call. Every answer.
         </span>
-        <h2 className="font-serif text-4xl md:text-6xl font-light text-white leading-tight">
+        <h2 className="font-headline font-extrabold tracking-[-0.02em] text-4xl md:text-6xl text-white leading-[1.0]">
           {outcome ? (
             <>
-              Get the <em className="text-[#c8a951]">real numbers.</em>
+              Get the <span className="text-[#c8a951]">real numbers.</span>
             </>
           ) : (
             <>
-              Request your <em className="text-[#c8a951]">adviser call.</em>
+              Request your <span className="text-[#c8a951]">adviser call.</span>
             </>
           )}
         </h2>

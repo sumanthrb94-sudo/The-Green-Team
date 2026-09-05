@@ -38,9 +38,9 @@ export function ProofStrip() {
           className="mb-12 text-center"
         >
           <span className="text-primary text-[10px] font-bold uppercase tracking-[0.6em] mb-4 block">Why trust us</span>
-          <h2 className="text-3xl md:text-5xl font-light text-on-surface leading-tight">
+          <h2 className="font-headline font-extrabold tracking-[-0.02em] text-3xl md:text-5xl text-on-surface leading-[1.02]">
             A curation house.{' '}
-            <span className="font-serif italic font-medium text-primary">Not a listing portal.</span>
+            <span className="text-primary">Not a listing portal.</span>
           </h2>
         </motion.div>
 

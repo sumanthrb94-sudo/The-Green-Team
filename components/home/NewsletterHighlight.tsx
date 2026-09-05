@@ -40,10 +40,10 @@ export function NewsletterHighlight() {
         <span className="text-[#a3b18a] text-[10px] font-bold uppercase tracking-[0.6em] mb-5 block">
           The Intelligence Network
         </span>
-        <h2 className="text-4xl md:text-6xl font-light leading-tight mb-6">
+        <h2 className="font-headline font-extrabold tracking-[-0.02em] text-4xl md:text-6xl leading-[0.98] mb-6">
           Stay ahead of the
           <br />
-          <span className="font-serif italic font-medium text-[#a3b18a]">resource curve.</span>
+          <span className="text-[#a3b18a]">resource curve.</span>
         </h2>
         <p className="text-white/45 text-lg font-light mb-12 max-w-xl mx-auto">
           Monthly environmental integrity reports, sanctuary valuations, and curation alerts. No spam — only

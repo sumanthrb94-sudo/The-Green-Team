@@ -92,10 +92,10 @@ export function BentoPortfolio({ sanctuaries }: { sanctuaries: Sanctuary[] }) {
             <span className="text-primary text-[10px] font-bold uppercase tracking-[0.6em] mb-4 block">
               Curated Portfolio
             </span>
-            <h2 className="font-serif text-5xl md:text-7xl font-light text-on-surface leading-none">
+            <h2 className="font-headline font-extrabold tracking-[-0.02em] text-4xl md:text-6xl text-on-surface leading-[0.95]">
               Three sanctuaries.
               <br />
-              <em className="text-primary">Chosen to be lived in.</em>
+              <span className="text-primary">Chosen to be lived in.</span>
             </h2>
           </div>
           <div className="max-w-xl">

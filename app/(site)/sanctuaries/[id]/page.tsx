@@ -87,36 +87,53 @@ export default async function SanctuaryPage({ params }: Props) {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-      {/* Hero header */}
-      <section className="relative min-h-[52vh] flex items-end overflow-hidden">
+      {/* Hero header — cinematic, full-height, with a clear next step */}
+      <section className="relative min-h-[82vh] md:min-h-[88vh] flex items-end overflow-hidden">
         <Image src={s.image} alt={s.title} fill priority sizes="100vw" className="object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/20" />
-        <div className="relative z-10 w-full max-w-6xl mx-auto px-6 md:px-12 pb-10">
-          <p className="text-[9px] uppercase tracking-[0.5em] text-[#c8a951] font-bold mb-3">{s.tagline}</p>
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0a1208] via-[#0a1208]/35 to-[#0a1208]/25" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0a1208]/50 to-transparent" />
+        <div className="relative z-10 w-full max-w-6xl mx-auto px-6 md:px-12 pb-12 md:pb-16">
+          <p className="text-[10px] uppercase tracking-[0.5em] text-[#c8a951] font-bold mb-4">{s.tagline}</p>
           <div className="flex flex-wrap items-end justify-between gap-6">
             <div>
-              <h1 className="text-4xl md:text-6xl font-light text-white leading-tight">{s.title}</h1>
-              <p className="mt-2 text-white/55 text-sm">{s.location}</p>
+              <h1 className="font-headline font-extrabold tracking-[-0.02em] text-4xl md:text-6xl xl:text-7xl text-white leading-[0.95]">
+                {s.title}
+              </h1>
+              <p className="mt-3 text-white/60 text-sm md:text-base">{s.location}</p>
             </div>
             <div className="text-right">
               {s.pricePerSqYd ? (
-                <p className="text-[9px] text-white/40 uppercase tracking-widest">
+                <p className="text-[9px] text-white/45 uppercase tracking-widest">
                   ₹{s.pricePerSqYd.toLocaleString('en-IN')}/sq yd
                 </p>
               ) : null}
-              <p className="text-3xl font-headline font-bold text-white">{s.memberPrice}</p>
+              <p className="text-3xl md:text-4xl font-headline font-extrabold text-white">{s.memberPrice}</p>
             </div>
           </div>
-          <div className="flex flex-wrap gap-6 mt-6">
+          <div className="flex flex-wrap gap-x-6 gap-y-3 mt-7">
             {[
               { Icon: Wind, text: `AQI ${s.aqi}` },
               { Icon: VolumeX, text: `${s.noise} dB` },
               { Icon: Clock, text: s.commute },
             ].map(({ Icon, text }) => (
-              <span key={text} className="flex items-center gap-2 text-white/70 text-[10px] uppercase tracking-widest font-bold">
+              <span key={text} className="flex items-center gap-2 text-white/75 text-[10px] uppercase tracking-widest font-bold">
                 <Icon className="w-3.5 h-3.5 text-[#a3b18a]" /> {text}
               </span>
             ))}
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3 mt-9">
+            <Link
+              href={`/contact?interest=site-visit&property=${s.id}`}
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-[#c8a951] text-[#1a1a0a] text-[10px] uppercase tracking-[0.35em] font-bold hover:bg-[#d9bb62] transition-all"
+            >
+              Book a private viewing
+            </Link>
+            <Link
+              href={`/contact?interest=${s.category ?? 'general'}&property=${s.id}`}
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full border border-white/25 text-white/80 text-[10px] uppercase tracking-[0.35em] font-bold hover:border-[#a3b18a]/60 hover:text-white transition-all"
+            >
+              Enquire · Get pricing
+            </Link>
           </div>
         </div>
       </section>
@@ -215,7 +232,7 @@ export default async function SanctuaryPage({ params }: Props) {
           Submissions land as `pending` and appear only after moderation. */}
       <section className="pb-20 px-6 md:px-24">
         <div className="max-w-4xl mx-auto">
-          <h2 className="font-serif text-2xl md:text-3xl font-light mb-2">
+          <h2 className="font-headline font-extrabold tracking-[-0.01em] text-2xl md:text-3xl mb-2">
             Visited {s.title}? Tell us how it went.
           </h2>
           <p className="text-sm text-secondary/60 mb-6">
