@@ -32,6 +32,8 @@ const EMPTY = {
   stage: 'ongoing' as Stage,
   investment: true,
   reserved: 0,
+  rera: '',
+  possession: '',
   features: [] as string[],
   plotImages: [] as string[],
 };
@@ -257,6 +259,24 @@ export function PropertiesManager({ initial }: { initial: AdminProperty[] }) {
                 value={form.reserved}
                 onChange={e => set('reserved', Math.max(0, Number(e.target.value) || 0))}
                 placeholder="e.g. 18"
+                className={input}
+              />
+            </div>
+            <div>
+              <label className={label}>RERA number(s)</label>
+              <input
+                value={form.rera}
+                onChange={e => set('rera', e.target.value)}
+                placeholder="e.g. P02400002648"
+                className={input}
+              />
+            </div>
+            <div>
+              <label className={label}>Possession</label>
+              <input
+                value={form.possession}
+                onChange={e => set('possession', e.target.value)}
+                placeholder="e.g. Dec 2027"
                 className={input}
               />
             </div>

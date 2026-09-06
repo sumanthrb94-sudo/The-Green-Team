@@ -4,7 +4,7 @@ const FIELDS = [
   'title', 'location', 'aqi', 'noise', 'commute', 'valuation', 'memberPrice', 'image',
   'tagline', 'description', 'plots', 'plotRange', 'amenityAcres', 'architect',
   'pricePerSqYd', 'sitePlanSrc', 'brochureUrl', 'status', 'order', 'features', 'plotImages', 'mapUrl',
-  'category', 'stage', 'investment', 'reserved',
+  'category', 'stage', 'investment', 'reserved', 'rera', 'possession',
 ] as const;
 
 /** Whitelist + normalize an admin property payload. */

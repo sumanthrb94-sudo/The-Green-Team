@@ -10,7 +10,7 @@
  * The Green Team difference is in what the spec row leads with: air and noise
  * sit beside size and stage, because that is what we actually sell.
  */
-import { useEffect, useState } from 'react';
+import { useShortlist } from '@/lib/shortlist';
 import Link from 'next/link';
 import Image from 'next/image';
 import { MapPin, Wind, VolumeX, Ruler, Heart, ArrowUpRight } from 'lucide-react';
@@ -19,29 +19,8 @@ import { stageLabel } from '@/lib/data/categories';
 import { estimateFromPrice, priceLabel } from '@/lib/data/listing';
 import { cn } from '@/lib/utils';
 
-const SHORTLIST_KEY = 'gt_shortlist';
-
-function useShortlisted(id: string): [boolean, () => void] {
-  const [on, setOn] = useState(false);
-  useEffect(() => {
-    try {
-      const raw = JSON.parse(localStorage.getItem(SHORTLIST_KEY) || '[]');
-      setOn(Array.isArray(raw) && raw.includes(id));
-    } catch {}
-  }, [id]);
-  const toggle = () => {
-    try {
-      const raw: string[] = JSON.parse(localStorage.getItem(SHORTLIST_KEY) || '[]');
-      const next = raw.includes(id) ? raw.filter(x => x !== id) : [...raw, id];
-      localStorage.setItem(SHORTLIST_KEY, JSON.stringify(next));
-      setOn(next.includes(id));
-    } catch {}
-  };
-  return [on, toggle];
-}
-
 export function ListingCard({ sanctuary: s }: { sanctuary: Sanctuary }) {
-  const [saved, toggleSaved] = useShortlisted(s.id);
+  const [saved, toggleSaved] = useShortlist(s.id);
   const from = estimateFromPrice(s);
   const stage = stageLabel(s.stage);
   const rate = s.pricePerSqYd

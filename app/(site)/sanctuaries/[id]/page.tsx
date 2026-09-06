@@ -1,19 +1,27 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { Wind, VolumeX, Clock, ExternalLink, Check } from 'lucide-react';
+import { Wind, VolumeX, Clock, Check, Camera } from 'lucide-react';
 import { SANCTUARIES, getSanctuary } from '@/lib/data/sanctuaries';
-import { getPropertyById } from '@/lib/server/portfolio';
+import { getPropertyById, getPortfolio } from '@/lib/server/portfolio';
 import { Gallery } from '@/components/property/Gallery';
 import { LayoutPlan } from '@/components/property/LayoutPlan';
 import { InvestPanel } from '@/components/property/InvestPanel';
+import { PdpTabs, type PdpSection } from '@/components/property/PdpTabs';
+import { KeyFacts } from '@/components/property/KeyFacts';
+import { PricingStrip } from '@/components/property/PricingStrip';
+import { Highlights } from '@/components/property/Highlights';
+import { LocationAdvantages } from '@/components/property/LocationAdvantages';
+import { EmiCalculator } from '@/components/property/EmiCalculator';
+import { DeveloperCard } from '@/components/property/DeveloperCard';
+import { PdpStickyBar } from '@/components/property/PdpStickyBar';
+import { ListingCard } from '@/components/portal/ListingCard';
 import { Footer } from '@/components/Footer';
 import { ReviewList } from '@/components/reviews/ReviewList';
 import { ReviewForm } from '@/components/reviews/ReviewForm';
 import { getApprovedReviews, aggregateRating } from '@/lib/server/reviews';
 import { SITE_URL } from '@/lib/data/contact';
-import { SITE_PLAN_CONFIG } from '@/lib/data/agartha-layout';
+import { estimateFromPrice } from '@/lib/data/listing';
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -52,13 +60,46 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export const revalidate = 300;
 
+/** Consistent section heading: eyebrow + bold title. */
+function SectionHead({ eyebrow, title }: { eyebrow: string; title: string }) {
+  return (
+    <div className="mb-6">
+      <p className="text-[9px] uppercase tracking-[0.4em] font-bold text-secondary/50 mb-2">{eyebrow}</p>
+      <h2 className="font-headline font-extrabold tracking-[-0.02em] text-2xl md:text-3xl text-on-surface leading-tight">{title}</h2>
+    </div>
+  );
+}
+
+/**
+ * The property page — a portal-grade, sectioned detail page (the 99acres
+ * shape): sticky section tabs, key facts, pricing strip, highlights, photos,
+ * site plan, amenities, location, pricing & investment, EMI, the developer card
+ * with the lead form, reviews, and similar listings — plus a mobile action bar.
+ * Everything shown is real listing data; sections with nothing to show are
+ * simply omitted, and their tab with them.
+ */
 export default async function SanctuaryPage({ params }: Props) {
   const { id } = await params;
-  const s = await getPropertyById(id);
+  const [s, portfolio, reviews] = await Promise.all([getPropertyById(id), getPortfolio(), getApprovedReviews(id)]);
   if (!s) notFound();
 
-  const reviews = await getApprovedReviews(id);
   const rating = aggregateRating(reviews);
+  const photos = s.plotImages?.length ? s.plotImages : [s.image];
+  const price = estimateFromPrice(s);
+  const others = portfolio.filter(x => x.id !== s.id);
+
+  const sections: PdpSection[] = [
+    { id: 'overview', label: 'Overview' },
+    { id: 'gallery', label: 'Photos' },
+    ...(s.sitePlanSrc ? [{ id: 'plan', label: 'Site plan' }] : []),
+    ...(s.features?.length ? [{ id: 'features', label: 'Amenities' }] : []),
+    { id: 'location', label: 'Location' },
+    { id: 'insights', label: 'Pricing' },
+    ...(price ? [{ id: 'emi', label: 'EMI' }] : []),
+    { id: 'contact', label: 'Developer' },
+    { id: 'reviews', label: 'Reviews' },
+    ...(others.length ? [{ id: 'similar', label: 'Similar' }] : []),
+  ];
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -73,13 +114,13 @@ export default async function SanctuaryPage({ params }: Props) {
       availability: 'https://schema.org/InStock',
       seller: { '@type': 'RealEstateAgent', name: 'The Green Team' },
     },
-    // Only present when real approved reviews exist — see lib/server/reviews.ts
     ...(rating ? { aggregateRating: rating } : {}),
     additionalProperty: [
       { '@type': 'PropertyValue', name: 'AQI', value: s.aqi },
       { '@type': 'PropertyValue', name: 'Ambient noise', value: `${s.noise} dB` },
       { '@type': 'PropertyValue', name: 'Commute', value: s.commute },
       ...(s.plotRange ? [{ '@type': 'PropertyValue', name: 'Sizes', value: s.plotRange }] : []),
+      ...(s.rera ? [{ '@type': 'PropertyValue', name: 'RERA', value: s.rera }] : []),
     ],
   };
 
@@ -87,12 +128,18 @@ export default async function SanctuaryPage({ params }: Props) {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-      {/* Hero header — cinematic, full-height, with a clear next step */}
-      <section className="relative min-h-[82vh] md:min-h-[88vh] flex items-end overflow-hidden">
+      {/* Hero */}
+      <section id="pdp-hero" className="relative min-h-[70vh] md:min-h-[78vh] flex items-end overflow-hidden">
         <Image src={s.image} alt={s.title} fill priority sizes="100vw" className="object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0a1208] via-[#0a1208]/35 to-[#0a1208]/25" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0a1208] via-[#0a1208]/35 to-[#0a1208]/20" />
         <div className="absolute inset-0 bg-gradient-to-r from-[#0a1208]/50 to-transparent" />
-        <div className="relative z-10 w-full max-w-6xl mx-auto px-6 md:px-12 pb-12 md:pb-16">
+        <a
+          href="#gallery"
+          className="absolute top-5 right-5 md:top-6 md:right-8 inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-black/45 backdrop-blur-sm border border-white/15 text-white text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-black/60 transition-all"
+        >
+          <Camera className="w-3.5 h-3.5" /> {photos.length} photos
+        </a>
+        <div className="relative z-10 w-full max-w-6xl mx-auto px-6 md:px-12 pb-10 md:pb-14">
           <p className="text-[10px] uppercase tracking-[0.5em] text-[#c8a951] font-bold mb-4">{s.tagline}</p>
           <div className="flex flex-wrap items-end justify-between gap-6">
             <div>
@@ -103,9 +150,7 @@ export default async function SanctuaryPage({ params }: Props) {
             </div>
             <div className="text-right">
               {s.pricePerSqYd ? (
-                <p className="text-[9px] text-white/45 uppercase tracking-widest">
-                  ₹{s.pricePerSqYd.toLocaleString('en-IN')}/sq yd
-                </p>
+                <p className="text-[9px] text-white/45 uppercase tracking-widest">₹{s.pricePerSqYd.toLocaleString('en-IN')}/sq yd</p>
               ) : null}
               <p className="text-3xl md:text-4xl font-headline font-extrabold text-white">{s.memberPrice}</p>
             </div>
@@ -121,127 +166,130 @@ export default async function SanctuaryPage({ params }: Props) {
               </span>
             ))}
           </div>
-          <div className="flex flex-col sm:flex-row gap-3 mt-9">
-            <Link
-              href={`/contact?interest=site-visit&property=${s.id}`}
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-[#c8a951] text-[#1a1a0a] text-[10px] uppercase tracking-[0.35em] font-bold hover:bg-[#d9bb62] transition-all"
-            >
-              Book a private viewing
-            </Link>
-            <Link
-              href={`/contact?interest=${s.category ?? 'general'}&property=${s.id}`}
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full border border-white/25 text-white/80 text-[10px] uppercase tracking-[0.35em] font-bold hover:border-[#a3b18a]/60 hover:text-white transition-all"
-            >
-              Enquire · Get pricing
-            </Link>
-          </div>
         </div>
       </section>
 
-      <section className="max-w-6xl mx-auto px-6 md:px-12 py-14">
-        <div className="grid lg:grid-cols-[1.6fr_1fr] gap-12 mb-14">
-          <div>
-            <p className="text-lg md:text-xl font-light text-secondary leading-relaxed">{s.description}</p>
-            {s.brochureUrl && (
-              <a
-                href={s.brochureUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 mt-6 text-[10px] uppercase tracking-[0.4em] font-bold text-primary hover:underline underline-offset-4"
-              >
-                Developer Brochure <ExternalLink className="w-3.5 h-3.5" />
-              </a>
-            )}
-          </div>
-          <div className="p-7 rounded-3xl border border-outline/15 bg-surface-container-low h-fit">
-            <p className="text-[9px] uppercase tracking-[0.5em] font-bold text-secondary/50 mb-4">At a glance</p>
-            <dl className="space-y-3 text-sm">
-              {[
-                ['Sizes', s.plotRange],
-                ['Amenity', s.amenityAcres],
-                ['Developer', s.architect],
-                // SYL sells villaments, not plots — the noun follows the property.
-                ...(s.plots
-                  ? [[`${SITE_PLAN_CONFIG[s.id]?.noun ?? 'Plot'}s`, String(s.plots)] as [string, string]]
-                  : []),
-              ]
-                .filter((r): r is [string, string] => Boolean(r[1]))
-                .map(([k, v]) => (
-                  <div key={k} className="flex justify-between gap-4">
-                    <dt className="text-secondary/60">{k}</dt>
-                    <dd className="font-medium text-on-surface text-right">{v}</dd>
+      <PdpTabs sections={sections} title={s.title} price={s.memberPrice} propertyId={s.id} />
+
+      <div className="max-w-6xl mx-auto px-6 md:px-12">
+        {/* Overview */}
+        <section id="overview" className="scroll-mt-40 py-10 md:py-12">
+          <KeyFacts sanctuary={s} />
+          <PricingStrip sanctuary={s} />
+          <div className="grid lg:grid-cols-[1.6fr_1fr] gap-10 mt-10">
+            <div>
+              <SectionHead eyebrow="About" title={s.title} />
+              <p className="text-base md:text-lg font-light text-secondary leading-relaxed">{s.description}</p>
+              <Highlights title={s.title} features={s.features ?? []} />
+            </div>
+            <aside className="h-fit rounded-3xl border border-outline/12 bg-surface-container-low p-6">
+              <p className="text-[9px] uppercase tracking-[0.4em] font-bold text-secondary/50 mb-4">Environment · measured on site</p>
+              <dl className="space-y-4">
+                {[
+                  { Icon: Wind, k: 'Air quality', v: `AQI ${s.aqi}`, sub: s.aqi <= 15 ? 'Pure air · city is 100–180' : 'Clean air · city is 100–180' },
+                  { Icon: VolumeX, k: 'Ambient noise', v: `${s.noise} dB`, sub: s.noise <= 20 ? 'Near silent · city is 65+' : 'Quiet · city is 65+' },
+                  { Icon: Clock, k: 'Commute', v: s.commute.split('·')[0].trim(), sub: 'measured, not estimated' },
+                ].map(({ Icon, k, v, sub }) => (
+                  <div key={k} className="flex items-start gap-3">
+                    <span className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">
+                      <Icon className="w-4 h-4" />
+                    </span>
+                    <div>
+                      <dt className="text-[9px] uppercase tracking-[0.25em] font-bold text-secondary/50">{k}</dt>
+                      <dd className="font-headline font-bold text-on-surface">{v}</dd>
+                      <dd className="text-[11px] text-secondary/60">{sub}</dd>
+                    </div>
                   </div>
                 ))}
-            </dl>
+              </dl>
+            </aside>
           </div>
-        </div>
+        </section>
 
+        {/* Photos */}
+        <section id="gallery" className="scroll-mt-40 py-10 md:py-12 border-t border-outline/10">
+          <Gallery images={photos} title={s.title} />
+        </section>
+
+        {/* Site plan */}
+        {s.sitePlanSrc ? (
+          <section id="plan" className="scroll-mt-40 py-10 md:py-12 border-t border-outline/10">
+            <SectionHead eyebrow="Layout" title="Site plan" />
+            <LayoutPlan sanctuary={s} />
+          </section>
+        ) : null}
+
+        {/* Amenities */}
         {s.features?.length ? (
-          <div className="mb-14">
-            <p className="text-[10px] uppercase tracking-[0.5em] font-bold text-on-surface/60 mb-5">Features</p>
+          <section id="features" className="scroll-mt-40 py-10 md:py-12 border-t border-outline/10">
+            <SectionHead eyebrow={`${s.features.length} listed`} title="Amenities & features" />
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {s.features.map(f => (
                 <div key={f} className="flex items-center gap-3 px-5 py-3.5 rounded-2xl border border-outline/12 bg-surface">
                   <Check className="w-4 h-4 text-primary flex-shrink-0" />
-                  <span className="text-sm text-on-surface/80">{f}</span>
+                  <span className="text-sm text-on-surface/85">{f}</span>
                 </div>
               ))}
             </div>
-          </div>
+          </section>
         ) : null}
 
-        {/* Single scroll — no tabs, no hidden content, fewer clicks. */}
-        <div className="space-y-16">
-          <div>
-            <p className="text-[10px] uppercase tracking-[0.5em] font-bold text-on-surface/60 mb-5">Gallery</p>
-            <Gallery images={s.plotImages ?? [s.image]} title={s.title} />
+        {/* Location */}
+        <section id="location" className="scroll-mt-40 py-10 md:py-12 border-t border-outline/10">
+          <SectionHead eyebrow="Location advantages" title="Getting there" />
+          <LocationAdvantages sanctuary={s} />
+        </section>
+
+        {/* Pricing & investment (includes the gated unit sheet) */}
+        <section id="insights" className="scroll-mt-40 py-10 md:py-12 border-t border-outline/10">
+          <SectionHead eyebrow="Pricing & investment" title="The numbers" />
+          <InvestPanel sanctuary={s} />
+        </section>
+
+        {/* EMI */}
+        {price ? (
+          <section id="emi" className="scroll-mt-40 py-10 md:py-12 border-t border-outline/10">
+            <SectionHead eyebrow="Affordability" title="Estimate your EMI" />
+            <EmiCalculator price={price} />
+          </section>
+        ) : null}
+
+        {/* Developer + lead form */}
+        <section id="contact" className="scroll-mt-40 py-10 md:py-12 border-t border-outline/10">
+          <SectionHead eyebrow="Contact" title="Talk to the developer, through us" />
+          <DeveloperCard sanctuary={s} />
+        </section>
+      </div>
+
+      {/* Reviews */}
+      <div id="reviews" className="scroll-mt-40 border-t border-outline/10">
+        <ReviewList reviews={reviews} />
+        <section className="py-14 px-6 md:px-24">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="font-headline font-extrabold tracking-[-0.01em] text-2xl md:text-3xl mb-2">
+              Visited {s.title}? Tell us how it went.
+            </h2>
+            <p className="text-sm text-secondary/60 mb-6">Reviews are read by a person before they go live.</p>
+            <ReviewForm propertyId={s.id} />
           </div>
-          {s.sitePlanSrc ? (
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.5em] font-bold text-on-surface/60 mb-5">Layout Plan</p>
-              <LayoutPlan sanctuary={s} />
+        </section>
+      </div>
+
+      {/* Similar */}
+      {others.length ? (
+        <section id="similar" className="scroll-mt-40 py-12 md:py-16 px-6 md:px-12 bg-surface-container-low border-t border-outline/10">
+          <div className="max-w-6xl mx-auto">
+            <SectionHead eyebrow="Also curated" title="Similar sanctuaries" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
+              {others.map(x => (
+                <ListingCard key={x.id} sanctuary={x} />
+              ))}
             </div>
-          ) : null}
-          <div>
-            <p className="text-[10px] uppercase tracking-[0.5em] font-bold text-on-surface/60 mb-5">Invest</p>
-            <InvestPanel sanctuary={s} />
           </div>
-        </div>
+        </section>
+      ) : null}
 
-        <div className="mt-16 pt-10 border-t border-outline/10 flex flex-wrap gap-4 items-center justify-between">
-          <p className="text-sm text-secondary">Explore the other curated sanctuaries:</p>
-          <div className="flex flex-wrap gap-3">
-            {SANCTUARIES.filter(x => x.id !== s.id).map(x => (
-              <Link
-                key={x.id}
-                href={`/sanctuaries/${x.id}`}
-                className="px-5 py-2.5 rounded-full border border-outline/25 text-[10px] uppercase tracking-widest font-bold text-on-surface/70 hover:border-primary hover:text-primary transition-all"
-              >
-                {x.title}
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <ReviewList reviews={reviews} />
-
-      {/* Property-scoped review capture. Without this mount nothing could ever
-          set `propertyId`, so per-property reviews (and the aggregateRating
-          above) could only be populated by calling the API directly.
-          Submissions land as `pending` and appear only after moderation. */}
-      <section className="pb-20 px-6 md:px-24">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="font-headline font-extrabold tracking-[-0.01em] text-2xl md:text-3xl mb-2">
-            Visited {s.title}? Tell us how it went.
-          </h2>
-          <p className="text-sm text-secondary/60 mb-6">
-            Reviews are read by a person before they go live.
-          </p>
-          <ReviewForm propertyId={s.id} />
-        </div>
-      </section>
-
+      <PdpStickyBar id={s.id} />
       <Footer />
     </>
   );

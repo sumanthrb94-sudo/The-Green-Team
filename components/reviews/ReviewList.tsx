@@ -16,7 +16,7 @@ export function ReviewList({ reviews }: { reviews: Review[] }) {
     <section className="py-20 px-6 md:px-24">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-baseline gap-4 mb-10">
-          <h2 className="font-serif text-3xl md:text-4xl font-light">What buyers say</h2>
+          <h2 className="font-headline font-extrabold tracking-[-0.02em] text-3xl md:text-4xl">What buyers say</h2>
           <span className="flex items-center gap-1.5 text-sm opacity-70">
             <Star className="w-4 h-4 fill-[#c8a951] text-[#c8a951]" />
             {avg.toFixed(1)} · {reviews.length} review{reviews.length > 1 ? 's' : ''}

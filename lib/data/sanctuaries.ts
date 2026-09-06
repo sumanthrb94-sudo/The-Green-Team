@@ -45,6 +45,10 @@ export interface Sanctuary {
   investment?: boolean;
   /** Real units reserved/sold, admin-entered — powers the momentum strip. */
   reserved?: number;
+  /** RERA registration number(s), as issued — shown as a trust badge when present. */
+  rera?: string;
+  /** Expected possession / handover, free text (e.g. "Dec 2027"). */
+  possession?: string;
   /** Firestore-managed properties carry these */
   status?: 'live' | 'draft';
   order?: number;
@@ -173,6 +177,7 @@ export const SANCTUARIES: Sanctuary[] = [
     plotRange: '500 sq yds · ₹18,000/sq yd',
     amenityAcres: '300+ Acres · 40% Open Space',
     architect: 'Planet Green Infra',
+    rera: 'P02400002648 · P02400003813',
     brochureUrl: 'https://www.thedatescounty.in',
     features: [
       'Adjacent to 4,000-Acre Reserve Forest',

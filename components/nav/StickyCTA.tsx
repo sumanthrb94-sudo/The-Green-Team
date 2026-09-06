@@ -12,6 +12,8 @@ import { WHATSAPP } from '@/lib/data/contact';
 export function StickyCTA() {
   const pathname = usePathname();
   if (pathname.startsWith('/admin')) return null;
+  // Property pages carry their own bar with property-specific WhatsApp + Enquire.
+  if (pathname.startsWith('/sanctuaries/')) return null;
 
   return (
     <div className="md:hidden fixed bottom-0 inset-x-0 z-[9980] p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pointer-events-none">
