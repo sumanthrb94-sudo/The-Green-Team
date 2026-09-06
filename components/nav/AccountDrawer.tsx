@@ -2,15 +2,32 @@
 
 /**
  * The slide-in menu — the primary navigation on mobile (where the top-bar links
- * are hidden) and the account panel on every size. It opens for everyone, not
- * only signed-in users: a logged-out visitor gets the full nav plus a clear
- * "Sign in / Join" call, which is what was missing before — a phone had no menu
- * and no visible way to log in.
+ * are hidden) and the account panel on every size.
+ *
+ * Ordered the way a property app orders it (the NoBroker pattern): the two
+ * doors come first. An account row at the very top — "Sign in / Join" for a
+ * visitor, name + role for a member — and directly under it a highlighted
+ * "List your property" card for the supply side. Only then the browse list,
+ * the sanctuaries, and the contact actions. It opens for everyone, not only
+ * signed-in users.
  */
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'motion/react';
-import { X, Home, BookOpen, LogOut, ShieldCheck, Phone, LogIn, Trees, Building2, TrendingUp, MapPin } from 'lucide-react';
+import {
+  X,
+  Home,
+  BookOpen,
+  LogOut,
+  ShieldCheck,
+  Phone,
+  Trees,
+  Building2,
+  TrendingUp,
+  MapPin,
+  ChevronRight,
+  User as UserIcon,
+} from 'lucide-react';
 import { Logo } from '@/components/brand/Logo';
 import { useAuth } from '@/components/auth/AuthProvider';
 
@@ -21,7 +38,6 @@ const NAV_ITEMS = [
   { name: 'Investments', href: '/explore/investments', icon: TrendingUp },
   { name: 'Sanctuary Map', href: '/map', icon: MapPin },
   { name: 'Journal', href: '/blog', icon: BookOpen },
-  { name: 'List your property', href: '/contact?interest=list-property', icon: Building2 },
 ];
 
 const SANCTUARY_ITEMS = [
@@ -61,23 +77,68 @@ export function AccountDrawer({ onClose, isDark }: { onClose: () => void; isDark
           </button>
         </div>
 
-        {/* Signed-out sign-in prompt — first thing a logged-out visitor sees */}
-        {!user && (
-          <div className="px-5 pt-5 pb-5" style={{ borderBottom: divider }}>
+        {/* ── Door 1: account row — the first thing on the menu ─────────── */}
+        <div className="px-5 pt-5">
+          {user ? (
+            <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-primary text-on-primary">
+              {user.photoURL ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={user.photoURL} referrerPolicy="no-referrer" alt="" className="w-11 h-11 rounded-full object-cover flex-shrink-0" />
+              ) : (
+                <span className="w-11 h-11 rounded-full bg-white/15 flex items-center justify-center font-bold text-base flex-shrink-0">
+                  {avatarLetter}
+                </span>
+              )}
+              <span className="min-w-0 flex-1">
+                <span className="block text-sm font-bold truncate">{user.displayName || user.email || user.phoneNumber}</span>
+                <span className="block text-[9px] uppercase tracking-[0.25em] opacity-70 mt-0.5">{isAdmin ? 'Admin' : 'Member'}</span>
+              </span>
+            </div>
+          ) : (
             <button
               onClick={() => { openAuth(); onClose(); }}
-              className="w-full py-3.5 rounded-xl bg-primary text-on-primary text-[10px] uppercase tracking-[0.35em] font-bold flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-primary/20 transition-all"
+              className="w-full flex items-center gap-3 p-3.5 rounded-2xl bg-primary text-on-primary text-left hover:shadow-lg hover:shadow-primary/20 transition-all"
             >
-              <LogIn className="w-4 h-4" /> Sign in / Join
+              <span className="w-11 h-11 rounded-full bg-white/15 flex items-center justify-center flex-shrink-0">
+                <UserIcon className="w-5 h-5" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-sm font-bold">Sign in / Join</span>
+                <span className="block text-[11px] opacity-75 mt-0.5">See unit-level pricing · Save shortlists</span>
+              </span>
+              <ChevronRight className="w-5 h-5 opacity-70 flex-shrink-0" />
             </button>
-            <p className="mt-2.5 text-center text-[10px] text-secondary/60 leading-relaxed">
-              Members see unit-level pricing and save shortlists.
-            </p>
-          </div>
-        )}
+          )}
+        </div>
 
+        {/* ── Door 2: list your property — right under the account row ────── */}
+        <div className="px-5 pt-3 pb-5" style={{ borderBottom: divider }}>
+          <Link
+            href="/contact?interest=list-property"
+            onClick={onClose}
+            className="flex items-center gap-3 p-3.5 rounded-2xl border border-outline/15 bg-surface-container-low hover:border-primary/40 transition-all group"
+          >
+            <span className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
+              <Building2 className="w-5 h-5" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-sm font-bold text-on-surface group-hover:text-primary transition-colors whitespace-nowrap">
+                List your property
+              </span>
+              <span className="flex items-center gap-2 mt-1">
+                <span className="text-[11px] text-secondary/70">Developers &amp; owners</span>
+                <span className="px-2 py-0.5 rounded-full bg-gold/15 text-gold text-[8px] uppercase tracking-[0.2em] font-extrabold whitespace-nowrap">
+                  Get curated
+                </span>
+              </span>
+            </span>
+            <ChevronRight className="w-5 h-5 text-secondary/40 group-hover:text-primary flex-shrink-0 transition-colors" />
+          </Link>
+        </div>
+
+        {/* ── Browse ───────────────────────────────────────────────────── */}
         <div className="px-5 pt-5 pb-5" style={{ borderBottom: divider }}>
-          <p className="text-[7px] uppercase tracking-[0.55em] text-secondary/40 font-bold mb-3 px-1">Navigate</p>
+          <p className="text-[7px] uppercase tracking-[0.55em] text-secondary/40 font-bold mb-3 px-1">Browse</p>
           <div className="flex flex-col">
             {NAV_ITEMS.map(({ name, href, icon: Icon }) => (
               <Link
@@ -95,6 +156,7 @@ export function AccountDrawer({ onClose, isDark }: { onClose: () => void; isDark
           </div>
         </div>
 
+        {/* ── Sanctuaries ──────────────────────────────────────────────── */}
         <div className="px-5 pt-5 pb-5" style={{ borderBottom: divider }}>
           <p className="text-[7px] uppercase tracking-[0.55em] text-secondary/40 font-bold mb-3 px-1">Sanctuaries</p>
           <div className="flex flex-col gap-2">
@@ -119,60 +181,34 @@ export function AccountDrawer({ onClose, isDark }: { onClose: () => void; isDark
           </div>
         </div>
 
+        {/* ── Contact / account actions ────────────────────────────────── */}
         <div className="px-5 pt-5 pb-6 mt-auto">
-          <p className="text-[7px] uppercase tracking-[0.55em] text-secondary/40 font-bold mb-3 px-1">Account</p>
-          {user ? (
-            <div className="flex flex-col gap-2.5">
-              <div className="flex items-center gap-3 px-3 py-3 rounded-xl bg-primary/5">
-                {user.photoURL ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={user.photoURL} referrerPolicy="no-referrer" alt="" className="w-10 h-10 rounded-full object-cover" />
-                ) : (
-                  <span className="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-sm">
-                    {avatarLetter}
-                  </span>
-                )}
-                <span className="min-w-0">
-                  <span className="block text-sm font-bold text-on-surface truncate">
-                    {user.displayName || user.email || user.phoneNumber}
-                  </span>
-                  <span className="block text-[8px] uppercase tracking-widest text-secondary/50 mt-0.5">
-                    {isAdmin ? 'Admin' : 'Member'}
-                  </span>
-                </span>
-              </div>
-              {isAdmin && (
-                <Link
-                  href="/admin"
-                  onClick={onClose}
-                  className="w-full py-3 rounded-xl bg-primary/10 text-primary text-[9px] uppercase tracking-[0.4em] font-bold flex items-center justify-center gap-2 hover:bg-primary/20 transition-all"
-                >
-                  <ShieldCheck className="w-3.5 h-3.5" /> Admin Dashboard
-                </Link>
-              )}
+          <div className="flex flex-col gap-2.5">
+            {isAdmin && (
               <Link
-                href="/contact"
+                href="/admin"
                 onClick={onClose}
-                className="w-full py-3.5 rounded-xl bg-primary text-on-primary text-[9px] uppercase tracking-[0.4em] font-bold flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-primary/20 transition-all"
+                className="w-full py-3 rounded-xl bg-primary/10 text-primary text-[9px] uppercase tracking-[0.4em] font-bold flex items-center justify-center gap-2 hover:bg-primary/20 transition-all"
               >
-                <Phone className="w-3.5 h-3.5" /> Talk to an adviser
+                <ShieldCheck className="w-3.5 h-3.5" /> Admin Dashboard
               </Link>
+            )}
+            <Link
+              href="/contact"
+              onClick={onClose}
+              className="w-full py-3.5 rounded-xl bg-gold text-[#1a1a0a] text-[9px] uppercase tracking-[0.4em] font-bold flex items-center justify-center gap-2 hover:bg-gold-bright transition-all"
+            >
+              <Phone className="w-3.5 h-3.5" /> Contact
+            </Link>
+            {user && (
               <button
                 onClick={() => { void signOutUser(); onClose(); }}
                 className="w-full py-3 rounded-xl border border-outline/25 text-on-surface/60 text-[9px] uppercase tracking-[0.4em] font-bold flex items-center justify-center gap-2 hover:text-on-surface transition-all"
               >
                 <LogOut className="w-3.5 h-3.5" /> Sign Out
               </button>
-            </div>
-          ) : (
-            <Link
-              href="/contact"
-              onClick={onClose}
-              className="w-full py-3.5 rounded-xl bg-primary text-on-primary text-[9px] uppercase tracking-[0.4em] font-bold flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-primary/20 transition-all"
-            >
-              <Phone className="w-3.5 h-3.5" /> Talk to an adviser
-            </Link>
-          )}
+            )}
+          </div>
           <p className="mt-5 text-center text-[8px] uppercase tracking-[0.3em] text-secondary/30">
             © {new Date().getFullYear()} The Green Team · Hyderabad
           </p>
