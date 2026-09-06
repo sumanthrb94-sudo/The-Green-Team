@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Clock, ArrowUpRight } from 'lucide-react';
 import { JOURNAL_POSTS } from '@/lib/data/journal';
-import { NewsletterHighlight } from '@/components/home/NewsletterHighlight';
 import { Footer } from '@/components/Footer';
 import { SITE_URL } from '@/lib/data/contact';
 
@@ -47,7 +46,6 @@ export default function BlogIndexPage() {
           ))}
         </div>
       </section>
-      <NewsletterHighlight />
       <Footer />
     </>
   );

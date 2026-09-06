@@ -79,12 +79,12 @@ async function main() {
   const page = await ctx.newPage();
 
   // ── 1. Newsletter signup ────────────────────────────────────────────────
-  console.log('\n▶ 1. Newsletter signup (inline form on home)');
+  console.log('\n▶ 1. Newsletter signup (the one form, in the footer)');
   await page.goto(`${BASE}/`, { waitUntil: 'load', timeout: 90000 });
   const nlEmail = `newsletter-${MARK}`;
-  await page.locator('#nl-highlight-email').scrollIntoViewIfNeeded();
-  await page.locator('#nl-highlight-email').fill(nlEmail);
-  await page.locator('button:has-text("Join the Collective")').click();
+  await page.locator('#nl-email').scrollIntoViewIfNeeded();
+  await page.locator('#nl-email').fill(nlEmail);
+  await page.locator('form:has(#nl-email) button[type="submit"]').click();
   await page.locator('text=You are on the list').waitFor({ timeout: 15000 }).then(
     () => ok('newsletter UI confirms subscription'),
     () => fail('newsletter UI confirmation missing')
@@ -130,15 +130,18 @@ async function main() {
   const userEmail = `user-${MARK}`;
   await page.goto(`${BASE}/`, { waitUntil: 'load' });
   await page.locator('nav button[aria-label="Sign in"]').click();
-  // Auth is Google-only now — assert the modal offers exactly that and nothing else.
+  // Two doors: mobile-number OTP (the default on a property app) and Google.
   await page.locator('button:has-text("Continue with Google")').waitFor({ timeout: 8000 }).then(
     () => ok('auth modal shows Google sign-in'),
     () => fail('Google sign-in button missing')
   );
-  (await page.locator('button:has-text("Continue with Email")').count()) === 0 &&
-  (await page.locator('button:has-text("Continue with Phone")').count()) === 0
-    ? ok('auth modal is Google-ONLY (email/phone paths removed)')
-    : fail('legacy email/phone sign-in still present');
+  await page.locator('input[aria-label="Mobile number"]').waitFor({ timeout: 8000 }).then(
+    () => ok('auth modal offers mobile-number OTP'),
+    () => fail('mobile-number sign-in missing')
+  );
+  (await page.locator('button:has-text("Create account")').count()) > 0
+    ? ok('sign-in / create-account are separate paths')
+    : fail('create-account path missing from auth modal');
   await page.keyboard.press('Escape');
 
   let idToken = null;

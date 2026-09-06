@@ -1,12 +1,13 @@
-import { NextRequest, NextResponse, after } from 'next/server';
-import { FieldValue } from 'firebase-admin/firestore';
-import { adminDb } from '@/lib/firebase/admin';
+import { NextRequest, NextResponse } from 'next/server';
 import { allowedOrigin, clientIp, rateLimited } from '@/lib/server/rate-limit';
-import { upsertContact, SEGMENT } from '@/lib/server/resend';
-import { sendNewsletterWelcome } from '@/lib/server/email';
+import { subscribeEmail } from '@/lib/server/newsletter';
 
-const SOURCES = new Set(['modal', 'inline', 'mobile_quick', 'footer']);
-
+/**
+ * The only HTTP door to the briefing list. It carries no subscription logic of
+ * its own — origin check, rate limit, then straight to `subscribeEmail`, which
+ * Groot's tool calls too. There is one signup form on the site (the footer), so
+ * there is one source tag; the route no longer accepts a caller-supplied one.
+ */
 export async function POST(req: NextRequest) {
   if (!allowedOrigin(req)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   if (rateLimited('newsletter', clientIp(req), { max: 10, windowMs: 10 * 60 * 1000 })) {
@@ -14,32 +15,9 @@ export async function POST(req: NextRequest) {
   }
   try {
     const body = await req.json();
-    const email = String(body.email ?? '').trim().toLowerCase().slice(0, 200);
-    const source = SOURCES.has(body.source) ? body.source : 'inline';
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
-      return NextResponse.json({ error: 'invalid email' }, { status: 400 });
-    }
-    const col = adminDb().collection('newsletter');
-    // A repeat signup is usually someone checking it worked: keep Resend in
-    // sync, but no second record and no second confirmation email.
-    const existing = await col.where('email', '==', email).limit(1).get();
-    if (!existing.empty) {
-      after(() => upsertContact({ email, segments: [SEGMENT.newsletter()], properties: { source } }));
-      return NextResponse.json({ ok: true, already: true });
-    }
-    await col.add({ email, source, createdAt: FieldValue.serverTimestamp() });
-    // `after` (not a bare `void`) so the serverless instance stays alive until
-    // these finish — otherwise the response returns, the function freezes and
-    // the request to Resend dies in flight.
-    after(async () => {
-      // Firestore is the record; Resend is where the broadcast goes out from.
-      await upsertContact({ email, segments: [SEGMENT.newsletter()], properties: { source } });
-      // Confirm immediately so the subscriber gets something in their inbox,
-      // not silence. The newsletter confirmation, not the member welcome — a
-      // subscriber cannot see per-unit pricing.
-      await sendNewsletterWelcome(email);
-    });
-    return NextResponse.json({ ok: true });
+    const result = await subscribeEmail({ email: String(body.email ?? ''), source: 'footer' });
+    if (result.invalid) return NextResponse.json({ error: 'invalid email' }, { status: 400 });
+    return NextResponse.json({ ok: true, already: result.already });
   } catch {
     return NextResponse.json({ error: 'failed' }, { status: 500 });
   }

@@ -5,7 +5,6 @@ import { BentoPortfolio } from '@/components/home/BentoPortfolio';
 import { ProofStrip } from '@/components/home/ProofStrip';
 import { ListWithUs } from '@/components/home/ListWithUs';
 import { AdviserCallSection } from '@/components/adviser/AdviserCallForm';
-import { NewsletterHighlight } from '@/components/home/NewsletterHighlight';
 import { Footer } from '@/components/Footer';
 import { getPortfolio } from '@/lib/server/portfolio';
 
@@ -29,7 +28,6 @@ export default async function HomePage() {
       <ProofStrip />
       <ListWithUs />
       <AdviserCallSection />
-      <NewsletterHighlight />
       <Footer />
     </>
   );

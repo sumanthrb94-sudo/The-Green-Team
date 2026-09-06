@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, Clock } from 'lucide-react';
 import { JOURNAL_POSTS, getPost } from '@/lib/data/journal';
-import { NewsletterHighlight } from '@/components/home/NewsletterHighlight';
 import { Footer } from '@/components/Footer';
 import { SITE_URL } from '@/lib/data/contact';
 
@@ -108,7 +107,6 @@ export default async function BlogPostPage({ params }: Props) {
           </div>
         </div>
       </article>
-      <NewsletterHighlight />
       <Footer />
     </>
   );

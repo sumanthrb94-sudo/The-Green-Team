@@ -4,6 +4,7 @@ import { adminDb } from '@/lib/firebase/admin';
 import { WHATSAPP } from '@/lib/data/contact';
 import type { Sanctuary } from '@/lib/data/sanctuaries';
 import { getPortfolio, getPropertyById } from '@/lib/server/portfolio';
+import { subscribeEmail } from '@/lib/server/newsletter';
 import type { GeminiTool } from '@/lib/ai/gemini';
 import type { ActionPayload, ToolName } from '@/lib/rag/types';
 
@@ -351,9 +352,11 @@ async function subscribeNewsletter(args: Record<string, unknown>): Promise<ToolR
   const storedArgs = compact({ email, name });
 
   try {
-    const collection = adminDb().collection('newsletter');
-    const existing = await collection.where('email', '==', email).limit(1).get();
-    if (!existing.empty) {
+    // Same function the footer form calls, so a chatbot subscriber lands in
+    // Resend and gets the confirmation like everyone else. This used to write
+    // to Firestore alone, which put them on a list no broadcast could reach.
+    const result = await subscribeEmail({ email, source: 'groot', name });
+    if (result.already) {
       return {
         ok: true,
         forModel: {
@@ -365,7 +368,6 @@ async function subscribeNewsletter(args: Record<string, unknown>): Promise<ToolR
       };
     }
 
-    await collection.add({ email, source: 'groot', createdAt: FieldValue.serverTimestamp() });
     return {
       ok: true,
       forModel: { saved: true, note: 'Confirm in one line. The interface already shows the card.' },
