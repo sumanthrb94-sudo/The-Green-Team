@@ -4,6 +4,16 @@ import { adminAuth, adminDb } from '@/lib/firebase/admin';
 import { upsertContact, splitName, SEGMENT } from '@/lib/server/resend';
 import { sendWelcomeEmail } from '@/lib/server/email';
 
+/** An account created within this window of the request is a genuine sign-up.
+ *  Anything older that arrives here without a profile record is a repaired
+ *  record for an existing member, and must not be welcomed. */
+const SIGNUP_WINDOW_MS = 10 * 60 * 1000;
+
+/** How long an unfinished welcome waits before it is tried again. This route
+ *  runs on ordinary page loads, so without a floor a provider outage would mean
+ *  a fresh attempt on every navigation for as long as it lasted. */
+const WELCOME_RETRY_MS = 60 * 60 * 1000;
+
 /** Read back your own profile, for the account page. Same rule as POST: the
  *  bearer token names the user, so nobody can read anyone else's record. */
 export async function GET(req: NextRequest) {
@@ -30,6 +40,11 @@ export async function GET(req: NextRequest) {
 /**
  * Authenticated profile upsert. The bearer ID token names the user — a caller
  * can only ever write their own users/{uid} document.
+ *
+ * This runs far more often than people expect: on sign-in, when the profile
+ * step is submitted, when the account page saves, and on ordinary page loads
+ * whenever the browser hands back a location. So nothing here may treat "this
+ * request happened" as "this person just joined".
  */
 export async function POST(req: NextRequest) {
   try {
@@ -63,30 +78,76 @@ export async function POST(req: NextRequest) {
     }
 
     const ref = adminDb().collection('users').doc(decoded.uid);
-    const snap = await ref.get();
-    const prev = snap.data();
-    const isNew = !snap.exists;
-    // Whichever address we know: verified from the token, just supplied, or
-    // stored on a previous visit.
-    const email = decoded.email ?? providedEmail ?? (prev?.email as string | undefined) ?? null;
     const authPhone = (decoded.phone_number as string | undefined) ?? undefined;
-    await ref.set(
-      {
-        uid: decoded.uid,
-        email,
-        displayName: (decoded.name as string | undefined) ?? null,
-        photoURL: (decoded.picture as string | undefined) ?? null,
-        ...(authPhone ? { phone: authPhone } : {}),
-        ...allowed,
-        ...(isNew ? { firstSignIn: FieldValue.serverTimestamp() } : {}),
-        lastSeen: FieldValue.serverTimestamp(),
-      },
-      { merge: true }
-    );
-    // Mirror to Resend so a sign-in is a contact the moment it happens. Fire and
-    // forget: the profile write above is the source of truth and must not wait
-    // on, or fail because of, an email provider.
+
+    let isNew = false;
+    let email: string | null = null;
+    let shouldWelcome = false;
+
+    // One transaction so two requests racing on the same sign-in cannot both
+    // decide they are the first, and send the welcome twice.
+    await adminDb().runTransaction(async tx => {
+      const snap = await tx.get(ref);
+      const prev = snap.data();
+      isNew = !snap.exists;
+      const prevEmail = (prev?.email as string | undefined) ?? null;
+      // Whichever address we know: verified from the token, just supplied, or
+      // stored on a previous visit.
+      email = decoded.email ?? providedEmail ?? prevEmail ?? null;
+
+      // The welcome belongs to one moment: the first time we have both an
+      // account and an address to write to. That is a sign-up (a first Google
+      // sign-in creates the account, so the two are the same event), or the
+      // moment an OTP member finally gives us an email. Never a later sign-in.
+      //
+      // Deliberately derived from state rather than from a missing flag: every
+      // account that predates this email would otherwise qualify, and five real
+      // members from April would have been "welcomed" months after joining.
+      const firstAddressForAccount = Boolean(email) && (isNew || !prevEmail);
+      // An unfinished attempt stays owed until it is actually delivered, so a
+      // send that fails is retried instead of being silently written off —
+      // but no more than once an hour, since this route also runs on page loads.
+      const lastTry = (prev?.welcomeAttemptedAt as { toMillis?: () => number } | undefined)?.toMillis?.() ?? 0;
+      const owed = prev?.welcomePending === true && Date.now() - lastTry > WELCOME_RETRY_MS;
+      shouldWelcome = !prev?.welcomeSentAt && (firstAddressForAccount || owed);
+
+      tx.set(
+        ref,
+        {
+          uid: decoded.uid,
+          email,
+          displayName: (decoded.name as string | undefined) ?? null,
+          photoURL: (decoded.picture as string | undefined) ?? null,
+          ...(authPhone ? { phone: authPhone } : {}),
+          ...allowed,
+          ...(isNew ? { firstSignIn: FieldValue.serverTimestamp() } : {}),
+          ...(shouldWelcome ? { welcomePending: true, welcomeAttemptedAt: FieldValue.serverTimestamp() } : {}),
+          lastSeen: FieldValue.serverTimestamp(),
+        },
+        { merge: true }
+      );
+    });
+
+    // A profile record can be missing for an old member — created before this
+    // route existed, or lost. That is a repair, not a sign-up, so check the age
+    // of the Firebase account itself before treating it as one. Only ever runs
+    // on the rare request that creates a record.
+    if (shouldWelcome && isNew) {
+      try {
+        const created = Date.parse((await adminAuth().getUser(decoded.uid)).metadata.creationTime);
+        if (Number.isFinite(created) && Date.now() - created > SIGNUP_WINDOW_MS) {
+          shouldWelcome = false;
+          await ref.set({ welcomePending: false }, { merge: true });
+        }
+      } catch {
+        // Auth lookup failed — fall through and welcome. Erring towards sending
+        // once is better than a new member hearing nothing at all.
+      }
+    }
+
+    // Mirror to Resend so a sign-in is a contact the moment it happens.
     if (email) {
+      const addr: string = email;
       const name = (allowed.name as string | undefined) ?? (decoded.name as string | undefined);
       // `after` runs once the response has been sent AND keeps the serverless
       // function alive until it finishes. A bare `void` promise here does not:
@@ -95,7 +156,7 @@ export async function POST(req: NextRequest) {
       // why no email ever arrived in production.
       after(async () => {
         await upsertContact({
-          email,
+          email: addr,
           ...splitName(name),
           segments: [SEGMENT.members()],
           properties: {
@@ -105,12 +166,16 @@ export async function POST(req: NextRequest) {
             source: 'sign-in',
           },
         });
-        // Welcome once per account, ever — but only stamp it once Resend has
-        // actually accepted the message, so a failed send is retried on the
-        // next sign-in instead of being silently marked as delivered.
-        if (!prev?.welcomeSentAt) {
-          const sent = await sendWelcomeEmail(email, splitName(name).firstName);
-          if (sent) await ref.set({ welcomeSentAt: FieldValue.serverTimestamp() }, { merge: true });
+        if (shouldWelcome) {
+          // Stamp sent only once Resend has actually accepted the message; a
+          // failure leaves `welcomePending` set, so the next visit retries.
+          const sent = await sendWelcomeEmail(addr, splitName(name).firstName);
+          if (sent) {
+            await ref.set(
+              { welcomeSentAt: FieldValue.serverTimestamp(), welcomePending: false },
+              { merge: true }
+            );
+          }
         }
       });
     }
