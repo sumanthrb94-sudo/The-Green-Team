@@ -1,8 +1,31 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, after } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
 import { adminAuth, adminDb } from '@/lib/firebase/admin';
 import { upsertContact, splitName, SEGMENT } from '@/lib/server/resend';
 import { sendWelcomeEmail } from '@/lib/server/email';
+
+/** Read back your own profile, for the account page. Same rule as POST: the
+ *  bearer token names the user, so nobody can read anyone else's record. */
+export async function GET(req: NextRequest) {
+  try {
+    const authz = req.headers.get('authorization') ?? '';
+    const idToken = authz.startsWith('Bearer ') ? authz.slice(7) : '';
+    const decoded = await adminAuth().verifyIdToken(idToken);
+    const d = (await adminDb().collection('users').doc(decoded.uid).get()).data() ?? {};
+    return NextResponse.json({
+      name: (d.name as string) ?? (d.displayName as string) ?? (decoded.name as string) ?? '',
+      email: (decoded.email as string) ?? (d.email as string) ?? '',
+      // A provider-verified address is not editable here; a self-supplied one is.
+      emailLocked: Boolean(decoded.email),
+      phone: (d.phone as string) ?? (decoded.phone_number as string) ?? '',
+      phoneLocked: Boolean(decoded.phone_number),
+      city: (d.city as string) ?? '',
+      occupation: (d.occupation as string) ?? '',
+    });
+  } catch {
+    return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  }
+}
 
 /**
  * Authenticated profile upsert. The bearer ID token names the user — a caller
@@ -65,25 +88,31 @@ export async function POST(req: NextRequest) {
     // on, or fail because of, an email provider.
     if (email) {
       const name = (allowed.name as string | undefined) ?? (decoded.name as string | undefined);
-      void upsertContact({
-        email,
-        ...splitName(name),
-        segments: [SEGMENT.members()],
-        properties: {
-          phone: (allowed.phone as string | undefined) ?? authPhone,
-          city: allowed.city as string | undefined,
-          occupation: allowed.occupation as string | undefined,
-          source: 'sign-in',
-        },
+      // `after` runs once the response has been sent AND keeps the serverless
+      // function alive until it finishes. A bare `void` promise here does not:
+      // the platform freezes the instance the moment the response returns and
+      // the in-flight socket to Resend is cut mid-request, which is exactly
+      // why no email ever arrived in production.
+      after(async () => {
+        await upsertContact({
+          email,
+          ...splitName(name),
+          segments: [SEGMENT.members()],
+          properties: {
+            phone: (allowed.phone as string | undefined) ?? authPhone,
+            city: allowed.city as string | undefined,
+            occupation: allowed.occupation as string | undefined,
+            source: 'sign-in',
+          },
+        });
+        // Welcome once per account, ever — but only stamp it once Resend has
+        // actually accepted the message, so a failed send is retried on the
+        // next sign-in instead of being silently marked as delivered.
+        if (!prev?.welcomeSentAt) {
+          const sent = await sendWelcomeEmail(email, splitName(name).firstName);
+          if (sent) await ref.set({ welcomeSentAt: FieldValue.serverTimestamp() }, { merge: true });
+        }
       });
-      // Welcome once per account, ever. Guarded by a stored timestamp rather
-      // than `isNew`, because a phone user's address only arrives at the
-      // profile step — by which point the document already exists — and
-      // because two concurrent sign-in writes must not both send.
-      if (!prev?.welcomeSentAt) {
-        void ref.set({ welcomeSentAt: FieldValue.serverTimestamp() }, { merge: true });
-        void sendWelcomeEmail(email, splitName(name).firstName);
-      }
     }
 
     return NextResponse.json({ ok: true, isNew });

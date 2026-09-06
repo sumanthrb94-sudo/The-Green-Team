@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, after } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
 import { adminDb } from '@/lib/firebase/admin';
 import { allowedOrigin, clientIp, rateLimited } from '@/lib/server/rate-limit';
@@ -52,8 +52,10 @@ export async function POST(req: NextRequest) {
     // /api/profile; sending the buyer confirmation too would be a second,
     // wrong email ("an adviser will call you about your enquiry") for someone
     // who only signed in.
+    // `after` keeps the function alive until the send completes; a bare `void`
+    // promise is killed when the response returns on serverless.
     if (email && source !== 'signup') {
-      void sendLeadConfirmation(email, name || undefined, intent || undefined, source);
+      after(() => sendLeadConfirmation(email, name || undefined, intent || undefined, source));
     }
     return NextResponse.json({ ok: true });
   } catch {

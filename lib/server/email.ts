@@ -19,13 +19,18 @@ import { renderListingReceived, LISTING_SUBJECT } from '@/emails/listing-receive
 
 const FROM = `The Green Team <${BUSINESS.email}>`;
 
-async function send(to: string, subject: string, html: string): Promise<void> {
+/**
+ * Returns whether Resend actually accepted the message, so a caller can avoid
+ * recording "sent" for something that never left. A suppressed address (test
+ * suite, no key) reports false: nothing was delivered.
+ */
+async function send(to: string, subject: string, html: string): Promise<boolean> {
   const key = process.env.RESEND_API_KEY;
-  if (!key) return;
+  if (!key) return false;
 
   const email = to.trim().toLowerCase();
-  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return;
-  if (email.endsWith('.test') || email.includes('example.')) return; // never to test suites
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return false;
+  if (email.endsWith('.test') || email.includes('example.')) return false; // never to test suites
 
   try {
     const res = await fetch('https://api.resend.com/emails', {
@@ -36,26 +41,29 @@ async function send(to: string, subject: string, html: string): Promise<void> {
     if (!res.ok) {
       const text = await res.text().catch(() => '');
       console.error(`[email] ${subject} → ${res.status}: ${text.slice(0, 200)}`);
+      return false;
     }
+    return true;
   } catch (err) {
     console.error('[email] send failed:', err);
+    return false;
   }
 }
 
 /** First sign-in welcome. */
-export async function sendWelcomeEmail(to: string, name?: string): Promise<void> {
-  await send(to, WELCOME_SUBJECT, await renderWelcome(name));
+export async function sendWelcomeEmail(to: string, name?: string): Promise<boolean> {
+  return send(to, WELCOME_SUBJECT, await renderWelcome(name));
 }
 
 /** Newsletter subscription confirmation — not the member welcome, which
  *  promises per-unit pricing a subscriber cannot see. */
-export async function sendNewsletterWelcome(to: string): Promise<void> {
-  await send(to, NEWSLETTER_WELCOME_SUBJECT, await renderNewsletterWelcome());
+export async function sendNewsletterWelcome(to: string): Promise<boolean> {
+  return send(to, NEWSLETTER_WELCOME_SUBJECT, await renderNewsletterWelcome());
 }
 
 /** Site-visit booking confirmation. */
-export async function sendSiteVisitConfirmation(to: string, name?: string, detail?: string): Promise<void> {
-  await send(to, SITE_VISIT_SUBJECT, await renderSiteVisit({ name, detail }));
+export async function sendSiteVisitConfirmation(to: string, name?: string, detail?: string): Promise<boolean> {
+  return send(to, SITE_VISIT_SUBJECT, await renderSiteVisit({ name, detail }));
 }
 
 /**
@@ -68,16 +76,14 @@ export async function sendLeadConfirmation(
   name?: string,
   intent?: string,
   source?: string
-): Promise<void> {
+): Promise<boolean> {
   // Supply side: a developer/owner asking to list must never get the buyer
   // confirmation ("an adviser will help you find a home… sign in for pricing").
   if (source === 'list-property') {
-    await send(to, LISTING_SUBJECT, await renderListingReceived({ name, intent }));
-    return;
+    return send(to, LISTING_SUBJECT, await renderListingReceived({ name, intent }));
   }
   if (source && /site-visit/i.test(source)) {
-    await sendSiteVisitConfirmation(to, name, intent);
-    return;
+    return sendSiteVisitConfirmation(to, name, intent);
   }
-  await send(to, LEAD_SUBJECT, await renderLeadConfirmation({ name, intent }));
+  return send(to, LEAD_SUBJECT, await renderLeadConfirmation({ name, intent }));
 }

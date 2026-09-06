@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, after } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
 import { adminDb } from '@/lib/firebase/admin';
 import { allowedOrigin, clientIp, rateLimited } from '@/lib/server/rate-limit';
@@ -24,16 +24,21 @@ export async function POST(req: NextRequest) {
     // sync, but no second record and no second confirmation email.
     const existing = await col.where('email', '==', email).limit(1).get();
     if (!existing.empty) {
-      void upsertContact({ email, segments: [SEGMENT.newsletter()], properties: { source } });
+      after(() => upsertContact({ email, segments: [SEGMENT.newsletter()], properties: { source } }));
       return NextResponse.json({ ok: true, already: true });
     }
     await col.add({ email, source, createdAt: FieldValue.serverTimestamp() });
-    // Firestore is the record; Resend is where the broadcast goes out from.
-    void upsertContact({ email, segments: [SEGMENT.newsletter()], properties: { source } });
-    // Confirm immediately so the subscriber gets something in their inbox, not
-    // silence. The newsletter confirmation, not the member welcome — a
-    // subscriber cannot see per-unit pricing. Fire-and-forget.
-    void sendNewsletterWelcome(email);
+    // `after` (not a bare `void`) so the serverless instance stays alive until
+    // these finish — otherwise the response returns, the function freezes and
+    // the request to Resend dies in flight.
+    after(async () => {
+      // Firestore is the record; Resend is where the broadcast goes out from.
+      await upsertContact({ email, segments: [SEGMENT.newsletter()], properties: { source } });
+      // Confirm immediately so the subscriber gets something in their inbox,
+      // not silence. The newsletter confirmation, not the member welcome — a
+      // subscriber cannot see per-unit pricing.
+      await sendNewsletterWelcome(email);
+    });
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: 'failed' }, { status: 500 });

@@ -80,7 +80,11 @@ export function AccountDrawer({ onClose, isDark }: { onClose: () => void; isDark
         {/* ── Door 1: account row — the first thing on the menu ─────────── */}
         <div className="px-5 pt-5">
           {user ? (
-            <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-primary text-on-primary">
+            <Link
+              href="/account"
+              onClick={onClose}
+              className="flex items-center gap-3 p-3.5 rounded-2xl bg-primary text-on-primary hover:opacity-95 transition-opacity"
+            >
               {user.photoURL ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={user.photoURL} referrerPolicy="no-referrer" alt="" className="w-11 h-11 rounded-full object-cover flex-shrink-0" />
@@ -91,9 +95,12 @@ export function AccountDrawer({ onClose, isDark }: { onClose: () => void; isDark
               )}
               <span className="min-w-0 flex-1">
                 <span className="block text-sm font-bold truncate">{user.displayName || user.email || user.phoneNumber}</span>
-                <span className="block text-[9px] uppercase tracking-[0.25em] opacity-70 mt-0.5">{isAdmin ? 'Admin' : 'Member'}</span>
+                <span className="block text-[9px] uppercase tracking-[0.25em] opacity-70 mt-0.5">
+                  {isAdmin ? 'Admin' : 'Member'} · View profile
+                </span>
               </span>
-            </div>
+              <ChevronRight className="w-5 h-5 opacity-70 flex-shrink-0" />
+            </Link>
           ) : (
             <button
               onClick={() => { openAuth(); onClose(); }}
