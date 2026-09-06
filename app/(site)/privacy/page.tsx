@@ -140,6 +140,11 @@ export default function PrivacyPage() {
             </li>
             <li>
               <strong>Be heard.</strong> Grievance redressal is clause 9, and it has a deadline.
+              {' '}No account?{' '}
+              <Link href="/privacy/request" className="text-primary hover:underline underline-offset-4">
+                Make any of these requests here
+              </Link>
+              .
             </li>
             <li>
               <strong>Nominate someone.</strong> You may nominate a person to exercise these rights

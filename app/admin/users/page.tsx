@@ -1,4 +1,4 @@
-import { Download, MapPin } from 'lucide-react';
+import { Download } from 'lucide-react';
 import { fetchUsers } from '@/lib/server/admin-data';
 import { getSessionUser } from '@/lib/server/session';
 
@@ -41,16 +41,6 @@ export default async function AdminUsersPage() {
                   <p className="text-xs text-secondary/60 truncate">{u.email}</p>
                 </div>
               </div>
-              {u.lat !== undefined && u.lng !== undefined && (
-                <a
-                  href={`https://www.openstreetmap.org/?mlat=${u.lat}&mlon=${u.lng}#map=14/${u.lat}/${u.lng}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-shrink-0 flex items-center gap-1 px-2.5 py-1.5 bg-primary/10 text-primary text-[8px] font-bold uppercase tracking-widest rounded-full hover:bg-primary/20 transition-all"
-                >
-                  <MapPin className="w-2.5 h-2.5" /> Map
-                </a>
-              )}
             </div>
             {(u.occupation || u.city) && (
               <p className="mt-3 text-xs text-secondary/70">{[u.occupation, u.city].filter(Boolean).join(' · ')}</p>
@@ -58,12 +48,6 @@ export default async function AdminUsersPage() {
             <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-[10px] text-secondary/40">
               <span>First seen: {fmt(u.firstSignIn)}</span>
               <span>Last seen: {fmt(u.lastSeen)}</span>
-              {u.lat !== undefined && u.lng !== undefined && (
-                <span className="font-mono">
-                  {u.lat.toFixed(4)}, {u.lng.toFixed(4)}
-                  {u.locationAccuracy ? ` ±${Math.round(u.locationAccuracy)}m` : ''}
-                </span>
-              )}
             </div>
           </div>
         ))}

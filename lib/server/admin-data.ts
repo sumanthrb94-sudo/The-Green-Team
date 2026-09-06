@@ -45,9 +45,6 @@ export interface AdminUser {
   name?: string;
   occupation?: string;
   city?: string;
-  lat?: number;
-  lng?: number;
-  locationAccuracy?: number;
   photoURL?: string;
   firstSignIn: string | null;
   lastSeen: string | null;
@@ -112,9 +109,6 @@ export async function fetchUsers(): Promise<AdminUser[]> {
         name: x.name ?? undefined,
         occupation: x.occupation ?? undefined,
         city: x.city ?? undefined,
-        lat: typeof x.lat === 'number' ? x.lat : undefined,
-        lng: typeof x.lng === 'number' ? x.lng : undefined,
-        locationAccuracy: typeof x.locationAccuracy === 'number' ? x.locationAccuracy : undefined,
         photoURL: x.photoURL ?? undefined,
         firstSignIn: iso(x.firstSignIn),
         lastSeen: iso(x.lastSeen),

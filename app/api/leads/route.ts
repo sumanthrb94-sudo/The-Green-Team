@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse, after } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
 import { adminDb } from '@/lib/firebase/admin';
+import { consentRecord } from '@/lib/data/legal';
 import { allowedOrigin, clientIp, rateLimited } from '@/lib/server/rate-limit';
 import { sendLeadConfirmation } from '@/lib/server/email';
 
@@ -41,6 +42,10 @@ export async function POST(req: NextRequest) {
         ...(intent ? { intent } : {}),
         source,
         status: 'new',
+        // Evidence, not an assertion: which notice this person was shown, for
+        // what purposes, and when. Stamped server-side from our own constant so
+        // a caller cannot claim a consent it never displayed.
+        consent: consentRecord(),
         createdAt: FieldValue.serverTimestamp(),
       });
     // Confirm receipt while the buyer is still on the page wondering if the form

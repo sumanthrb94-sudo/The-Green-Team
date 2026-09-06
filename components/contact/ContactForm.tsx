@@ -14,6 +14,7 @@ import { useState } from 'react';
 import { Check, Send, Phone } from 'lucide-react';
 import { INVESTMENT_BRACKETS, WHATSAPP, BUSINESS } from '@/lib/data/contact';
 import { track, markConverted } from '@/lib/analytics';
+import { CollectionNotice } from '@/components/legal/CollectionNotice';
 import { cn } from '@/lib/utils';
 
 const INTERESTS = [
@@ -205,6 +206,9 @@ export function ContactForm({
         <Send className="w-4 h-4" />
         {loading ? 'Sending…' : 'Send message'}
       </button>
+
+      {/* DPDP s.5: the notice belongs here, not only in the footer. */}
+      <CollectionNotice />
 
       <div className="flex items-center justify-center gap-5 pt-1">
         <a href={`tel:${BUSINESS.phone.replace(/\s/g, '')}`} className="inline-flex items-center gap-1.5 text-xs text-secondary/70 hover:text-primary transition-colors">

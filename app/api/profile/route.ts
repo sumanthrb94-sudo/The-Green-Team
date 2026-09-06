@@ -69,9 +69,10 @@ export async function POST(req: NextRequest) {
       const ph = body.phone.replace(/[^\d+\s\-()]/g, '').trim().slice(0, 40);
       if (ph.replace(/\D/g, '').length >= 8) allowed.phone = ph;
     }
-    for (const k of ['lat', 'lng', 'locationAccuracy'] as const) {
-      if (typeof body[k] === 'number' && Number.isFinite(body[k])) allowed[k] = body[k];
-    }
+    // Precise coordinates are deliberately NOT accepted. We used to collect them
+    // silently on sign-in and show them to an administrator, which is exactly
+    // what DPDP s.6(1) forbids: consent limited to what is necessary for a
+    // specified purpose, and there was no purpose. Old values were purged.
     // A phone-OTP user has no email on the token, so the profile step is the
     // only chance to ask for one. Accepted ONLY when the token carries no
     // email — otherwise a Google user could overwrite their verified address

@@ -18,6 +18,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // Indexed on purpose: a buyer checking whether an agent is legitimate looks
     // for these, and a search engine treats their presence as a trust signal.
     { url: `${SITE_URL}/privacy`, lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
+    { url: `${SITE_URL}/privacy/request`, lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
     { url: `${SITE_URL}/terms`, lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
     { url: `${SITE_URL}/cookies`, lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
   ];

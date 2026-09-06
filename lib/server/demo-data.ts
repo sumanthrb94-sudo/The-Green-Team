@@ -33,9 +33,9 @@ export const DEMO_NEWSLETTER: AdminNewsletterEntry[] = [
 ];
 
 export const DEMO_USERS: AdminUser[] = [
-  { id: 'u1', email: 'aarav.mehta@example.in', displayName: 'Aarav Mehta', name: 'Aarav Mehta', occupation: 'Product Designer', city: 'Hyderabad', lat: 17.4239, lng: 78.4738, locationAccuracy: 26, firstSignIn: days(50), lastSeen: days(1) },
-  { id: 'u2', email: 'divya.rao@example.in', displayName: 'Divya Rao', name: 'Divya Rao', occupation: 'Cardiologist', city: 'Secunderabad', lat: 17.4399, lng: 78.4983, locationAccuracy: 41, firstSignIn: days(30), lastSeen: days(2) },
-  { id: 'u3', email: 'karthik.r@example.in', displayName: 'Karthik Reddy', name: 'Karthik Reddy', occupation: 'Founder, LogiFleet', city: 'Gachibowli', lat: 17.4401, lng: 78.3489, locationAccuracy: 33, firstSignIn: days(12), lastSeen: days(4) },
+  { id: 'u1', email: 'aarav.mehta@example.in', displayName: 'Aarav Mehta', name: 'Aarav Mehta', occupation: 'Product Designer', city: 'Hyderabad', firstSignIn: days(50), lastSeen: days(1) },
+  { id: 'u2', email: 'divya.rao@example.in', displayName: 'Divya Rao', name: 'Divya Rao', occupation: 'Cardiologist', city: 'Secunderabad', firstSignIn: days(30), lastSeen: days(2) },
+  { id: 'u3', email: 'karthik.r@example.in', displayName: 'Karthik Reddy', name: 'Karthik Reddy', occupation: 'Founder, LogiFleet', city: 'Gachibowli', firstSignIn: days(12), lastSeen: days(4) },
   { id: 'u4', email: 'sana.f@example.in', displayName: 'Sana Fatima', name: 'Sana Fatima', occupation: 'Architect', city: 'Jubilee Hills', firstSignIn: days(7), lastSeen: days(6) },
 ];
 

@@ -10,6 +10,7 @@ import { Check, Phone } from 'lucide-react';
 import { INVESTMENT_BRACKETS } from '@/lib/data/contact';
 import { track, markConverted } from '@/lib/analytics';
 import { cn } from '@/lib/utils';
+import { CollectionNotice } from '@/components/legal/CollectionNotice';
 
 export function AdviserCallForm({
   compact = false,
@@ -127,6 +128,8 @@ export function AdviserCallForm({
       <p className="text-center text-[10px] text-white/30">
         Free · We call within 24 hours · No spam
       </p>
+      {/* DPDP s.5: the notice belongs here, not only in the footer. */}
+      <CollectionNotice onDark />
     </form>
   );
 }

@@ -14,6 +14,7 @@
     "e2e:welcome": "node --env-file=.env.local scripts/e2e-welcome.mjs",
     "sim": "node --env-file=.env.local scripts/ceo-sim.mjs",
     "e2e:consent": "node --env-file=.env.local scripts/e2e-consent.mjs",
+    "retention": "node --env-file=.env.local scripts/enforce-retention.mjs",
     "kb:eval": "tsx --conditions=react-server --env-file=.env.local scripts/eval-retrieval.ts",
     "analytics:prune": "tsx --env-file=.env.local scripts/prune-analytics.ts",
     "optimize:images": "node scripts/optimize-images.mjs",

@@ -125,12 +125,6 @@ export const DATA_WE_HOLD: DataRow[] = [
     keptFor: 'Until you delete your account.',
   },
   {
-    what: 'Your approximate location (latitude and longitude), if your browser gives it',
-    why: 'To estimate the drive time from where you are to each property.',
-    basis: 'Consent — your browser asks you first, and refusing changes nothing else on the site.',
-    keptFor: 'Until you delete your account. You can revoke it in your browser at any time.',
-  },
-  {
     what: 'What you asked for in an enquiry — the property, budget band and message',
     why: 'So the adviser who calls you back knows what you want.',
     basis: 'Voluntarily provided for the purpose you provided it for (DPDP s.7(a)).',
@@ -194,8 +188,52 @@ export const COOKIES: CookieRow[] = [
 
 export const LEGAL_LINKS = [
   { href: '/privacy', label: 'Privacy Policy' },
+  { href: '/privacy/request', label: 'Your Data Rights' },
   { href: '/terms', label: 'Terms of Use' },
   { href: '/cookies', label: 'Cookie Policy' },
 ] as const;
 
 export const CONTACT_LINE = `${BUSINESS.email} · ${BUSINESS.phone} · ${SITE_URL}`;
+
+/* ────────────────────────────────────────────────────────────────────────── */
+/* The notice shown where personal data is actually collected (DPDP s.5).     */
+/* ────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Section 5 requires a notice accompanying or preceding the request for
+ * consent, in clear and plain language: what is collected, what for, and how to
+ * exercise your rights. A link to a policy is not a notice — this is the text
+ * that sits beside the button, where the person actually is.
+ *
+ * The version travels with each record, so if the wording changes we can still
+ * say which notice a given person was shown. That is the evidence half of
+ * consent, and without it "they consented" is an assertion rather than a fact.
+ */
+export const COLLECTION_NOTICE_VERSION = 1;
+
+export const COLLECTION_NOTICE = {
+  version: COLLECTION_NOTICE_VERSION,
+  /** Enumerated purposes, stored on the record alongside the version. */
+  purposes: ['respond-to-enquiry', 'arrange-site-visit', 'share-with-named-developer'] as const,
+  /** What the person reads. Kept to two sentences on purpose. */
+  text:
+    'We use your name and number only to answer this enquiry, and we pass them to the developer of a project when you ask us to arrange a visit. We keep the enquiry for three years, we never sell your details, and you can ask us to erase them at any time.',
+  /** DPDP s.9 — this service is not for children, and we say so where it counts. */
+  ageLine: 'By continuing you confirm you are 18 or over.',
+} as const;
+
+/** Stamped onto every record created from a form that showed the notice. */
+export interface ConsentRecord {
+  noticeVersion: number;
+  purposes: string[];
+  givenAt: string;
+  /** How it was given, so the record is self-describing a year from now. */
+  method: 'form-submission';
+}
+
+export const consentRecord = (): ConsentRecord => ({
+  noticeVersion: COLLECTION_NOTICE.version,
+  purposes: [...COLLECTION_NOTICE.purposes],
+  givenAt: new Date().toISOString(),
+  method: 'form-submission',
+});

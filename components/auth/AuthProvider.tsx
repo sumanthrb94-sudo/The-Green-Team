@@ -66,19 +66,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [, bumpProfile] = useState(0);
   const sessionExchanged = useRef(false);
 
-  const captureLocation = useCallback((u: User) => {
-    if (typeof navigator === 'undefined' || !('geolocation' in navigator)) return;
-    navigator.geolocation.getCurrentPosition(
-      pos =>
-        postProfile(u, {
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude,
-          locationAccuracy: pos.coords.accuracy,
-        }),
-      () => {}, // denied — silent
-      { timeout: 8000, maximumAge: 300000 }
-    );
-  }, []);
 
   const exchangeSession = useCallback(async (u: User) => {
     try {
@@ -100,7 +87,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(u);
       setAuthModalOpen(false);
       void exchangeSession(u);
-      setTimeout(() => captureLocation(u), 1500);
       void postProfile(u).then(({ isNew: wasNewDoc, needsEmail }) => {
         // `needsEmail` keeps the step open for an OTP member who has still not
         // given us an address — there is no way to reach them without it.
@@ -121,7 +107,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       });
     },
-    [captureLocation, exchangeSession]
+    [exchangeSession]
   );
 
   useEffect(() => {
@@ -140,7 +126,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (u && !sessionExchanged.current) {
         sessionExchanged.current = true;
         void exchangeSession(u);
-        setTimeout(() => captureLocation(u), 2000);
         // Asked once per session, not only at sign-up: someone who refreshed
         // past the profile step would otherwise stay unreachable forever.
         if (!u.email) {
@@ -155,7 +140,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     });
     return unsub;
-  }, [captureLocation, exchangeSession, onSignedIn]);
+  }, [exchangeSession, onSignedIn]);
 
   /** Pull the Auth profile again — the server sets displayName when a member
    *  saves their name, and without this the menu keeps showing the old value

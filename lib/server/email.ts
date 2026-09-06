@@ -87,3 +87,67 @@ export async function sendLeadConfirmation(
   }
   return send(to, LEAD_SUBJECT, await renderLeadConfirmation({ name, intent }));
 }
+
+/* ── Data-rights requests (DPDP s.11–13) ─────────────────────────────────── */
+
+const KIND_LABEL: Record<string, string> = {
+  access: 'See what you hold on me',
+  correction: 'Correct my details',
+  erasure: 'Erase my data',
+  'withdraw-consent': 'Withdraw my consent',
+  grievance: 'A complaint',
+};
+
+/**
+ * Tell the person we have their request and when they will hear back. A silent
+ * request is indistinguishable from one that was never received, and the whole
+ * point of a published deadline is that the person can hold us to it.
+ */
+export async function sendRightsRequestAck(
+  to: string,
+  { kind, reference, dueDays }: { kind: string; reference: string; dueDays: number }
+): Promise<boolean> {
+  const label = KIND_LABEL[kind] ?? 'Your request';
+  return send(
+    to,
+    'We have your request — The Green Team',
+    `<div style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#1a1c1a;max-width:560px">
+      <p>We have received your request: <strong>${escapeHtml(label)}</strong>.</p>
+      <p>Your reference is <strong>${escapeHtml(reference)}</strong>. We will answer within
+      <strong>${dueDays} days</strong>. We may ask you to confirm who you are first — we will not hand
+      anybody's data to somebody who cannot show it is theirs.</p>
+      <p>If we do not answer, you may complain to the Data Protection Board of India.</p>
+      <p style="color:#555;font-size:13px">The Green Team · Channel Partners · Hyderabad</p>
+    </div>`
+  );
+}
+
+/** And tell the officer, because the deadline is theirs to meet. */
+export async function notifyRightsRequest(r: {
+  id: string;
+  kind: string;
+  name?: string;
+  email?: string;
+  phone?: string;
+  details?: string;
+  dueBy: Date;
+}): Promise<boolean> {
+  const { LEGAL } = await import('@/lib/data/legal');
+  const target = r.kind === 'grievance' ? LEGAL.grievanceOfficer.email : LEGAL.dpo.email;
+  return send(
+    target,
+    `[${r.kind}] Data request ${r.id} — due ${r.dueBy.toISOString().slice(0, 10)}`,
+    `<div style="font-family:system-ui,sans-serif;font-size:14px;line-height:1.7">
+      <p><strong>${escapeHtml(KIND_LABEL[r.kind] ?? r.kind)}</strong></p>
+      <p>Name: ${escapeHtml(r.name || '—')}<br>
+         Email: ${escapeHtml(r.email || '—')}<br>
+         Phone: ${escapeHtml(r.phone || '—')}</p>
+      <p>${escapeHtml(r.details || 'No further detail given.')}</p>
+      <p><strong>Due by ${r.dueBy.toISOString().slice(0, 10)}.</strong> Verify identity before acting.</p>
+    </div>`
+  );
+}
+
+function escapeHtml(s: string): string {
+  return s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
+}
