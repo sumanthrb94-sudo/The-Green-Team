@@ -42,7 +42,8 @@ export function Navbar() {
     } catch {}
   };
 
-  const avatarLetter = (user?.displayName?.[0] || user?.email?.[0] || user?.phoneNumber?.[1] || '?').toUpperCase();
+  // A digit lifted out of someone's phone number is not an initial.
+  const avatarLetter = (user?.displayName?.[0] || user?.email?.[0] || '').toUpperCase();
 
   return (
     <>
@@ -128,7 +129,7 @@ export function Navbar() {
                   />
                 ) : (
                   <span className="w-9 h-9 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-sm">
-                    {avatarLetter}
+                    {avatarLetter || <UserIcon className="w-4 h-4" />}
                   </span>
                 )
               ) : (

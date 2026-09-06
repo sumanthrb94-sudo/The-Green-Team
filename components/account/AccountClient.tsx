@@ -29,7 +29,7 @@ const EMPTY: Profile = {
 };
 
 export function AccountClient() {
-  const { user, authReady, openAuth, signOutUser, isAdmin } = useAuth();
+  const { user, authReady, openAuth, signOutUser, isAdmin, refreshUser } = useAuth();
   const [p, setP] = useState<Profile>(EMPTY);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -105,6 +105,7 @@ export function AccountClient() {
       });
       if (!r.ok) throw new Error();
       setSaved(true);
+      await refreshUser();
       await load();
     } catch {
       setError('Could not save. Please try again.');

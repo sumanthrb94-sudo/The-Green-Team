@@ -48,7 +48,10 @@ const SANCTUARY_ITEMS = [
 
 export function AccountDrawer({ onClose, isDark }: { onClose: () => void; isDark: boolean }) {
   const { user, isAdmin, signOutUser, openAuth } = useAuth();
-  const avatarLetter = (user?.displayName?.[0] || user?.email?.[0] || user?.phoneNumber?.[1] || '?').toUpperCase();
+  // Only a name or an address gives a meaningful initial. The old fallback took
+  // the second character of the phone number, so a member who signed up by OTP
+  // was greeted by a lone digit from their own number.
+  const initial = (user?.displayName?.[0] || user?.email?.[0] || '').toUpperCase();
   const divider = isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(45,58,29,0.07)';
 
   return (
@@ -90,7 +93,7 @@ export function AccountDrawer({ onClose, isDark }: { onClose: () => void; isDark
                 <img src={user.photoURL} referrerPolicy="no-referrer" alt="" className="w-11 h-11 rounded-full object-cover flex-shrink-0" />
               ) : (
                 <span className="w-11 h-11 rounded-full bg-white/15 flex items-center justify-center font-bold text-base flex-shrink-0">
-                  {avatarLetter}
+                  {initial || <UserIcon className="w-5 h-5" />}
                 </span>
               )}
               <span className="min-w-0 flex-1">

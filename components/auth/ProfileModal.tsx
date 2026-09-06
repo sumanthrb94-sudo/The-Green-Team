@@ -19,7 +19,7 @@ import { Check, X } from 'lucide-react';
 import { useAuth } from './AuthProvider';
 
 export function ProfileModal() {
-  const { user, profileModalOpen, closeProfile } = useAuth();
+  const { user, profileModalOpen, closeProfile, refreshUser } = useAuth();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -64,6 +64,9 @@ export function ProfileModal() {
       // A required step must not close on a failed save — that would strand the
       // member with no address and no second prompt until their next visit.
       if (!res.ok) throw new Error();
+      // The server just put the name on the Auth record; pick it up now so the
+      // menu greets them by name instead of by phone number.
+      await refreshUser();
       closeProfile();
     } catch {
       setError('Could not save that. Please try again.');

@@ -27,6 +27,8 @@ interface AuthContextValue {
   closeAuth: () => void;
   closeProfile: () => void;
   onSignedIn: (user: User, isNew: boolean) => void;
+  /** Re-read the Firebase profile after it changed server-side (a new name). */
+  refreshUser: () => Promise<void>;
   signOutUser: () => Promise<void>;
 }
 
@@ -59,6 +61,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [authReady, setAuthReady] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
+  // `reload()` mutates the User object in place, so its reference never changes
+  // and React would not re-render. This forces the pass that shows the new name.
+  const [, bumpProfile] = useState(0);
   const sessionExchanged = useRef(false);
 
   const captureLocation = useCallback((u: User) => {
@@ -152,6 +157,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return unsub;
   }, [captureLocation, exchangeSession, onSignedIn]);
 
+  /** Pull the Auth profile again — the server sets displayName when a member
+   *  saves their name, and without this the menu keeps showing the old value
+   *  (a phone number) until they sign out and back in. */
+  const refreshUser = useCallback(async () => {
+    try {
+      await auth.currentUser?.reload();
+      bumpProfile(n => n + 1);
+    } catch {
+      /* a stale greeting is not worth surfacing */
+    }
+  }, []);
+
   const signOutUser = useCallback(async () => {
     try {
       await signOut(auth);
@@ -174,6 +191,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         closeAuth: () => setAuthModalOpen(false),
         closeProfile: () => setProfileModalOpen(false),
         onSignedIn,
+        refreshUser,
         signOutUser,
       }}
     >

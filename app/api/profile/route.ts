@@ -133,6 +133,23 @@ export async function POST(req: NextRequest) {
       );
     });
 
+    // Put the name on the Firebase Auth record too, not only in Firestore.
+    // Everything that greets a member — the menu, the avatar initial, the
+    // chatbot — reads `user.displayName` off the client's auth object, and a
+    // phone-OTP account has none. Without this the name they just typed is
+    // stored but invisible, and the menu greets them with their own phone
+    // number. Awaited rather than deferred so the client can reload straight
+    // after and see it without signing out.
+    const newName = allowed.name as string | undefined;
+    if (newName && newName !== decoded.name) {
+      try {
+        await adminAuth().updateUser(decoded.uid, { displayName: newName });
+      } catch (err) {
+        // Firestore already has the name; a failure here costs a greeting, not data.
+        console.error('[profile] could not set auth displayName:', err);
+      }
+    }
+
     // A profile record can be missing for an old member — created before this
     // route existed, or lost. That is a repair, not a sign-up, so check the age
     // of the Firebase account itself before treating it as one. Only ever runs
