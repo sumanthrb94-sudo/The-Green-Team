@@ -24,12 +24,14 @@ import type { NextConfig } from 'next';
  */
 const csp = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://*.clarity.ms https://apis.google.com",
+  // www.google.com / www.gstatic.com / recaptcha.google.com: the invisible
+  // reCAPTCHA Firebase requires for phone (SMS OTP) sign-in.
+  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://*.clarity.ms https://apis.google.com https://www.google.com https://www.gstatic.com https://recaptcha.google.com",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
-  "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.clarity.ms https://*.bing.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://www.googleapis.com",
-  "frame-src 'self' https://accounts.google.com https://*.firebaseapp.com",
+  "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.clarity.ms https://*.bing.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://www.googleapis.com https://www.google.com https://recaptcha.google.com",
+  "frame-src 'self' https://accounts.google.com https://*.firebaseapp.com https://www.google.com https://recaptcha.google.com",
   "worker-src 'self' blob:",
   "object-src 'none'",
   "base-uri 'self'",
