@@ -4,7 +4,7 @@ import { EXPERIMENT_COOKIE, newVisitorId } from '@/lib/experiments';
 /**
  * Issues the visitor id used to bucket A/B experiments.
  *
- * Doing it in middleware means the cookie exists before the first page renders,
+ * Doing it in the proxy (Next 16's successor to middleware) means the cookie exists before the first page renders,
  * so variants are assigned server-side and the visitor never sees the control
  * variant flash before being switched — the usual failure of client-side A/B
  * tooling.
@@ -12,7 +12,7 @@ import { EXPERIMENT_COOKIE, newVisitorId } from '@/lib/experiments';
  * The id is random and carries no personal data; it only keeps a visitor in the
  * same bucket across visits so the test measures what it claims to.
  */
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const res = NextResponse.next();
   if (!req.cookies.get(EXPERIMENT_COOKIE)) {
     res.cookies.set(EXPERIMENT_COOKIE, newVisitorId(), {
