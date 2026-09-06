@@ -10,12 +10,17 @@ import { Logo } from '@/components/brand/Logo';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { AccountDrawer } from './AccountDrawer';
 
-const NAV = [
+/**
+ * Portal header. Browse categories at centre; the two real actions live as
+ * pills on the right — "List your property" (supply side, outline) and
+ * "Contact" (demand side, gold). Gold means one thing across the whole site:
+ * talk to us. Everything else is navigation.
+ */
+const NAV: { name: string; href: string; gold?: boolean }[] = [
   { name: 'Villas', href: '/explore/villas' },
   { name: 'Plots', href: '/explore/plots' },
   { name: 'Investments', href: '/explore/investments' },
   { name: 'Journal', href: '/blog' },
-  { name: 'Contact', href: '/contact', gold: true },
 ];
 
 export function Navbar() {
@@ -81,15 +86,19 @@ export function Navbar() {
             >
               {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
-            {/* Signed-out desktop: an explicit Sign in, not just an icon */}
-            {!user && (
-              <button
-                onClick={openAuth}
-                className="hidden md:inline-flex items-center px-4 py-2 rounded-full border border-outline/30 text-[9px] uppercase tracking-[0.3em] font-bold text-on-surface/70 hover:border-primary hover:text-primary transition-all"
-              >
-                Sign in
-              </button>
-            )}
+            {/* The two portal actions — supply side (outline) and demand side (gold) */}
+            <Link
+              href="/contact?interest=list-property"
+              className="hidden lg:inline-flex items-center px-4 py-2 rounded-full border border-outline/30 text-[9px] uppercase tracking-[0.25em] font-bold text-on-surface/70 hover:border-primary hover:text-primary transition-all"
+            >
+              List your property
+            </Link>
+            <Link
+              href="/contact"
+              className="hidden md:inline-flex items-center px-5 py-2 rounded-full bg-gold text-[#1a1a0a] text-[9px] uppercase tracking-[0.25em] font-bold hover:bg-gold-bright transition-all"
+            >
+              Contact
+            </Link>
             {/* Mobile menu (nav links live here on small screens) */}
             <button
               onClick={() => setDrawerOpen(true)}
@@ -101,7 +110,12 @@ export function Navbar() {
             <button
               onClick={() => (user ? setDrawerOpen(true) : openAuth())}
               aria-label={user ? 'Account' : 'Sign in'}
-              className="w-9 h-9 rounded-full flex items-center justify-center overflow-hidden ring-2 ring-transparent hover:ring-primary/25 transition-all"
+              className={cn(
+                'flex items-center justify-center overflow-hidden transition-all',
+                user
+                  ? 'w-9 h-9 rounded-full ring-2 ring-transparent hover:ring-primary/25'
+                  : 'h-9 rounded-full md:px-3.5 md:gap-2 md:border md:border-outline/30 text-secondary/70 hover:text-primary md:hover:border-primary',
+              )}
             >
               {user ? (
                 user.photoURL ? (
@@ -118,9 +132,12 @@ export function Navbar() {
                   </span>
                 )
               ) : (
-                <span className="w-9 h-9 rounded-full border border-outline/40 flex items-center justify-center">
-                  <UserIcon className="w-4 h-4 text-secondary/60" />
-                </span>
+                <>
+                  <span className="w-9 h-9 md:w-auto md:h-auto rounded-full border border-outline/40 md:border-0 flex items-center justify-center">
+                    <UserIcon className="w-4 h-4" />
+                  </span>
+                  <span className="hidden md:inline text-[9px] uppercase tracking-[0.25em] font-bold">Sign in</span>
+                </>
               )}
             </button>
           </div>

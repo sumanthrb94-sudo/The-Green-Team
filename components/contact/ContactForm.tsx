@@ -21,6 +21,7 @@ const INTERESTS = [
   { value: 'plots', label: 'A plot / farmland' },
   { value: 'investments', label: 'An investment' },
   { value: 'site-visit', label: 'Booking a site visit' },
+  { value: 'list-property', label: 'Listing my property (owner / developer)' },
   { value: 'general', label: 'General enquiry' },
 ] as const;
 
@@ -67,9 +68,11 @@ export function ContactForm({
     ]
       .filter(Boolean)
       .join(' · ');
-    // A site-visit intent is tagged as such so the confirmation email uses the
-    // site-visit template and the admin pipeline can prioritise it.
-    const source = interest === 'site-visit' ? 'contact-site-visit' : 'contact';
+    // Tag the source by intent so the admin pipeline can route it: a site-visit
+    // gets the visit confirmation template; a listing request is supply-side
+    // (a developer/owner), not a buyer, and should never sit in the buyer queue.
+    const source =
+      interest === 'site-visit' ? 'contact-site-visit' : interest === 'list-property' ? 'list-property' : 'contact';
     try {
       const res = await fetch('/api/leads', {
         method: 'POST',

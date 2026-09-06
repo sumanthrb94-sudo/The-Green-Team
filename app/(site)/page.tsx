@@ -3,6 +3,7 @@ import { Hero } from '@/components/home/Hero';
 import { ActivityStrip } from '@/components/social/ActivityStrip';
 import { BentoPortfolio } from '@/components/home/BentoPortfolio';
 import { ProofStrip } from '@/components/home/ProofStrip';
+import { ListWithUs } from '@/components/home/ListWithUs';
 import { AdviserCallSection } from '@/components/adviser/AdviserCallForm';
 import { NewsletterHighlight } from '@/components/home/NewsletterHighlight';
 import { Footer } from '@/components/Footer';
@@ -26,6 +27,7 @@ export default async function HomePage() {
       <ActivityStrip />
       <BentoPortfolio sanctuaries={portfolio} />
       <ProofStrip />
+      <ListWithUs />
       <AdviserCallSection />
       <NewsletterHighlight />
       <Footer />

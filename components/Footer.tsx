@@ -13,7 +13,8 @@ const AGENDA: { label: string; sub: string; href: string }[] = [
   { label: 'Our Standard', sub: 'The bar a property must clear to be listed', href: '/standard' },
   { label: 'The Journal', sub: 'Field notes & sanctuary intelligence', href: '/blog' },
   { label: 'Sanctuary Map', sub: 'Environmental heatmap · AQI · Noise', href: '/map' },
-  { label: 'Adviser Call', sub: 'Free · We respond within 24 hours', href: '/adviser-call' },
+  { label: 'List your property', sub: 'Developers & owners · Get curated', href: '/contact?interest=list-property' },
+  { label: 'Contact', sub: 'Free · We respond within 24 hours', href: '/contact' },
 ];
 
 export function Footer() {
@@ -28,12 +29,20 @@ export function Footer() {
               noise, verified commute, before we ever show you a brochure.
             </p>
           </div>
-          <Link
-            href="/adviser-call"
-            className="self-start px-10 py-5 border border-gold/50 text-gold text-[10px] uppercase tracking-[0.4em] font-bold hover:bg-gold hover:text-olive-900 transition-all duration-500"
-          >
-            Request Adviser Call
-          </Link>
+          <div className="flex flex-wrap gap-3 self-start">
+            <Link
+              href="/contact?interest=list-property"
+              className="px-8 py-5 border border-white/20 text-white/70 text-[10px] uppercase tracking-[0.35em] font-bold hover:border-white/50 hover:text-white transition-all duration-500"
+            >
+              List your property
+            </Link>
+            <Link
+              href="/contact"
+              className="px-8 py-5 bg-gold text-olive-900 text-[10px] uppercase tracking-[0.35em] font-bold hover:bg-gold-bright transition-all duration-500"
+            >
+              Contact
+            </Link>
+          </div>
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-px bg-white/5 border border-white/5 mb-16">

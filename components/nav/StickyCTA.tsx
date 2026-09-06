@@ -28,10 +28,10 @@ export function StickyCTA() {
           WhatsApp
         </a>
         <Link
-          href="/adviser-call"
+          href="/contact"
           className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-full bg-[#c8a951] text-[#1a1a0a] text-[10px] uppercase tracking-[0.25em] font-bold"
         >
-          <Phone className="w-4 h-4" /> Adviser Call
+          <Phone className="w-4 h-4" /> Contact
         </Link>
       </div>
     </div>

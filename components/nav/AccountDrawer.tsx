@@ -21,6 +21,7 @@ const NAV_ITEMS = [
   { name: 'Investments', href: '/explore/investments', icon: TrendingUp },
   { name: 'Sanctuary Map', href: '/map', icon: MapPin },
   { name: 'Journal', href: '/blog', icon: BookOpen },
+  { name: 'List your property', href: '/contact?interest=list-property', icon: Building2 },
 ];
 
 const SANCTUARY_ITEMS = [

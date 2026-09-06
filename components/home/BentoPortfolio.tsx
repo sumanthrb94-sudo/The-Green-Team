@@ -106,7 +106,7 @@ export function BentoPortfolio({ sanctuaries }: { sanctuaries: Sanctuary[] }) {
               href="/list"
               className="inline-flex px-7 py-3.5 rounded-full border border-outline/30 text-[10px] uppercase tracking-[0.4em] font-bold text-on-surface/60 hover:border-primary hover:text-primary transition-all"
             >
-              Explore all sanctuaries
+              View all listings
             </Link>
           </div>
         </div>

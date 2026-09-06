@@ -92,14 +92,14 @@ export function Hero() {
               href="/list"
               className="group inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full bg-[#c8a951] text-[#1a1a0a] text-[10px] uppercase tracking-[0.35em] font-bold hover:bg-[#d9bb62] transition-all"
             >
-              Explore the portfolio
+              Explore listings
               <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
             </Link>
             <Link
               href="/contact"
               className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full border border-white/20 text-white/70 text-[10px] uppercase tracking-[0.35em] font-bold hover:border-[#a3b18a]/60 hover:text-white transition-all"
             >
-              <Phone className="w-3.5 h-3.5" /> Adviser call
+              <Phone className="w-3.5 h-3.5" /> Talk to an adviser
             </Link>
           </motion.div>
 

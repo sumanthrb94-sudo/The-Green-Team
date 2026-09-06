@@ -82,16 +82,33 @@ export default async function ContactPage({ searchParams }: Props) {
 
       <section className="pt-24 md:pt-28 pb-16 px-6 md:px-14">
         <div className="max-w-6xl mx-auto">
-          <span className="text-primary text-[10px] font-bold uppercase tracking-[0.6em] mb-3 block">
-            One call. Every answer.
-          </span>
-          <h1 className="font-serif text-4xl md:text-6xl font-light text-on-surface leading-[0.98]">
-            Let&apos;s talk about <span className="italic text-primary">your sanctuary.</span>
-          </h1>
-          <p className="text-base md:text-lg font-light text-secondary leading-relaxed mt-5 max-w-2xl">
-            Pricing, plots, site visits, investment questions — all of it comes to the same desk. Leave a note
-            below, or reach us on whichever channel suits you. A curated-property adviser replies within 24 hours.
-          </p>
+          {interest === 'list-property' ? (
+            <>
+              <span className="text-primary text-[10px] font-bold uppercase tracking-[0.6em] mb-3 block">
+                For developers & owners
+              </span>
+              <h1 className="font-headline font-extrabold tracking-[-0.02em] text-4xl md:text-6xl text-on-surface leading-[0.98]">
+                List your property <span className="text-primary">with us.</span>
+              </h1>
+              <p className="text-base md:text-lg font-light text-secondary leading-relaxed mt-5 max-w-2xl">
+                Tell us about the project — location, approvals, what stage it is at. If it clears our six-part
+                standard, we visit, verify, and put it in front of buyers who came here for exactly this.
+              </p>
+            </>
+          ) : (
+            <>
+              <span className="text-primary text-[10px] font-bold uppercase tracking-[0.6em] mb-3 block">
+                One call. Every answer.
+              </span>
+              <h1 className="font-headline font-extrabold tracking-[-0.02em] text-4xl md:text-6xl text-on-surface leading-[0.98]">
+                Let&apos;s talk about <span className="text-primary">your sanctuary.</span>
+              </h1>
+              <p className="text-base md:text-lg font-light text-secondary leading-relaxed mt-5 max-w-2xl">
+                Pricing, plots, site visits, investment questions — all of it comes to the same desk. Leave a note
+                below, or reach us on whichever channel suits you. A curated-property adviser replies within 24 hours.
+              </p>
+            </>
+          )}
 
           <div className="grid lg:grid-cols-[1.4fr_1fr] gap-10 lg:gap-14 mt-12">
             {/* Form */}
