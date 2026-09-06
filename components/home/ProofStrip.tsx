@@ -2,10 +2,16 @@
 
 /**
  * Compact credibility band — replaces the old Manifesto + WhatWeDo +
- * TrustSignals + EcosystemPillars stack with one scannable section. Three
- * principles, partners, and the 2024 award. Nothing to click; the next stop
- * is the adviser-call form below it.
+ * TrustSignals + EcosystemPillars stack with one scannable section: three
+ * principles, then the developers we work with.
+ *
+ * The 2024 award here is MODCON's, for Agartha. It is stated that way on
+ * purpose. An unattributed award under a heading that says "why trust us",
+ * printed beside a list of partner names, reads as ours — and a channel partner
+ * borrowing a developer's credential is exactly the thing that costs one its
+ * credibility. It links to the project so the claim can be checked.
  */
+import Link from 'next/link';
 import { motion } from 'motion/react';
 import { Award, ShieldCheck, Compass, Handshake } from 'lucide-react';
 
@@ -61,18 +67,36 @@ export function ProofStrip() {
           ))}
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 p-6 rounded-3xl bg-gold/8 border border-gold/20">
-          <div className="flex items-center gap-3">
-            <Award className="w-5 h-5 text-gold flex-shrink-0" />
-            <p className="text-sm text-on-surface">
-              <span className="font-bold">Outlook Business 2024</span>
-              <span className="text-secondary"> · Best Sustainable Eco-Friendly Project (MODCON Agartha)</span>
+        {/* The award belongs to MODCON, for Agartha — not to us, and not jointly
+            to the three developers. Sitting unattributed under "Why trust us",
+            beside a partner list, it read as ours. Say whose it is, and link to
+            the project so a buyer can check. */}
+        <div className="rounded-3xl bg-gold/8 border border-gold/20 divide-y divide-outline/10">
+          <Link
+            href="/sanctuaries/agartha"
+            className="group flex items-start gap-4 p-6 hover:bg-gold/5 transition-colors rounded-t-3xl"
+          >
+            <Award className="w-5 h-5 text-gold flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-[9px] uppercase tracking-[0.35em] font-bold text-secondary/60 mb-1.5">
+                Awarded to MODCON
+              </p>
+              <p className="text-sm text-on-surface leading-relaxed">
+                <span className="font-bold">Best Sustainable Eco-Friendly Project of the Year 2024</span>
+                <span className="text-secondary">
+                  {' '}— Outlook Business Spotlight Entity Awards, won by MODCON for{' '}
+                </span>
+                <span className="font-bold group-hover:text-primary transition-colors">MODCON Agartha</span>
+                <span className="text-secondary">, one of the three projects on our list.</span>
+              </p>
+            </div>
+          </Link>
+          <div className="px-6 py-5">
+            <p className="text-[9px] uppercase tracking-[0.35em] font-bold text-secondary/60 mb-2">
+              Developers we work with
             </p>
+            <p className="text-sm text-secondary">MODCON · ARQEN Design Studio · Planet Green</p>
           </div>
-          <span className="hidden sm:block w-px h-8 bg-outline/20" />
-          <p className="text-[9px] uppercase tracking-[0.4em] font-bold text-secondary/60">
-            MODCON · ARQEN · Planet Green
-          </p>
         </div>
       </div>
     </section>
