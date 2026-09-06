@@ -139,6 +139,52 @@
   display: none;
 }
 
+/* ── Launch splash (components/brand/SplashScreen.tsx) ──────────────────────
+   CSS, not JS, so it runs from the server HTML before hydration. Timeline:
+   back leaf settles → front outline draws → fill lands → wordmark → two lines,
+   then the mark breathes while the app finishes loading. */
+@keyframes gt-back-in {
+  from { opacity: 0; transform: translate(-6px, 6px) scale(0.92); }
+  to   { opacity: 0.3; transform: translate(0, 0) scale(1); }
+}
+@keyframes gt-draw {
+  from { stroke-dashoffset: 1; opacity: 1; }
+  80%  { stroke-dashoffset: 0; opacity: 1; }
+  to   { stroke-dashoffset: 0; opacity: 0; }
+}
+@keyframes gt-fill-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes gt-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes gt-breathe {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.035); }
+}
+@keyframes gt-glow {
+  0%, 100% { opacity: 0.6; }
+  50%      { opacity: 1; }
+}
+@keyframes gt-bar {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(400%); }
+}
+.gt-splash .gt-back   { opacity: 0; transform-origin: 50% 50%; transform-box: fill-box; animation: gt-back-in 0.8s cubic-bezier(0.16,1,0.3,1) 0.05s forwards; }
+.gt-splash .gt-draw   { stroke-dasharray: 1; stroke-dashoffset: 1; animation: gt-draw 1.5s cubic-bezier(0.65,0,0.35,1) 0.25s forwards; }
+.gt-splash .gt-fill   { opacity: 0; animation: gt-fill-in 0.7s ease-out 1.05s forwards; }
+.gt-splash .gt-up     { opacity: 0; animation: gt-up 0.6s cubic-bezier(0.16,1,0.3,1) forwards; }
+.gt-splash .gt-breathe{ animation: gt-breathe 2.6s ease-in-out 1.8s infinite; }
+.gt-splash .gt-glow   { animation: gt-glow 2.6s ease-in-out infinite; }
+.gt-splash .gt-bar    { animation: gt-bar 1.4s cubic-bezier(0.65,0,0.35,1) 0.4s infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .gt-splash .gt-back, .gt-splash .gt-fill, .gt-splash .gt-up { animation-duration: 0.01ms; animation-delay: 0s; }
+  .gt-splash .gt-draw { display: none; }
+  .gt-splash .gt-breathe, .gt-splash .gt-glow { animation: none; }
+}
+
 /* ── Leaflet overrides (sanctuary map) ───────────────────────────────────── */
 
 .custom-popup .leaflet-popup-content-wrapper {
