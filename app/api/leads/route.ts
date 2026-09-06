@@ -47,7 +47,14 @@ export async function POST(req: NextRequest) {
     // worked. Transactional (they asked to be contacted), not marketing, so the
     // lead is deliberately NOT added to a mailing segment without consent.
     // Fire-and-forget: the lead is captured above regardless.
-    if (email) void sendLeadConfirmation(email, name || undefined, intent || undefined, source);
+    // 'signup' is not an enquiry — it is the lead row that tells an adviser a
+    // new account exists. That person already gets the welcome email from
+    // /api/profile; sending the buyer confirmation too would be a second,
+    // wrong email ("an adviser will call you about your enquiry") for someone
+    // who only signed in.
+    if (email && source !== 'signup') {
+      void sendLeadConfirmation(email, name || undefined, intent || undefined, source);
+    }
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: 'failed' }, { status: 500 });

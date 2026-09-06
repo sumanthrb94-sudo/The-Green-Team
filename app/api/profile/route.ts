@@ -29,16 +29,31 @@ export async function POST(req: NextRequest) {
     for (const k of ['lat', 'lng', 'locationAccuracy'] as const) {
       if (typeof body[k] === 'number' && Number.isFinite(body[k])) allowed[k] = body[k];
     }
+    // A phone-OTP user has no email on the token, so the profile step is the
+    // only chance to ask for one. Accepted ONLY when the token carries no
+    // email — otherwise a Google user could overwrite their verified address
+    // with someone else's.
+    let providedEmail: string | undefined;
+    if (!decoded.email && typeof body.email === 'string') {
+      const e = body.email.trim().toLowerCase().slice(0, 200);
+      if (/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)) providedEmail = e;
+    }
 
     const ref = adminDb().collection('users').doc(decoded.uid);
     const snap = await ref.get();
+    const prev = snap.data();
     const isNew = !snap.exists;
+    // Whichever address we know: verified from the token, just supplied, or
+    // stored on a previous visit.
+    const email = decoded.email ?? providedEmail ?? (prev?.email as string | undefined) ?? null;
+    const authPhone = (decoded.phone_number as string | undefined) ?? undefined;
     await ref.set(
       {
         uid: decoded.uid,
-        email: decoded.email ?? null,
+        email,
         displayName: (decoded.name as string | undefined) ?? null,
         photoURL: (decoded.picture as string | undefined) ?? null,
+        ...(authPhone ? { phone: authPhone } : {}),
         ...allowed,
         ...(isNew ? { firstSignIn: FieldValue.serverTimestamp() } : {}),
         lastSeen: FieldValue.serverTimestamp(),
@@ -48,22 +63,27 @@ export async function POST(req: NextRequest) {
     // Mirror to Resend so a sign-in is a contact the moment it happens. Fire and
     // forget: the profile write above is the source of truth and must not wait
     // on, or fail because of, an email provider.
-    if (decoded.email) {
+    if (email) {
       const name = (allowed.name as string | undefined) ?? (decoded.name as string | undefined);
       void upsertContact({
-        email: decoded.email,
+        email,
         ...splitName(name),
         segments: [SEGMENT.members()],
         properties: {
-          phone: allowed.phone as string | undefined,
+          phone: (allowed.phone as string | undefined) ?? authPhone,
           city: allowed.city as string | undefined,
           occupation: allowed.occupation as string | undefined,
           source: 'sign-in',
         },
       });
-      // Welcome email once, on the first sign-in only. Fire-and-forget for the
-      // same reason as the contact sync — it must never fail the profile write.
-      if (isNew) void sendWelcomeEmail(decoded.email, splitName(name).firstName);
+      // Welcome once per account, ever. Guarded by a stored timestamp rather
+      // than `isNew`, because a phone user's address only arrives at the
+      // profile step — by which point the document already exists — and
+      // because two concurrent sign-in writes must not both send.
+      if (!prev?.welcomeSentAt) {
+        void ref.set({ welcomeSentAt: FieldValue.serverTimestamp() }, { merge: true });
+        void sendWelcomeEmail(email, splitName(name).firstName);
+      }
     }
 
     return NextResponse.json({ ok: true, isNew });

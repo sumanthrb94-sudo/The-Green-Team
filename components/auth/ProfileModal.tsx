@@ -1,6 +1,14 @@
 'use client';
 
-/** Post-sign-up profile capture — name / phone / occupation / city, optional. */
+/**
+ * Post-sign-up profile capture — it asks for whatever the sign-in method did
+ * not already give us, and nothing more.
+ *
+ * Google hands over a verified email and a name but no phone, so we ask for
+ * the phone. Phone OTP hands over a number but no name and no email, so we ask
+ * for those — otherwise a phone member could never be emailed at all, and
+ * would never reach the Members segment. Everything stays skippable.
+ */
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { Check, X } from 'lucide-react';
@@ -9,13 +17,24 @@ import { useAuth } from './AuthProvider';
 export function ProfileModal() {
   const { user, profileModalOpen, closeProfile } = useAuth();
   const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [occupation, setOccupation] = useState('');
   const [city, setCity] = useState('');
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  const needsEmail = Boolean(user && !user.email);
+  const needsPhone = Boolean(user && !user.phoneNumber);
 
   const save = async () => {
     if (!user) return closeProfile();
+    const mail = email.trim().toLowerCase();
+    if (needsEmail && mail && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mail)) {
+      setError("That email doesn't look right — or leave it blank and skip.");
+      return;
+    }
+    setError('');
     setSaving(true);
     try {
       const idToken = await user.getIdToken();
@@ -24,6 +43,7 @@ export function ProfileModal() {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
         body: JSON.stringify({
           ...(name.trim() ? { name: name.trim() } : {}),
+          ...(needsEmail && mail ? { email: mail } : {}),
           ...(phone.trim() ? { phone: phone.trim() } : {}),
           ...(occupation.trim() ? { occupation: occupation.trim() } : {}),
           ...(city.trim() ? { city: city.trim() } : {}),
@@ -77,11 +97,20 @@ export function ProfileModal() {
                 <input id="pf-name" value={name} onChange={e => setName(e.target.value)}
                   placeholder={user.displayName ?? 'Your name'} className={inputCls} />
               </div>
-              <div>
-                <label htmlFor="pf-phone" className={labelCls}>Phone (for your adviser)</label>
-                <input id="pf-phone" type="tel" inputMode="tel" autoComplete="tel" value={phone}
-                  onChange={e => setPhone(e.target.value)} placeholder="+91 98xxx xxxxx" className={inputCls} />
-              </div>
+              {needsEmail && (
+                <div>
+                  <label htmlFor="pf-email" className={labelCls}>Email (for pricing sheets &amp; updates)</label>
+                  <input id="pf-email" type="email" inputMode="email" autoComplete="email" value={email}
+                    onChange={e => setEmail(e.target.value)} placeholder="you@example.com" className={inputCls} />
+                </div>
+              )}
+              {needsPhone && (
+                <div>
+                  <label htmlFor="pf-phone" className={labelCls}>Phone (for your adviser)</label>
+                  <input id="pf-phone" type="tel" inputMode="tel" autoComplete="tel" value={phone}
+                    onChange={e => setPhone(e.target.value)} placeholder="+91 98xxx xxxxx" className={inputCls} />
+                </div>
+              )}
               <div>
                 <label htmlFor="pf-occupation" className={labelCls}>What do you do?</label>
                 <input id="pf-occupation" value={occupation} onChange={e => setOccupation(e.target.value)}
@@ -93,6 +122,8 @@ export function ProfileModal() {
                   placeholder="e.g. Hyderabad" className={inputCls} />
               </div>
             </div>
+
+            {error && <p className="mt-4 text-sm text-error">{error}</p>}
 
             <div className="flex gap-3 mt-8">
               <button
