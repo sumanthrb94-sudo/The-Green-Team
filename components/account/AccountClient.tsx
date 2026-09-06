@@ -13,7 +13,7 @@
  */
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Check, LogOut, ShieldCheck, Lock, AlertCircle, ArrowRight, Mail } from 'lucide-react';
+import { Check, LogOut, ShieldCheck, Lock, AlertCircle, ArrowRight, Mail, Download, Trash2 } from 'lucide-react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { cn } from '@/lib/utils';
 
@@ -36,6 +36,8 @@ export function AccountClient() {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState('');
   const [mailBusy, setMailBusy] = useState(false);
+  const [rightsBusy, setRightsBusy] = useState('');
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const load = useCallback(async () => {
     if (!user) return;
@@ -76,6 +78,49 @@ export function AccountClient() {
       setError('Could not change that just now. Please try again.');
     } finally {
       setMailBusy(false);
+    }
+  };
+
+  /** DPDP s.11 — the summary of what we hold, as a file, right now. */
+  const exportData = async () => {
+    if (!user) return;
+    setRightsBusy('export');
+    try {
+      const t = await user.getIdToken();
+      const r = await fetch('/api/me', { headers: { Authorization: `Bearer ${t}` } });
+      if (!r.ok) throw new Error();
+      const blob = await r.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `green-team-my-data-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      setError('Could not build your file. Please try again.');
+    } finally {
+      setRightsBusy('');
+    }
+  };
+
+  /** DPDP s.12(3) — erasure. Irreversible, so it asks once. */
+  const deleteAccount = async () => {
+    if (!user) return;
+    setRightsBusy('delete');
+    try {
+      const t = await user.getIdToken();
+      const r = await fetch('/api/me', { method: 'DELETE', headers: { Authorization: `Bearer ${t}` } });
+      if (!r.ok) throw new Error();
+      const data = await r.json();
+      const kept = data.retained
+        ? `\n\nWe have kept ${data.retained.count} ${data.retained.what}: ${data.retained.why}`
+        : '';
+      alert(`Your account has been deleted.\n\nRemoved: ${(data.removed ?? []).join(', ')}.${kept}`);
+      await signOutUser();
+      window.location.href = '/';
+    } catch {
+      setError('Could not delete your account. Please write to us and we will do it by hand.');
+      setRightsBusy('');
     }
   };
 
@@ -261,6 +306,65 @@ export function AccountClient() {
         </div>
         {!p.email && (
           <p className="mt-3 text-xs text-secondary/60">Add an email above to subscribe.</p>
+        )}
+      </div>
+
+      {/* ── Your data, and the two rights that need a button ─────────────── */}
+      <div className="mt-10 pt-8 border-t border-outline/12">
+        <p className="text-sm font-bold text-on-surface">Your data</p>
+        <p className="text-sm text-secondary mt-1 mb-5 leading-relaxed">
+          Under the Digital Personal Data Protection Act you can see everything we hold on you, and
+          have it erased. Both happen here, immediately — you do not have to write to anyone.
+        </p>
+        <div className="flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={() => void exportData()}
+            disabled={rightsBusy !== ''}
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-outline/25 text-on-surface/80 text-[10px] uppercase tracking-[0.28em] font-bold hover:border-primary/50 hover:text-on-surface transition-all disabled:opacity-50"
+          >
+            <Download className="w-3.5 h-3.5" />
+            {rightsBusy === 'export' ? 'Preparing…' : 'Download my data'}
+          </button>
+          {confirmDelete ? (
+            <div className="flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                onClick={() => void deleteAccount()}
+                disabled={rightsBusy !== ''}
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-error text-white text-[10px] uppercase tracking-[0.28em] font-bold hover:opacity-90 transition-all disabled:opacity-50"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                {rightsBusy === 'delete' ? 'Deleting…' : 'Yes, delete permanently'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setConfirmDelete(false)}
+                className="text-[10px] uppercase tracking-[0.28em] font-bold text-secondary/70 hover:text-on-surface transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setConfirmDelete(true)}
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-error/30 text-error text-[10px] uppercase tracking-[0.28em] font-bold hover:bg-error/8 transition-all"
+            >
+              <Trash2 className="w-3.5 h-3.5" /> Delete my account
+            </button>
+          )}
+        </div>
+        {confirmDelete && (
+          <p className="text-xs text-secondary mt-4 leading-relaxed max-w-prose">
+            This removes your profile, your chat transcripts and your place on the briefing list, and
+            signs you out for good. It cannot be undone. Enquiry records are kept for three years —
+            they are the record of an introduction we made — and the{' '}
+            <Link href="/privacy#c6" className="text-primary hover:underline underline-offset-4">
+              Privacy Policy
+            </Link>{' '}
+            explains why.
+          </p>
         )}
       </div>
 

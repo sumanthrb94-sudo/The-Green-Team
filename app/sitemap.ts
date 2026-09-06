@@ -15,6 +15,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/standard`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${SITE_URL}/blog`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
     { url: `${SITE_URL}/reviews`, lastModified: now, changeFrequency: 'weekly', priority: 0.6 },
+    // Indexed on purpose: a buyer checking whether an agent is legitimate looks
+    // for these, and a search engine treats their presence as a trust signal.
+    { url: `${SITE_URL}/privacy`, lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
+    { url: `${SITE_URL}/terms`, lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
+    { url: `${SITE_URL}/cookies`, lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
   ];
   for (const c of CATEGORIES) {
     routes.push({

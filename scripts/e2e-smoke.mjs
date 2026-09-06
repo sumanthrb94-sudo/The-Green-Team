@@ -88,7 +88,10 @@ async function main() {
   await page.locator('#ac-name').fill('E2E Test Lead');
   await page.locator('#ac-phone').fill(leadPhone);
   await page.locator('button:has-text("₹1 Cr – ₹2 Cr")').click();
-  await page.locator('button:has-text("Request Adviser Call")').click();
+  // The submit label is A/B tested ("Request Adviser Call" vs "Get Pricing &
+  // Availability"), so targeting either one makes this suite pass or fail on
+  // which bucket the fresh browser landed in. Target the role instead.
+  await page.locator('form button[type="submit"]').first().click();
   await page.locator("text=Done. We'll call you.").waitFor({ timeout: 15000 }).then(
     () => ok('adviser-call UI confirms request'),
     () => fail('adviser-call confirmation missing')

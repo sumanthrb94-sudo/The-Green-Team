@@ -7,12 +7,16 @@
  * never be the reason a page feels slow.
  *
  * Renders nothing at all when the keys are absent, which is the normal state
- * in local dev and on preview deployments.
+ * in local dev and on preview deployments — and nothing until the visitor has
+ * accepted analytics. That gate is the point: under the DPDP Act these tags
+ * may not load first and ask afterwards, so no script tag is even emitted
+ * until consent is granted, and refusing later stops the reporting.
  */
 import Script from 'next/script';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { GA_ID, CLARITY_ID } from '@/lib/analytics';
+import { readConsent, onConsentChange } from '@/lib/consent';
 
 /**
  * The App Router does not fire a browser navigation between routes, so GA4's
@@ -36,7 +40,16 @@ function RouteChangeReporter() {
 }
 
 export function Analytics() {
+  // Read on the client only: the server has no way to know the answer, and
+  // rendering the tags optimistically would load them before the yes.
+  const [allowed, setAllowed] = useState(false);
+  useEffect(() => {
+    setAllowed(readConsent() === 'granted');
+    return onConsentChange(state => setAllowed(state === 'granted'));
+  }, []);
+
   if (!GA_ID && !CLARITY_ID) return null;
+  if (!allowed) return null;
 
   return (
     <>

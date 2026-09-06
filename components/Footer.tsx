@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Instagram, Linkedin, Mail } from 'lucide-react';
 import { Logo } from '@/components/brand/Logo';
 import { BUSINESS } from '@/lib/data/contact';
+import { LEGAL, LEGAL_LINKS } from '@/lib/data/legal';
 
 /**
  * Three short columns, not eleven description cards.
@@ -89,9 +90,26 @@ export function Footer() {
         </nav>
 
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-8 border-t border-white/8">
-          <p className="text-[9px] uppercase tracking-[0.3em] text-white/35">
-            © {new Date().getFullYear()} The Green Team · Channel Partners · Hyderabad
-          </p>
+          <div>
+            <p className="text-[9px] uppercase tracking-[0.3em] text-white/35">
+              © {new Date().getFullYear()} The Green Team · Channel Partners · Hyderabad
+            </p>
+            {/* RERA 2016 s.9/10: an agent's registration belongs on the advertisement. */}
+            <p className="mt-2 text-[9px] uppercase tracking-[0.2em] text-white/25">
+              {LEGAL.reraAuthority} agent reg. {LEGAL.reraAgentRegNo}
+            </p>
+            <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
+              {LEGAL_LINKS.map(l => (
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  className="text-[9px] uppercase tracking-[0.2em] text-white/45 hover:text-white transition-colors"
+                >
+                  {l.label}
+                </Link>
+              ))}
+            </div>
+          </div>
           <div className="flex items-center gap-2">
             <a
               href={BUSINESS.instagram}

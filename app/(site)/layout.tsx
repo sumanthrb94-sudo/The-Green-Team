@@ -5,6 +5,7 @@ import { ProfileModal } from '@/components/auth/ProfileModal';
 import { Groot } from '@/components/chat/Groot';
 import { WhatsAppFab } from '@/components/contact/WhatsAppFab';
 import { WelcomeGate } from '@/components/home/WelcomeGate';
+import { ConsentBanner } from '@/components/legal/ConsentBanner';
 import { SplashScreen } from '@/components/brand/SplashScreen';
 
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
@@ -18,6 +19,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
       <Groot />
       <WhatsAppFab />
       <WelcomeGate />
+      <ConsentBanner />
       <AuthModal />
       <ProfileModal />
     </>

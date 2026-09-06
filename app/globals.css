@@ -325,3 +325,13 @@
 .leaflet-container {
   background: #0d1409;
 }
+
+
+/* ── Legal documents (components/legal/LegalPage.tsx) ──────────────────────
+   Long-form prose that people actually have to read, so: a comfortable measure,
+   visible links, and tables that scroll rather than break the page. */
+.legal-body a:not([class]) { color: var(--color-primary); text-decoration: underline; text-underline-offset: 3px; }
+.legal-body p { max-width: 68ch; }
+.legal-body ul { max-width: 68ch; }
+.legal-body table { font-variant-numeric: tabular-nums; }
+.legal-body code { font-size: 0.85em; background: color-mix(in srgb, currentColor 8%, transparent); padding: 0.1em 0.35em; border-radius: 3px; }

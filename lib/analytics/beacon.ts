@@ -13,6 +13,7 @@
  * localStorage, no fingerprinting, no cross-site tracking, and the server
  * never stores a raw IP.
  */
+import { readConsent } from '@/lib/consent';
 import type { TrackPayload } from './types';
 
 const VID_KEY = 'gt_vid';
@@ -80,6 +81,10 @@ export function sessionId(): string {
  */
 export function send(payload: TrackPayload): void {
   if (typeof window === 'undefined') return;
+  // Consent gate. Our own page-view record is still personal data — it carries
+  // a visitor identifier and a hash of the IP — so it waits for a yes exactly
+  // like the third-party tags do. `unknown` behaves as a refusal.
+  if (readConsent() !== 'granted') return;
   // Never record the operator's own admin browsing — self-traffic would
   // otherwise dominate the numbers on a site this size and make every report
   // useless. Checked here so no call site can forget.
