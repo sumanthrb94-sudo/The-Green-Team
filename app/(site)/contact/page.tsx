@@ -7,7 +7,7 @@ import { BUSINESS, WHATSAPP, SITE_URL } from '@/lib/data/contact';
 export const metadata: Metadata = {
   title: 'Contact The Green Team — Talk to a Property Adviser in Hyderabad',
   description:
-    'One form for every question — pricing, plots, site visits or investment. Reach The Green Team by form, WhatsApp, phone or email. A curated-property adviser replies within 24 hours.',
+    'Pricing, plots, site visits or investment — reach The Green Team by form, WhatsApp, phone or email. An adviser replies within 24 hours.',
   alternates: { canonical: `${SITE_URL}/contact` },
   openGraph: {
     type: 'website',

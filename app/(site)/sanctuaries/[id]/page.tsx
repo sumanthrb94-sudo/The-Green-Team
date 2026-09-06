@@ -126,7 +126,12 @@ export default async function SanctuaryPage({ params }: Props) {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      {/* `</` escaped: the description is admin-editable, and an unescaped
+          "</script>" inside it would break out of this block. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
+      />
 
       {/* Hero */}
       <section id="pdp-hero" className="relative min-h-[70vh] md:min-h-[78vh] flex items-end overflow-hidden">

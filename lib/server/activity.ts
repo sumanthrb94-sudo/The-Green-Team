@@ -83,7 +83,12 @@ export async function getActivity(): Promise<{ items: ActivityItem[]; at: string
 
   // --- Enquiries to date (real leads). Shown once there are enough to band.
   try {
-    const leads = (await db.collection('leads').count().get()).data().count;
+    // Buyer enquiries only. The lead auto-created on every new sign-up and a
+    // developer's listing request are real rows but not enquiries; counting
+    // them would inflate the number the strip promises is real.
+    const leads = (
+      await db.collection('leads').where('source', 'not-in', ['signup', 'list-property']).count().get()
+    ).data().count;
     const ENQUIRY_MIN = 10;
     if (leads >= ENQUIRY_MIN) {
       items.push({ id: 'enquiries', label: 'enquiries and counting', value: `${bandDown(leads, 10)}+` });

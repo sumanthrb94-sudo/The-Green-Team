@@ -3,6 +3,8 @@ import { BUSINESS } from '@/lib/data/contact';
 import { renderWelcome, WELCOME_SUBJECT } from '@/emails/welcome';
 import { renderLeadConfirmation, LEAD_SUBJECT } from '@/emails/lead-confirmation';
 import { renderSiteVisit, SITE_VISIT_SUBJECT } from '@/emails/site-visit';
+import { renderNewsletterWelcome, NEWSLETTER_WELCOME_SUBJECT } from '@/emails/newsletter-welcome';
+import { renderListingReceived, LISTING_SUBJECT } from '@/emails/listing-received';
 
 /**
  * Transactional email — one message to one person, triggered by something they
@@ -45,6 +47,12 @@ export async function sendWelcomeEmail(to: string, name?: string): Promise<void>
   await send(to, WELCOME_SUBJECT, await renderWelcome(name));
 }
 
+/** Newsletter subscription confirmation — not the member welcome, which
+ *  promises per-unit pricing a subscriber cannot see. */
+export async function sendNewsletterWelcome(to: string): Promise<void> {
+  await send(to, NEWSLETTER_WELCOME_SUBJECT, await renderNewsletterWelcome());
+}
+
 /** Site-visit booking confirmation. */
 export async function sendSiteVisitConfirmation(to: string, name?: string, detail?: string): Promise<void> {
   await send(to, SITE_VISIT_SUBJECT, await renderSiteVisit({ name, detail }));
@@ -61,6 +69,12 @@ export async function sendLeadConfirmation(
   intent?: string,
   source?: string
 ): Promise<void> {
+  // Supply side: a developer/owner asking to list must never get the buyer
+  // confirmation ("an adviser will help you find a home… sign in for pricing").
+  if (source === 'list-property') {
+    await send(to, LISTING_SUBJECT, await renderListingReceived({ name, intent }));
+    return;
+  }
   if (source && /site-visit/i.test(source)) {
     await sendSiteVisitConfirmation(to, name, intent);
     return;

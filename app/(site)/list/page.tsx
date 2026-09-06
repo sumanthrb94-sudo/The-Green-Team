@@ -9,7 +9,7 @@ import { getPortfolio } from '@/lib/server/portfolio';
 export const metadata: Metadata = {
   title: 'Explore — Villas, Plots & Investment Property Near Hyderabad',
   description:
-    'Search every property The Green Team has curated near Hyderabad — villas and villaments, forest-edge plots and farmland, and investment opportunities with a documented price history. Filter by budget, delivery stage and asset class.',
+    'Search every property The Green Team has curated near Hyderabad — villas, forest-edge plots and investment opportunities. Filter by budget, stage and asset class.',
   alternates: { canonical: `${SITE_URL}/list` },
   openGraph: {
     type: 'website',
