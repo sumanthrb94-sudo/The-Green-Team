@@ -28,7 +28,7 @@ import {
 import { X, ChevronLeft, ArrowRight, Smartphone } from 'lucide-react';
 import { auth, googleProvider } from '@/lib/firebase/client';
 import { useAuth } from './AuthProvider';
-import { Logo } from '@/components/brand/Logo';
+import { AnimatedMark } from '@/components/brand/AnimatedMark';
 import { cn } from '@/lib/utils';
 
 const FRIENDLY: Record<string, string> = {
@@ -218,7 +218,7 @@ export function AuthModal() {
                   <ChevronLeft className="w-6 h-6" />
                 </button>
               ) : (
-                <Logo iconOnly />
+                <span />
               )}
               <button
                 onClick={closeAuth}
@@ -229,11 +229,33 @@ export function AuthModal() {
               </button>
             </div>
 
-            <div className="flex-1 px-6 pt-8 pb-8 flex flex-col">
+            <div className="flex-1 px-6 pt-6 pb-8 flex flex-col">
               {step === 'phone' ? (
                 <>
+                  {/* The mark assembles itself, the way it does at launch — the
+                      same drawing and the same keyframes, so the door into the
+                      app is recognisably the app. Everything below is unchanged. */}
+                  <div className="flex flex-col items-center mb-7">
+                    <AnimatedMark
+                      id="gt-auth"
+                      className="w-16 h-16"
+                      back="#2d3a1d"
+                      front="#2d3a1d"
+                      highlight="#4a5c35"
+                      breathe={false}
+                    />
+                    <div className="gt-splash">
+                      <p
+                        className="gt-up mt-4 font-headline font-extrabold tracking-[0.28em] text-[10px] text-on-surface/70"
+                        style={{ animationDelay: '1.3s' }}
+                      >
+                        THE GREEN TEAM
+                      </p>
+                    </div>
+                  </div>
+
                   {/* Segmented control */}
-                  <div className="grid grid-cols-2 gap-1 p-1 rounded-full bg-surface-container border border-outline/10 mb-8">
+                  <div className="grid grid-cols-2 gap-1 p-1 rounded-full bg-surface-container border border-outline/10 mb-7">
                     {(['signin', 'signup'] as Mode[]).map(m => (
                       <button
                         key={m}

@@ -53,7 +53,13 @@ export function splitName(full?: string | null): { firstName?: string; lastName?
  * for the same address updates rather than duplicates; segment membership is
  * additive, so a newsletter subscriber who later signs in ends up in both.
  */
-export async function upsertContact(input: UpsertInput): Promise<void> {
+export async function upsertContact(
+  input: UpsertInput & {
+    /** Resend's own opt-out flag. Set when a member turns the briefing off, so
+     *  the state lives where the broadcast is sent from, not only in Firestore. */
+    unsubscribed?: boolean;
+  }
+): Promise<void> {
   if (!resendEnabled()) return;
 
   const email = input.email.trim().toLowerCase();
@@ -83,7 +89,7 @@ export async function upsertContact(input: UpsertInput): Promise<void> {
         ...name,
         ...(segments.length ? { segments } : {}),
         ...(Object.keys(properties).length ? { properties } : {}),
-        unsubscribed: false,
+        unsubscribed: input.unsubscribed ?? false,
       }),
     });
     if (res.ok || res.status === 409) return; // 409 = already exists; fine.
@@ -98,7 +104,7 @@ export async function upsertContact(input: UpsertInput): Promise<void> {
           fetch(`${API}/audiences/${id}/contacts`, {
             method: 'POST',
             headers,
-            body: JSON.stringify({ email, ...name, unsubscribed: false }),
+            body: JSON.stringify({ email, ...name, unsubscribed: input.unsubscribed ?? false }),
           }).then(async r => {
             if (!r.ok && r.status !== 409) {
               const t = await r.text().catch(() => '');

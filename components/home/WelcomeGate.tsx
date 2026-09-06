@@ -25,7 +25,7 @@ export function WelcomeGate() {
   useEffect(() => {
     if (!authReady || user) return;
     try {
-      if (localStorage.getItem(SEEN_KEY) || localStorage.getItem('gt_subscribed') === 'true') return;
+      if (localStorage.getItem(SEEN_KEY)) return;
     } catch {}
     const t = setTimeout(() => setShow(true), 6000);
     return () => clearTimeout(t);

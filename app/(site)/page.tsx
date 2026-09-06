@@ -20,11 +20,14 @@ export default async function HomePage() {
   const portfolio = await getPortfolio();
   return (
     <>
+      {/* Search first, then the properties themselves. Everything that argues
+          for us — momentum, the standard, the adviser — comes after a visitor
+          has seen what there is to buy. */}
       <Hero />
+      <BentoPortfolio sanctuaries={portfolio} />
       {/* Real momentum — the component renders nothing (no bar) until there is
           something true to show, so there is never an empty strip. */}
       <ActivityStrip />
-      <BentoPortfolio sanctuaries={portfolio} />
       <ProofStrip />
       <ListWithUs />
       <AdviserCallSection />

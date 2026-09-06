@@ -13,16 +13,20 @@
  */
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Check, LogOut, ShieldCheck, Lock, AlertCircle, ArrowRight } from 'lucide-react';
+import { Check, LogOut, ShieldCheck, Lock, AlertCircle, ArrowRight, Mail } from 'lucide-react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { cn } from '@/lib/utils';
 
 interface Profile {
   name: string; email: string; emailLocked: boolean;
   phone: string; phoneLocked: boolean; city: string; occupation: string;
+  subscribed: boolean;
 }
 
-const EMPTY: Profile = { name: '', email: '', emailLocked: false, phone: '', phoneLocked: false, city: '', occupation: '' };
+const EMPTY: Profile = {
+  name: '', email: '', emailLocked: false, phone: '', phoneLocked: false,
+  city: '', occupation: '', subscribed: false,
+};
 
 export function AccountClient() {
   const { user, authReady, openAuth, signOutUser, isAdmin } = useAuth();
@@ -31,6 +35,7 @@ export function AccountClient() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState('');
+  const [mailBusy, setMailBusy] = useState(false);
 
   const load = useCallback(async () => {
     if (!user) return;
@@ -50,6 +55,29 @@ export function AccountClient() {
     if (!user) { setLoading(false); return; }
     void load();
   }, [authReady, user, load]);
+
+  /** The briefing lives here and nowhere else on the site, so this toggle is
+   *  the whole subscription UI. The address is never sent — the server reads it
+   *  from the token, so nobody can subscribe anyone but themselves. */
+  const toggleBriefing = async () => {
+    if (!user) return;
+    setMailBusy(true);
+    setError('');
+    try {
+      const t = await user.getIdToken();
+      const r = await fetch('/api/newsletter', {
+        method: p.subscribed ? 'DELETE' : 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${t}` },
+      });
+      if (!r.ok) throw new Error();
+      const data = await r.json();
+      setP(x => ({ ...x, subscribed: Boolean(data.subscribed) }));
+    } catch {
+      setError('Could not change that just now. Please try again.');
+    } finally {
+      setMailBusy(false);
+    }
+  };
 
   const set = (k: keyof Profile, v: string) => { setP(x => ({ ...x, [k]: v })); setSaved(false); };
 
@@ -202,6 +230,38 @@ export function AccountClient() {
           </button>
         </div>
       </form>
+
+      {/* ── The monthly briefing — the only place on the site it is offered ── */}
+      <div className="mt-10 pt-8 border-t border-outline/12">
+        <div className="flex items-start gap-4 flex-wrap sm:flex-nowrap">
+          <span className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
+            <Mail className="w-5 h-5" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-bold text-on-surface">The monthly briefing</p>
+            <p className="text-sm text-secondary mt-1 leading-relaxed">
+              Air and noise readings, new curations and honest price movement. Once a month, nothing else
+              {p.email ? <> — to <span className="text-on-surface/80">{p.email}</span>.</> : '.'}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => void toggleBriefing()}
+            disabled={mailBusy || !p.email}
+            className={cn(
+              'px-6 py-3 rounded-full text-[10px] uppercase tracking-[0.3em] font-bold transition-all disabled:opacity-50 flex-shrink-0',
+              p.subscribed
+                ? 'border border-outline/25 text-secondary/70 hover:text-on-surface'
+                : 'bg-primary text-on-primary hover:opacity-90',
+            )}
+          >
+            {mailBusy ? '…' : p.subscribed ? 'Unsubscribe' : 'Subscribe'}
+          </button>
+        </div>
+        {!p.email && (
+          <p className="mt-3 text-xs text-secondary/60">Add an email above to subscribe.</p>
+        )}
+      </div>
 
       <p className="mt-10 text-xs text-secondary/60 leading-relaxed">
         We use this only to answer you and to send what you asked for. We never sell your details.{' '}

@@ -18,7 +18,7 @@ import { sendNewsletterWelcome } from '@/lib/server/email';
  */
 
 /** Where the address was typed. One value per real surface — nothing else. */
-export type SubscribeSource = 'footer' | 'groot';
+export type SubscribeSource = 'profile' | 'groot';
 
 export interface SubscribeResult {
   ok: boolean;
@@ -87,4 +87,30 @@ export async function subscribeEmail({
     await sendNewsletterWelcome(email);
   });
   return { ok: true, already: false };
+}
+
+/** Is this address on the list? Powers the toggle's state on the account page. */
+export async function isSubscribed(email: string): Promise<boolean> {
+  const addr = String(email ?? '').trim().toLowerCase();
+  if (!addr) return false;
+  const snap = await adminDb().collection('newsletter').where('email', '==', addr).limit(1).get();
+  return !snap.empty;
+}
+
+/**
+ * Turn the briefing off. A preference a member can set has to be one they can
+ * unset, so this is the other half of the toggle rather than a link buried in an
+ * email footer — though that link keeps working too.
+ */
+export async function unsubscribeEmail(email: string): Promise<{ ok: boolean }> {
+  const addr = String(email ?? '').trim().toLowerCase();
+  if (!addr) return { ok: false };
+  const snap = await adminDb().collection('newsletter').where('email', '==', addr).get();
+  await Promise.all(snap.docs.map(d => d.ref.delete()));
+  await schedule(async () => {
+    // Mark the opt-out in Resend as well: the record here is not what the
+    // broadcast reads, so deleting only the Firestore row would keep sending.
+    await upsertContact({ email: addr, segments: [SEGMENT.newsletter()], unsubscribed: true });
+  });
+  return { ok: true };
 }

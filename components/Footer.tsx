@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { Instagram, Linkedin, Mail } from 'lucide-react';
 import { Logo } from '@/components/brand/Logo';
-import { NewsletterSignup } from '@/components/newsletter/NewsletterSignup';
 import { BUSINESS } from '@/lib/data/contact';
 
 const AGENDA: { label: string; sub: string; href: string }[] = [
@@ -57,12 +56,6 @@ export function Footer() {
               <p className="mt-1 text-[9px] uppercase tracking-[0.25em] text-white/35">{item.sub}</p>
             </Link>
           ))}
-        </div>
-
-        {/* The one signup on the site. Below the links, above the legal line —
-            present on every page, in the way on none of them. */}
-        <div className="pb-12 mb-4 border-b border-white/8">
-          <NewsletterSignup />
         </div>
 
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-8 border-t border-white/8">

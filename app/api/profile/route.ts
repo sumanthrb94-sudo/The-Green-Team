@@ -3,6 +3,7 @@ import { FieldValue } from 'firebase-admin/firestore';
 import { adminAuth, adminDb } from '@/lib/firebase/admin';
 import { upsertContact, splitName, SEGMENT } from '@/lib/server/resend';
 import { sendWelcomeEmail } from '@/lib/server/email';
+import { isSubscribed } from '@/lib/server/newsletter';
 
 /** An account created within this window of the request is a genuine sign-up.
  *  Anything older that arrives here without a profile record is a repaired
@@ -22,7 +23,11 @@ export async function GET(req: NextRequest) {
     const idToken = authz.startsWith('Bearer ') ? authz.slice(7) : '';
     const decoded = await adminAuth().verifyIdToken(idToken);
     const d = (await adminDb().collection('users').doc(decoded.uid).get()).data() ?? {};
+    const addr = (decoded.email as string) ?? (d.email as string) ?? '';
     return NextResponse.json({
+      // The briefing is a setting on this page and nowhere else, so its state
+      // has to come back with the rest of the profile.
+      subscribed: addr ? await isSubscribed(addr) : false,
       name: (d.name as string) ?? (d.displayName as string) ?? (decoded.name as string) ?? '',
       email: (decoded.email as string) ?? (d.email as string) ?? '',
       // A provider-verified address is not editable here; a self-supplied one is.

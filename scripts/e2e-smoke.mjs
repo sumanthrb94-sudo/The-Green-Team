@@ -6,10 +6,9 @@
  *   node --env-file=.env.local scripts/e2e-smoke.mjs
  *
  * Flows exercised as a real browser user:
- *   1. Newsletter signup (inline form)        → `newsletter` collection
  *   2. Adviser call request                   → `leads` (name/phone/budget bracket)
  *   3. Email/password account signup          → Firebase Auth user + `users` profile + signup lead
- *   4. Profile capture modal                  → users/{uid} name/occupation/city
+ *   4. Monthly briefing toggle                 → `newsletter` (a profile setting)
  *   5. WhatsApp CTAs                          → correct number + prefilled text
  *   6. Admin API security                     → unauthenticated + non-admin both rejected
  *
@@ -78,21 +77,9 @@ async function main() {
   });
   const page = await ctx.newPage();
 
-  // ── 1. Newsletter signup ────────────────────────────────────────────────
-  console.log('\n▶ 1. Newsletter signup (the one form, in the footer)');
+  // The briefing is no longer a public form — it is a setting on the account
+  // page, so it is exercised with a real ID token in step 4 below.
   await page.goto(`${BASE}/`, { waitUntil: 'load', timeout: 90000 });
-  const nlEmail = `newsletter-${MARK}`;
-  await page.locator('#nl-email').scrollIntoViewIfNeeded();
-  await page.locator('#nl-email').fill(nlEmail);
-  await page.locator('form:has(#nl-email) button[type="submit"]').click();
-  await page.locator('text=You are on the list').waitFor({ timeout: 15000 }).then(
-    () => ok('newsletter UI confirms subscription'),
-    () => fail('newsletter UI confirmation missing')
-  );
-  const nlDocs = await findDocs('newsletter', 'email', nlEmail);
-  nlDocs.length
-    ? ok('newsletter doc in Firestore', `source=${nlDocs[0].data().source}`)
-    : fail('newsletter doc NOT found in Firestore');
 
   // ── 2. Adviser call request (the ONE conversion form) ───────────────────
   console.log('\n▶ 2. Adviser call request (name + phone + budget chip)');
@@ -214,6 +201,50 @@ async function main() {
     ? ok('signup recorded as lead', 'intent="New Sign-up"')
     : fail('signup lead missing');
 
+  // ── 4. The briefing — one place on the site, and it is behind an account ──
+  console.log('\n▶ 4. Monthly briefing toggle (a profile setting, not a public form)');
+  (await page.locator('#nl-email').count()) === 0
+    ? ok('no public newsletter form anywhere on the home page')
+    : fail('a second newsletter form still exists');
+
+  const anonSub = await fetch(`${BASE}/api/newsletter`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Origin: BASE },
+    body: JSON.stringify({ email: 'stranger@greenteam-e2e.test' }),
+  });
+  anonSub.status === 401
+    ? ok('an anonymous subscribe is rejected (401)')
+    : fail('anonymous subscribe not rejected', `status=${anonSub.status}`);
+
+  if (idToken) {
+    const sub = await fetch(`${BASE}/api/newsletter`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Origin: BASE, Authorization: `Bearer ${idToken}` },
+    });
+    sub.ok ? ok('a member subscribes from their profile') : fail('member subscribe failed', `status=${sub.status}`);
+
+    const subDocs = await findDocs('newsletter', 'email', userEmail, 6);
+    subDocs.length && subDocs[0].data().source === 'profile'
+      ? ok('newsletter doc in Firestore', `source=${subDocs[0].data().source}`)
+      : fail('newsletter doc NOT found in Firestore');
+
+    // The address is never sent by the client — the server reads it from the
+    // token — so a caller cannot subscribe anyone but themselves.
+    const prof = await fetch(`${BASE}/api/profile`, { headers: { Authorization: `Bearer ${idToken}` } });
+    (await prof.json()).subscribed === true
+      ? ok('the profile reports the subscription back')
+      : fail('profile does not report subscribed state');
+
+    const unsub = await fetch(`${BASE}/api/newsletter`, {
+      method: 'DELETE',
+      headers: { Origin: BASE, Authorization: `Bearer ${idToken}` },
+    });
+    const stillThere = (await db.collection('newsletter').where('email', '==', userEmail).get()).size;
+    unsub.ok && stillThere === 0
+      ? ok('and can turn it off again')
+      : fail('unsubscribe failed', `ok=${unsub.ok} remaining=${stillThere}`);
+  }
+
   // ── 5. WhatsApp CTAs use the current number ─────────────────────────────
   console.log('\n▶ 5. WhatsApp contact CTAs');
   await page.goto(`${BASE}/sanctuaries/agartha`, { waitUntil: 'load' });
@@ -258,7 +289,7 @@ async function main() {
   let removed = 0;
   for (const coll of ['newsletter', 'leads']) {
     for (const field of ['email']) {
-      for (const value of [nlEmail, userEmail]) {
+      for (const value of [userEmail]) {
         const snap = await db.collection(coll).where(field, '==', value).get();
         for (const doc of snap.docs) { await doc.ref.delete(); removed++; }
       }

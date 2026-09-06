@@ -1,18 +1,24 @@
 'use client';
 
 /**
- * v3 hero — "bold modern" (The Agency / Compass register). One statement, one
- * image, two actions. The old hero stacked a headline, a paragraph, a search
- * bar, glass tickets, an animated KPI grid and a marquee — seven competing
- * elements that read as a listing utility. A billion-dollar brand says one
- * thing per screen, so this is a confident split: oversized type on a dark
- * canvas at left, a single cinematic listing at right with a floating featured
- * card. Search lives on /list, where a portal belongs — not on the front door.
+ * v4 hero — "bold modern" (The Agency / Compass register), now with the front
+ * door's first action in it.
+ *
+ * v3 was a statement and nothing else: the only thing a visitor could do on
+ * arrival was scroll, and listings did not appear until the second screen. This
+ * keeps the confident split — oversized type on a dark canvas at left, one
+ * cinematic listing at right — but the paragraph gives way to a search bar and
+ * four shortcuts, and the whole band is short enough that real listings are on
+ * screen behind it rather than a scroll away.
+ *
+ * It is still not the seven stacked elements of v2 that read as a listing
+ * utility: one statement, one image, one search.
  */
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'motion/react';
 import { ArrowUpRight, ArrowRight, Phone } from 'lucide-react';
+import { HeroSearch } from '@/components/home/HeroSearch';
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -34,7 +40,7 @@ export function Hero() {
 
       <div className="relative z-10 max-w-[1500px] mx-auto grid lg:grid-cols-[1.05fr_0.95fr]">
         {/* LEFT — the statement */}
-        <div className="flex flex-col justify-center px-6 md:px-14 pt-16 md:pt-24 pb-12 lg:pb-24 min-h-[62svh] lg:min-h-[88svh]">
+        <div className="min-w-0 flex flex-col justify-center px-6 md:px-14 pt-16 md:pt-20 pb-10 lg:pb-16 min-h-[58svh] lg:min-h-[74svh]">
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
@@ -76,42 +82,48 @@ export function Hero() {
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.8 }}
-            className="text-base md:text-lg font-light text-white/55 leading-relaxed max-w-md mt-7"
+            className="text-sm md:text-base font-light text-white/55 leading-relaxed max-w-md mt-5"
           >
-            A short list of forest-adjacent homes, plots and retreats near Hyderabad — each verified for air,
-            quiet, access and title before you ever see it.
+            Forest-adjacent homes and plots near Hyderabad — each verified for air, quiet, access and title
+            before you ever see it.
           </motion.p>
 
+          {/* The first thing a visitor can do, rather than a scroll. */}
           <motion.div
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.62, duration: 0.8 }}
-            className="flex flex-col sm:flex-row gap-3 mt-9"
+            className="mt-7"
+          >
+            <HeroSearch />
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8, duration: 0.8 }}
+            className="mt-6"
           >
             <Link
-              href="/list"
-              className="group inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full bg-[#c8a951] text-[#1a1a0a] text-[10px] uppercase tracking-[0.35em] font-bold hover:bg-[#d9bb62] transition-all"
-            >
-              Explore listings
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-            </Link>
-            <Link
               href="/contact"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full border border-white/20 text-white/70 text-[10px] uppercase tracking-[0.35em] font-bold hover:border-[#a3b18a]/60 hover:text-white transition-all"
+              className="group inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] font-bold text-white/45 hover:text-white transition-colors"
             >
-              <Phone className="w-3.5 h-3.5" /> Talk to an adviser
+              <Phone className="w-3.5 h-3.5" /> Or talk to an adviser
+              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
             </Link>
           </motion.div>
 
-          {/* refined single-line credential row */}
+          {/* Credential row — desktop only. On a phone it wrapped into the
+              sticky call bar, and the search is the job there anyway; the proof
+              strip further down carries the same numbers. */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.9, duration: 0.8 }}
-            className="flex items-center gap-6 md:gap-9 mt-12"
+            className="hidden sm:flex flex-wrap items-center gap-x-6 gap-y-4 md:gap-9 mt-9"
           >
             {STATS.map((s, i) => (
-              <div key={s.label} className="flex items-center gap-6 md:gap-9">
+              <div key={s.label} className="flex items-center gap-x-6 md:gap-9">
                 {i > 0 && <span className="h-8 w-px bg-white/10" />}
                 <div>
                   <p className={`font-headline font-extrabold text-2xl md:text-3xl leading-none ${s.accent ? 'text-[#c8a951]' : 'text-white'}`}>
@@ -129,7 +141,7 @@ export function Hero() {
           initial={{ opacity: 0, scale: 1.04 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1.1, ease }}
-          className="relative min-h-[52svh] lg:min-h-[88svh]"
+          className="relative min-h-[40svh] lg:min-h-[74svh]"
         >
           <Image
             src="/gallery/agartha/11.webp"
