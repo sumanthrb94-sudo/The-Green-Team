@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%" role="img" aria-label="The Green Team">
+  <!-- Dark-surface version of the two-leaf mark: cream leaf behind, sage leaf
+       in front, so it holds on the forest footer and drawer header. -->
+  <defs>
+    <path id="gt-leaf-d" d="M46 94 C39 72 27 58 34 40 C41 22 66 17 82 31 C95 43 90 64 72 74 C60 80 51 86 46 94 Z"/>
+    <clipPath id="gt-front-d"><use href="#gt-leaf-d"/></clipPath>
+  </defs>
+  <use href="#gt-leaf-d" transform="translate(8 -10) matrix(-1 0 0 1 100 0)" fill="#faf9f6" opacity="0.3"/>
+  <use href="#gt-leaf-d" fill="#a3b18a"/>
+  <path clip-path="url(#gt-front-d)" d="M0 0 H60 C54 38 51 68 46 94 H0 Z" fill="#b9c6a4"/>
+</svg>

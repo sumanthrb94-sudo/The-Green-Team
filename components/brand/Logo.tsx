@@ -14,11 +14,11 @@ export function Logo({
   return (
     <Link href="/" aria-label="The Green Team — Home" className={cn('flex items-center gap-3 group', className)}>
       <Image
-        src="/logo-mark.svg"
+        src={onDark ? '/logo-mark-dark.svg' : '/logo-mark.svg'}
         alt=""
-        width={36}
-        height={36}
-        className="w-9 h-9 transition-transform duration-500 group-hover:rotate-[-6deg]"
+        width={40}
+        height={40}
+        className="w-10 h-10 transition-transform duration-500 group-hover:rotate-[-6deg]"
         priority
       />
       {!iconOnly && (
@@ -26,7 +26,7 @@ export function Logo({
           <span
             className={cn(
               'block font-headline font-extrabold tracking-[0.18em] text-[15px]',
-              onDark ? 'text-white' : 'text-on-surface'
+              onDark ? 'text-white' : 'text-[#2c4a2e]'
             )}
           >
             THE GREEN TEAM

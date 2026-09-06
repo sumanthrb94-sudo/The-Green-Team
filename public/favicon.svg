@@ -1,31 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%" role="img" aria-label="The Green Team">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <!-- Favicon: the two-leaf mark on a cream tile so it reads at 16px. -->
   <defs>
-    <linearGradient id="gt-badge" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#33461f"/>
-      <stop offset="1" stop-color="#1a2410"/>
-    </linearGradient>
-    <linearGradient id="gt-leaf" x1="0.2" y1="0.1" x2="0.8" y2="1">
-      <stop offset="0" stop-color="#e7ecd9"/>
-      <stop offset="0.55" stop-color="#a3b18a"/>
-      <stop offset="1" stop-color="#7f9068"/>
-    </linearGradient>
-    <linearGradient id="gt-gold" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#e2c46e"/>
-      <stop offset="1" stop-color="#b8860b"/>
-    </linearGradient>
+    <path id="gt-leaf-f" d="M46 94 C39 72 27 58 34 40 C41 22 66 17 82 31 C95 43 90 64 72 74 C60 80 51 86 46 94 Z"/>
+    <clipPath id="gt-front-f"><use href="#gt-leaf-f"/></clipPath>
   </defs>
-
-  <!-- Badge -->
-  <rect width="100" height="100" rx="24" fill="url(#gt-badge)"/>
-  <!-- Premium gold hairline -->
-  <rect x="6.5" y="6.5" width="87" height="87" rx="18.5" fill="none" stroke="url(#gt-gold)" stroke-width="1.4" opacity="0.55"/>
-
-  <!-- Leaf -->
-  <path d="M50 85 C33 76 27 57 30 41 C32 27 42 19 50 16 C58 19 68 27 70 41 C73 57 67 76 50 85 Z"
-        fill="url(#gt-leaf)"/>
-  <!-- Central vein -->
-  <path d="M50 81 L50 22" fill="none" stroke="url(#gt-gold)" stroke-width="2.4" stroke-linecap="round"/>
-  <!-- Side veins -->
-  <path d="M50 60 L36 52 M50 60 L64 52 M50 47 L39 41 M50 47 L61 41 M50 71 L41 65 M50 71 L59 65"
-        fill="none" stroke="url(#gt-gold)" stroke-width="1.5" stroke-linecap="round" opacity="0.9"/>
+  <rect width="100" height="100" rx="22" fill="#faf9f6"/>
+  <g transform="translate(5 3) scale(0.9)">
+    <use href="#gt-leaf-f" transform="translate(8 -10) matrix(-1 0 0 1 100 0)" fill="#dfe3dc"/>
+    <use href="#gt-leaf-f" fill="#2c4a2e"/>
+    <path clip-path="url(#gt-front-f)" d="M0 0 H60 C54 38 51 68 46 94 H0 Z" fill="#37583a"/>
+  </g>
 </svg>
