@@ -4,10 +4,14 @@
  * Post-sign-up profile capture — it asks for whatever the sign-in method did
  * not already give us, and nothing more.
  *
- * Google hands over a verified email and a name but no phone, so we ask for
- * the phone. Phone OTP hands over a number but no name and no email, so we ask
- * for those — otherwise a phone member could never be emailed at all, and
- * would never reach the Members segment. Everything stays skippable.
+ * Google hands over a verified email and a name but no phone, so we ask for the
+ * phone and everything here is optional; we can already reach that member.
+ *
+ * Phone OTP hands over a number and nothing else, and a member we cannot email
+ * gets no welcome, no pricing sheet, no site-visit confirmation and never
+ * reaches the Members segment. So when there is no address on the account the
+ * email field is required and there is no way past it — no Skip, no close, no
+ * dismissing the backdrop. Everything else on the form stays optional.
  */
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
@@ -26,19 +30,27 @@ export function ProfileModal() {
 
   const needsEmail = Boolean(user && !user.email);
   const needsPhone = Boolean(user && !user.phoneNumber);
+  /** No address on file means no way to reach this member: the step is required. */
+  const required = needsEmail;
 
   const save = async () => {
     if (!user) return closeProfile();
     const mail = email.trim().toLowerCase();
-    if (needsEmail && mail && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mail)) {
-      setError("That email doesn't look right — or leave it blank and skip.");
-      return;
+    if (needsEmail) {
+      if (!mail) {
+        setError('We need an email address to send you pricing and confirmations.');
+        return;
+      }
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mail)) {
+        setError("That email doesn't look right.");
+        return;
+      }
     }
     setError('');
     setSaving(true);
     try {
       const idToken = await user.getIdToken();
-      await fetch('/api/profile', {
+      const res = await fetch('/api/profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
         body: JSON.stringify({
@@ -49,9 +61,14 @@ export function ProfileModal() {
           ...(city.trim() ? { city: city.trim() } : {}),
         }),
       });
+      // A required step must not close on a failed save — that would strand the
+      // member with no address and no second prompt until their next visit.
+      if (!res.ok) throw new Error();
+      closeProfile();
+    } catch {
+      setError('Could not save that. Please try again.');
     } finally {
       setSaving(false);
-      closeProfile();
     }
   };
 
@@ -66,6 +83,7 @@ export function ProfileModal() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
+          onClick={required ? undefined : closeProfile}
           className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-md p-0 sm:p-6"
         >
           <motion.div
@@ -73,6 +91,7 @@ export function ProfileModal() {
             animate={{ y: 0, scale: 1, opacity: 1 }}
             exit={{ y: 40, scale: 0.98, opacity: 0 }}
             transition={{ type: 'spring', damping: 26, stiffness: 300 }}
+            onClick={e => e.stopPropagation()}
             className="w-full sm:max-w-lg bg-surface rounded-t-3xl sm:rounded-3xl shadow-2xl p-8 sm:p-10"
           >
             <div className="flex items-start justify-between mb-2">
@@ -82,13 +101,19 @@ export function ProfileModal() {
                   {user.displayName || user.email?.split('@')[0] || 'Member'}
                 </h2>
               </div>
-              <button onClick={closeProfile} aria-label="Skip" className="p-2 rounded-full hover:bg-primary/10">
-                <X className="w-5 h-5 text-on-surface/60" />
-              </button>
+              {!required && (
+                <button onClick={closeProfile} aria-label="Skip" className="p-2 rounded-full hover:bg-primary/10">
+                  <X className="w-5 h-5 text-on-surface/60" />
+                </button>
+              )}
             </div>
-            <p className="font-serif italic text-2xl text-on-surface mb-1">One quick thing</p>
+            <p className="font-serif italic text-2xl text-on-surface mb-1">
+              {required ? 'Where should we send it?' : 'One quick thing'}
+            </p>
             <p className="text-sm text-on-surface/60 mb-7">
-              Help us match you with the right sanctuary. Totally optional — skip anytime.
+              {required
+                ? 'Your number gets you in; an email is how we send pricing sheets, site-visit confirmations and the monthly briefing. We never sell your details.'
+                : 'Help us match you with the right sanctuary. Totally optional — skip anytime.'}
             </p>
 
             <div className="space-y-4">
@@ -99,8 +124,8 @@ export function ProfileModal() {
               </div>
               {needsEmail && (
                 <div>
-                  <label htmlFor="pf-email" className={labelCls}>Email (for pricing sheets &amp; updates)</label>
-                  <input id="pf-email" type="email" inputMode="email" autoComplete="email" value={email}
+                  <label htmlFor="pf-email" className={labelCls}>Email · Required</label>
+                  <input id="pf-email" type="email" required inputMode="email" autoComplete="email" value={email}
                     onChange={e => setEmail(e.target.value)} placeholder="you@example.com" className={inputCls} />
                 </div>
               )}
@@ -131,14 +156,16 @@ export function ProfileModal() {
                 disabled={saving}
                 className="flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl bg-primary text-on-primary text-sm font-bold hover:opacity-95 transition-all disabled:opacity-60"
               >
-                <Check className="w-4 h-4" /> {saving ? 'Saving…' : 'Complete Profile'}
+                <Check className="w-4 h-4" /> {saving ? 'Saving…' : required ? 'Continue' : 'Complete Profile'}
               </button>
-              <button
-                onClick={closeProfile}
-                className="px-6 py-4 rounded-2xl border border-outline/25 text-sm text-on-surface/60 hover:text-on-surface transition-all"
-              >
-                Skip
-              </button>
+              {!required && (
+                <button
+                  onClick={closeProfile}
+                  className="px-6 py-4 rounded-2xl border border-outline/25 text-sm text-on-surface/60 hover:text-on-surface transition-all"
+                >
+                  Skip
+                </button>
+              )}
             </div>
           </motion.div>
         </motion.div>

@@ -47,9 +47,9 @@ async function postProfile(user: User, extra: Record<string, unknown> = {}) {
       body: JSON.stringify(extra),
     });
     const data = await res.json().catch(() => ({}));
-    return Boolean(data?.isNew);
+    return { isNew: Boolean(data?.isNew), needsEmail: Boolean(data?.needsEmail) };
   } catch {
-    return false;
+    return { isNew: false, needsEmail: false };
   }
 }
 
@@ -96,7 +96,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setAuthModalOpen(false);
       void exchangeSession(u);
       setTimeout(() => captureLocation(u), 1500);
-      void postProfile(u).then(wasNewDoc => {
+      void postProfile(u).then(({ isNew: wasNewDoc, needsEmail }) => {
+        // `needsEmail` keeps the step open for an OTP member who has still not
+        // given us an address — there is no way to reach them without it.
+        if (needsEmail) setProfileModalOpen(true);
         if (isNew || wasNewDoc) {
           setProfileModalOpen(true);
           void fetch('/api/leads', {
@@ -133,6 +136,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         sessionExchanged.current = true;
         void exchangeSession(u);
         setTimeout(() => captureLocation(u), 2000);
+        // Asked once per session, not only at sign-up: someone who refreshed
+        // past the profile step would otherwise stay unreachable forever.
+        if (!u.email) {
+          void postProfile(u).then(({ needsEmail }) => {
+            if (needsEmail) setProfileModalOpen(true);
+          });
+        }
       }
       if (!u) {
         sessionExchanged.current = false;

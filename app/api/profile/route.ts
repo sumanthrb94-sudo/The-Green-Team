@@ -180,7 +180,10 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    return NextResponse.json({ ok: true, isNew });
+    // `needsEmail` is what makes the profile step mandatory rather than a
+    // suggestion: an OTP member who closed it, or refreshed past it, is asked
+    // again on their next visit until we actually have an address for them.
+    return NextResponse.json({ ok: true, isNew, needsEmail: !email });
   } catch {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }

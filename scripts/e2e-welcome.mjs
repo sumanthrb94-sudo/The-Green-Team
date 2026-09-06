@@ -7,7 +7,8 @@
  *
  * The rule under test: a member is welcomed at the first moment we hold both an
  * account and an address to write to — a sign-up, a first Google sign-in (which
- * is the same event), or the moment an OTP member finally gives us an email.
+ * is the same event), or the OTP member's profile step, where the email is
+ * required and cannot be skipped.
  * Never on a later sign-in, and never on the page loads that quietly re-post the
  * profile when the browser hands back a location.
  *
@@ -135,14 +136,25 @@ async function main() {
   n === 0 ? ok('returning sign-ins send nothing') : bad('returning sign-in', `expected 0 attempts, saw ${n}`);
 
   // ── 3. OTP member: account first, address later ───────────────────────────
-  console.log('\n▶ 3. Phone-OTP sign-up (no address yet), then the profile step');
+  console.log('\n▶ 3. Phone-OTP sign-up, then the mandatory email step');
   const otp = await makeUser({ uid: `${RUN}-p`, phoneNumber: `+1650555${String(Date.now()).slice(-4)}` });
   const otpToken = await idTokenFor(otp.uid);
-  n = await attempts(() => postProfile(otpToken));
+  let body;
+  n = await attempts(async () => { body = await postProfile(otpToken); });
   n === 0 ? ok('OTP sign-up alone sends nothing — no address to write to') : bad('OTP sign-up', `expected 0, saw ${n}`);
+  // What makes the profile step mandatory in the UI: the server says an address
+  // is still missing, so the modal reopens with no way past it.
+  body?.needsEmail === true
+    ? ok('server reports needsEmail — the profile step cannot be skipped')
+    : bad('needsEmail flag', `expected true, got ${JSON.stringify(body)}`);
 
-  n = await attempts(() => postProfile(otpToken, { name: 'Otp Member', email: `${RUN}-p@greenteam-e2e.invalid` }));
+  n = await attempts(async () => {
+    body = await postProfile(otpToken, { name: 'Otp Member', email: `${RUN}-p@greenteam-e2e.invalid` });
+  });
   n === 1 ? ok('welcome fires when the OTP member gives an email') : bad('OTP profile step', `expected 1, saw ${n}`);
+  body?.needsEmail === false
+    ? ok('and the step stops being required once an address is on file')
+    : bad('needsEmail cleared', `expected false, got ${JSON.stringify(body)}`);
   await markDelivered(otp.uid);
 
   n = await attempts(() => postProfile(otpToken, { city: 'Hyderabad' }));
