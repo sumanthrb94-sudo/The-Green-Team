@@ -1,33 +1,35 @@
 'use client';
 
 /**
- * Sign-in modal — mobile number (SMS OTP) first, Google second.
+ * Sign-in / sign-up — built to feel like a native app screen, not a web modal:
+ * full-bleed on a phone, a segmented Sign in / Create account control, a
+ * +91 phone step, and six separate OTP boxes that auto-advance, accept a
+ * pasted code and submit themselves on the sixth digit.
  *
- * Phone leads because this is an Indian property portal: a buyer's mobile
- * number is the identity they actually use, and it's also the one thing the
- * adviser needs. It works inside Instagram/Facebook webviews too (no popup),
- * which is where most of the reel traffic lands. Google stays as the one-tap
- * alternative, with a redirect fallback for blocked popups.
- *
- * Firebase requires an (invisible) reCAPTCHA for web phone auth. The verifier
- * is created lazily on first send and torn down on close/error, because a
- * widget that has already failed once tends to stay stuck.
+ * On the sign-up vs sign-in distinction: Firebase has no safe way to ask
+ * "does this number already exist?" before sending a code — a lookup like that
+ * is an account-enumeration oracle, which is why the SDK does not expose one.
+ * So the toggle sets intent and wording, the same verification runs either way,
+ * and afterwards `getAdditionalUserInfo().isNewUser` tells us authoritatively
+ * what actually happened. If someone picks the wrong one we say so plainly and
+ * carry on rather than making them start again.
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import {
   RecaptchaVerifier,
+  getAdditionalUserInfo,
   signInWithPhoneNumber,
   signInWithPopup,
   signInWithRedirect,
   type ConfirmationResult,
-  type User,
   type UserCredential,
 } from 'firebase/auth';
-import { X, Smartphone, ArrowRight, ChevronLeft } from 'lucide-react';
+import { X, ChevronLeft, ArrowRight, Smartphone } from 'lucide-react';
 import { auth, googleProvider } from '@/lib/firebase/client';
 import { useAuth } from './AuthProvider';
 import { Logo } from '@/components/brand/Logo';
+import { cn } from '@/lib/utils';
 
 const FRIENDLY: Record<string, string> = {
   'auth/popup-closed-by-user': 'Sign-in was cancelled.',
@@ -35,7 +37,7 @@ const FRIENDLY: Record<string, string> = {
   'auth/too-many-requests': 'Too many attempts. Please wait a moment and retry.',
   'auth/network-request-failed': 'Network error — check your connection.',
   'auth/unauthorized-domain': 'This domain is not authorised for sign-in.',
-  'auth/operation-not-allowed': 'This sign-in method is not enabled yet — please use Google for now.',
+  'auth/operation-not-allowed': 'Phone sign-in is not enabled yet — please use Google for now.',
   'auth/invalid-phone-number': "That number doesn't look right — enter a 10-digit mobile number.",
   'auth/missing-phone-number': 'Enter your mobile number first.',
   'auth/invalid-verification-code': "That code isn't right. Check the SMS and try again.",
@@ -43,44 +45,42 @@ const FRIENDLY: Record<string, string> = {
   'auth/quota-exceeded': 'SMS limit reached for now. Please use Google sign-in, or try again later.',
   'auth/captcha-check-failed': 'Verification failed — please try again.',
 };
-const friendly = (code?: string) => (code && FRIENDLY[code]) || 'Something went wrong. Please try again.';
+const friendly = (c?: string) => (c && FRIENDLY[c]) || 'Something went wrong. Please try again.';
 
-const isInAppBrowser = () =>
+const isInApp = () =>
   typeof navigator !== 'undefined' &&
   /Instagram|FBAN|FBAV|LinkedInApp|TikTok|MicroMessenger|Line\//i.test(navigator.userAgent);
 
-const wasNew = (u: User) => u.metadata.creationTime === u.metadata.lastSignInTime;
-
-/** Normalise what an Indian buyer types into E.164, or null if it isn't a mobile number. */
 function toE164India(raw: string): string | null {
   let d = raw.replace(/\D/g, '');
   if (d.length === 12 && d.startsWith('91')) d = d.slice(2);
   if (d.length === 11 && d.startsWith('0')) d = d.slice(1);
   return /^[6-9]\d{9}$/.test(d) ? `+91${d}` : null;
 }
-
-const prettyPhone = (e164: string) => `${e164.slice(0, 3)} ${e164.slice(3, 8)} ${e164.slice(8)}`;
+const pretty = (e: string) => `${e.slice(0, 3)} ${e.slice(3, 8)} ${e.slice(8)}`;
 
 const RECAPTCHA_ID = 'gt-recaptcha';
 const RESEND_SECONDS = 30;
+type Mode = 'signin' | 'signup';
 
 export function AuthModal() {
   const { authModalOpen, closeAuth, onSignedIn } = useAuth();
+  const [mode, setMode] = useState<Mode>('signin');
   const [step, setStep] = useState<'phone' | 'otp'>('phone');
   const [phone, setPhone] = useState('');
   const [e164, setE164] = useState('');
-  const [otp, setOtp] = useState('');
+  const [digits, setDigits] = useState<string[]>(Array(6).fill(''));
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
   const [cooldown, setCooldown] = useState(0);
   const confirmation = useRef<ConfirmationResult | null>(null);
   const verifier = useRef<RecaptchaVerifier | null>(null);
-  const otpInput = useRef<HTMLInputElement>(null);
+  const boxes = useRef<(HTMLInputElement | null)[]>([]);
+  const code = digits.join('');
 
-  const teardownRecaptcha = useCallback(() => {
-    try {
-      verifier.current?.clear();
-    } catch {}
+  const teardown = useCallback(() => {
+    try { verifier.current?.clear(); } catch {}
     verifier.current = null;
   }, []);
 
@@ -88,22 +88,16 @@ export function AuthModal() {
     if (!authModalOpen) return;
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && closeAuth();
     window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    document.body.classList.add('modal-open');
+    return () => { window.removeEventListener('keydown', onKey); document.body.classList.remove('modal-open'); };
   }, [authModalOpen, closeAuth]);
 
-  // Reset everything when the modal closes.
   useEffect(() => {
     if (authModalOpen) return;
-    setStep('phone');
-    setPhone('');
-    setE164('');
-    setOtp('');
-    setError('');
-    setLoading(false);
-    setCooldown(0);
-    confirmation.current = null;
-    teardownRecaptcha();
-  }, [authModalOpen, teardownRecaptcha]);
+    setStep('phone'); setPhone(''); setE164(''); setDigits(Array(6).fill(''));
+    setError(''); setNotice(''); setLoading(false); setCooldown(0);
+    confirmation.current = null; teardown();
+  }, [authModalOpen, teardown]);
 
   useEffect(() => {
     if (cooldown <= 0) return;
@@ -111,184 +105,193 @@ export function AuthModal() {
     return () => clearTimeout(t);
   }, [cooldown]);
 
-  useEffect(() => {
-    if (step === 'otp') setTimeout(() => otpInput.current?.focus(), 50);
-  }, [step]);
+  useEffect(() => { if (step === 'otp') setTimeout(() => boxes.current[0]?.focus(), 80); }, [step]);
 
-  const finish = useCallback(
-    (cred: UserCredential) => onSignedIn(cred.user, wasNew(cred.user)),
-    [onSignedIn]
-  );
+  const finish = useCallback((cred: UserCredential) => {
+    const isNew = getAdditionalUserInfo(cred)?.isNewUser ?? false;
+    // Say plainly when what happened differs from what they picked.
+    if (mode === 'signin' && isNew) setNotice('No account existed for that number, so we created one.');
+    if (mode === 'signup' && !isNew) setNotice('You already had an account — signed you in.');
+    onSignedIn(cred.user, isNew);
+  }, [mode, onSignedIn]);
 
   const getVerifier = () => {
-    if (!verifier.current) {
-      verifier.current = new RecaptchaVerifier(auth, RECAPTCHA_ID, { size: 'invisible' });
-    }
+    if (!verifier.current) verifier.current = new RecaptchaVerifier(auth, RECAPTCHA_ID, { size: 'invisible' });
     return verifier.current;
   };
 
   const sendOtp = async (e?: React.FormEvent) => {
     e?.preventDefault();
-    setError('');
-    const normalised = toE164India(phone);
-    if (!normalised) {
-      setError(FRIENDLY['auth/invalid-phone-number']);
-      return;
-    }
+    setError(''); setNotice('');
+    const n = toE164India(phone);
+    if (!n) { setError(FRIENDLY['auth/invalid-phone-number']); return; }
     setLoading(true);
     try {
-      confirmation.current = await signInWithPhoneNumber(auth, normalised, getVerifier());
-      setE164(normalised);
-      setOtp('');
-      setStep('otp');
-      setCooldown(RESEND_SECONDS);
+      confirmation.current = await signInWithPhoneNumber(auth, n, getVerifier());
+      setE164(n); setDigits(Array(6).fill('')); setStep('otp'); setCooldown(RESEND_SECONDS);
     } catch (err) {
       setError(friendly((err as { code?: string }).code));
-      teardownRecaptcha(); // a failed widget must be rebuilt, not reused
-    } finally {
-      setLoading(false);
-    }
+      teardown();
+    } finally { setLoading(false); }
   };
 
-  const verifyOtp = async (e?: React.FormEvent) => {
-    e?.preventDefault();
-    setError('');
-    const code = otp.replace(/\D/g, '');
-    if (code.length !== 6 || !confirmation.current) {
-      setError(FRIENDLY['auth/invalid-verification-code']);
-      return;
-    }
-    setLoading(true);
+  const verify = useCallback(async (value: string) => {
+    if (value.length !== 6 || !confirmation.current || loading) return;
+    setError(''); setLoading(true);
     try {
-      finish(await confirmation.current.confirm(code));
+      finish(await confirmation.current.confirm(value));
     } catch (err) {
       setError(friendly((err as { code?: string }).code));
-    } finally {
-      setLoading(false);
+      setDigits(Array(6).fill(''));
+      setTimeout(() => boxes.current[0]?.focus(), 50);
+    } finally { setLoading(false); }
+  }, [finish, loading]);
+
+  const setDigit = (i: number, raw: string) => {
+    const v = raw.replace(/\D/g, '');
+    if (!v) { const next = [...digits]; next[i] = ''; setDigits(next); return; }
+    const next = [...digits];
+    if (v.length > 1) {                         // pasted code
+      for (let k = 0; k < 6 - i; k++) next[i + k] = v[k] ?? '';
+      setDigits(next);
+      const last = Math.min(i + v.length, 5);
+      boxes.current[last]?.focus();
+      if (next.join('').length === 6) void verify(next.join(''));
+      return;
     }
+    next[i] = v;
+    setDigits(next);
+    if (i < 5) boxes.current[i + 1]?.focus();
+    if (next.join('').length === 6) void verify(next.join(''));
   };
 
-  const handleGoogle = async () => {
-    setError('');
-    setLoading(true);
+  const onKeyDown = (i: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace' && !digits[i] && i > 0) boxes.current[i - 1]?.focus();
+    if (e.key === 'ArrowLeft' && i > 0) boxes.current[i - 1]?.focus();
+    if (e.key === 'ArrowRight' && i < 5) boxes.current[i + 1]?.focus();
+  };
+
+  const google = async () => {
+    setError(''); setNotice(''); setLoading(true);
     try {
-      if (isInAppBrowser()) {
-        await signInWithRedirect(auth, googleProvider);
-        return;
-      }
+      if (isInApp()) { await signInWithRedirect(auth, googleProvider); return; }
       finish(await signInWithPopup(auth, googleProvider));
     } catch (err) {
-      const code = (err as { code?: string }).code;
-      if (code === 'auth/popup-blocked' || code === 'auth/popup-closed-by-user') {
-        try {
-          await signInWithRedirect(auth, googleProvider);
-          return;
-        } catch {
-          /* fall through */
-        }
+      const c = (err as { code?: string }).code;
+      if (c === 'auth/popup-blocked' || c === 'auth/popup-closed-by-user') {
+        try { await signInWithRedirect(auth, googleProvider); return; } catch {}
       }
-      setError(friendly(code));
-    } finally {
-      setLoading(false);
-    }
+      setError(friendly(c));
+    } finally { setLoading(false); }
   };
 
-  const input =
-    'w-full bg-surface-container border border-outline/20 rounded-2xl py-4 text-on-surface placeholder:text-secondary/40 outline-none focus:border-primary/60 transition-all';
+  const signup = mode === 'signup';
 
   return (
     <AnimatePresence>
       {authModalOpen && (
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[9998] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-md p-0 sm:p-6"
-          onClick={closeAuth}
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          className="fixed inset-0 z-[9998] flex sm:items-center sm:justify-center bg-black/60 sm:backdrop-blur-md sm:p-6"
+          onClick={e => { if (e.target === e.currentTarget) closeAuth(); }}
         >
+          {/* Full-bleed sheet on a phone, a card from `sm` up */}
           <motion.div
-            initial={{ y: 40, scale: 0.98, opacity: 0 }}
-            animate={{ y: 0, scale: 1, opacity: 1 }}
-            exit={{ y: 40, scale: 0.98, opacity: 0 }}
-            transition={{ type: 'spring', damping: 26, stiffness: 300 }}
+            initial={{ y: '100%', opacity: 1 }}
+            animate={{ y: 0 }}
+            exit={{ y: '100%' }}
+            transition={{ type: 'spring', damping: 32, stiffness: 320 }}
             onClick={e => e.stopPropagation()}
-            className="w-full sm:max-w-md bg-surface rounded-t-3xl sm:rounded-3xl overflow-hidden shadow-2xl"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Sign in"
+            role="dialog" aria-modal="true" aria-label={signup ? 'Create account' : 'Sign in'}
+            className="relative w-full h-[100dvh] sm:h-auto sm:max-w-md bg-surface sm:rounded-3xl overflow-y-auto flex flex-col sm:shadow-2xl"
           >
-            <div className="bg-forest-section p-7 sm:p-8 text-white relative overflow-hidden">
-              <div className="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-primary/20 blur-3xl" />
-              <div className="flex items-start justify-between relative">
-                <Logo onDark />
+            <div id={RECAPTCHA_ID} />
+
+            {/* App-style top bar */}
+            <div className="sticky top-0 z-10 flex items-center justify-between px-4 h-14 bg-surface/95 backdrop-blur-xl border-b border-outline/10 flex-shrink-0">
+              {step === 'otp' ? (
                 <button
-                  onClick={closeAuth}
-                  aria-label="Close"
-                  className="p-2 -mr-2 -mt-2 rounded-full hover:bg-white/10 transition-all"
+                  onClick={() => { setStep('phone'); setError(''); }}
+                  aria-label="Back"
+                  className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-on-surface/70 hover:bg-primary/8 transition-colors"
                 >
-                  <X className="w-5 h-5 text-white/70" />
+                  <ChevronLeft className="w-6 h-6" />
                 </button>
-              </div>
-              <p className="mt-7 font-headline font-extrabold tracking-[-0.02em] text-3xl leading-[1.0] text-white">
-                Where the forest
-                <br />
-                <span className="text-[#a3b18a]">becomes home.</span>
-              </p>
+              ) : (
+                <Logo iconOnly />
+              )}
+              <button
+                onClick={closeAuth}
+                aria-label="Close"
+                className="w-10 h-10 -mr-2 rounded-full flex items-center justify-center text-on-surface/60 hover:bg-primary/8 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
-            <div className="p-7 sm:p-8">
-              {/* Firebase mounts the invisible reCAPTCHA here */}
-              <div id={RECAPTCHA_ID} />
-
+            <div className="flex-1 px-6 pt-8 pb-8 flex flex-col">
               {step === 'phone' ? (
                 <>
-                  <h2 className="text-xl font-bold text-on-surface mb-1">Sign in to The Green Team</h2>
-                  <p className="text-sm text-on-surface/50 mb-6">
-                    Your mobile number, one code. Full access to every sanctuary.
+                  {/* Segmented control */}
+                  <div className="grid grid-cols-2 gap-1 p-1 rounded-full bg-surface-container border border-outline/10 mb-8">
+                    {(['signin', 'signup'] as Mode[]).map(m => (
+                      <button
+                        key={m}
+                        onClick={() => { setMode(m); setError(''); setNotice(''); }}
+                        aria-pressed={mode === m}
+                        className={cn(
+                          'py-3 rounded-full text-[11px] uppercase tracking-[0.2em] font-bold transition-all',
+                          mode === m ? 'bg-primary text-on-primary shadow-sm' : 'text-secondary/70',
+                        )}
+                      >
+                        {m === 'signin' ? 'Sign in' : 'Create account'}
+                      </button>
+                    ))}
+                  </div>
+
+                  <h2 className="font-headline font-extrabold tracking-[-0.02em] text-3xl text-on-surface leading-tight">
+                    {signup ? 'Create your account.' : 'Welcome back.'}
+                  </h2>
+                  <p className="text-secondary mt-2.5 mb-8 leading-relaxed">
+                    {signup
+                      ? 'Members see the price of every plot and villament, and can save a shortlist.'
+                      : 'Enter your mobile number and we will text you a code.'}
                   </p>
 
-                  {error && (
-                    <p className="mb-5 text-sm text-error bg-error/10 border border-error/20 rounded-xl px-4 py-3">
-                      {error}
-                    </p>
-                  )}
+                  {error && <p className="mb-5 text-sm text-error bg-error/10 border border-error/20 rounded-2xl px-4 py-3">{error}</p>}
 
-                  <form onSubmit={sendOtp} className="space-y-3">
-                    <div className="relative">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-2 text-sm font-semibold text-on-surface/70 pointer-events-none">
+                  <form onSubmit={sendOtp} className="space-y-4">
+                    <div className="flex items-stretch gap-2">
+                      <span className="flex items-center gap-2 px-4 rounded-2xl bg-surface-container border border-outline/20 text-on-surface font-semibold flex-shrink-0">
                         <Smartphone className="w-4 h-4 text-primary/70" /> +91
                       </span>
                       <input
-                        type="tel"
-                        inputMode="numeric"
-                        autoComplete="tel-national"
+                        type="tel" inputMode="numeric" autoComplete="tel-national" autoFocus
                         aria-label="Mobile number"
                         value={phone}
-                        onChange={e => setPhone(e.target.value.replace(/[^\d\s]/g, '').slice(0, 13))}
+                        onChange={e => setPhone(e.target.value.replace(/[^\d\s]/g, '').slice(0, 12))}
                         placeholder="98765 43210"
-                        className={`${input} pl-[5.25rem] pr-4 text-base tracking-wide`}
+                        className="flex-1 min-w-0 h-16 px-5 rounded-2xl bg-surface-container border border-outline/20 text-xl tracking-wide text-on-surface placeholder:text-secondary/35 outline-none focus:border-primary/60 transition-colors"
                       />
                     </div>
                     <button
-                      type="submit"
-                      disabled={loading}
-                      className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-primary text-on-primary text-[10px] uppercase tracking-[0.35em] font-bold hover:opacity-90 transition-all disabled:opacity-60"
+                      type="submit" disabled={loading}
+                      className="w-full flex items-center justify-center gap-2 h-16 rounded-2xl bg-primary text-on-primary text-[11px] uppercase tracking-[0.3em] font-bold hover:opacity-90 active:scale-[0.99] transition-all disabled:opacity-60"
                     >
-                      {loading ? 'Sending code…' : 'Send OTP'}
+                      {loading ? 'Sending code…' : signup ? 'Create account' : 'Send OTP'}
                       {!loading && <ArrowRight className="w-4 h-4" />}
                     </button>
                   </form>
 
-                  <div className="flex items-center gap-4 my-5">
+                  <div className="flex items-center gap-4 my-7">
                     <span className="flex-1 h-px bg-outline/15" />
                     <span className="text-[9px] uppercase tracking-[0.3em] text-secondary/50 font-bold">or</span>
                     <span className="flex-1 h-px bg-outline/15" />
                   </div>
 
                   <button
-                    onClick={handleGoogle}
-                    disabled={loading}
-                    className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl border border-outline/30 bg-surface-container-low hover:border-primary/50 hover:shadow-md transition-all text-sm font-medium text-on-surface disabled:opacity-60"
+                    onClick={google} disabled={loading}
+                    className="w-full flex items-center justify-center gap-3 h-16 rounded-2xl border border-outline/25 bg-surface-container-low text-sm font-semibold text-on-surface hover:border-primary/40 active:scale-[0.99] transition-all disabled:opacity-60"
                   >
                     <svg className="w-5 h-5" viewBox="0 0 24 24" aria-hidden>
                       <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1Z" />
@@ -296,58 +299,59 @@ export function AuthModal() {
                       <path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84Z" />
                       <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1A11 11 0 0 0 2.18 7.06l3.66 2.84C6.71 7.3 9.14 5.38 12 5.38Z" />
                     </svg>
-                    <span>Continue with Google</span>
+                    Continue with Google
                   </button>
+
+                  <p className="mt-auto pt-8 text-center text-[10px] uppercase tracking-[0.25em] text-secondary/40 leading-relaxed">
+                    By continuing you agree to our terms.
+                    <br />We never spam — only sanctuary intelligence.
+                  </p>
                 </>
               ) : (
                 <>
-                  <button
-                    onClick={() => { setStep('phone'); setError(''); setOtp(''); }}
-                    className="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.25em] font-bold text-secondary/60 hover:text-primary transition-colors mb-4"
-                  >
-                    <ChevronLeft className="w-3.5 h-3.5" /> Change number
-                  </button>
-                  <h2 className="text-xl font-bold text-on-surface mb-1">Enter the code</h2>
-                  <p className="text-sm text-on-surface/50 mb-6">
-                    We sent a 6-digit code by SMS to <span className="font-semibold text-on-surface/80">{prettyPhone(e164)}</span>.
+                  <h2 className="font-headline font-extrabold tracking-[-0.02em] text-3xl text-on-surface leading-tight">
+                    Enter the code.
+                  </h2>
+                  <p className="text-secondary mt-2.5 mb-8">
+                    Sent by SMS to <span className="font-semibold text-on-surface">{pretty(e164)}</span>.
                   </p>
 
-                  {error && (
-                    <p className="mb-5 text-sm text-error bg-error/10 border border-error/20 rounded-xl px-4 py-3">
-                      {error}
-                    </p>
-                  )}
+                  {error && <p className="mb-5 text-sm text-error bg-error/10 border border-error/20 rounded-2xl px-4 py-3">{error}</p>}
 
-                  <form onSubmit={verifyOtp} className="space-y-3">
-                    <input
-                      ref={otpInput}
-                      type="text"
-                      inputMode="numeric"
-                      autoComplete="one-time-code"
-                      aria-label="6-digit code"
-                      value={otp}
-                      onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                      placeholder="••••••"
-                      className={`${input} px-4 text-center text-2xl font-headline font-extrabold tracking-[0.5em]`}
-                    />
-                    <button
-                      type="submit"
-                      disabled={loading || otp.length !== 6}
-                      className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-primary text-on-primary text-[10px] uppercase tracking-[0.35em] font-bold hover:opacity-90 transition-all disabled:opacity-50"
-                    >
-                      {loading ? 'Verifying…' : 'Verify & continue'}
-                    </button>
-                  </form>
+                  {/* Six boxes: auto-advance, paste-aware, self-submitting */}
+                  <div className="flex gap-2 justify-between" onPaste={e => { e.preventDefault(); setDigit(0, e.clipboardData.getData('text')); }}>
+                    {digits.map((d, i) => (
+                      <input
+                        key={i}
+                        ref={el => { boxes.current[i] = el; }}
+                        value={d}
+                        onChange={e => setDigit(i, e.target.value)}
+                        onKeyDown={e => onKeyDown(i, e)}
+                        onFocus={e => e.target.select()}
+                        type="tel" inputMode="numeric"
+                        autoComplete={i === 0 ? 'one-time-code' : 'off'}
+                        maxLength={6}
+                        aria-label={`Digit ${i + 1}`}
+                        className={cn(
+                          'w-full aspect-square min-w-0 rounded-2xl border text-center text-2xl font-headline font-extrabold text-on-surface bg-surface-container outline-none transition-all',
+                          d ? 'border-primary/60' : 'border-outline/20',
+                          'focus:border-primary focus:ring-4 focus:ring-primary/10',
+                        )}
+                      />
+                    ))}
+                  </div>
 
-                  <p className="mt-5 text-center text-sm text-secondary/70">
-                    {cooldown > 0 ? (
-                      <>Resend code in {cooldown}s</>
-                    ) : (
-                      <button
-                        onClick={() => sendOtp()}
-                        disabled={loading}
-                        className="font-semibold text-primary hover:underline underline-offset-4 disabled:opacity-60"
-                      >
+                  <button
+                    onClick={() => void verify(code)}
+                    disabled={loading || code.length !== 6}
+                    className="w-full h-16 mt-6 rounded-2xl bg-primary text-on-primary text-[11px] uppercase tracking-[0.3em] font-bold hover:opacity-90 active:scale-[0.99] transition-all disabled:opacity-40"
+                  >
+                    {loading ? 'Verifying…' : signup ? 'Create account' : 'Verify & sign in'}
+                  </button>
+
+                  <p className="mt-6 text-center text-sm text-secondary/70">
+                    {cooldown > 0 ? `Resend code in ${cooldown}s` : (
+                      <button onClick={() => sendOtp()} disabled={loading} className="font-semibold text-primary hover:underline underline-offset-4 disabled:opacity-60">
                         Resend code
                       </button>
                     )}
@@ -355,11 +359,9 @@ export function AuthModal() {
                 </>
               )}
 
-              <p className="mt-6 text-center text-[9px] uppercase tracking-[0.3em] text-on-surface/25 leading-relaxed">
-                By continuing, you agree to our terms.
-                <br />
-                We never spam — only sanctuary intelligence.
-              </p>
+              {notice && (
+                <p className="mt-6 text-sm text-primary bg-primary/8 border border-primary/20 rounded-2xl px-4 py-3">{notice}</p>
+              )}
             </div>
           </motion.div>
         </motion.div>
