@@ -5,6 +5,7 @@
  * decided here (ADMIN_EMAILS env) — never in the browser.
  */
 import 'server-only';
+import { cache } from 'react';
 import { cookies } from 'next/headers';
 import { adminAuth, isAdminEmail } from '@/lib/firebase/admin';
 
@@ -26,7 +27,13 @@ export async function createSessionCookie(idToken: string) {
   return { cookie, expiresIn, decoded };
 }
 
-export async function getSessionUser(): Promise<SessionUser | null> {
+/**
+ * Deduplicated per render pass. A single admin navigation asks for the session
+ * three times — the layout, the page, and each data reader's requireAdmin() —
+ * and `cache` collapses those into one cookie read and one verification instead
+ * of repeating identical work three times for the same request.
+ */
+export const getSessionUser = cache(async function getSessionUser(): Promise<SessionUser | null> {
   // Dev-only documentation mode — never active in production builds.
   if (process.env.NODE_ENV === 'development' && process.env.DEMO_ADMIN === '1') {
     return { uid: 'demo-admin', email: 'admin@demo.local', name: 'Demo Admin', picture: null, isAdmin: true };
@@ -46,7 +53,7 @@ export async function getSessionUser(): Promise<SessionUser | null> {
   } catch {
     return null;
   }
-}
+});
 
 export async function requireAdmin(): Promise<SessionUser> {
   const user = await getSessionUser();

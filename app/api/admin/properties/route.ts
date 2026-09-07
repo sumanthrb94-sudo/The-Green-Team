@@ -1,3 +1,4 @@
+import { revalidateTag } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
 import { adminDb } from '@/lib/firebase/admin';
@@ -19,5 +20,8 @@ export async function POST(req: NextRequest) {
   const ref = await adminDb()
     .collection('properties')
     .add({ ...sanitizePropertyInput(body), createdAt: FieldValue.serverTimestamp() });
+  // The admin lists are cached for 30s; an admin must never watch
+  // their own edit reappear as the old value.
+  revalidateTag('admin', 'max');
   return NextResponse.json({ ok: true, id: ref.id });
 }

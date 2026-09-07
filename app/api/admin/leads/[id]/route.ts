@@ -1,3 +1,4 @@
+import { revalidateTag } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
 import { adminDb } from '@/lib/firebase/admin';
 import { requireAdmin } from '@/lib/server/session';
@@ -16,5 +17,8 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
   const { status } = await req.json();
   if (!STATUSES.has(status)) return NextResponse.json({ error: 'bad status' }, { status: 400 });
   await adminDb().collection('leads').doc(id).update({ status });
+  // The admin lists are cached for 30s; an admin must never watch
+  // their own edit reappear as the old value.
+  revalidateTag('admin', 'max');
   return NextResponse.json({ ok: true });
 }

@@ -1,3 +1,4 @@
+import { revalidateTag } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
 import { adminDb } from '@/lib/firebase/admin';
 import { requireAdmin } from '@/lib/server/session';
@@ -16,6 +17,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'bad request' }, { status: 400 });
     }
     await adminDb().collection('reviews').doc(String(id)).update({ status });
+    // The admin lists are cached for 30s; an admin must never watch
+    // their own edit reappear as the old value.
+    revalidateTag('admin', 'max');
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: 'failed' }, { status: 500 });
