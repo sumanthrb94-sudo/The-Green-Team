@@ -58,9 +58,10 @@ export default function TermsPage() {
             </a>
           </p>
           <p>
-            Each project on this site carries its own RERA registration number on its page. You
-            should verify a project&rsquo;s registration on the authority&rsquo;s website before you
-            pay anything to anyone. Do not rely on a number printed by us; rely on the register.
+            Where a project holds a RERA registration, its number is shown on that project&rsquo;s
+            page. Verify it on the authority&rsquo;s website before you pay anything to anyone — do
+            not rely on a number printed by us, rely on the register. Where no number is shown, ask
+            us and we will tell you the project&rsquo;s registration status plainly.
           </p>
         </Clause>
 

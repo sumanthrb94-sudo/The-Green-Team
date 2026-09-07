@@ -27,7 +27,10 @@ export const LEGAL = {
   /**
    * Telangana RERA agent registration. A real-estate agent may not facilitate
    * the sale of a RERA-registered project without one (RERA 2016, s.9), and
-   * every advertisement must carry it.
+   * every advertisement must carry it. Operating without it costs ₹10,000 a day
+   * up to 5% of the value of each unit whose sale was facilitated (s.62).
+   *
+   * How to obtain it: docs/rera-agent-registration.md
    */
   reraAgentRegNo: TBD,
   reraAuthority: 'Telangana Real Estate Regulatory Authority (TG-RERA)',
