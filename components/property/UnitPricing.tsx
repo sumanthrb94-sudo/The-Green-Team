@@ -21,6 +21,7 @@ import { Lock, Star, ArrowRight } from 'lucide-react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { sendEvent } from '@/lib/analytics/beacon';
 import { GATE_INTENT_KEY } from '@/lib/analytics/gate-intent';
+import { clarityEvent, clarityUpgrade } from '@/lib/analytics/clarity';
 import { formatRs } from '@/lib/utils';
 
 interface UnitRow {
@@ -72,7 +73,13 @@ export function UnitPricing({
   // One impression per property view, so the funnel counts people reaching the
   // gate against people who sign in rather than counting re-renders.
   useEffect(() => {
-    if (authReady && !user) sendEvent('pricing_gate_view', { propertyId: sanctuaryId });
+    if (!authReady || user) return;
+    sendEvent('pricing_gate_view', { propertyId: sanctuaryId });
+    // Seven real visitors reached this gate last week and none of them got
+    // through it. Those are the sessions to watch, so keep every one of them
+    // rather than letting Clarity's sampling decide.
+    clarityEvent('pricing_gate_view');
+    clarityUpgrade(`pricing_gate:${sanctuaryId}`);
   }, [authReady, user, sanctuaryId]);
 
   const onSignIn = useCallback(() => {

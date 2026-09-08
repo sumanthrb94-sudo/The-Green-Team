@@ -18,6 +18,7 @@ import { onAuthStateChanged, getRedirectResult, signOut, type User } from 'fireb
 import { auth } from '@/lib/firebase/client';
 import { attribution } from '@/lib/analytics/attribution';
 import { setAnalyticsUid } from '@/lib/analytics/beacon';
+import { setClarityIdentity } from '@/lib/analytics/clarity';
 import { takeGateIntent } from '@/lib/analytics/gate-intent';
 
 interface AuthContextValue {
@@ -134,6 +135,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // sign-out so a shared device does not attribute the next person's
       // browsing to whoever used it last.
       setAnalyticsUid(u?.uid);
+      setClarityIdentity(u?.uid, u?.displayName);
       if (u && !sessionExchanged.current) {
         sessionExchanged.current = true;
         void exchangeSession(u);

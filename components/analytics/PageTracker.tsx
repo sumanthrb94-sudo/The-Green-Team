@@ -19,6 +19,7 @@ import { consumeNewVisitor, send, sendEvent, sessionId, visitorId } from '@/lib/
 import { recordTouch } from '@/lib/analytics/attribution';
 import { sessionRef, withRef } from '@/lib/analytics/ref';
 import { onConsentChange } from '@/lib/consent';
+import { clarityEvent, clarityTag, clarityUpgrade } from '@/lib/analytics/clarity';
 
 /** Activity older than this stops the engagement clock. */
 const IDLE_MS = 30_000;
@@ -273,6 +274,12 @@ function ClickTracker() {
         sendEvent('whatsapp_click', {
           meta: { href: href.slice(0, 120), ...(ref ? { ref } : {}) },
         });
+        // The single highest-intent act on this site, and the one that leaves.
+        // Keep the recording and make it findable by the same code the message
+        // carries, so the trace and the replay open from one reference.
+        clarityEvent('whatsapp_click');
+        clarityUpgrade('whatsapp_click');
+        if (ref) clarityTag('gt_ref', ref);
       } else if (href.startsWith('tel:')) {
         sendEvent('phone_click');
       } else if (href.startsWith('mailto:')) {

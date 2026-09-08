@@ -24,6 +24,7 @@
     "email": "email dev --dir emails --port 3030"
   },
   "dependencies": {
+    "@microsoft/clarity": "^1.0.2",
     "@react-email/components": "^1.0.12",
     "@react-email/render": "^2.1.0",
     "clsx": "^2.1.1",

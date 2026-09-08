@@ -12,6 +12,9 @@
  */
 
 import { sendEvent } from '@/lib/analytics/beacon';
+import { clarityEvent, clarityTag, clarityUpgrade } from '@/lib/analytics/clarity';
+
+export { clarityTag };
 
 export const GA_ID = process.env.NEXT_PUBLIC_GA_ID ?? '';
 export const CLARITY_ID = process.env.NEXT_PUBLIC_CLARITY_ID ?? '';
@@ -103,21 +106,16 @@ export const track = {
 };
 
 /**
- * Tell Clarity about a conversion so sessions can be filtered by it — the
- * point of a heatmap tool is watching the sessions that converted (and the
- * ones that nearly did), not the average of all of them.
- */
-export function clarityTag(key: string, value: string) {
-  if (typeof window === 'undefined' || !window.clarity) return;
-  try {
-    window.clarity('set', key, value);
-  } catch {
-    /* never let session tagging break a form submit */
-  }
-}
-
-/**
  * Mark the current Clarity session as converted. Call alongside the matching
  * `track.*` event on a form's success path.
+ *
+ * Both a tag and an event: the tag makes the session findable by filter, the
+ * event makes it show up in Clarity's own conversion reporting. And an upgrade,
+ * because Clarity samples — on a site with a dozen real visitors a week, the
+ * one session that converted is the only one worth keeping.
  */
-export const markConverted = (kind: string) => clarityTag('converted', kind);
+export const markConverted = (kind: string) => {
+  clarityTag('converted', kind);
+  clarityEvent(`converted_${kind}`);
+  clarityUpgrade(`converted:${kind}`);
+};

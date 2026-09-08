@@ -17,6 +17,7 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 import { GA_ID, CLARITY_ID } from '@/lib/analytics';
 import { readConsent, onConsentChange } from '@/lib/consent';
+import { identifyCurrent, startClarity, stopClarity } from '@/lib/analytics/clarity';
 
 /**
  * The App Router does not fire a browser navigation between routes, so GA4's
@@ -35,6 +36,40 @@ function RouteChangeReporter() {
       page_title: document.title,
     });
   }, [pathname, searchParams]);
+
+  return null;
+}
+
+/**
+ * Clarity's lifecycle, kept apart from GA4's because it is genuinely different:
+ * GA4 is a script tag that only needs to be emitted, while Clarity is an API
+ * that has to be started, told who the visitor is on every page, and told to
+ * stop if consent is withdrawn.
+ */
+function ClarityLoader() {
+  const pathname = usePathname();
+
+  useEffect(() => {
+    startClarity();
+    // Withdrawing consent mid-session must actually stop the recorder rather
+    // than just stopping the next page from starting it.
+    return onConsentChange(state => (state === 'granted' ? startClarity() : stopClarity()));
+  }, []);
+
+  useEffect(() => {
+    // Crossing into /admin on a client-side navigation, with the recorder
+    // already running from a public page, is the one way customer names and
+    // phone numbers could reach Microsoft. startClarity's check only fires at
+    // start, so the boundary is enforced again on every route change.
+    if (pathname.startsWith('/admin')) {
+      stopClarity();
+      return;
+    }
+    startClarity();
+    // Re-asserted per route, per Microsoft's guidance. The identity itself is
+    // pushed in by AuthProvider — see setClarityIdentity for why it is not a hook.
+    identifyCurrent();
+  }, [pathname]);
 
   return null;
 }
@@ -82,17 +117,13 @@ export function Analytics() {
         </>
       )}
 
-      {CLARITY_ID && (
-        <Script id="clarity-init" strategy="afterInteractive">
-          {`
-            (function(c,l,a,r,i,t,y){
-              c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-              t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-              y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-            })(window, document, "clarity", "script", "${CLARITY_ID}");
-          `}
-        </Script>
-      )}
+      {/* Clarity is loaded through @microsoft/clarity rather than an inline
+          snippet. The snippet only starts it; the package's typed API is what
+          lets a recording be tagged with our own session reference, named with
+          the member behind it, and prioritised when the visitor shows intent —
+          which is the difference between a pile of videos and something a
+          WhatsApp message can be traced into. */}
+      {CLARITY_ID && <ClarityLoader />}
     </>
   );
 }
