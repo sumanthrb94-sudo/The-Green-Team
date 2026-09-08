@@ -16,6 +16,9 @@ import {
 } from 'react';
 import { onAuthStateChanged, getRedirectResult, signOut, type User } from 'firebase/auth';
 import { auth } from '@/lib/firebase/client';
+import { attribution } from '@/lib/analytics/attribution';
+import { setAnalyticsUid } from '@/lib/analytics/beacon';
+import { takeGateIntent } from '@/lib/analytics/gate-intent';
 
 interface AuthContextValue {
   user: User | null;
@@ -100,8 +103,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               name: u.displayName || 'New User',
               email: u.email || undefined,
               phone: u.phoneNumber || undefined,
-              intent: 'New Sign-up',
+              intent: takeGateIntent() ?? 'New Sign-up',
               source: 'signup',
+              // Which channel found this member. Without it every account
+              // reads as 'signup' and the marketing spend that produced it is
+              // invisible.
+              attribution: attribution(),
             }),
           }).catch(() => {});
         }
@@ -123,6 +130,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const unsub = onAuthStateChanged(auth, u => {
       setUser(u);
       setAuthReady(true);
+      // Label subsequent analytics rows with the member, and clear the label on
+      // sign-out so a shared device does not attribute the next person's
+      // browsing to whoever used it last.
+      setAnalyticsUid(u?.uid);
       if (u && !sessionExchanged.current) {
         sessionExchanged.current = true;
         void exchangeSession(u);

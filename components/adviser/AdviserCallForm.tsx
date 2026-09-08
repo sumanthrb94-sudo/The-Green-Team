@@ -9,6 +9,7 @@ import { useState } from 'react';
 import { Check, Phone } from 'lucide-react';
 import { INVESTMENT_BRACKETS } from '@/lib/data/contact';
 import { track, markConverted } from '@/lib/analytics';
+import { attribution } from '@/lib/analytics/attribution';
 import { cn } from '@/lib/utils';
 import { CollectionNotice } from '@/components/legal/CollectionNotice';
 
@@ -40,6 +41,7 @@ export function AdviserCallForm({
           phone,
           intent: bracket ? `Budget: ${bracket}` : 'Adviser call request',
           source: 'adviser-call',
+          attribution: attribution(),
         }),
       });
       if (!res.ok) throw new Error();

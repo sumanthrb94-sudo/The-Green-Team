@@ -14,6 +14,7 @@
  * never stores a raw IP.
  */
 import { readConsent } from '@/lib/consent';
+import { sessionRef } from './ref';
 import type { TrackPayload } from './types';
 
 const VID_KEY = 'gt_vid';
@@ -44,6 +45,24 @@ const write = (store: Storage, k: string, v: string) => {
 };
 
 let freshVisitor = false;
+
+/**
+ * The signed-in member's uid, if there is one.
+ *
+ * Held in module scope and set by AuthProvider rather than read from Firebase
+ * here, so this file stays free of the auth SDK and keeps working on pages that
+ * never load it. An anonymous visitor simply has none, and nothing about the
+ * pipeline changes.
+ *
+ * What it buys: without it, an adviser can see that somebody read the Agartha
+ * page four times this week but not that it was the member they are about to
+ * call. That link is the entire difference between a traffic report and a call
+ * list, on a site where a hundred visitors a month is a good month.
+ */
+let currentUid = '';
+export const setAnalyticsUid = (uid: string | null | undefined) => {
+  currentUid = uid ?? '';
+};
 
 export function visitorId(): string {
   if (typeof window === 'undefined') return '';
@@ -88,9 +107,23 @@ export function send(payload: TrackPayload): void {
   // Never record the operator's own admin browsing — self-traffic would
   // otherwise dominate the numbers on a site this size and make every report
   // useless. Checked here so no call site can forget.
+  //
+  // Both the current location AND the payload's own path, because they differ
+  // exactly when it matters: a pageview is flushed on route change, by which
+  // point window.location is already the *new* page. Guarding on location
+  // alone let every admin page leak into the visitor numbers on the way out —
+  // which is how /admin/newsletter ended up in the live feed.
   if (window.location.pathname.startsWith('/admin')) return;
+  if (payload.path?.startsWith('/admin')) return;
   try {
-    const body = JSON.stringify(payload);
+    // Stamped centrally rather than at each call site: the reference is only
+    // useful if *every* event of the session carries it, so that a code pasted
+    // from WhatsApp replays the whole visit and not just the tap.
+    const body = JSON.stringify({
+      ref: sessionRef() || undefined,
+      uid: currentUid || undefined,
+      ...payload,
+    });
     if (navigator.sendBeacon) {
       navigator.sendBeacon('/api/track', new Blob([body], { type: 'application/json' }));
       return;

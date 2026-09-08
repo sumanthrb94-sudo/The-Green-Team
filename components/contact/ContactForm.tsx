@@ -14,6 +14,7 @@ import { useState } from 'react';
 import { Check, Send, Phone } from 'lucide-react';
 import { INVESTMENT_BRACKETS, WHATSAPP, BUSINESS } from '@/lib/data/contact';
 import { track, markConverted } from '@/lib/analytics';
+import { attribution } from '@/lib/analytics/attribution';
 import { CollectionNotice } from '@/components/legal/CollectionNotice';
 import { cn } from '@/lib/utils';
 
@@ -78,7 +79,7 @@ export function ContactForm({
       const res = await fetch('/api/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, phone, email, intent, source }),
+        body: JSON.stringify({ name, phone, email, intent, source, attribution: attribution() }),
       });
       if (!res.ok) throw new Error();
       track.lead(source, bracket || undefined);

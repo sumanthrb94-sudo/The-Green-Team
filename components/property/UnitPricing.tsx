@@ -20,6 +20,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Lock, Star, ArrowRight } from 'lucide-react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { sendEvent } from '@/lib/analytics/beacon';
+import { GATE_INTENT_KEY } from '@/lib/analytics/gate-intent';
 import { formatRs } from '@/lib/utils';
 
 interface UnitRow {
@@ -76,6 +77,15 @@ export function UnitPricing({
 
   const onSignIn = useCallback(() => {
     sendEvent('pricing_gate_signin_click', { propertyId: sanctuaryId });
+    // Remember what they were trying to price. Without this the lead written on
+    // sign-up says only "New Sign-up", so the adviser who calls has no idea the
+    // person was standing in front of the Agartha price sheet thirty seconds
+    // earlier — which is the single most useful thing to know on that call.
+    try {
+      sessionStorage.setItem(GATE_INTENT_KEY, sanctuaryId);
+    } catch {
+      /* storage disabled — the lead just keeps its generic intent */
+    }
     openAuth();
   }, [openAuth, sanctuaryId]);
 

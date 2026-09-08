@@ -2,6 +2,7 @@ import 'server-only';
 import { Timestamp } from 'firebase-admin/firestore';
 import { adminDb } from '@/lib/firebase/admin';
 import { requireAdmin } from '@/lib/server/session';
+import { isRef } from '@/lib/analytics/ref';
 import type { DeviceKind } from '@/lib/analytics/types';
 
 /**
@@ -45,6 +46,35 @@ export interface Row {
   avgScrollPct?: number;
 }
 
+/**
+ * One person, as far as this site can tell.
+ *
+ * `vid` is a random first-party id, not an identity. `uid` is only present when
+ * the visitor was signed in at the time, and it is the thing that turns
+ * "someone looked at Agartha four times" into "this member did" — which is the
+ * difference between a statistic and a call worth making.
+ */
+export interface VisitorRow {
+  vid: string;
+  uid?: string;
+  /** ISO. Full timestamps, year included — a returning buyer is the signal. */
+  firstSeen: string;
+  lastSeen: string;
+  sessions: number;
+  pageviews: number;
+  engagedSec: number;
+  city: string;
+  country: string;
+  device: string;
+  channel: string;
+  /** Most-viewed property, when there is one. */
+  focus?: string;
+  /** Conversion events this visitor fired, e.g. ['whatsapp_click']. */
+  did: string[];
+  /** Latest session reference, for the trace lookup. */
+  ref?: string;
+}
+
 export interface AnalyticsSummary {
   rangeDays: number;
   from: string;
@@ -82,10 +112,46 @@ export interface AnalyticsSummary {
   /** Property page attention, richest signal for this business. */
   properties: Row[];
   funnel: { step: string; count: number; pct: number }[];
+  /**
+   * The pricing gate, counted in people. This is the sharpest funnel on the
+   * site — everything above it is interest, and this is the step where interest
+   * either becomes a contactable member or walks away — so it is reported
+   * separately rather than being averaged into the buyer funnel.
+   */
+  gate: { views: number; signInClicks: number; unlocked: number };
+  /**
+   * Where on a page people actually stop. Two independent measures, because
+   * each lies on its own: scroll depth says how far down they got but not
+   * whether they read anything, and section dwell says where the time went but
+   * not whether they ever reached the bottom.
+   */
+  attention: {
+    path: string;
+    samples: number;
+    /** Share of visits reaching each quarter of the page, 0-100. */
+    depth: [number, number, number, number];
+    /** Named sections by mean engaged seconds, hottest first. */
+    sections: { id: string; avgSec: number; samples: number }[];
+  }[];
+  /**
+   * The visitor list behind every number above. Named `people` because
+   * `visitors` is already the count — and because that is what these are.
+   */
+  people: VisitorRow[];
   /** Distinct visitors seen in the last 5 minutes. */
   liveVisitors: number;
   /** Most recent activity, newest first. */
-  recent: { at: string; path: string; name: string; city: string; country: string; device: string; channel: string }[];
+  recent: {
+    at: string;
+    path: string;
+    name: string;
+    city: string;
+    country: string;
+    device: string;
+    channel: string;
+    /** Session reference, so a row in the feed opens as a full trace. */
+    ref?: string;
+  }[];
 }
 
 interface Ev {
@@ -99,6 +165,7 @@ interface Ev {
   scrollPct: number;
   sid: string;
   vid: string;
+  uid?: string;
   newVisitor: boolean;
   device: DeviceKind;
   browser: string;
@@ -107,6 +174,8 @@ interface Ev {
   region: string;
   city: string;
   propertyId?: string;
+  ref?: string;
+  meta?: Record<string, string | number>;
   bot: boolean;
   at: Date;
 }
@@ -171,6 +240,7 @@ async function loadRange(from: Date, to: Date): Promise<Ev[]> {
       scrollPct: Number(x.scrollPct ?? 0),
       sid: String(x.sid ?? ''),
       vid: String(x.vid ?? ''),
+      uid: x.uid ? String(x.uid) : undefined,
       newVisitor: x.newVisitor === true,
       device: (x.device ?? 'desktop') as DeviceKind,
       browser: String(x.browser ?? 'Other'),
@@ -179,10 +249,159 @@ async function loadRange(from: Date, to: Date): Promise<Ev[]> {
       region: String(x.region ?? 'Unknown'),
       city: String(x.city ?? 'Unknown'),
       propertyId: x.propertyId ? String(x.propertyId) : undefined,
+      ref: x.ref ? String(x.ref) : undefined,
+      meta: (x.meta ?? undefined) as Record<string, string | number> | undefined,
       bot: x.bot === true,
       at: x.at?.toDate?.() ?? new Date(0),
     };
   });
+}
+
+/**
+ * Per-page attention profile.
+ *
+ * The depth buckets are cumulative reach, not a histogram: "68% of visits got
+ * at least halfway". That is the number that tells you whether the thing you
+ * put at 70% of the page is being seen at all, which a histogram of stopping
+ * points does not.
+ */
+function buildAttention(pageviews: Ev[], dwell: Ev[]): AnalyticsSummary['attention'] {
+  const pages = new Map<string, { depth: [number, number, number, number]; n: number }>();
+  for (const e of pageviews) {
+    let p = pages.get(e.path);
+    if (!p) pages.set(e.path, (p = { depth: [0, 0, 0, 0], n: 0 }));
+    p.n++;
+    // A visit that reached 80% also reached 25, 50 and 75.
+    if (e.scrollPct >= 25) p.depth[0]++;
+    if (e.scrollPct >= 50) p.depth[1]++;
+    if (e.scrollPct >= 75) p.depth[2]++;
+    if (e.scrollPct >= 95) p.depth[3]++;
+  }
+
+  // Section dwell arrives as one event per section with meta { s, ms }.
+  const sections = new Map<string, Map<string, { ms: number; n: number }>>();
+  for (const e of dwell) {
+    const id = String(e.meta?.s ?? '').slice(0, 40);
+    const ms = Number(e.meta?.ms ?? 0);
+    if (!id || !Number.isFinite(ms) || ms <= 0) continue;
+    let byPage = sections.get(e.path);
+    if (!byPage) sections.set(e.path, (byPage = new Map()));
+    const cur = byPage.get(id) ?? { ms: 0, n: 0 };
+    cur.ms += ms;
+    cur.n++;
+    byPage.set(id, cur);
+  }
+
+  return [...pages.entries()]
+    .sort((a, b) => b[1].n - a[1].n)
+    .slice(0, 8)
+    .map(([path, p]) => ({
+      path,
+      samples: p.n,
+      depth: p.depth.map(c => Math.round((c / p.n) * 100)) as [number, number, number, number],
+      sections: [...(sections.get(path) ?? new Map()).entries()]
+        .map(([id, s]) => ({ id, avgSec: Math.round(s.ms / s.n / 1000), samples: s.n }))
+        .sort((a, b) => b.avgSec - a.avgSec)
+        .slice(0, 10),
+    }));
+}
+
+/** Roll every event up to the person who fired it. */
+function buildVisitors(events: Ev[]): VisitorRow[] {
+  const CONVERSIONS = new Set([
+    'whatsapp_click',
+    'chat_open',
+    'generate_lead',
+    'site_visit',
+    'sign_up',
+    'phone_click',
+    'pricing_unlocked',
+  ]);
+
+  const acc = new Map<
+    string,
+    {
+      uid?: string;
+      first: Date;
+      last: Date;
+      sids: Set<string>;
+      views: number;
+      ms: number;
+      city: string;
+      country: string;
+      device: string;
+      channel: string;
+      props: Map<string, number>;
+      did: Set<string>;
+      ref?: string;
+    }
+  >();
+
+  // Events arrive newest-first, so the first row seen for a visitor is their
+  // latest — which is what should win for city, device, channel and ref.
+  for (const e of events) {
+    if (!e.vid) continue;
+    let a = acc.get(e.vid);
+    if (!a) {
+      acc.set(
+        e.vid,
+        (a = {
+          uid: e.uid,
+          first: e.at,
+          last: e.at,
+          sids: new Set(),
+          views: 0,
+          ms: 0,
+          city: e.city,
+          country: e.country,
+          device: e.device,
+          channel: e.channel,
+          props: new Map(),
+          did: new Set(),
+          ref: e.ref,
+        })
+      );
+    }
+    if (e.uid && !a.uid) a.uid = e.uid;
+    if (e.ref && !a.ref) a.ref = e.ref;
+    if (e.at < a.first) a.first = e.at;
+    if (e.at > a.last) a.last = e.at;
+    a.sids.add(e.sid);
+    if (e.type === 'pageview') {
+      a.views++;
+      a.ms += e.engagedMs;
+    }
+    // A channel is only meaningful when it is not the fallback.
+    if (a.channel === 'Direct' && e.channel !== 'Direct') a.channel = e.channel;
+    if (a.city === 'Unknown' && e.city !== 'Unknown') a.city = e.city;
+    const prop = e.propertyId ?? (e.path.startsWith('/sanctuaries/') ? e.path.split('/')[2] : '');
+    if (prop) a.props.set(prop, (a.props.get(prop) ?? 0) + 1);
+    if (CONVERSIONS.has(e.name)) a.did.add(e.name);
+  }
+
+  return [...acc.entries()]
+    .map(([vid, a]) => ({
+      vid,
+      ...(a.uid ? { uid: a.uid } : {}),
+      firstSeen: a.first.toISOString(),
+      lastSeen: a.last.toISOString(),
+      sessions: a.sids.size,
+      pageviews: a.views,
+      engagedSec: Math.round(a.ms / 1000),
+      city: a.city,
+      country: a.country,
+      device: a.device,
+      channel: a.channel,
+      ...(a.props.size
+        ? { focus: [...a.props.entries()].sort((x, y) => y[1] - x[1])[0][0] }
+        : {}),
+      did: [...a.did],
+      ...(a.ref ? { ref: a.ref } : {}),
+    }))
+    // Most engaged first: for a business with 84 visitors a month, the person
+    // who spent eleven minutes reading Agartha is the whole report.
+    .sort((x, y) => y.engagedSec - x.engagedSec || y.pageviews - x.pageviews)
+    .slice(0, 100);
 }
 
 /** Conversion steps in funnel order, widest first. */
@@ -267,6 +486,21 @@ export async function getAnalytics(rangeDays = 30): Promise<AnalyticsSummary> {
   const propertyOf = (e: Ev) =>
     e.propertyId ?? (e.path.startsWith('/sanctuaries/') ? e.path.split('/')[2] : undefined);
 
+  // Gate funnel, counted in people. Hits would be misleading here: the unlock
+  // event fires on every page load once someone is signed in, so nine
+  // `pricing_unlocked` events can be — and currently are — one member.
+  const peopleWho = (name: string) =>
+    new Set(events.filter(e => e.name === name).map(e => e.vid)).size;
+  const gate = {
+    views: peopleWho('pricing_gate_view'),
+    signInClicks: peopleWho('pricing_gate_signin_click'),
+    unlocked: peopleWho('pricing_unlocked'),
+  };
+
+  // Attention: scroll-depth distribution plus named-section dwell, per page.
+  const attention = buildAttention(pageviews, events.filter(e => e.name === 'section_dwell'));
+  const visitorRows = buildVisitors(events);
+
   const summary: AnalyticsSummary = {
     rangeDays: days,
     from: from.toISOString(),
@@ -322,9 +556,13 @@ export async function getAnalytics(rangeDays = 30): Promise<AnalyticsSummary> {
       pct: funnelTop ? Math.round((f.count / funnelTop) * 100) : 0,
     })),
 
+    gate,
+    attention,
+    people: visitorRows,
+
     liveVisitors: new Set(events.filter(e => e.at.getTime() > liveCutoff).map(e => e.vid)).size,
 
-    recent: events.slice(0, 40).map(e => ({
+    recent: events.slice(0, 60).map(e => ({
       at: e.at.toISOString(),
       path: e.path,
       name: e.type === 'pageview' ? 'pageview' : e.name,
@@ -332,9 +570,199 @@ export async function getAnalytics(rangeDays = 30): Promise<AnalyticsSummary> {
       country: e.country,
       device: e.device,
       channel: e.channel,
+      ...(e.ref ? { ref: e.ref } : {}),
     })),
   };
 
   cache.set(days, { at: Date.now(), data: summary });
   return summary;
+}
+
+/* ────────────────────────────────────────────────────────────────────────── */
+/* Session trace — one visit, in order.                                       */
+/* ────────────────────────────────────────────────────────────────────────── */
+
+export interface TraceStep {
+  at: string;
+  kind: 'pageview' | 'event';
+  name: string;
+  path: string;
+  title?: string;
+  engagedSec: number;
+  scrollPct: number;
+  /** Seconds since the step before it, so gaps are visible. */
+  gapSec: number;
+  meta?: Record<string, string | number>;
+}
+
+export interface SessionTrace {
+  found: boolean;
+  /** What was searched for, normalised. */
+  query: string;
+  ref?: string;
+  sid?: string;
+  vid?: string;
+  uid?: string;
+  startedAt?: string;
+  endedAt?: string;
+  durationSec?: number;
+  engagedSec?: number;
+  city?: string;
+  country?: string;
+  device?: string;
+  browser?: string;
+  os?: string;
+  channel?: string;
+  referrer?: string;
+  utmCampaign?: string;
+  steps: TraceStep[];
+  /** Leads whose attribution carries this reference. */
+  leads: { id: string; name: string; phone?: string; source: string; createdAt?: string }[];
+  /** Other visits by the same visitor id, newest first. */
+  otherSessions: { sid: string; ref?: string; at: string; steps: number }[];
+}
+
+const EMPTY_TRACE = (query: string): SessionTrace => ({
+  found: false,
+  query,
+  steps: [],
+  leads: [],
+  otherSessions: [],
+});
+
+/**
+ * Resolve a session reference, a session id or a visitor id to the visit behind
+ * it — the answer to "a WhatsApp message just arrived quoting GT-4KP2QX; who is
+ * this and what were they reading?".
+ *
+ * Every query here is a single equality filter served by Firestore's automatic
+ * single-field indexes, sorted in memory afterwards. That is deliberate: a
+ * composite index would have to be created by hand in the console before the
+ * lookup box worked at all, and a trace tool that 404s until somebody
+ * remembers to do that is a trace tool nobody uses.
+ */
+export async function traceSession(rawQuery: string): Promise<SessionTrace> {
+  await requireAdmin();
+
+  const query = rawQuery.trim().slice(0, 60);
+  if (!query) return EMPTY_TRACE(query);
+
+  const db = adminDb();
+  const col = db.collection('analytics_events');
+  const upper = query.toUpperCase();
+
+  // A reference code is the common case (pasted out of WhatsApp); fall back to
+  // a raw session or visitor id so a row in the visitor table is clickable too.
+  let snap = isRef(upper)
+    ? await col.where('ref', '==', upper).limit(500).get()
+    : await col.where('sid', '==', query).limit(500).get();
+  if (snap.empty && !isRef(upper)) snap = await col.where('vid', '==', query).limit(500).get();
+  if (snap.empty) return EMPTY_TRACE(query);
+
+  const rows = snap.docs
+    .map(d => {
+      const x = d.data();
+      return {
+        at: (x.at?.toDate?.() ?? new Date(0)) as Date,
+        type: String(x.type ?? 'pageview'),
+        name: String(x.name ?? 'pageview'),
+        path: String(x.path ?? '/'),
+        title: x.title ? String(x.title) : undefined,
+        engagedMs: Number(x.engagedMs ?? 0),
+        scrollPct: Number(x.scrollPct ?? 0),
+        sid: String(x.sid ?? ''),
+        vid: String(x.vid ?? ''),
+        uid: x.uid ? String(x.uid) : undefined,
+        ref: x.ref ? String(x.ref) : undefined,
+        city: String(x.city ?? 'Unknown'),
+        country: String(x.country ?? 'Unknown'),
+        device: String(x.device ?? 'desktop'),
+        browser: String(x.browser ?? 'Other'),
+        os: String(x.os ?? 'Other'),
+        channel: String(x.channel ?? 'Direct'),
+        referrer: String(x.referrer ?? 'direct'),
+        utmCampaign: x.utmCampaign ? String(x.utmCampaign) : undefined,
+        meta: (x.meta ?? undefined) as Record<string, string | number> | undefined,
+      };
+    })
+    .sort((a, b) => a.at.getTime() - b.at.getTime());
+
+  // A visitor-id query spans several visits; show the most recent one in full.
+  const targetSid = rows[rows.length - 1].sid;
+  const session = rows.filter(r => r.sid === targetSid);
+  const head = session[0];
+
+  const steps: TraceStep[] = session.map((r, i) => ({
+    at: r.at.toISOString(),
+    kind: r.type === 'event' ? 'event' : 'pageview',
+    name: r.type === 'event' ? r.name : 'pageview',
+    path: r.path,
+    ...(r.title ? { title: r.title } : {}),
+    engagedSec: Math.round(r.engagedMs / 1000),
+    scrollPct: r.scrollPct,
+    gapSec: i === 0 ? 0 : Math.round((r.at.getTime() - session[i - 1].at.getTime()) / 1000),
+    ...(r.meta ? { meta: r.meta } : {}),
+  }));
+
+  // Leads carrying this reference. Wrapped because a missing index on a nested
+  // field would otherwise take down the whole trace for the sake of a footnote.
+  let leads: SessionTrace['leads'] = [];
+  const code = head.ref;
+  if (code) {
+    try {
+      const ls = await db.collection('leads').where('attribution.ref', '==', code).limit(10).get();
+      leads = ls.docs.map(d => {
+        const x = d.data();
+        return {
+          id: d.id,
+          name: String(x.name ?? 'Unknown'),
+          ...(x.phone ? { phone: String(x.phone) } : {}),
+          source: String(x.source ?? 'unspecified'),
+          createdAt: x.createdAt?.toDate?.()?.toISOString(),
+        };
+      });
+    } catch (err) {
+      console.error('[trace] lead lookup failed:', err);
+    }
+  }
+
+  const bySid = new Map<string, { at: Date; ref?: string; n: number }>();
+  for (const r of rows) {
+    const s = bySid.get(r.sid) ?? { at: r.at, ref: r.ref, n: 0 };
+    if (r.at > s.at) s.at = r.at;
+    s.n++;
+    bySid.set(r.sid, s);
+  }
+
+  const durationSec = Math.round(
+    (session[session.length - 1].at.getTime() - head.at.getTime()) / 1000
+  );
+
+  return {
+    found: true,
+    query,
+    ref: head.ref,
+    sid: targetSid,
+    vid: head.vid,
+    uid: session.find(r => r.uid)?.uid,
+    startedAt: head.at.toISOString(),
+    endedAt: session[session.length - 1].at.toISOString(),
+    durationSec,
+    engagedSec: Math.round(session.reduce((n, r) => n + r.engagedMs, 0) / 1000),
+    city: head.city,
+    country: head.country,
+    device: head.device,
+    browser: head.browser,
+    os: head.os,
+    channel: head.channel,
+    referrer: head.referrer,
+    utmCampaign: head.utmCampaign,
+    steps,
+    leads,
+    otherSessions: [...bySid.entries()]
+      .filter(([sid]) => sid !== targetSid)
+      .map(([sid, s]) => ({ sid, ref: s.ref, at: s.at.toISOString(), steps: s.n }))
+      .sort((a, b) => b.at.localeCompare(a.at))
+      .slice(0, 10),
+  };
 }

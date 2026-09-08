@@ -10,6 +10,39 @@ import { sendLeadConfirmation } from '@/lib/server/email';
  * client access to the `leads` collection. `phone` is persisted (v1 collected
  * it in the membership form but silently dropped it).
  */
+
+/** Fields we accept on `attribution`, and how long each may be. */
+const ATTRIBUTION_FIELDS: Record<string, number> = {
+  firstChannel: 48,
+  firstLanding: 120,
+  firstAt: 32,
+  lastChannel: 48,
+  lastLanding: 120,
+  ref: 10,
+  utmSource: 40,
+  utmMedium: 40,
+  utmCampaign: 60,
+};
+
+/**
+ * Where this buyer came from, as recorded in their own browser.
+ *
+ * Entirely client-supplied and therefore untrusted: whitelisted keys only,
+ * strings only, every value length-capped. It is a marketing attribution note,
+ * never an authorisation input, so a forged value costs nothing but a wrong row
+ * in a report — but an unbounded one would cost a Firestore document.
+ */
+function cleanAttribution(v: unknown): Record<string, string> | undefined {
+  if (!v || typeof v !== 'object' || Array.isArray(v)) return undefined;
+  const out: Record<string, string> = {};
+  for (const [key, max] of Object.entries(ATTRIBUTION_FIELDS)) {
+    const raw = (v as Record<string, unknown>)[key];
+    if (typeof raw !== 'string') continue;
+    const val = raw.trim().slice(0, max);
+    if (val) out[key] = val;
+  }
+  return Object.keys(out).length ? out : undefined;
+}
 export async function POST(req: NextRequest) {
   if (!allowedOrigin(req)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   if (rateLimited('leads', clientIp(req), { max: 10, windowMs: 10 * 60 * 1000 })) {
@@ -33,6 +66,9 @@ export async function POST(req: NextRequest) {
     if (!name && !email && !phone) {
       return NextResponse.json({ error: 'empty lead' }, { status: 400 });
     }
+    // Absent whenever the visitor refused analytics — the lead is still
+    // captured, it just carries the form's own source and nothing more.
+    const attribution = cleanAttribution(body.attribution);
     await adminDb()
       .collection('leads')
       .add({
@@ -41,6 +77,7 @@ export async function POST(req: NextRequest) {
         ...(phone ? { phone } : {}),
         ...(intent ? { intent } : {}),
         source,
+        ...(attribution ? { attribution } : {}),
         status: 'new',
         // Evidence, not an assertion: which notice this person was shown, for
         // what purposes, and when. Stamped server-side from our own constant so

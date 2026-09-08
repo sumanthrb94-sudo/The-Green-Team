@@ -64,6 +64,22 @@ export async function POST(req: NextRequest) {
     const vid = str(body.vid, 40);
     if (!sid || !vid) return ok(); // no identity → unusable row
 
+    // Session reference. Stored as a top-level field, not inside `meta`, so the
+    // admin lookup is a single equality query served by Firestore's automatic
+    // single-field index — no composite index to create by hand before the
+    // trace box works. Shape-checked because it is a public endpoint.
+    const refRaw = str(body.ref, 10).toUpperCase();
+    const ref = /^GT-[0-9A-Z]{6}$/.test(refRaw) ? refRaw : '';
+
+    // Claimed uid. NOT verified — this endpoint takes no credential and adding
+    // one would break sendBeacon on page teardown, which is when the most
+    // valuable record is sent. So it is treated as what it is: a label on an
+    // analytics row, useful for "which member read what", never as proof of
+    // identity and never used to authorise anything. Shape-checked so a hostile
+    // caller cannot write an arbitrary string into the field.
+    const uidRaw = str(body.uid, 128);
+    const uid = /^[A-Za-z0-9_-]{20,128}$/.test(uidRaw) ? uidRaw : '';
+
     const name = type === 'event' ? str(body.name, MAX_EVENT_NAME) : 'pageview';
     if (type === 'event' && !name) return ok();
 
@@ -114,6 +130,8 @@ export async function POST(req: NextRequest) {
         sid,
         vid,
         newVisitor: body.newVisitor === true,
+        ...(ref ? { ref } : {}),
+        ...(uid ? { uid } : {}),
         device: deviceOf(ua, typeof body.vw === 'number' ? body.vw : undefined),
         browser: browserOf(ua),
         os: osOf(ua),

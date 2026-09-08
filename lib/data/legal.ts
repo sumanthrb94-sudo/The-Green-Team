@@ -140,10 +140,16 @@ export const DATA_WE_HOLD: DataRow[] = [
     keptFor: 'Twelve months.',
   },
   {
-    what: 'Pages you viewed, the site that referred you, your device type, browser and coarse location, and a rotating visitor identifier',
-    why: 'To count visits and see which pages work. We do not build advertising profiles and we do not sell this.',
+    what: 'Pages you viewed, how long you spent on each part of a page, the site that referred you, your device type, browser and coarse location, and a rotating visitor identifier',
+    why: 'To count visits and see which pages work — including which sections people actually read, so we can fix the ones they skip. We do not build advertising profiles and we do not sell this.',
     basis: 'Consent, given through the cookie banner. Refuse it and this is not collected.',
     keptFor: 'Fourteen months, then deleted automatically.',
+  },
+  {
+    what: 'A short reference code for your visit, and — if you are signed in — a link between that visit and your account',
+    why: 'So that when you message us on WhatsApp we can see what you were looking at and answer properly instead of starting from nothing, and so an adviser calling you back knows which property you were reading. The code is a random string that means nothing outside our records; it is added to a WhatsApp message only when you choose to send one.',
+    basis: 'Consent, given through the cookie banner. Refuse it and no code is created and no message carries one.',
+    keptFor: 'Fourteen months, with the rest of the analytics record.',
   },
   {
     what: 'Your IP address',
@@ -187,6 +193,7 @@ export const COOKIES: CookieRow[] = [
   { name: '_ga, _ga_*', kind: 'Analytics', why: 'Google Analytics: counts visits and distinguishes one visitor from another. Set only if you accept analytics.', life: 'Up to 24 months.' },
   { name: '_clck, _clsk', kind: 'Analytics', why: 'Microsoft Clarity: groups interactions into a session. Set only if you accept analytics.', life: 'Up to 12 months.' },
   { name: 'gt_splash_seen, gt_welcome_v2, gt_shortlist, gt_subscribed', kind: 'Strictly necessary', why: 'Stored in your browser, never sent to us: whether you have seen the opening animation, whether a prompt was dismissed, and what you shortlisted.', life: 'Until you clear your browser data.' },
+  { name: 'gt_vid, gt_sid, gt_ref, gt_first, gt_last', kind: 'Analytics', why: 'Stored in your browser: a random visitor and session identifier, the reference code for this visit, and which site you first arrived from. Created only if you accept analytics.', life: 'Session identifiers and the reference end when you close the tab; the visitor id and first-arrival note stay until you clear your browser data.' },
 ];
 
 export const LEGAL_LINKS = [

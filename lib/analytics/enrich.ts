@@ -46,39 +46,11 @@ export function osOf(ua: string): string {
 }
 
 /**
- * Groups a referrer into a channel a human can act on. For this business the
- * distinction that matters is Instagram (where the reels campaign runs) versus
- * organic search versus direct.
+ * Channel classification lives in ./channel so the browser can run the same
+ * rules when it records first-touch attribution. Re-exported here so every
+ * server-side caller keeps importing from one place.
  */
-export function channelOf(referrerHost: string, utmSource?: string): string {
-  const s = (utmSource ?? '').toLowerCase();
-  const h = referrerHost.toLowerCase();
-  const test = (re: RegExp) => re.test(s) || re.test(h);
-
-  if (test(/instagram|ig\b/)) return 'Instagram';
-  if (test(/facebook|fb\.|meta/)) return 'Facebook';
-  if (test(/whatsapp|wa\.me/)) return 'WhatsApp';
-  if (test(/youtube|youtu\.be/)) return 'YouTube';
-  if (test(/linkedin|lnkd/)) return 'LinkedIn';
-  if (test(/google/)) return s.includes('cpc') || s.includes('ads') ? 'Google Ads' : 'Google';
-  if (test(/bing|duckduckgo|yahoo|ecosia|brave/)) return 'Search (other)';
-  if (test(/x\.com|twitter|t\.co/)) return 'X / Twitter';
-  if (test(/telegram|t\.me/)) return 'Telegram';
-  if (!h || h === 'direct') return s ? `Campaign: ${s.slice(0, 24)}` : 'Direct';
-  return h.replace(/^www\./, '').slice(0, 40);
-}
-
-/** Referrer URL → bare host, ignoring our own domain (that's internal navigation). */
-export function referrerHost(referrer: string | undefined, selfHost: string): string {
-  if (!referrer) return 'direct';
-  try {
-    const h = new URL(referrer).host.toLowerCase();
-    if (!h || h === selfHost.toLowerCase()) return 'direct';
-    return h.replace(/^www\./, '').slice(0, 60);
-  } catch {
-    return 'direct';
-  }
-}
+export { channelOf, referrerHost } from './channel';
 
 /**
  * Salted daily hash of the IP. Never store or log a raw IP: it is personal data

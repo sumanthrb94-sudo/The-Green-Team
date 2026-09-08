@@ -23,6 +23,14 @@ export interface TrackPayload {
   vid: string;
   /** True only on the pageview that created the visitor id. */
   newVisitor?: boolean;
+  /**
+   * Session reference code (`GT-XXXXXX`). Stamped on every event of a session
+   * so that the code a visitor carries into WhatsApp resolves to the whole
+   * visit. See lib/analytics/ref.ts.
+   */
+  ref?: string;
+  /** Firebase uid, present only while a member is signed in. */
+  uid?: string;
   /** Viewport width, used to sanity-check the UA device class. */
   vw?: number;
   propertyId?: string;
@@ -48,6 +56,10 @@ export interface AnalyticsEvent {
   sid: string;
   vid: string;
   newVisitor: boolean;
+  /** Session reference code, indexed so a pasted code resolves to this session. */
+  ref?: string;
+  /** Firebase uid when the visitor was signed in; absent otherwise. */
+  uid?: string;
   device: DeviceKind;
   browser: string;
   os: string;
