@@ -70,6 +70,7 @@ const PRETTY_EVENT: Record<string, string> = {
   pricing_gate_view: 'Saw the pricing gate',
   pricing_gate_signin_click: 'Clicked sign in at the gate',
   pricing_unlocked: 'Unlocked the price sheet',
+  profile_email_skipped: 'Skipped giving an email',
   section_dwell: 'Read a section',
   experiment_impression: 'Saw a test variant',
 };

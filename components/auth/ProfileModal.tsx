@@ -10,13 +10,26 @@
  * Phone OTP hands over a number and nothing else, and a member we cannot email
  * gets no welcome, no pricing sheet, no site-visit confirmation and never
  * reaches the Members segment. So when there is no address on the account the
- * email field is required and there is no way past it — no Skip, no close, no
- * dismissing the backdrop. Everything else on the form stays optional.
+ * email field is emphasised and the copy says plainly what skipping costs.
+ *
+ * It is emphasised, not mandatory. An earlier version had no way past this step
+ * — no Skip, no close, no dismissing the backdrop — and the first traceable
+ * lead the site ever produced showed what that costs. He arrived from Google,
+ * read the whole Agartha page, signed up by OTP to see the price sheet, hit
+ * this modal, and left for WhatsApp sixty-six seconds later without ever seeing
+ * a price. His opening message asked for the pricing this modal was standing in
+ * front of.
+ *
+ * A wall in front of someone who has already given us a working phone number
+ * buys an email we could have asked for later, at the price of the thing they
+ * actually came for. So it asks once per session, states the cost, and lets
+ * them past.
  */
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { Check, X } from 'lucide-react';
 import { useAuth } from './AuthProvider';
+import { sendEvent } from '@/lib/analytics/beacon';
 
 export function ProfileModal() {
   const { user, profileModalOpen, closeProfile, refreshUser } = useAuth();
@@ -30,8 +43,27 @@ export function ProfileModal() {
 
   const needsEmail = Boolean(user && !user.email);
   const needsPhone = Boolean(user && !user.phoneNumber);
-  /** No address on file means no way to reach this member: the step is required. */
-  const required = needsEmail;
+
+  /**
+   * Closing without giving an address is recorded, because letting people past
+   * this step is a trade — an email now against the page they came for — and
+   * the only way to know whether it was the right trade is to count both sides.
+   * `profile_email_skipped` against `sign_up` is that ratio.
+   */
+  const dismiss = useCallback(() => {
+    if (needsEmail) sendEvent('profile_email_skipped');
+    closeProfile();
+  }, [needsEmail, closeProfile]);
+
+  /** Escape closes it, like any other dialog. Nothing here is worth trapping someone in. */
+  useEffect(() => {
+    if (!profileModalOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') dismiss();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [profileModalOpen, dismiss]);
 
   const save = async () => {
     if (!user) return closeProfile();
@@ -61,8 +93,9 @@ export function ProfileModal() {
           ...(city.trim() ? { city: city.trim() } : {}),
         }),
       });
-      // A required step must not close on a failed save — that would strand the
-      // member with no address and no second prompt until their next visit.
+      // Someone who typed an address and pressed save meant it, so a failed
+      // write keeps the dialog open and says so rather than closing silently
+      // and losing what they entered. Dismissing is still one click away.
       if (!res.ok) throw new Error();
       // The server just put the name on the Auth record; pick it up now so the
       // menu greets them by name instead of by phone number.
@@ -86,7 +119,7 @@ export function ProfileModal() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          onClick={required ? undefined : closeProfile}
+          onClick={dismiss}
           className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-md p-0 sm:p-6"
         >
           <motion.div
@@ -104,18 +137,16 @@ export function ProfileModal() {
                   {user.displayName || user.email?.split('@')[0] || 'Member'}
                 </h2>
               </div>
-              {!required && (
-                <button onClick={closeProfile} aria-label="Skip" className="p-2 rounded-full hover:bg-primary/10">
-                  <X className="w-5 h-5 text-on-surface/60" />
-                </button>
-              )}
+              <button onClick={dismiss} aria-label="Close" className="p-2 rounded-full hover:bg-primary/10">
+                <X className="w-5 h-5 text-on-surface/60" />
+              </button>
             </div>
             <p className="font-serif italic text-2xl text-on-surface mb-1">
-              {required ? 'Where should we send it?' : 'One quick thing'}
+              {needsEmail ? 'Where should we send it?' : 'One quick thing'}
             </p>
             <p className="text-sm text-on-surface/60 mb-7">
-              {required
-                ? 'Your number gets you in; an email is how we send pricing sheets, site-visit confirmations and the monthly briefing. We never sell your details.'
+              {needsEmail
+                ? 'You’re in — the pricing is on the page behind this. An email is how we send the plot-wise sheet, site-visit confirmations and the monthly briefing. We never sell your details.'
                 : 'Help us match you with the right sanctuary. Totally optional — skip anytime.'}
             </p>
 
@@ -127,7 +158,7 @@ export function ProfileModal() {
               </div>
               {needsEmail && (
                 <div>
-                  <label htmlFor="pf-email" className={labelCls}>Email · Required</label>
+                  <label htmlFor="pf-email" className={labelCls}>Email · How we send the sheet</label>
                   <input id="pf-email" type="email" required inputMode="email" autoComplete="email" value={email}
                     onChange={e => setEmail(e.target.value)} placeholder="you@example.com" className={inputCls} />
                 </div>
@@ -159,16 +190,18 @@ export function ProfileModal() {
                 disabled={saving}
                 className="flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl bg-primary text-on-primary text-sm font-bold hover:opacity-95 transition-all disabled:opacity-60"
               >
-                <Check className="w-4 h-4" /> {saving ? 'Saving…' : required ? 'Continue' : 'Complete Profile'}
+                <Check className="w-4 h-4" /> {saving ? 'Saving…' : needsEmail ? 'Save and continue' : 'Complete Profile'}
               </button>
-              {!required && (
-                <button
-                  onClick={closeProfile}
-                  className="px-6 py-4 rounded-2xl border border-outline/25 text-sm text-on-surface/60 hover:text-on-surface transition-all"
-                >
-                  Skip
-                </button>
-              )}
+              {/* The escape hatch is labelled with what they came for. Someone who
+                  signed up at the pricing gate wants the price sheet, not a form,
+                  and hiding the way out is how that person ends up on WhatsApp
+                  asking for a number the page could have shown them. */}
+              <button
+                onClick={dismiss}
+                className="px-6 py-4 rounded-2xl border border-outline/25 text-sm text-on-surface/60 hover:text-on-surface transition-all whitespace-nowrap"
+              >
+                {needsEmail ? 'See pricing' : 'Skip'}
+              </button>
             </div>
           </motion.div>
         </motion.div>
