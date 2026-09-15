@@ -1,5 +1,11 @@
 import 'server-only';
-import { AGARTHA_NOW_RATE, SYL_RATE, SYL_TOTAL_UNITS } from '@/lib/data/contact';
+import {
+  AGARTHA_CONFIGS,
+  AGARTHA_CONSTRUCTION_RATE,
+  AGARTHA_NOW_RATE,
+  SYL_RATE,
+  SYL_TOTAL_UNITS,
+} from '@/lib/data/contact';
 
 /**
  * Unit-by-unit price sheets — the detail that sits behind sign-in.
@@ -66,13 +72,23 @@ const DATES_RATE = 18000;
 export function getPriceSheet(id: string): PriceSheet | null {
   if (id === 'agartha') {
     return {
-      rateLabel: `₹${inr(AGARTHA_NOW_RATE)} / sq yd`,
-      rows: AGARTHA_SIZES.map(s => ({
-        label: s.label,
-        qty: `${inr(s.yds)} sq yds`,
-        price: s.yds * AGARTHA_NOW_RATE,
-      })),
-      note: `Calculated at the current listed rate of ₹${inr(AGARTHA_NOW_RATE)} per sq yd across the 37 plots on the issued master plan. Better than the listed rate is routinely available on an in-person visit, and we negotiate that on your behalf — ask your adviser for the live price sheet and which plots are still unsold. Stamp duty, registration and GST where it applies are additional.`,
+      rateLabel: `₹${inr(AGARTHA_NOW_RATE)} / sq yd land · ₹${inr(AGARTHA_CONSTRUCTION_RATE)} / sq ft build`,
+      rows: [
+        // The two marketed packages first, because "from ₹78 lakhs" is one of
+        // them and a buyer who has seen that number needs to find it here.
+        ...AGARTHA_CONFIGS.map(c => ({
+          label: `${c.label} — ${inr(c.yds)} sq yds + ${inr(c.sft)} sq ft home`,
+          qty: 'land + build',
+          price: c.yds * AGARTHA_NOW_RATE + c.sft * AGARTHA_CONSTRUCTION_RATE,
+          star: true,
+        })),
+        ...AGARTHA_SIZES.map(s => ({
+          label: `${s.label} — land only`,
+          qty: `${inr(s.yds)} sq yds`,
+          price: s.yds * AGARTHA_NOW_RATE,
+        })),
+      ],
+      note: `Land is ₹${inr(AGARTHA_NOW_RATE)} per sq yd, flat across all plot sizes. The home is built to order and charged separately at ₹${inr(AGARTHA_CONSTRUCTION_RATE)} per sq ft, a rate that does not step with size — so every total here is one multiplied by the other and added. The starred rows are the two published packages; the rest are land alone, before you decide what to build. Club membership (₹50,000 to ₹2,00,000 one-time by plot size) is optional, is a separate purchase and is not included in any figure above. Better than the listed rate is routinely available on an in-person visit and we negotiate that on your behalf — ask your adviser which of the 37 plots are still unsold. Stamp duty, registration and GST where it applies are additional.`,
     };
   }
 

@@ -142,7 +142,7 @@ export const SALES_FAQ: Array<{ q: string; a: string; tags?: string[] }> = [
   },
   {
     q: 'How do the three sanctuaries differ, and which one suits me?',
-    a: 'MODCON Agartha is a 25-acre farmhouse community on the Narsapur forest boundary — 37 plots from 726 sq yds to a full acre, for someone who wants land, a working permaculture farm and the cleanest air of the three. MODCON SYL Residences at Tukkuguda is built living: villaments from 2,500 to 4,500 SFT, ten minutes from the airport, for someone who wants a ready home inside the Fourth City corridor. Dates County at Kandukur is 300+ acres of villa plots beside a 4,000-acre reserve forest — land you can build on later, inside a large planned township.',
+    a: 'MODCON Agartha is a 25-acre farmhouse community on the Narsapur forest boundary — 37 plots from 726 sq yds to a full acre, for someone who wants land, a working permaculture farm and the cleanest air of the three. MODCON SYL Residences at Tukkuguda is built living: villaments from 3,882 to 7,000 SFT, ten minutes from the airport, for someone who wants a ready home inside the Fourth City corridor. Dates County at Kandukur is 300+ acres of villa plots beside a 4,000-acre reserve forest — land you can build on later, inside a large planned township.',
     tags: ['comparison', 'portfolio', 'fit'],
   },
   {

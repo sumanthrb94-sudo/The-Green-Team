@@ -62,6 +62,25 @@ export const AGARTHA_OLD_RATE = 6200; // 2024 launch rate
 export const AGARTHA_NOW_RATE = 8500; // current rate (2026)
 export const AGARTHA_PROJECTED_RATE = 10000; // developer projection for 2028
 
+/**
+ * Agartha construction (₹/sq ft), per MODCON's rate card. Flat — it does not
+ * step with built area, because homes are designed and built to order.
+ *
+ * Publishing this is what makes the two headline numbers reconcile. Land alone
+ * on the smallest plot is 726 × 8,500 = ₹61,71,000, but the project is marketed
+ * "from ₹78 lakhs" — which is that plot plus the 650 sq ft 1 BHK starting home
+ * at ₹2,500 a foot (₹16,25,000), giving ₹77,96,000. Without the construction
+ * rate on the page the two look like a contradiction, and it is exactly the
+ * question the first traceable lead came to WhatsApp to ask.
+ */
+export const AGARTHA_CONSTRUCTION_RATE = 2500;
+
+/** The two published starting packages: plot + built home. */
+export const AGARTHA_CONFIGS = [
+  { label: 'One BHK', yds: 726, sft: 650 },
+  { label: 'Two BHK', yds: 847, sft: 800 },
+] as const;
+
 /** MODCON SYL villament rate (₹/SFT), current as of 2026. */
 export const SYL_RATE = 6999;
 

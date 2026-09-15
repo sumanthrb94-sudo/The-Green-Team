@@ -71,7 +71,7 @@ export const SANCTUARIES: Sanctuary[] = [
     commute: '50 mins to Gachibowli · 100 m from upcoming RRR',
     pricePerSqYd: 8500,
     valuation: '',
-    memberPrice: 'From ₹78 L',
+    memberPrice: 'From ₹78 L · land + home',
     image: '/gallery/agartha/11.webp',
     tagline: 'Where the forest becomes home.',
     metaDescription:
@@ -126,7 +126,7 @@ export const SANCTUARIES: Sanctuary[] = [
     brochureUrl: 'https://www.modconbuilders.com',
     features: [
       'Integrated Commercial Hub (Enquire)',
-      '15 Villaments · 3,882 – 7,000 SFT',
+      '155 Villaments · 3,882 – 7,000 SFT',
       'Infinity Pool',
       'Gym with Pilates · Steam & Sauna',
       'Yoga Pavilion · Library',
