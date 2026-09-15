@@ -286,7 +286,7 @@ function layoutChunks(out: KbChunk[]): void {
   sylLayoutChunks(out);
 }
 
-/** SYL: 155 villaments stacked inside the 15 footprints the issued plan draws. */
+/** SYL: 155 villaments in the project; the issued plan details the ones we can place. */
 function sylLayoutChunks(out: KbChunk[]): void {
   const base = { source: 'layout' as const, url: '/sanctuaries/syl', propertyId: 'syl' };
 
@@ -317,9 +317,8 @@ function sylLayoutChunks(out: KbChunk[]): void {
     id: 'layout:syl:unit-inventory',
     title: 'MODCON SYL Residences — Villament Sizes & Pricing',
     text:
-      `MODCON SYL Residences comprises ${SYL_TOTAL_UNITS} villaments. The issued site plan draws ` +
-      `${SYL_UNITS.length} building footprints across two blocks — Block B to the north and Block A ` +
-      `to the south, each served by its own staircase lobby, with the villaments stacked inside them, ` +
+      `MODCON SYL Residences comprises ${SYL_TOTAL_UNITS} villaments. The issued site plan details ` +
+      `${SYL_UNITS.length} of them across two blocks — Block B to the north and Block A to the south, ` +
       `separated by a central park, ` +
       `with the integrated commercial block on the western half of the 4.5-acre site. Unit sizes range from ` +
       `${inr(Math.min(...areas))} SFT to ${inr(Math.max(...areas))} SFT: ${lines.join('; ')}. ` +

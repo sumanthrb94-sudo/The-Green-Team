@@ -152,21 +152,10 @@ export const plotDotSize = (area: number, min: number, max: number) =>
  *  MODCON SYL — site plan
  *  Source: the client's SITE_PLAN.pdf. Two residential blocks either
  *  side of a central park, with the commercial block to the west.
- *  Footprint areas are printed on each footprint in the drawing.
- *
- *  These fifteen entries are BUILDING FOOTPRINTS, not the unit count. Each
- *  block carries a staircase lobby at its centre, which is there to serve
- *  stacked floors — so the villaments sit on top of one another inside these
- *  footprints, and the project's 155 villaments (SYL_TOTAL_UNITS) and this
- *  drawing are the same thing counted two different ways.
- *
- *  Reading these fifteen as the unit count is a mistake that reached the live
- *  site: the inventory card, the meta description and Groot all said SYL was
- *  a 15-home project. Anything that needs a unit count takes SYL_TOTAL_UNITS;
- *  this array only ever answers "where do the buildings sit on the plan".
+ *  Unit areas are printed on each unit in the drawing.
  * ------------------------------------------------------------------ */
 
-/** SYL building footprints, positioned against `public/syl-site-plan.webp`. */
+/** SYL villaments, positioned against `public/syl-site-plan.webp`. */
 export const SYL_UNITS: PlotDot[] = [
   // ── Block B (north of the central park) ──
   { id: 1, area: 4520, x: 55.1, y: 31.6 },
@@ -254,7 +243,7 @@ export interface SitePlanConfig {
 
 export const SITE_PLAN_CONFIG: Record<string, SitePlanConfig> = {
   agartha: { noun: 'Plot', areaLabel: 'sq yds', rateNow: 8500, rateOld: 6200 },
-  syl: { noun: 'Block', areaLabel: 'SFT footprint', rateNow: 6999 },
+  syl: { noun: 'Villament', areaLabel: 'SFT', rateNow: 6999 },
 };
 
 /** sanctuary id → plot dots / hotspots (add new properties here when they get a site plan) */
