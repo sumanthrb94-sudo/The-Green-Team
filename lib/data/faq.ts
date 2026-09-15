@@ -116,6 +116,16 @@ export const SALES_FAQ: Array<{ q: string; a: string; tags?: string[] }> = [
     tags: ['resale', 'rental', 'returns'],
   },
   {
+    q: 'Is there a club membership fee at Agartha, and is it compulsory?',
+    a: 'There is a one-time club membership, and it is optional — plot buyers are not required to take it, and it is never folded into a plot price. The tier follows plot size: Standard ₹50,000 for plots under half an acre or for standalone members, Premium ₹1,00,000 for half-acre owners, Founder ₹2,00,000 for one-acre owners and early patrons. It covers unlimited access to the shared two-acre resort, priority invitations to retreats and workshops, and discounts on stays, dining and activities. If a price you have been quoted includes it, ask for the split — land, construction and membership are three separate lines.',
+    tags: ['agartha', 'membership', 'clubhouse', 'pricing'],
+  },
+  {
+    q: 'What rental income does an Agartha home earn?',
+    a: 'MODCON runs the letting in-house and states ₹30,000 to ₹50,000 a month deposited to the owner for a built home let out when the owner is not using it, fully managed, with a projected 8% annual growth. Three honest caveats. Those are the developer\u2019s figures, not ours, and the growth number is a projection rather than anything measured. It is not a guaranteed or assured return — we do not underwrite it, and we do not list assured-return structures, so if anyone tells you the income is contractually guaranteed, ask to see that clause in the buyer agreement before you believe it. And it applies only once a house stands on the plot: raw land earns nothing. Get the letting agreement in writing and read the income clause.',
+    tags: ['agartha', 'rental', 'returns', 'objection'],
+  },
+  {
     q: 'Are the returns guaranteed?',
     a: 'No, and we will not put a number on a future you cannot verify. What we will show you is the rate history — ₹6,199 to ₹8,500 per sq yd at Agartha — and the reasons behind it: RRR proximity, a forest boundary that cannot be manufactured, and a developer that delivered. Judge the thesis, not a projection.',
     tags: ['returns', 'objection', 'ethics'],

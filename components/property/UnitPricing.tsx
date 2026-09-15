@@ -117,7 +117,11 @@ export function UnitPricing({
             </div>
           ))}
         </div>
-        <p className="mt-3 text-[11px] leading-relaxed text-secondary/60">{sheet.note}</p>
+        {/* whitespace-pre-line: the note is several paragraphs — what the rate
+            covers, what membership costs, what the letting claim is and is not.
+            A plain <p> collapses those breaks into one wall of text, and the
+            caveats are the part a buyer most needs to be able to find. */}
+        <p className="mt-3 text-[11px] leading-relaxed text-secondary/60 whitespace-pre-line">{sheet.note}</p>
       </div>
     );
   }

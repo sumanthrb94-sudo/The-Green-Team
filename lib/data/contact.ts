@@ -81,6 +81,41 @@ export const AGARTHA_CONFIGS = [
   { label: 'Two BHK', yds: 847, sft: 800 },
 ] as const;
 
+/**
+ * Agartha club membership — one-time, tiered by plot size, per MODCON's rate
+ * card. Optional and a separate purchase, so it is never folded into a plot
+ * total; quoting it inside one would overstate the price of the land.
+ */
+export const AGARTHA_MEMBERSHIP = [
+  { tier: 'Standard', appliesTo: 'Plots under 0.5 acre, or standalone members', fee: 50_000 },
+  { tier: 'Premium', appliesTo: '0.5 acre plot owners', fee: 100_000 },
+  { tier: 'Founder', appliesTo: '1 acre plot owners, or early patrons', fee: 200_000 },
+] as const;
+
+/**
+ * Agartha's in-house letting programme, as MODCON states it.
+ *
+ * Deliberately typed as the developer's claim rather than ours. Our published
+ * standard (lib/data/standard.ts) refuses to list assured-return, guaranteed-
+ * buyback or rental-guarantee structures in any form — so these figures may be
+ * repeated as an indicative operating estimate for a managed let, and may not
+ * be described as guaranteed anywhere, by us or in an advertisement, unless an
+ * assured-return clause actually exists in the buyer agreement. If one does,
+ * the project fails our own standard and the listing is the thing to revisit,
+ * not the wording.
+ *
+ * It applies only to a built home let out when the owner is not using it. Raw
+ * land produces no rent.
+ */
+export const AGARTHA_RENTAL = {
+  monthlyLow: 30_000,
+  monthlyHigh: 50_000,
+  /** MODCON's projection, not a measurement and not ours. */
+  statedAnnualGrowthPct: 8,
+  management: 'Fully managed in-house',
+  guaranteed: false,
+} as const;
+
 /** MODCON SYL villament rate (₹/SFT), current as of 2026. */
 export const SYL_RATE = 6999;
 

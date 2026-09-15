@@ -2,7 +2,9 @@ import 'server-only';
 import {
   AGARTHA_CONFIGS,
   AGARTHA_CONSTRUCTION_RATE,
+  AGARTHA_MEMBERSHIP,
   AGARTHA_NOW_RATE,
+  AGARTHA_RENTAL,
   SYL_RATE,
   SYL_TOTAL_UNITS,
 } from '@/lib/data/contact';
@@ -88,7 +90,25 @@ export function getPriceSheet(id: string): PriceSheet | null {
           price: s.yds * AGARTHA_NOW_RATE,
         })),
       ],
-      note: `Land is ₹${inr(AGARTHA_NOW_RATE)} per sq yd, flat across all plot sizes. The home is built to order and charged separately at ₹${inr(AGARTHA_CONSTRUCTION_RATE)} per sq ft, a rate that does not step with size — so every total here is one multiplied by the other and added. The starred rows are the two published packages; the rest are land alone, before you decide what to build. Club membership (₹50,000 to ₹2,00,000 one-time by plot size) is optional, is a separate purchase and is not included in any figure above. Better than the listed rate is routinely available on an in-person visit and we negotiate that on your behalf — ask your adviser which of the 37 plots are still unsold. Stamp duty, registration and GST where it applies are additional.`,
+      note:
+        `Land is ₹${inr(AGARTHA_NOW_RATE)} per sq yd, flat across all plot sizes. The home is built to ` +
+        `order and charged separately at ₹${inr(AGARTHA_CONSTRUCTION_RATE)} per sq ft, a rate that does ` +
+        `not step with size — so every total here is one multiplied by the other and added. The starred ` +
+        `rows are the two published packages; the rest are land alone, before you decide what to build. ` +
+        `\n\nClub membership is optional and a separate purchase, so it is in none of the figures above: ` +
+        AGARTHA_MEMBERSHIP.map(m => `${m.tier} ₹${inr(m.fee)} (${m.appliesTo.toLowerCase()})`).join('; ') +
+        `. It covers unlimited access to the 2-acre resort, priority invitations to retreats and workshops, ` +
+        `and discounts on stays and dining.` +
+        `\n\nOn letting: MODCON runs an in-house programme and states ₹${inr(AGARTHA_RENTAL.monthlyLow)}` +
+        `–₹${inr(AGARTHA_RENTAL.monthlyHigh)} a month deposited to the owner on a built home let out when ` +
+        `you are not using it, fully managed, with a projected ${AGARTHA_RENTAL.statedAnnualGrowthPct}% ` +
+        `annual growth. Those are the developer's figures and the growth number is a projection, not a ` +
+        `measurement. It is not a guaranteed or assured return, we do not underwrite it, and raw land ` +
+        `earns nothing until a home stands on it — ask for the letting agreement in writing and read the ` +
+        `income clause before you count on any of it.` +
+        `\n\nBetter than the listed rate is routinely available on an in-person visit and we negotiate ` +
+        `that on your behalf — ask your adviser which of the 37 plots are still unsold. Stamp duty, ` +
+        `registration and GST where it applies are additional.`,
     };
   }
 
