@@ -64,3 +64,14 @@ export const AGARTHA_PROJECTED_RATE = 10000; // developer projection for 2028
 
 /** MODCON SYL villament rate (₹/SFT), current as of 2026. */
 export const SYL_RATE = 6999;
+
+/**
+ * Villaments in MODCON SYL Residences, per the developer.
+ *
+ * Kept separate from `SYL_UNITS` in agartha-layout.ts, which holds only the
+ * units we have plotted positions and printed areas for off the issued
+ * SITE_PLAN.pdf. That drawing is a portion of the project, so the two numbers
+ * are different things and neither should be derived from the other — the
+ * interactive site plan draws what we can place, this is what is being built.
+ */
+export const SYL_TOTAL_UNITS = 155;

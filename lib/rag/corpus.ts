@@ -15,6 +15,7 @@ import {
   INVESTMENT_BRACKETS,
   SITE_URL,
   SYL_RATE,
+  SYL_TOTAL_UNITS,
 } from '@/lib/data/contact';
 import { SALES_FAQ } from '@/lib/data/faq';
 import { DISQUALIFIERS, LISTING_STANDARD, SERVICE_AREA } from '@/lib/data/standard';
@@ -285,7 +286,7 @@ function layoutChunks(out: KbChunk[]): void {
   sylLayoutChunks(out);
 }
 
-/** SYL's sanctioned site plan: 15 villaments across two blocks, priced per SFT. */
+/** SYL: 155 villaments in the project; the issued plan details the ones we can place. */
 function sylLayoutChunks(out: KbChunk[]): void {
   const base = { source: 'layout' as const, url: '/sanctuaries/syl', propertyId: 'syl' };
 
@@ -316,14 +317,15 @@ function sylLayoutChunks(out: KbChunk[]): void {
     id: 'layout:syl:unit-inventory',
     title: 'MODCON SYL Residences — Villament Sizes & Pricing',
     text:
-      `The MODCON SYL Residences sanctioned site plan lays out ${SYL_UNITS.length} villaments in two blocks — ` +
-      `Block B with 7 units to the north and Block A with 8 units to the south — separated by a central park, ` +
+      `MODCON SYL Residences comprises ${SYL_TOTAL_UNITS} villaments. The issued site plan details ` +
+      `${SYL_UNITS.length} of them across two blocks — Block B to the north and Block A to the south, ` +
+      `separated by a central park, ` +
       `with the integrated commercial block on the western half of the 4.5-acre site. Unit sizes range from ` +
       `${inr(Math.min(...areas))} SFT to ${inr(Math.max(...areas))} SFT: ${lines.join('; ')}. ` +
       `MODCON SYL Residences is priced at ₹${inr(SYL_RATE)} per SFT. Each block is served by its own staircase ` +
       `lobby, internal roads are 16 m wide, and the single ${inr(Math.max(...areas))} SFT unit is the corner ` +
       `villament at the eastern end of Block A. The clubhouse is a separate 22,000 SFT G+2 building and is not ` +
-      `one of these 15 villaments. Current availability and the final price for MODCON SYL should be confirmed ` +
+      `one of the villaments. Current availability and the final price for MODCON SYL should be confirmed ` +
       `with an adviser — the figures on the property page take precedence.`,
   });
 }

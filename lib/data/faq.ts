@@ -137,7 +137,7 @@ export const SALES_FAQ: Array<{ q: string; a: string; tags?: string[] }> = [
   },
   {
     q: 'What sizes and prices are the SYL villaments, and what is the commercial component?',
-    a: 'MODCON SYL Residences is the residential half of a 4.5-acre integrated project at Tukkuguda. The issued site plan shows 15 villaments across Block A and Block B, either side of a central park, from 3,882 to 7,000 SFT, at ₹6,999 per SFT. The commercial block sits to the west: retail, cafés and banking at ground level, co-working on the first floor, clinics and diagnostics on the second, and business suites with a hospitality stay concept above — aimed at airport and corporate visitors. Commercial pricing is quoted on enquiry rather than published.',
+    a: 'MODCON SYL Residences is the residential half of a 4.5-acre integrated project at Tukkuguda. It is 155 villaments across Block A and Block B, either side of a central park, from 3,882 to 7,000 SFT, at ₹6,999 per SFT. The commercial block sits to the west: retail, cafés and banking at ground level, co-working on the first floor, clinics and diagnostics on the second, and business suites with a hospitality stay concept above — aimed at airport and corporate visitors. Commercial pricing is quoted on enquiry rather than published.',
     tags: ['syl', 'pricing', 'commercial'],
   },
   {

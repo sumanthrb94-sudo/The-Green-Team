@@ -1,5 +1,5 @@
 import 'server-only';
-import { AGARTHA_NOW_RATE, SYL_RATE } from '@/lib/data/contact';
+import { AGARTHA_NOW_RATE, SYL_RATE, SYL_TOTAL_UNITS } from '@/lib/data/contact';
 
 /**
  * Unit-by-unit price sheets — the detail that sits behind sign-in.
@@ -84,7 +84,7 @@ export function getPriceSheet(id: string): PriceSheet | null {
         qty: `${inr(s.sft)} SFT`,
         price: s.sft * SYL_RATE,
       })),
-      note: `Calculated at the current rate of ₹${inr(SYL_RATE)} per SFT across the 15 villaments on the issued site plan. A lower pre-investor window exists for a limited number of units — your adviser confirms the current rate and how many remain. Commercial space in the integrated block is quoted on enquiry rather than published. Stamp duty, registration and GST where it applies are additional.`,
+      note: `Calculated at the current rate of ₹${inr(SYL_RATE)} per SFT across the ${inr(SYL_TOTAL_UNITS)} villaments in the project. A lower pre-investor window exists for a limited number of units — your adviser confirms the current rate and how many remain. Commercial space in the integrated block is quoted on enquiry rather than published. Stamp duty, registration and GST where it applies are additional.`,
     };
   }
 

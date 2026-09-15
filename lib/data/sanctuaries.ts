@@ -115,10 +115,10 @@ export const SANCTUARIES: Sanctuary[] = [
     image: '/gallery/syl/syl-exterior-dusk.webp',
     tagline: 'A modern address where luxury meets nature.',
     metaDescription:
-      'MODCON SYL Residences — 15 biophilic villaments, 3,882–7,000 SFT at ₹6,999/SFT at Tukkuguda, ORR Exit-14, with a 22,000 SFT clubhouse. 10 min to the airport.',
+      'MODCON SYL Residences — 155 biophilic villaments, 3,882–7,000 SFT at ₹6,999/SFT at Tukkuguda, ORR Exit-14, with a 22,000 SFT clubhouse. 10 min to the airport.',
     description:
       "MODCON SYL Residences is the residential half of a 4.5-acre integrated commercial-and-residential project at Tukkuguda, ORR Exit-14 — villament living in a low-density, biophilic enclave overlooking forest, with large balconies, abundant light and sunrise views. The 22,000 sq ft G+2 clubhouse is built entirely around health, wellness and nature: infinity pool, fully equipped gym with Pilates, yoga pavilion, steam and sauna, library, co-working spaces, banquet and guest rooms, indoor and outdoor play. Alongside it sits an integrated commercial hub — retail, cafés and banking at ground, co-working on the first floor, clinics and diagnostics on the second, and business suites with a hospitality stay concept above. Every balcony is landscaped on biophilic principles. Two to five minutes from ORR Exit-14 and Fab City, 10–15 minutes from the airport.",
-    plots: 15,
+    plots: 155,
     plotRange: 'Villaments 3,882 – 7,000 SFT · Integrated Commercial',
     amenityAcres: '22,000 SFT G+2 Clubhouse · Health • Wellness • Nature',
     architect: 'MODCON Builders',
