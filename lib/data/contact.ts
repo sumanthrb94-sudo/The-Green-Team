@@ -50,30 +50,30 @@ export const INVESTMENT_BRACKETS = [
 
 /**
  * Agartha pricing (₹/sq yd) — used in invest panels and Groot.
- * Per MODCON's 2026 price-projection deck: launched 2024 at ₹6,200, now
- * ₹8,500, developer-projected ₹10,000 by 2028.
+ * Launched 2024 at ₹6,200, currently ₹8,000, developer-projected ₹10,000 by
+ * 2028.
  *
- * The same deck prints "90.48% in 18 months" next to those two numbers, but
- * ₹6,200 → ₹8,500 is +37.1%. We publish the figure its own numbers support,
- * not the headline — a wrong appreciation claim is the one number a buyer
- * will check.
+ * MODCON's 2026 deck prints "90.48% in 18 months" next to its own two numbers,
+ * which do not support it: ₹6,200 → ₹8,000 is +29.0%. We publish the figure the
+ * arithmetic gives, not the headline — a wrong appreciation claim is the one
+ * number a buyer will check.
  */
 export const AGARTHA_OLD_RATE = 6200; // 2024 launch rate
-export const AGARTHA_NOW_RATE = 8500; // current rate (2026)
+export const AGARTHA_NOW_RATE = 8000; // current rate (2026)
 export const AGARTHA_PROJECTED_RATE = 10000; // developer projection for 2028
 
 /**
- * Agartha construction (₹/sq ft), per MODCON's rate card. Flat — it does not
- * step with built area, because homes are designed and built to order.
+ * Agartha construction (₹/sq ft). Flat — it does not step with built area,
+ * because homes are designed and built to order.
  *
  * Publishing this is what makes the two headline numbers reconcile. Land alone
- * on the smallest plot is 726 × 8,500 = ₹61,71,000, but the project is marketed
+ * on the smallest plot is 726 × 8,000 = ₹58,08,000, but the project is marketed
  * "from ₹78 lakhs" — which is that plot plus the 650 sq ft 1 BHK starting home
- * at ₹2,500 a foot (₹16,25,000), giving ₹77,96,000. Without the construction
+ * at ₹3,000 a foot (₹19,50,000), giving ₹77,58,000. Without the construction
  * rate on the page the two look like a contradiction, and it is exactly the
  * question the first traceable lead came to WhatsApp to ask.
  */
-export const AGARTHA_CONSTRUCTION_RATE = 2500;
+export const AGARTHA_CONSTRUCTION_RATE = 3000;
 
 /** The two published starting packages: plot + built home. */
 export const AGARTHA_CONFIGS = [

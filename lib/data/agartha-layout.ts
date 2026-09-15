@@ -83,11 +83,11 @@ export const AGARTHA_HOTSPOTS: Hotspot[] = [
     label: '37-Plot Farmhouse Community',
     tag: 'From ₹78 L',
     detail:
-      '37 farm plots across 25 acres, from 726 sq yds up to a full acre, at ₹8,500/sq yd. Homes are built to order in natural materials — the Bamora Retreat in bamboo with a mezzanine, or the Earthlyn Retreat in CSCB brick with lime plaster — as 1, 2 or 3 BHK.',
+      '37 farm plots across 25 acres, from 726 sq yds up to a full acre, at ₹8,000/sq yd. Homes are built to order in natural materials — the Bamora Retreat in bamboo with a mezzanine, or the Earthlyn Retreat in CSCB brick with lime plaster — as 1, 2 or 3 BHK.',
     stats: [
       { label: 'Plots', value: '37' },
       { label: 'Sizes', value: '726 sq yds – 1 acre' },
-      { label: 'Rate', value: '₹8,500/sq yd' },
+      { label: 'Rate', value: '₹8,000/sq yd' },
     ],
   },
 ];
@@ -242,7 +242,7 @@ export interface SitePlanConfig {
 }
 
 export const SITE_PLAN_CONFIG: Record<string, SitePlanConfig> = {
-  agartha: { noun: 'Plot', areaLabel: 'sq yds', rateNow: 8500, rateOld: 6200 },
+  agartha: { noun: 'Plot', areaLabel: 'sq yds', rateNow: 8000, rateOld: 6200 },
   syl: { noun: 'Villament', areaLabel: 'SFT', rateNow: 6999 },
 };
 

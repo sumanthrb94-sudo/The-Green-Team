@@ -32,7 +32,7 @@ export const SALES_FAQ: Array<{ q: string; a: string; tags?: string[] }> = [
   },
   {
     q: 'Does buying through you cost more than going to the developer directly?',
-    a: 'No. The developer pays the channel partner, so the price you pay is the developer price and it does not change because we introduced you. In practice a channel partner usually gets better terms, because we negotiate across many buyers instead of one. At MODCON Agartha, better pricing than the listed rate of ₹8,500 per sq yd is available on an in-person visit and we negotiate that on your behalf.',
+    a: 'No. The developer pays the channel partner, so the price you pay is the developer price and it does not change because we introduced you. In practice a channel partner usually gets better terms, because we negotiate across many buyers instead of one. At MODCON Agartha, better pricing than the listed rate of ₹8,000 per sq yd is available on an in-person visit and we negotiate that on your behalf.',
     tags: ['channel-partner', 'pricing', 'objection'],
   },
   {
@@ -52,7 +52,7 @@ export const SALES_FAQ: Array<{ q: string; a: string; tags?: string[] }> = [
   },
   {
     q: 'What is not included in the quoted price?',
-    a: 'Quoted rates — ₹8,500 per sq yd at MODCON Agartha, ₹6,999 per SFT at MODCON SYL Residences, ₹18,000 per sq yd at Dates County — are the property price only. Stamp duty and registration, GST where it applies, any corpus or maintenance deposit, and optional add-ons such as a built home on your plot are all extra. Your adviser gives you the all-in number for the specific unit before you commit to anything.',
+    a: 'Quoted rates — ₹8,000 per sq yd at MODCON Agartha, ₹6,999 per SFT at MODCON SYL Residences, ₹18,000 per sq yd at Dates County — are the property price only. Stamp duty and registration, GST where it applies, any corpus or maintenance deposit, and optional add-ons such as a built home on your plot are all extra. Your adviser gives you the all-in number for the specific unit before you commit to anything.',
     tags: ['pricing', 'costs'],
   },
   {
@@ -82,7 +82,7 @@ export const SALES_FAQ: Array<{ q: string; a: string; tags?: string[] }> = [
   },
   {
     q: 'Why does the price keep rising? Is that just a sales tactic?',
-    a: 'It is a schedule the developer sets in advance, and there is a record of it running. MODCON Agartha opened at a VIP pre-launch rate of ₹6,199 per sq yd and stands at ₹8,500 per sq yd today — the same ladder, one full cycle later. Ask your adviser what the next step on the ladder is and when it takes effect; if nobody can tell you that, the urgency is not real.',
+    a: 'It is a schedule the developer sets in advance, and there is a record of it running. MODCON Agartha opened at a VIP pre-launch rate of ₹6,199 per sq yd and stands at ₹8,000 per sq yd today — the same ladder, one full cycle later. Ask your adviser what the next step on the ladder is and when it takes effect; if nobody can tell you that, the urgency is not real.',
     tags: ['pricing', 'objection', 'pre-investor'],
   },
   {
@@ -112,7 +112,7 @@ export const SALES_FAQ: Array<{ q: string; a: string; tags?: string[] }> = [
   },
   {
     q: 'What is the resale and rental potential?',
-    a: 'Resale rests on the same things that made the purchase sensible in the first place: corridor, access, scarcity, and how the place feels to be in. Agartha moving from ₹6,199 to ₹8,500 per sq yd tells you a real secondary market exists for this kind of asset. Rental income is realistic for a built unit like a SYL villament and for staycation use at Agartha; raw land does not produce rent, and anyone telling you otherwise is selling.',
+    a: 'Resale rests on the same things that made the purchase sensible in the first place: corridor, access, scarcity, and how the place feels to be in. Agartha moving from ₹6,199 to ₹8,000 per sq yd tells you a real secondary market exists for this kind of asset. Rental income is realistic for a built unit like a SYL villament and for staycation use at Agartha; raw land does not produce rent, and anyone telling you otherwise is selling.',
     tags: ['resale', 'rental', 'returns'],
   },
   {
@@ -127,7 +127,7 @@ export const SALES_FAQ: Array<{ q: string; a: string; tags?: string[] }> = [
   },
   {
     q: 'Are the returns guaranteed?',
-    a: 'No, and we will not put a number on a future you cannot verify. What we will show you is the rate history — ₹6,199 to ₹8,500 per sq yd at Agartha — and the reasons behind it: RRR proximity, a forest boundary that cannot be manufactured, and a developer that delivered. Judge the thesis, not a projection.',
+    a: 'No, and we will not put a number on a future you cannot verify. What we will show you is the rate history — ₹6,199 to ₹8,000 per sq yd at Agartha — and the reasons behind it: RRR proximity, a forest boundary that cannot be manufactured, and a developer that delivered. Judge the thesis, not a projection.',
     tags: ['returns', 'objection', 'ethics'],
   },
   {

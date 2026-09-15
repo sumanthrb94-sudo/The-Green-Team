@@ -69,7 +69,7 @@ export const SANCTUARIES: Sanctuary[] = [
     aqi: 12,
     noise: 18,
     commute: '50 mins to Gachibowli · 100 m from upcoming RRR',
-    pricePerSqYd: 8500,
+    pricePerSqYd: 8000,
     valuation: '',
     memberPrice: 'From ₹78 L · land + home',
     image: '/gallery/agartha/11.webp',

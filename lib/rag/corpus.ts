@@ -29,8 +29,8 @@ import type { KbChunk, KbSource } from '@/lib/rag/types';
 
 /**
  * Contextual retrieval: every chunk restates its own subject, because an
- * embedded fragment is retrieved alone and read alone — "priced at ₹8,500/sq yd"
- * matches nothing useful, "MODCON Agartha is priced at ₹8,500/sq yd" does.
+ * embedded fragment is retrieved alone and read alone — "priced at ₹8,000/sq yd"
+ * matches nothing useful, "MODCON Agartha is priced at ₹8,000/sq yd" does.
  */
 
 export function hashText(t: string): string {

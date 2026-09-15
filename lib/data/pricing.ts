@@ -17,7 +17,7 @@ import {
  * read it with devtools — the gate would be theatre. It reaches the browser only
  * through /api/pricing/[id], which checks for a session first.
  *
- * What stays public elsewhere is the headline rate (₹8,500/sq yd, ₹6,999/SFT,
+ * What stays public elsewhere is the headline rate (₹8,000/sq yd, ₹6,999/SFT,
  * ₹18,000/sq yd), the size ranges and the entry price. That is deliberate: those
  * are in the page titles, meta descriptions and Product JSON-LD, and they win the
  * searches that actually convert. Hiding them would either cost those rankings or,

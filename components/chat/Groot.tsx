@@ -42,7 +42,7 @@ const ESCAPES: Record<string, string> = {
 };
 const escapeHtml = (s: string) => s.replace(/[&<>"']/g, c => ESCAPES[c]);
 
-/** Only real routes are linkified — otherwise "₹8,500/sq yd" becomes a link. */
+/** Only real routes are linkified — otherwise "₹8,000/sq yd" becomes a link. */
 const ROUTE =
   /(^|[\s(])(\/(?:sanctuaries|blog|map|list|membership|adviser-call|preinvestor-gold|syl)[\w\-/]*)/g;
 const ABSOLUTE = /https?:\/\/[^\s<]+/g;

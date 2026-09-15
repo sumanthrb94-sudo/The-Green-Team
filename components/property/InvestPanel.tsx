@@ -2,7 +2,7 @@
 
 /** Per-property investment economics + WhatsApp CTAs — parity with v1's Invest tab. */
 import { Wind, VolumeX, Clock, MapPin, Leaf } from 'lucide-react';
-import { WHATSAPP } from '@/lib/data/contact';
+import { AGARTHA_NOW_RATE, WHATSAPP } from '@/lib/data/contact';
 import { UnitPricing } from '@/components/property/UnitPricing';
 import type { Sanctuary } from '@/lib/data/sanctuaries';
 
@@ -33,6 +33,10 @@ function WhatsAppButtons({ enquire, visit, visitLabel }: { enquire: string; visi
 }
 
 export function InvestPanel({ sanctuary }: { sanctuary: Sanctuary }) {
+  // Spoken three times on the Agartha panel — the heading, the price sheet and
+  // the negotiation line. Three hardcoded copies is what let the page keep
+  // saying ₹8,500 after the rate moved, so it is derived once from the constant.
+  const agarthaRate = `₹${AGARTHA_NOW_RATE.toLocaleString('en-IN')} / sq yd`;
   const telemetry = (
     <div className="grid grid-cols-3 gap-px bg-outline/10 border border-outline/10 rounded-2xl overflow-hidden mb-10">
       {[
@@ -55,9 +59,9 @@ export function InvestPanel({ sanctuary }: { sanctuary: Sanctuary }) {
       <div>
         {telemetry}
         <p className="text-[10px] uppercase tracking-[0.5em] font-bold text-on-surface/60 mb-4">
-          Price Estimate — ₹8,500 / sq yd
+          Price Estimate — {agarthaRate}
         </p>
-        <UnitPricing sanctuaryId="agartha" rateLabel="₹8,500 / sq yd" noun="plot" />
+        <UnitPricing sanctuaryId="agartha" rateLabel={agarthaRate} noun="plot" />
         <p className="mt-3 text-[10px] text-secondary/50">37 plots from 726 sq yds to 1 acre</p>
 
         <div className="mt-8 p-7 rounded-3xl border border-outline/15 bg-surface-container-low">
@@ -88,7 +92,7 @@ export function InvestPanel({ sanctuary }: { sanctuary: Sanctuary }) {
         </div>
 
         <p className="mt-8 text-sm text-on-surface/70">
-          Rate is ₹8,500/sq yd. <strong>Better pricing available for in-person visits — we negotiate on your behalf.</strong>{' '}
+          Rate is {agarthaRate}. <strong>Better pricing available for in-person visits — we negotiate on your behalf.</strong>{' '}
           Message us on WhatsApp to enquire or book a site visit.
         </p>
         <WhatsAppButtons enquire={WHATSAPP.agarthaEnquire} visit={WHATSAPP.agarthaVisit} visitLabel="Book Site Visit · WhatsApp" />
