@@ -104,7 +104,7 @@ export const SANCTUARIES: Sanctuary[] = [
     id: 'syl',
     title: 'MODCON SYL Residences',
     category: 'villas',
-    stage: 'ongoing',
+    stage: 'upcoming',
     investment: true,
     location: 'Tukkuguda, ORR Exit-14 · Hyderabad',
     aqi: 22,
