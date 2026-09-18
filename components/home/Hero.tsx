@@ -1,46 +1,53 @@
 'use client';
 
 /**
- * v4 hero — "bold modern" (The Agency / Compass register), now with the front
- * door's first action in it.
+ * v5 hero — one full-bleed band, one statement, one search.
  *
- * v3 was a statement and nothing else: the only thing a visitor could do on
- * arrival was scroll, and listings did not appear until the second screen. This
- * keeps the confident split — oversized type on a dark canvas at left, one
- * cinematic listing at right — but the paragraph gives way to a search bar and
- * four shortcuts, and the whole band is short enough that real listings are on
- * screen behind it rather than a scroll away.
+ * v4 split the band in two: type on a dark canvas at left, a cinematic Agartha
+ * still at right. That still is gone. It pinned the front door to one of the
+ * three projects, and it covered half of the backdrop — so the slideshow behind
+ * the headline was only ever visible on the half nobody was looking at.
  *
- * It is still not the seven stacked elements of v2 that read as a listing
- * utility: one statement, one image, one search.
+ * What is left is the backdrop at full width: three stills of what we actually
+ * sell, crossfading slowly under a left-weighted wash that keeps the display
+ * type legible. Real listings — Agartha among them — are on the screen directly
+ * below, which is where a visitor picks one rather than being handed one.
  */
 import Link from 'next/link';
-import Image from 'next/image';
 import { motion } from 'motion/react';
-import { ArrowUpRight, ArrowRight, Phone } from 'lucide-react';
+import { ArrowRight, Phone } from 'lucide-react';
 import { HeroSearch } from '@/components/home/HeroSearch';
+import { HeroBackdrop } from '@/components/home/HeroBackdrop';
+import { AGARTHA_NOW_RATE, AGARTHA_OLD_RATE } from '@/lib/data/contact';
 
 const ease = [0.16, 1, 0.3, 1] as const;
+
+// Derived, not typed. This read "+37%" for a week after the rate moved to
+// ₹8,000 — it had been computed against ₹8,500 and nothing recomputed it. It is
+// the single number on the home page a buyer can check with a calculator.
+const APPRECIATION_PCT = Math.round(((AGARTHA_NOW_RATE - AGARTHA_OLD_RATE) / AGARTHA_OLD_RATE) * 100);
 
 const STATS = [
   { v: '12', label: 'AQI at our sites' },
   { v: '45 min', label: 'to the city' },
-  { v: '+37%', label: 'Agartha · 18 mo', accent: true },
+  { v: `+${APPRECIATION_PCT}%`, label: 'Agartha · 18 mo', accent: true },
 ];
 
 export function Hero() {
   return (
     <section className="relative bg-[#0a1208] overflow-hidden">
-      {/* faint texture wash so the dark canvas isn't flat */}
-      <div className="absolute inset-0 opacity-[0.5]">
-        <Image src="/hero-backdrop.jpg" alt="" fill priority sizes="100vw" className="object-cover object-center" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0a1208] via-[#0a1208]/92 to-[#0a1208]/60" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0a1208] via-transparent to-[#0a1208]/50" />
-      </div>
+      {/* The whole canvas now — three stills of what we actually sell,
+          crossfading slowly behind the headline. */}
+      <HeroBackdrop
+        slides={[
+          { src: '/hero-villa.webp', position: '60% center' },
+          { src: '/hero-highrise.webp', position: '55% center' },
+          { src: '/hero-balcony.webp', position: '55% center' },
+        ]}
+      />
 
-      <div className="relative z-10 max-w-[1500px] mx-auto grid lg:grid-cols-[1.05fr_0.95fr]">
-        {/* LEFT — the statement */}
-        <div className="min-w-0 flex flex-col justify-center px-6 md:px-14 pt-16 md:pt-20 pb-10 lg:pb-16 min-h-[58svh] lg:min-h-[74svh]">
+      <div className="relative z-10 max-w-[1500px] mx-auto">
+        <div className="min-w-0 max-w-2xl flex flex-col justify-center px-6 md:px-14 pt-16 md:pt-20 pb-14 md:pb-20 min-h-[62svh] lg:min-h-[78svh]">
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
@@ -135,52 +142,6 @@ export function Hero() {
             ))}
           </motion.div>
         </div>
-
-        {/* RIGHT — one cinematic listing */}
-        <motion.div
-          initial={{ opacity: 0, scale: 1.04 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.1, ease }}
-          className="relative min-h-[40svh] lg:min-h-[74svh]"
-        >
-          <Image
-            src="/gallery/agartha/11.webp"
-            alt="MODCON Agartha — earthen retreat on the Narsapur forest boundary"
-            fill
-            priority
-            sizes="(max-width: 1024px) 100vw, 50vw"
-            className="object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0a1208]/90 via-transparent to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0a1208]/60 via-transparent to-transparent lg:from-[#0a1208]/80" />
-
-          {/* Featured listing card */}
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7, duration: 0.9, ease }}
-            className="absolute bottom-5 left-5 right-5 md:bottom-8 md:left-8 md:right-8 lg:right-10"
-          >
-            <Link
-              href="/sanctuaries/agartha"
-              className="group flex items-center gap-4 p-3.5 pr-5 rounded-2xl bg-white/[0.07] border border-white/12 backdrop-blur-xl hover:bg-white/[0.12] hover:border-[#a3b18a]/40 transition-all max-w-md"
-            >
-              <span className="px-2.5 py-3 rounded-xl bg-[#c8a951] text-[#1a1a0a] text-[8px] uppercase tracking-[0.2em] font-extrabold [writing-mode:vertical-rl] rotate-180">
-                Featured
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block font-headline font-bold text-white leading-tight">MODCON Agartha</span>
-                <span className="block text-[10px] uppercase tracking-[0.2em] text-white/45 font-bold mt-1">
-                  Narsapur forest · 37 plots
-                </span>
-              </span>
-              <span className="text-right flex-shrink-0">
-                <span className="block font-headline font-extrabold text-[#c8a951] whitespace-nowrap">From ₹78 L</span>
-                <ArrowUpRight className="w-4 h-4 text-white/35 ml-auto mt-1 group-hover:text-[#a3b18a] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
-              </span>
-            </Link>
-          </motion.div>
-        </motion.div>
       </div>
     </section>
   );
