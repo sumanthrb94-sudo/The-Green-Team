@@ -40,9 +40,9 @@ export function Hero() {
           crossfading slowly behind the headline. */}
       <HeroBackdrop
         slides={[
-          { src: '/hero-villa.webp', position: '60% center' },
-          { src: '/hero-highrise.webp', position: '55% center' },
-          { src: '/hero-balcony.webp', position: '55% center' },
+          { src: '/hero-villa.webp', portraitSrc: '/hero-villa-portrait.webp', position: '60% center' },
+          { src: '/hero-highrise.webp', portraitSrc: '/hero-highrise-portrait.webp', position: '55% center' },
+          { src: '/hero-balcony.webp', portraitSrc: '/hero-balcony-portrait.webp', position: '55% center' },
         ]}
       />
 

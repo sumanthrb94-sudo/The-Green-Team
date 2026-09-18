@@ -355,5 +355,20 @@
     400,
     800,
     1200
+  ],
+  "/hero-villa-portrait.webp": [
+    400,
+    800,
+    1200
+  ],
+  "/hero-highrise-portrait.webp": [
+    400,
+    800,
+    1200
+  ],
+  "/hero-balcony-portrait.webp": [
+    400,
+    800,
+    1200
   ]
 }
