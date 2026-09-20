@@ -26,3 +26,4 @@ next-env.d.ts
 
 # Generated marketing renders — regenerate with scripts/generate-carousels.mjs
 marketing/ugc-cast/out/
+marketing/ugc-cast/out-story/

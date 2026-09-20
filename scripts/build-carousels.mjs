@@ -1,8 +1,9 @@
 /**
  * Build per-project carousel posts from the real project renders.
  *
- *   node scripts/build-carousels.mjs            # all three projects
- *   node scripts/build-carousels.mjs agartha
+ *   node scripts/build-carousels.mjs               # all three, 4:5 feed posts
+ *   node scripts/build-carousels.mjs agartha       # one project
+ *   node scripts/build-carousels.mjs --story       # 9:16 stories instead
  *
  * No AI, no API key, no credits. This composites the renders the developers
  * actually gave us and sets type over them.
@@ -19,9 +20,21 @@
 import sharp from 'sharp';
 import { mkdirSync, existsSync } from 'node:fs';
 
-const W = 2160, H = 2700;
+/**
+ * Two formats off one layout.
+ *
+ * A story is not a taller post. Instagram and WhatsApp overlay their own UI on
+ * the top and bottom of a 9:16 frame — avatar and close button above, reply
+ * box and sticker row below — so type parked at the bottom edge, which is
+ * correct for a feed post, gets covered. `SAFE` lifts the whole text block
+ * clear of it.
+ */
+const STORY = process.argv.includes('--story');
+const W = 2160;
+const H = STORY ? 3840 : 2700;
+const SAFE = STORY ? 620 : 0;   // bottom reserved for platform chrome
 const INK = '#0a1208', GOLD = '#c8a951', SAGE = '#a3b18a';
-const OUT = 'marketing/ugc-cast/out';
+const OUT = STORY ? 'marketing/ugc-cast/out-story' : 'marketing/ugc-cast/out';
 
 /** SVG is XML: an unescaped & or < silently kills the whole overlay. */
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -34,24 +47,24 @@ const scrim = (from, to, y0, y1) => `
   </linearGradient>`;
 
 function coverSvg({ eyebrow, title, tagline }) {
-  return `<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg"><defs>${scrim(INK, INK, H * 0.3, H)}</defs>
-  <rect x="0" y="${H * 0.3}" width="${W}" height="${H * 0.7}" fill="url(#g)"/>
-  <circle cx="150" cy="${H - 700}" r="13" fill="${GOLD}"/>
-  <text x="196" y="${H - 686}" font-family="Work Sans" font-weight="700" font-size="40" letter-spacing="14" fill="#ffffff" opacity="0.72">${esc(eyebrow)}</text>
-  <text x="146" y="${H - 480}" font-family="Outfit" font-weight="700" font-size="150" letter-spacing="-4" fill="#ffffff">${esc(title)}</text>
-  <text x="150" y="${H - 360}" font-family="Work Sans" font-size="60" fill="${SAGE}">${esc(tagline)}</text>
-  <rect x="150" y="${H - 250}" width="300" height="5" fill="${GOLD}" opacity="0.85"/>
-  <text x="150" y="${H - 150}" font-family="Work Sans" font-weight="700" font-size="38" letter-spacing="10" fill="#ffffff" opacity="0.6">SWIPE</text>
-  <text x="392" y="${H - 148}" font-family="Work Sans" font-weight="700" font-size="44" fill="${GOLD}">&#8594;</text>
+  return `<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg"><defs>${scrim(INK, INK, H * (STORY ? 0.18 : 0.3), H - SAFE * 0.4)}</defs>
+  <rect x="0" y="${H * (STORY ? 0.18 : 0.3)}" width="${W}" height="${H}" fill="url(#g)"/>
+  <circle cx="150" cy="${H - SAFE - 700}" r="13" fill="${GOLD}"/>
+  <text x="196" y="${H - SAFE - 686}" font-family="Work Sans" font-weight="700" font-size="40" letter-spacing="14" fill="#ffffff" opacity="0.72">${esc(eyebrow)}</text>
+  <text x="146" y="${H - SAFE - 480}" font-family="Outfit" font-weight="700" font-size="150" letter-spacing="-4" fill="#ffffff">${esc(title)}</text>
+  <text x="150" y="${H - SAFE - 360}" font-family="Work Sans" font-size="60" fill="${SAGE}">${esc(tagline)}</text>
+  <rect x="150" y="${H - SAFE - 250}" width="300" height="5" fill="${GOLD}" opacity="0.85"/>
+  <text x="150" y="${H - SAFE - 150}" font-family="Work Sans" font-weight="700" font-size="38" letter-spacing="10" fill="#ffffff" opacity="0.6">SWIPE</text>
+  <text x="392" y="${H - SAFE - 148}" font-family="Work Sans" font-weight="700" font-size="44" fill="${GOLD}">&#8594;</text>
   </svg>`;
 }
 
 function statSvg({ value, label, sub }) {
-  return `<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg"><defs>${scrim(INK, INK, H * 0.38, H)}</defs>
-  <rect x="0" y="${H * 0.38}" width="${W}" height="${H * 0.62}" fill="url(#g)"/>
-  <text x="150" y="${H - 420}" font-family="Outfit" font-weight="700" font-size="230" letter-spacing="-8" fill="${GOLD}">${esc(value)}</text>
-  <text x="154" y="${H - 300}" font-family="Outfit" font-weight="700" font-size="76" fill="#ffffff">${esc(label)}</text>
-  ${sub ? `<text x="156" y="${H - 200}" font-family="Work Sans" font-size="48" fill="#ffffff" opacity="0.62">${esc(sub)}</text>` : ''}
+  return `<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg"><defs>${scrim(INK, INK, H * (STORY ? 0.24 : 0.38), H - SAFE * 0.4)}</defs>
+  <rect x="0" y="${H * (STORY ? 0.24 : 0.38)}" width="${W}" height="${H}" fill="url(#g)"/>
+  <text x="150" y="${H - SAFE - 420}" font-family="Outfit" font-weight="700" font-size="230" letter-spacing="-8" fill="${GOLD}">${esc(value)}</text>
+  <text x="154" y="${H - SAFE - 300}" font-family="Outfit" font-weight="700" font-size="76" fill="#ffffff">${esc(label)}</text>
+  ${sub ? `<text x="156" y="${H - SAFE - 200}" font-family="Work Sans" font-size="48" fill="#ffffff" opacity="0.62">${esc(sub)}</text>` : ''}
   </svg>`;
 }
 
@@ -59,15 +72,15 @@ function ctaSvg() {
   return `<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg"><defs>${scrim(INK, INK, 0, H)}</defs>
   <rect x="0" y="0" width="${W}" height="${H}" fill="${INK}" opacity="0.72"/>
   <rect x="0" y="0" width="${W}" height="${H}" fill="url(#g)"/>
-  <circle cx="150" cy="${H / 2 - 430}" r="13" fill="${GOLD}"/>
-  <text x="196" y="${H / 2 - 416}" font-family="Work Sans" font-weight="700" font-size="40" letter-spacing="14" fill="#ffffff" opacity="0.72">THE GREEN TEAM</text>
-  <text x="146" y="${H / 2 - 190}" font-family="Outfit" font-weight="700" font-size="136" letter-spacing="-4" fill="#ffffff">We don&#8217;t sell these.</text>
-  <text x="146" y="${H / 2 - 40}" font-family="Outfit" font-weight="700" font-size="136" letter-spacing="-4" fill="${SAGE}">We check them.</text>
-  <text x="150" y="${H / 2 + 110}" font-family="Work Sans" font-size="58" fill="#ffffff" opacity="0.72">Air &#183; quiet &#183; access &#183; title —</text>
-  <text x="150" y="${H / 2 + 190}" font-family="Work Sans" font-size="58" fill="#ffffff" opacity="0.72">verified before you ever see it.</text>
-  <rect x="150" y="${H / 2 + 290}" width="760" height="130" rx="65" fill="${GOLD}"/>
-  <text x="228" y="${H / 2 + 373}" font-family="Work Sans" font-weight="700" font-size="46" letter-spacing="6" fill="${INK}">thegreenteam.in</text>
-  <text x="150" y="${H - 120}" font-family="Work Sans" font-size="34" fill="#ffffff" opacity="0.38">Architectural renders. Homes not yet built.</text>
+  <circle cx="150" cy="${H / 2 - SAFE / 2 - 430}" r="13" fill="${GOLD}"/>
+  <text x="196" y="${H / 2 - SAFE / 2 - 416}" font-family="Work Sans" font-weight="700" font-size="40" letter-spacing="14" fill="#ffffff" opacity="0.72">THE GREEN TEAM</text>
+  <text x="146" y="${H / 2 - SAFE / 2 - 190}" font-family="Outfit" font-weight="700" font-size="136" letter-spacing="-4" fill="#ffffff">We don&#8217;t sell these.</text>
+  <text x="146" y="${H / 2 - SAFE / 2 - 40}" font-family="Outfit" font-weight="700" font-size="136" letter-spacing="-4" fill="${SAGE}">We check them.</text>
+  <text x="150" y="${H / 2 - SAFE / 2 + 110}" font-family="Work Sans" font-size="58" fill="#ffffff" opacity="0.72">Air &#183; quiet &#183; access &#183; title —</text>
+  <text x="150" y="${H / 2 - SAFE / 2 + 190}" font-family="Work Sans" font-size="58" fill="#ffffff" opacity="0.72">verified before you ever see it.</text>
+  <rect x="150" y="${H / 2 - SAFE / 2 + 290}" width="760" height="130" rx="65" fill="${GOLD}"/>
+  <text x="228" y="${H / 2 - SAFE / 2 + 373}" font-family="Work Sans" font-weight="700" font-size="46" letter-spacing="6" fill="${INK}">thegreenteam.in</text>
+  <text x="150" y="${H - SAFE - 120}" font-family="Work Sans" font-size="34" fill="#ffffff" opacity="0.38">Architectural renders. Homes not yet built.</text>
   </svg>`;
 }
 
@@ -120,7 +133,9 @@ async function frame(img, svg, out) {
   return out;
 }
 
-const wanted = process.argv[2] ? [process.argv[2]] : Object.keys(PROJECTS);
+const arg = process.argv.slice(2).find(a => !a.startsWith('--'));
+const wanted = arg ? [arg] : Object.keys(PROJECTS);
+console.log(STORY ? `story 9:16 — ${W}x${H}` : `post 4:5 — ${W}x${H}`);
 for (const key of wanted) {
   const p = PROJECTS[key];
   if (!p) { console.log(`skip ${key}`); continue; }
