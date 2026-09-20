@@ -23,3 +23,6 @@ next-env.d.ts
 
 # Backups written by scripts/set-hero.mjs when swapping the hero image
 .hero-backups/
+
+# Generated marketing renders — regenerate with scripts/generate-carousels.mjs
+marketing/ugc-cast/out/
