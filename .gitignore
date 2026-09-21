@@ -32,3 +32,8 @@ marketing/ugc-cast/out-story/
 # first frame of a clip and stops being disposable — commit those explicitly
 # with `git add -f`, the way tara-reference.png is kept.
 marketing/agartha-ugc/campaign/stills/
+
+# Raw 8s generations. About a second of each survives the cut, and they
+# regenerate from the committed stills — only finished films get committed,
+# the way reel/*.mp4 already are.
+marketing/agartha-ugc/campaign/clips/
