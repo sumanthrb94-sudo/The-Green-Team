@@ -1,8 +1,9 @@
 /**
  * Generate the per-project UGC carousel posts.
  *
- *   GEMINI_API_KEY=... node scripts/generate-carousels.mjs            # all projects
+ *   GEMINI_API_KEY=... node scripts/generate-carousels.mjs            # all projects, 2K
  *   GEMINI_API_KEY=... node scripts/generate-carousels.mjs agartha    # one project
+ *   GEMINI_API_KEY=... node scripts/generate-carousels.mjs --4k       # 4K masters instead
  *
  * Output lands in marketing/ugc-cast/out/<project>/ (gitignored — regenerate
  * rather than version 4K PNGs).
@@ -31,7 +32,12 @@ const KEY = process.env.GEMINI_API_KEY;
 if (!KEY) { console.error('Set GEMINI_API_KEY. Top up at https://ai.studio/projects if it returns 402.'); process.exit(1); }
 
 const MODEL = 'gemini-3-pro-image';
-const SIZE = '4K';          // max the model offers: ~3072 x 3840 at 4:5
+/**
+ * 2K by default: ~2048px on the short edge, already well past 1080p delivery
+ * and roughly half the per-image cost of 4K. Pass --4k when you want masters
+ * to crop into or print from, not when you want posts.
+ */
+const SIZE = process.argv.includes('--4k') ? '4K' : '2K';
 const RATIO = '4:5';        // feed carousel. '9:16' for stories.
 const OUT = 'marketing/ugc-cast/out';
 const CAST = 'marketing/ugc-cast/tara-reference.png';
@@ -118,7 +124,8 @@ async function generate(project, shot) {
   return null;
 }
 
-const wanted = process.argv[2] ? [process.argv[2]] : Object.keys(PROJECTS);
+const arg = process.argv.slice(2).find(a => !a.startsWith('--'));
+const wanted = arg ? [arg] : Object.keys(PROJECTS);
 for (const project of wanted) {
   const shots = PROJECTS[project];
   if (!shots) { console.log(`skip ${project}: no shot list`); continue; }
