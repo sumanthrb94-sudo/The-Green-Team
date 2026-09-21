@@ -27,3 +27,8 @@ next-env.d.ts
 # Generated marketing renders — regenerate with scripts/generate-carousels.mjs
 marketing/ugc-cast/out/
 marketing/ugc-cast/out-story/
+
+# Unapproved campaign seed stills. Once a still is signed off it becomes the
+# first frame of a clip and stops being disposable — commit those explicitly
+# with `git add -f`, the way tara-reference.png is kept.
+marketing/agartha-ugc/campaign/stills/
