@@ -35,8 +35,14 @@ function bandDown(n: number, step: number): number {
 const READ_CAP = 20000;
 
 export async function getActivity(): Promise<{ items: ActivityItem[]; at: string }> {
-  const db = adminDb();
   const items: ActivityItem[] = [];
+
+  let db;
+  try {
+    db = adminDb();
+  } catch {
+    return { items, at: new Date().toISOString() };
+  }
 
   // --- Reserved units (real scarcity, admin-entered) — the strongest chip.
   // Summed across live properties from the `reserved` field the admin sets.

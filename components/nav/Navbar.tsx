@@ -89,10 +89,10 @@ export function Navbar() {
             </button>
             {/* The two portal actions — supply side (outline) and demand side (gold) */}
             <Link
-              href="/contact?interest=list-property"
+              href="/onboard"
               className="hidden lg:inline-flex items-center px-4 py-2 rounded-full border border-outline/30 text-[9px] uppercase tracking-[0.25em] font-bold text-on-surface/70 hover:border-primary hover:text-primary transition-all"
             >
-              List your property
+              Onboard Property
             </Link>
             <Link
               href="/contact"

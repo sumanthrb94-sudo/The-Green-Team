@@ -27,16 +27,19 @@ import {
   MapPin,
   ChevronRight,
   User as UserIcon,
+  Compass,
 } from 'lucide-react';
 import { Logo } from '@/components/brand/Logo';
 import { useAuth } from '@/components/auth/AuthProvider';
 
 const NAV_ITEMS = [
   { name: 'Home', href: '/', icon: Home },
+  { name: 'Explore Portfolio', href: '/list', icon: Compass },
   { name: 'Villas', href: '/explore/villas', icon: Building2 },
   { name: 'Plots & Farmland', href: '/explore/plots', icon: Trees },
   { name: 'Investments', href: '/explore/investments', icon: TrendingUp },
   { name: 'Sanctuary Map', href: '/map', icon: MapPin },
+  { name: 'RERA & Compliance', href: '/compliance', icon: ShieldCheck },
   { name: 'Journal', href: '/blog', icon: BookOpen },
 ];
 
@@ -124,7 +127,7 @@ export function AccountDrawer({ onClose, isDark }: { onClose: () => void; isDark
         {/* ── Door 2: list your property — right under the account row ────── */}
         <div className="px-5 pt-3 pb-5" style={{ borderBottom: divider }}>
           <Link
-            href="/contact?interest=list-property"
+            href="/onboard"
             onClick={onClose}
             className="flex items-center gap-3 p-3.5 rounded-2xl border border-outline/15 bg-surface-container-low hover:border-primary/40 transition-all group"
           >

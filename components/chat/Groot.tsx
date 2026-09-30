@@ -126,6 +126,12 @@ export function Groot() {
     return () => clearTimeout(t);
   }, [open]);
 
+  useEffect(() => {
+    const handleOpen = () => setOpen(true);
+    window.addEventListener('tgt:open-groot', handleOpen);
+    return () => window.removeEventListener('tgt:open-groot', handleOpen);
+  }, []);
+
   const close = useCallback(() => {
     setOpen(false);
     launcherRef.current?.focus();

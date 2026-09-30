@@ -63,14 +63,17 @@ export const metadata: Metadata = {
     'geo.region': 'IN-TG',
     'geo.placename': 'Hyderabad, Telangana, India',
     'geo.position': '17.3850;78.4867',
-    ICBM: '17.3850, 78.4867',
+    'mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-status-bar-style': 'black-translucent',
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: '#2d3a1d',
+  themeColor: '#0a1208',
   width: 'device-width',
   initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
   viewportFit: 'cover',
 };
 

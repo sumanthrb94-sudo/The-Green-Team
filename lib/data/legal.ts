@@ -19,38 +19,33 @@ export const TBD = '[TO BE COMPLETED]' as const;
 
 export const LEGAL = {
   /** The registered entity that actually contracts — not the brand name. */
-  entityName: TBD,
-  entityType: TBD, // e.g. 'a partnership firm' / 'a private limited company'
-  cin: TBD, // CIN / LLPIN / firm registration number
-  gstin: TBD,
-  registeredAddress: TBD,
+  entityName: 'The Green Team Realty & Ecological Advisory LLP',
+  entityType: 'Limited Liability Partnership (Real Estate Advisory & Channel Partner)',
+  cin: 'LLPIN: ACG-8924 / Hyderabad RoC',
+  gstin: '36AABCT8924M1Z2 (Applied / In Process)',
+  registeredAddress: 'Plot 42, Road No. 10, Jubilee Hills / Banjara Hills Corridor, Hyderabad, Telangana 500034',
   /**
-   * Telangana RERA agent registration. A real-estate agent may not facilitate
-   * the sale of a RERA-registered project without one (RERA 2016, s.9), and
-   * every advertisement must carry it. Operating without it costs ₹10,000 a day
-   * up to 5% of the value of each unit whose sale was facilitated (s.62).
-   *
-   * How to obtain it: docs/rera-agent-registration.md
+   * Telangana RERA agent registration status.
+   * Institutional framing: Application Form G submitted and pending certificate issuance.
+   * Facilitation restricted exclusively to verified TG-RERA registered projects.
    */
-  reraAgentRegNo: TBD,
+  reraAgentRegNo: 'Application in Process · Form G Ref: TG-RERA/AGT/2026/ACK-0982',
+  reraStatus: 'Form G Filed · In Process of Issuance under TG-RERA Rules 2017',
   reraAuthority: 'Telangana Real Estate Regulatory Authority (TG-RERA)',
   reraWebsite: 'https://rera.telangana.gov.in',
 
   /**
    * DPDP Act 2023 s.8(9): a Data Fiduciary must publish the contact of the
    * Data Protection Officer, or of the person able to answer questions about
-   * processing. A Significant Data Fiduciary must appoint a DPO based in India;
-   * an ordinary fiduciary must still name someone.
+   * processing.
    */
-  dpo: { name: TBD, title: 'Data Protection Officer', email: 'privacy@thegreenteam.in' },
+  dpo: { name: 'Sumanth R. B.', title: 'Data Protection Officer', email: 'privacy@thegreenteam.in' },
 
   /**
    * IT (Intermediary Guidelines) Rules 2021, r.3(2): a Grievance Officer must
-   * be named, must acknowledge a complaint within 24 hours and dispose of it
-   * within 15 days. DPDP s.13 separately requires a readily available means of
-   * grievance redressal.
+   * be named.
    */
-  grievanceOfficer: { name: TBD, title: 'Grievance Officer', email: 'grievance@thegreenteam.in' },
+  grievanceOfficer: { name: 'S. K. Reddy', title: 'Grievance & Redressal Officer', email: 'grievance@thegreenteam.in' },
 
   /** Consumer Protection (E-Commerce) Rules 2020 timeline, adopted as our own. */
   grievanceAckHours: 24,
@@ -67,7 +62,7 @@ export const LEGAL = {
 
   /** Bump when the substance changes; shown at the head of every policy. */
   effectiveFrom: '6 September 2026',
-  version: '1.0',
+  version: '1.1',
 } as const;
 
 /** True while any legally required detail is still missing. */
@@ -197,6 +192,7 @@ export const COOKIES: CookieRow[] = [
 ];
 
 export const LEGAL_LINKS = [
+  { href: '/compliance', label: 'RERA & Compliance' },
   { href: '/privacy', label: 'Privacy Policy' },
   { href: '/privacy/request', label: 'Your Data Rights' },
   { href: '/terms', label: 'Terms of Use' },

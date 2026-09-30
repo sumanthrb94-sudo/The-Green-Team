@@ -100,6 +100,8 @@
 
   body {
     @apply bg-surface text-on-surface font-sans antialiased selection:bg-primary/20;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
 
   body.modal-open {
