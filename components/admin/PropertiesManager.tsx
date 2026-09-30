@@ -333,7 +333,7 @@ export function PropertiesManager({ initial }: { initial: AdminProperty[] }) {
     <div>
       <div className="flex items-center justify-between mb-6">
         <p className="text-xs text-secondary/60 max-w-md">
-          Live properties appear on the home page and portfolio alongside the three flagship sanctuaries.
+          Live properties appear on the home page and portfolio alongside the canonical curated sanctuaries.
         </p>
         <button
           onClick={openNew}

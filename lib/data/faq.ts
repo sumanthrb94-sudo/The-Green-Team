@@ -16,8 +16,8 @@ export const SALES_FAQ: Array<{ q: string; a: string; tags?: string[] }> = [
     tags: ['channel-partner', 'about'],
   },
   {
-    q: 'Why do you only list three projects?',
-    a: 'Because only three cleared the standard. We measure every project against six things before it goes on the site: a real environmental advantage (AQI 30 or under and 30 dB or under, measured on site, against a Hyderabad average near 148), title and approvals that survive a lawyer, an approach road that already exists and that we have driven, a developer with at least one delivered project you can walk through, design that keeps the green it is selling, and numbers we are willing to be quoted on. We also refuse assured-return and guaranteed-buyback schemes outright, and anything we have not physically stood on. The full standard, including what we turn down, is published at /standard.',
+    q: 'How do you select and curate projects for the portfolio?',
+    a: 'Only projects that clear our rigorous six-point standard are accepted into the live portfolio and pre-launch pipeline. We measure every project against: a real environmental advantage (AQI 30 or under and 30 dB or under, measured on site, against a Hyderabad average near 148), title and approvals that survive a lawyer, an approach road that already exists and that we have driven, a developer with at least one delivered project you can walk through, design that keeps the green it is selling, and transparent numbers. Projects completing title verification and environmental audits are published under upcoming in-dossier stages. The full standard is published at /standard.',
     tags: ['standard', 'curation', 'trust', 'about'],
   },
   {
@@ -67,7 +67,7 @@ export const SALES_FAQ: Array<{ q: string; a: string; tags?: string[] }> = [
   },
   {
     q: 'Can an NRI buy these properties?',
-    a: 'An NRI or person of Indian origin can buy residential and commercial property in India under the RBI general permission, funded through NRE or NRO accounts or normal banking channels. Agricultural land, plantation property and farmhouses are outside that general permission, which matters for a farm estate like MODCON Agartha. Tell your adviser your residency status early — it decides which of the three sanctuaries are genuinely open to you.',
+    a: 'An NRI or person of Indian origin can buy residential and commercial property in India under the RBI general permission, funded through NRE or NRO accounts or normal banking channels. Agricultural land, plantation property and farmhouses are outside that general permission, which matters for a farm estate like MODCON Agartha. Tell your adviser your residency status early — it decides which sanctuaries in the portfolio are genuinely open to you.',
     tags: ['nri', 'legal', 'eligibility'],
   },
   {
@@ -151,13 +151,13 @@ export const SALES_FAQ: Array<{ q: string; a: string; tags?: string[] }> = [
     tags: ['syl', 'pricing', 'commercial'],
   },
   {
-    q: 'How do the three sanctuaries differ, and which one suits me?',
-    a: 'MODCON Agartha is a 25-acre farmhouse community on the Narsapur forest boundary — 37 plots from 726 sq yds to a full acre, for someone who wants land, a working permaculture farm and the cleanest air of the three. MODCON SYL Residences at Tukkuguda is built living: villaments from 3,882 to 7,000 SFT, ten minutes from the airport, for someone who wants a ready home inside the Fourth City corridor. Dates County at Kandukur is 300+ acres of villa plots beside a 4,000-acre reserve forest — land you can build on later, inside a large planned township.',
+    q: 'How do the different sanctuaries in the portfolio compare, and which suits me?',
+    a: 'MODCON Agartha is a 25-acre farmhouse community on the Narsapur forest boundary for someone who wants land, permaculture and the cleanest air. MODCON SYL Residences at Tukkuguda is built living: villaments 10 minutes from the airport in the Fourth City corridor. Dates County at Kandukur is 300+ acres of villa plots beside a 4,000-acre reserve forest. Our upcoming in-dossier properties — including Ananthagiri Biosphere Retreat and Kollur Green Canopy — expand this choice across the Western and Northern biodiversity ridges.',
     tags: ['comparison', 'portfolio', 'fit'],
   },
   {
     q: 'Which of them will appreciate fastest?',
-    a: 'That question has no honest answer in advance, and the three are not running on the same clock. Agartha is a scarcity play on a forest boundary near the RRR, SYL is an early-phase play in the Tukkuguda growth corridor, and Dates County is a scale play on the Srisailam Highway axis. Match the asset to your holding horizon first, then talk about price.',
+    a: 'That question has no honest answer in advance, as corridors run on different timelines. Agartha is a scarcity play on a forest boundary near the RRR, SYL is an early-phase play in the Tukkuguda growth corridor, Dates County and Mucherla are scale plays on the Srisailam Highway axis, while Ananthagiri and Kollur capture the Vikarabad nature ridge and western IT extension. Match the asset to your holding horizon first, then talk about price.',
     tags: ['comparison', 'returns', 'objection'],
   },
   {
@@ -167,7 +167,7 @@ export const SALES_FAQ: Array<{ q: string; a: string; tags?: string[] }> = [
   },
   {
     q: 'What happens after I request an adviser call?',
-    a: 'We call the number you give us and start with what you are actually solving for — end use, holding horizon, budget bracket — then shortlist from there rather than pitching all three. You get pricing, document status and the current phase in writing, and a site visit if the shortlist holds up. If nothing in the portfolio fits you we will say so; we would rather lose a booking than place you badly.',
+    a: 'We call the number you give us and start with what you are actually solving for — end use, holding horizon, budget bracket — then shortlist from there rather than pitching everything. You get pricing, document status and the current phase in writing, and a site visit if the shortlist holds up. If nothing in the portfolio fits you we will say so; we would rather lose a booking than place you badly.',
     tags: ['adviser', 'process', 'next-steps'],
   },
 ];

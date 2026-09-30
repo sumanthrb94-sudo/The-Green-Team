@@ -9,7 +9,7 @@
  */
 
 export const GROOT_GREETING =
-  "I'm Groot, adviser for The Green Team. Ask me about pricing, plot sizes, air quality or approvals across our three sanctuaries — or tell me when you'd like to visit one and I'll set it up.";
+  "I'm Groot, adviser for The Green Team. Ask me about pricing, plot sizes, air quality or approvals across our curated sanctuaries and pipeline dossiers — or tell me when you'd like to visit one and I'll set it up.";
 
 /** Shown only when the assistant cannot be reached at all. */
 export const GROOT_FALLBACK =

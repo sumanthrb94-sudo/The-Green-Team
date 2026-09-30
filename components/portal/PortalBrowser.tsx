@@ -181,10 +181,10 @@ export function PortalBrowser({
       <div className="flex items-center justify-between gap-4 mt-7 mb-5">
         <p className="text-sm text-secondary/80">
           <span className="font-bold text-on-surface tabular-nums">{results.length}</span>{' '}
-          {results.length === 1 ? 'property' : 'properties'}
+          {results.length === 1 ? 'curated sanctuary' : 'curated sanctuaries'}
           <span className="hidden sm:inline"> · </span>
           <span className="hidden sm:inline-flex items-center gap-1 text-secondary/60">
-            <MapPin className="w-3.5 h-3.5 text-primary/50" /> Hyderabad
+            <MapPin className="w-3.5 h-3.5 text-primary/50" /> Hyderabad Green Corridors
           </span>
         </p>
         {activeCount > 0 && (

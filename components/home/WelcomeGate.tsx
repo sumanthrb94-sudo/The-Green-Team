@@ -56,9 +56,9 @@ export function WelcomeGate() {
             <X className="w-4 h-4 text-white/60" />
           </button>
           <p className="text-[8px] uppercase tracking-[0.5em] font-bold text-[#a3b18a] mb-2">The Green Team</p>
-          <p className="font-headline font-bold text-lg leading-snug mb-1.5">Unlock all three sanctuaries</p>
+          <p className="font-headline font-bold text-lg leading-snug mb-1.5">Unlock the sanctuary portfolio</p>
           <p className="text-sm text-white/50 mb-5">
-            One sign-in gets you every price, plot and briefing — Agartha, SYL &amp; Dates County.
+            One sign-in gets you every price, plot dossier, and pre-launch briefing across our curated portfolio.
           </p>
           <button
             onClick={() => {

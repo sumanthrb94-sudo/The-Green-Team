@@ -354,7 +354,7 @@ function contactChunks(out: KbChunk[]): void {
       `When enquiring with ${BUSINESS.name}, buyers choose an investment bracket so the adviser shortlists only ` +
       `what fits. The brackets offered are: ${INVESTMENT_BRACKETS.join(', ')}. ` +
       `The portfolio entry point sits in the first bracket, and the bracket a buyer selects drives which of the ` +
-      `three sanctuaries the adviser puts in front of them.`,
+      `curated sanctuaries the adviser puts in front of them.`,
   });
 
   const growth = ((AGARTHA_NOW_RATE - AGARTHA_OLD_RATE) / AGARTHA_OLD_RATE) * 100;

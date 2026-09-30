@@ -87,7 +87,7 @@ export function ProofStrip() {
                   {' '}— Outlook Business Spotlight Entity Awards, won by MODCON for{' '}
                 </span>
                 <span className="font-bold group-hover:text-primary transition-colors">MODCON Agartha</span>
-                <span className="text-secondary">, one of the three projects on our list.</span>
+                <span className="text-secondary">, one of the flagship sanctuaries on our curated list.</span>
               </p>
             </div>
           </Link>

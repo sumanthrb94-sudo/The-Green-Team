@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     siteName: 'The Green Team',
     title: 'Our Listing Standard | The Green Team',
     description:
-      'Why we list three projects and not three hundred — the standard, and the list of what we turn down.',
+      'Why we curate select sanctuaries rather than listing hundreds — the standard, and the list of what we turn down.',
     url: `${SITE_URL}/standard`,
     images: [{ url: `${SITE_URL}/agartha-render.jpg` }],
   },
@@ -33,9 +33,9 @@ export const metadata: Metadata = {
 export const revalidate = 300;
 
 /**
- * The page that answers the obvious objection to a curated portfolio: "only
- * three listings?" Publishing the bar — and the refusals underneath it — turns
- * a thin catalogue into the reason to trust the catalogue.
+ * The page that answers the question: "how do you select what to list?"
+ * Publishing the bar — and the refusals underneath it — turns
+ * curation into the reason to trust the catalogue.
  */
 export default async function StandardPage() {
   const portfolio = await getPortfolio();
@@ -50,7 +50,7 @@ export default async function StandardPage() {
             Our Standard
           </p>
           <h1 className="font-serif text-4xl md:text-6xl font-light leading-tight mb-6">
-            We list three projects because only three passed.
+            We list curated sanctuaries because only the best pass.
           </h1>
           <p className="text-lg md:text-xl font-light text-secondary leading-relaxed max-w-2xl">
             A portal lists everything and lets you sort it out. We do the opposite: we measure

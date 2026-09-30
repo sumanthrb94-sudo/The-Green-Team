@@ -57,8 +57,19 @@ import { cn } from '@/lib/utils';
 
 // --- Custom Surgical Leaflet Markers ---
 
+function getSanctuaryAccent(id: string) {
+  if (id === 'agartha') return '#a3b18a';
+  if (id === 'syl') return '#c8a951';
+  if (id === 'dates-county') return '#e2c46e';
+  if (id === 'ananthagiri-reserve') return '#34d399';
+  if (id === 'kollur-canopy') return '#2dd4bf';
+  if (id === 'shamirpet-lakeview') return '#38bdf8';
+  if (id === 'mucherla-future-city') return '#f59e0b';
+  return '#10b981';
+}
+
 function createSanctuaryIcon(s: MapLocation, isSelected: boolean) {
-  const accentColor = s.id === 'agartha' ? '#a3b18a' : s.id === 'syl' ? '#c8a951' : '#e2c46e';
+  const accentColor = getSanctuaryAccent(s.id);
   const html = `
     <div style="position:relative;display:flex;align-items:center;transform:translate(-50%,-50%);cursor:pointer;z-index:${isSelected ? 1000 : 500};">
       <div style="
@@ -410,7 +421,7 @@ export default function SanctuaryMap() {
           {/* Individual Sanctuaries */}
           {sanctuaries.map(s => {
             const active = selectedLocation?.id === s.id;
-            const dotColor = s.id === 'agartha' ? '#4ade80' : s.id === 'syl' ? '#facc15' : '#fb923c';
+            const dotColor = getSanctuaryAccent(s.id);
             return (
               <button
                 key={s.id}

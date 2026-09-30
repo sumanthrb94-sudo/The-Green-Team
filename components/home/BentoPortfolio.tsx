@@ -79,6 +79,11 @@ const BADGES: Record<string, string> = {
   agartha: 'Flagship · Open Reservation',
   syl: 'Pre-Investor Phase',
   'dates-county': 'Now Booking',
+  'ananthagiri-reserve': 'In Dossier · Highland Buffer',
+  'kollur-canopy': 'Upcoming · Pre-Launch',
+  'shamirpet-lakeview': 'Dossier Review · Lakefront',
+  'mucherla-future-city': 'Future City Core · Pipeline',
+  'moinabad-eco-enclave': 'Private Member Dossier',
 };
 
 export function BentoPortfolio({ sanctuaries }: { sanctuaries: Sanctuary[] }) {
@@ -93,7 +98,7 @@ export function BentoPortfolio({ sanctuaries }: { sanctuaries: Sanctuary[] }) {
               Curated Portfolio
             </span>
             <h2 className="font-headline font-extrabold tracking-[-0.02em] text-4xl md:text-6xl text-on-surface leading-[0.95]">
-              Three sanctuaries.
+              Curated sanctuaries.
               <br />
               <span className="text-primary">Chosen to be lived in.</span>
             </h2>
@@ -117,6 +122,37 @@ export function BentoPortfolio({ sanctuaries }: { sanctuaries: Sanctuary[] }) {
             <Tile key={s.id} s={s} index={i + 1} badge={BADGES[s.id] ?? 'Curated'} />
           ))}
         </div>
+
+        {/* Upcoming In-Dossier Sanctuaries */}
+        {rest.length > 2 && (
+          <div className="mt-14 pt-10 border-t border-outline/10">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+              <div>
+                <span className="text-primary text-[9px] font-bold uppercase tracking-[0.4em] block mb-1">
+                  Pipeline &amp; Onboarding
+                </span>
+                <h3 className="font-headline font-bold text-2xl md:text-3xl text-on-surface">
+                  Upcoming Sanctuaries in Dossier
+                </h3>
+                <p className="text-xs text-secondary/70 mt-1 max-w-xl">
+                  Properties undergoing legal vetting, TG-RERA compliance drafting, and on-ground environmental measurements.
+                </p>
+              </div>
+              <Link
+                href="/list?stage=upcoming"
+                className="inline-flex items-center gap-1.5 text-xs uppercase tracking-wider font-bold text-primary hover:underline underline-offset-4"
+              >
+                <span>View all upcoming ({rest.length - 2})</span>
+                <span>→</span>
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
+              {rest.slice(2).map((s, i) => (
+                <Tile key={s.id} s={s} index={i + 3} badge={BADGES[s.id] ?? 'In Dossier'} />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );
