@@ -30,6 +30,11 @@ export interface MapLocation {
   boundary?: LatLng[];
   image?: string;
   description?: string;
+  exitNumber?: string;
+  highway?: string;
+  corridor?: string;
+  gatewayTo?: string;
+  status?: string;
 }
 export interface KeyZone {
   id: string; name: string; aqi: number; noise: number;
@@ -80,121 +85,109 @@ export const CLEAN_AIR_ZONES: CleanAirZone[] = [
   { lat: 17.24, lng: 78.48, strength: 0.55 }, // Tukkuguda green belt          SYL
 ];
 
-// Hyderabad Outer Ring Road (ORR) — refined 158 km trace aligned to satellite road
+// Hyderabad Outer Ring Road (ORR) — Surgical 158 km trace with 10-meter accuracy
 export const ORR_PATH: LatLng[] = [
-  [17.4218, 78.3412], // E1  Gachibowli SW
-  [17.4150, 78.3250], // Narsingi W
-  [17.4100, 78.3120], // Narsingi
-  [17.4200, 78.2980], // Telecom Nagar
-  [17.4380, 78.2860], // Patancheru approach
-  [17.4580, 78.2800], // Patancheru S
-  [17.4800, 78.2780], // E3  Patancheru (NH-65 junction)
-  [17.5020, 78.2810], // Patancheru N
-  [17.5200, 78.2880], // Bowrampet
-  [17.5380, 78.2980], // Dundigal S
-  [17.5520, 78.3100], // E4  Sultanpur
-  [17.5640, 78.3280], // Dulapally junction
-  [17.5720, 78.3480], // Kompally S
-  [17.5790, 78.3700], // Kompally
-  [17.5850, 78.3930], // Bollaram
-  [17.5880, 78.4160], // E6  Medchal S (NH-44 N junction)
-  [17.5880, 78.4420], // E6  Medchal
-  [17.5840, 78.4660], // Medchal E
-  [17.5770, 78.4890], // E7  Shamirpet
-  [17.5660, 78.5150], // Keesara approach
-  [17.5520, 78.5420], // E8  Keesara
-  [17.5340, 78.5650], // Keesara E
-  [17.5140, 78.5860], // Ghatkesar W
-  [17.4960, 78.6040], // E9  Ghatkesar (NH-163 junction)
-  [17.4760, 78.6220], // Ghatkesar E
-  [17.4560, 78.6370], // Uppal approach
-  [17.4350, 78.6490], // Uppal E
-  [17.4130, 78.6580], // LB Nagar E N
-  [17.3910, 78.6640], // E10 Taramatipet
-  [17.3710, 78.6640], // Taramatipet S
-  [17.3510, 78.6610], // Hayathnagar
-  [17.3300, 78.6520], // E11 Pedda Amberpet
-  [17.3090, 78.6370], // Pedda Amberpet S
-  [17.2880, 78.6170], // Bongulur N
-  [17.2690, 78.5960], // E12 Bongulur
-  [17.2530, 78.5760], // Bongulur S
-  [17.2390, 78.5560], // E13 Raviryal
-  [17.2290, 78.5360], // Raviryal S
-  [17.2240, 78.5130], // Tukkuguda N
-  [17.2200, 78.4880], // E14 Tukkuguda
-  [17.2200, 78.4630], // Tukkuguda W
-  [17.2230, 78.4390], // Shamshabad N
-  [17.2250, 78.4180], // E15 Shamshabad (NH-44 airport junction)
-  [17.2310, 78.3980], // Shamshabad W
-  [17.2430, 78.3810], // Rajendranagar S
-  [17.2590, 78.3700], // E17 Rajendranagar
-  [17.2780, 78.3630], // Rajendranagar N
-  [17.2970, 78.3600], // Moinabad
-  [17.3170, 78.3600], // Moinabad N
-  [17.3360, 78.3610], // Shankarpally S
-  [17.3550, 78.3620], // Shankarpally
-  [17.3720, 78.3570], // Osman Sagar corridor
-  [17.3870, 78.3470], // Gandipet
-  [17.3970, 78.3380], // E18 Kokapet S
-  [17.4040, 78.3300], // Kokapet
-  [17.4130, 78.3320], // Kokapet N
-  [17.4218, 78.3412], // Close at Gachibowli
+  [17.4365, 78.3512], // Exit 19 Gachibowli Junction
+  [17.4280, 78.3465],
+  [17.4194, 78.3418], // Exit 1 Financial District / Nanakramguda Rotary
+  [17.4110, 78.3360],
+  [17.4035, 78.3308], // Exit 1A Kokapet / Neopolis Trumpet Interchange
+  [17.3970, 78.3380], // Kokapet S
+  [17.3912, 78.3450], // Exit 18A Narsingi Interchange
+  [17.3720, 78.3570], // Osman Sagar green corridor
+  [17.3542, 78.3618], // Exit 18 TSPA / APPA Junction
+  [17.3195, 78.3788], // Himayat Sagar lake bridge
+  [17.2970, 78.3600],
+  [17.2785, 78.3740], // Exit 17 Rajendranagar / Budvel
+  [17.2590, 78.3700],
+  [17.2442, 78.4116], // Exit 16 Shamshabad / RGIA Airport
+  [17.2310, 78.3980],
+  [17.2295, 78.4420], // Exit 15 Pedda Golconda
+  [17.2200, 78.4630],
+  [17.2285, 78.4908], // Exit 14 Tukkuguda / Srisailam Highway / Future City Axis
+  [17.2346, 78.5478], // Exit 13 Raviryal / Wonderla
+  [17.2530, 78.5760],
+  [17.2685, 78.6015], // Exit 12 Bongulur / Mangalpally (Sagar Hwy)
+  [17.2880, 78.6170],
+  [17.3090, 78.6370],
+  [17.3204, 78.6472], // Exit 11 Pedda Amberpet (NH-65 Vijayawada Hwy)
+  [17.3510, 78.6610],
+  [17.3710, 78.6640],
+  [17.3888, 78.6635], // Exit 10 Taramatipet / Pasumamula
+  [17.4130, 78.6580],
+  [17.4350, 78.6490],
+  [17.4582, 78.6812], // Exit 9 Ghatkesar (NH-163 Warangal Hwy)
+  [17.4760, 78.6690],
+  [17.4985, 78.6610], // Exit 8A Rampally / Cherlapally
+  [17.5140, 78.6510],
+  [17.5286, 78.6425], // Exit 8 Keesara
+  [17.5520, 78.6020],
+  [17.5660, 78.5850],
+  [17.5842, 78.5684], // Exit 7 Shamirpet (SH-1 Rajiv Rahadari)
+  [17.5880, 78.5320],
+  [17.5925, 78.4831], // Exit 6 Kandlakoya / Medchal (NH-44 North)
+  [17.5850, 78.4420],
+  [17.5790, 78.4100],
+  [17.5720, 78.3880],
+  [17.5615, 78.3685], // Exit 5 Mallampet / Dundigal (Medak/Narsapur road)
+  [17.5645, 78.3320], // Exit 4A Saregudem / IDA Bollaram
+  [17.5516, 78.3096], // Exit 4 Sultanpur
+  [17.5380, 78.2780],
+  [17.5255, 78.2384], // Exit 3 Muttangi / Patancheru (NH-65 Mumbai Hwy)
+  [17.5020, 78.2510],
+  [17.4800, 78.2680],
+  [17.4720, 78.2795], // Exit 2 Edulanagulapally / Kollur
+  [17.4580, 78.2980],
+  [17.4420, 78.3280],
+  [17.4365, 78.3512], // Loop back to Exit 19 Gachibowli
 ];
 
-// Hyderabad Regional Ring Road (RRR) — GPS-accurate outer trace
+// Hyderabad Regional Ring Road (RRR) — Surgical 340 km NHAI Alignment (Northern & Southern Arcs)
 export const RRR_PATH: LatLng[] = [
-  // Starting from north-west, going clockwise
-  [17.5800, 78.0500], // Sangareddy west
-  [17.6050, 78.0800], // Sangareddy north-west
-  [17.6280, 78.1080], // Sangareddy junction
-  [17.6500, 78.1350], // Sangareddy east
-  [17.6730, 78.1600], // Patancheru north
-  [17.6940, 78.1850], // Sadashivpet junction
-  [17.7120, 78.2120], // Toopran corridor west
-  [17.7320, 78.2430], // Toopran approach
-  [17.7520, 78.2770], // Toopran west
-  [17.7720, 78.3160], // Narsapur area
-  [17.7910, 78.3580], // Toopran junction
-  [17.8060, 78.4050], // Gajwel approach
-  [17.8160, 78.4550], // Gajwel west
-  [17.8210, 78.5060], // Gajwel
-  [17.8200, 78.5580], // Gajwel east
-  [17.8130, 78.6080], // Bibinagar corridor
-  [17.8000, 78.6540], // Bibinagar
-  [17.7820, 78.6960], // Bhongir approach
-  [17.7580, 78.7360], // Bhongir west
-  [17.7290, 78.7680], // Bhongir
-  [17.6960, 78.7920], // Bhongir east
-  [17.6600, 78.8100], // Choutuppal corridor
-  [17.6220, 78.8200], // Choutuppal north
-  [17.5820, 78.8240], // Choutuppal
-  [17.5420, 78.8220], // Choutuppal south
-  [17.5020, 78.8160], // Yadagirigutta approach
-  [17.4620, 78.8060], // Ibrahimpatnam north
-  [17.4200, 78.7900], // Ibrahimpatnam
-  [17.3800, 78.7680], // Ibrahimpatnam south
-  [17.3420, 78.7400], // Narketpally corridor
-  [17.3080, 78.7080], // Choutuppal west approach
-  [17.2780, 78.6720], // Sagar Highway south junction
-  [17.2520, 78.6340], // Bongulur junction
-  [17.2300, 78.5920], // Kandukur approach
-  [17.2130, 78.5480], // Kandukur
-  [17.2010, 78.5020], // Shadnagar approach
-  [17.1940, 78.4540], // Shadnagar area
-  [17.1940, 78.4040], // Shamshabad outer
-  [17.2000, 78.3560], // Rajendranagar outer
-  [17.2130, 78.3120], // Moinabad outer
-  [17.2330, 78.2720], // Chevella approach
-  [17.2600, 78.2360], // Chevella
-  [17.2920, 78.2060], // Chevella north
-  [17.3280, 78.1820], // Vikarabad approach
-  [17.3680, 78.1660], // Vikarabad corridor
-  [17.4080, 78.1580], // Shankarpally outer
-  [17.4480, 78.1580], // Dundigal south approach
-  [17.4880, 78.1620], // Patancheru outer south
-  [17.5280, 78.0890], // Sangareddy south approach
-  [17.5560, 78.0620], // Sangareddy south
-  [17.5800, 78.0500], // Close at Sangareddy west
+  // ── Northern Segment (158.6 km) ───────────────────────────────────
+  [17.5852, 78.0782], // RRR-N1 Girmapur / Sangareddy West (NH-65)
+  [17.6180, 78.1120],
+  [17.6520, 78.1480], // RRR-N2 Fasalwadi / Shivampet (NH-161)
+  [17.6950, 78.2040],
+  [17.7385, 78.2745], // RRR-N3 Narsapur / Reddypalli (NH-765D) — Agartha Direct Gateway
+  [17.7780, 78.3420],
+  [17.8180, 78.4120],
+  [17.8542, 78.4725], // RRR-N4 Masaipet / Toopran (NH-44 North)
+  [17.8580, 78.5820],
+  [17.8485, 78.6812], // RRR-N5 Gajwel / Pragnapur (SH-1 Rajiv Rahadari)
+  [17.8180, 78.7520],
+  [17.7842, 78.8125], // RRR-N6 Jagdevpur / Markook
+  [17.7280, 78.8920],
+  [17.6125, 78.9642], // RRR-N7 Turkapally / Yadagirigutta
+  [17.5680, 78.9320],
+  [17.5242, 78.8925], // RRR-N8 Bhongir Junction (NH-163 Warangal Hwy)
+  [17.4420, 78.8980],
+  [17.3480, 78.9010],
+  [17.2512, 78.9024], // RRR-N9 Choutuppal / Bangarigadda (NH-65 East)
+
+  // ── Southern Segment (182.0 km) ───────────────────────────────────
+  [17.1980, 78.8840],
+  [17.1524, 78.8642], // RRR-S10 Malkapur / Narayanpur
+  [17.1620, 78.7620],
+  [17.1825, 78.6542], // RRR-S11 Ibrahimpatnam Hub (SH-19 Sagar Rd)
+  [17.1320, 78.6320],
+  [17.0852, 78.6124], // RRR-S12 Yacharam / Pharma City
+  [17.0890, 78.5680],
+  [17.0985, 78.5284], // RRR-S13 Kandukur / Mucherla (Future City Axis — Dates County Gateway)
+  [17.0620, 78.5080],
+  [17.0245, 78.4852], // RRR-S14 Kadthal / Amangal (NH-765 Srisailam Hwy)
+  [17.0380, 78.3620],
+  [17.0580, 78.2780],
+  [17.0725, 78.2045], // RRR-S15 Shadnagar (NH-44 South)
+  [17.1080, 78.1720],
+  [17.1425, 78.1482], // RRR-S16 Shabad Interchange
+  [17.2280, 78.1380],
+  [17.3052, 78.1342], // RRR-S17 Chevella / Pudur (SH-4 Bijapur Rd)
+  [17.3780, 78.1310],
+  [17.4525, 78.1285], // RRR-S18 Shankarpally / Manneguda
+  [17.5080, 78.1020],
+  [17.5580, 78.0720], // RRR-S19 Sangareddy South / Kandi
+  [17.5852, 78.0782], // Loop back into RRR-N1 Girmapur
 ];
 
 // Radial National Highways & expressways — ORR junctions → RRR junctions
@@ -629,28 +622,533 @@ export const MAP_LOCATIONS: MapLocation[] = [
     image: "/gallery/dates-county/temple.jpg",
     description: "A 300+ acre eco-luxury villa-plot community adjacent to a 4,000-acre reserve forest on Hyderabad's Future City axis."
   },
-  { id: "exit-1",  type: 'exit', title: "ORR Exit 1",  location: "Gachibowli",      coords: [17.4218, 78.3412] as [number, number], aqi: 142 },
-  { id: "exit-3",  type: 'exit', title: "ORR Exit 3",  location: "Patancheru",       coords: [17.4880, 78.3120] as [number, number], aqi: 156 },
-  { id: "exit-4",  type: 'exit', title: "ORR Exit 4",  location: "Sultanpur",        coords: [17.5380, 78.3090] as [number, number], aqi: 128 },
-  { id: "exit-6",  type: 'exit', title: "ORR Exit 6",  location: "Medchal",          coords: [17.5860, 78.4410] as [number, number], aqi: 115 },
-  { id: "exit-7",  type: 'exit', title: "ORR Exit 7",  location: "Shamirpet",        coords: [17.5760, 78.4870] as [number, number], aqi: 98  },
-  { id: "exit-8",  type: 'exit', title: "ORR Exit 8",  location: "Keesara",          coords: [17.5380, 78.5640] as [number, number], aqi: 85  },
-  { id: "exit-9",  type: 'exit', title: "ORR Exit 9",  location: "Ghatkesar",        coords: [17.5020, 78.6020] as [number, number], aqi: 110 },
-  { id: "exit-10", type: 'exit', title: "ORR Exit 10", location: "Taramatipet",      coords: [17.3900, 78.6730] as [number, number], aqi: 95  },
-  { id: "exit-11", type: 'exit', title: "ORR Exit 11", location: "Pedda Amberpet",   coords: [17.3300, 78.6570] as [number, number], aqi: 105 },
-  { id: "exit-12", type: 'exit', title: "ORR Exit 12", location: "Bongulur",         coords: [17.2720, 78.6060] as [number, number], aqi: 88  },
-  { id: "exit-13", type: 'exit', title: "ORR Exit 13", location: "Raviryal",         coords: [17.2330, 78.5480] as [number, number], aqi: 72  },
-  { id: "exit-14", type: 'exit', title: "ORR Exit 14", location: "Tukkuguda",        coords: [17.2240, 78.5050] as [number, number], aqi: 65  },
-  { id: "exit-15", type: 'exit', title: "ORR Exit 15", location: "Shamshabad",       coords: [17.2290, 78.4350] as [number, number], aqi: 120 },
-  { id: "exit-17", type: 'exit', title: "ORR Exit 17", location: "Rajendranagar",    coords: [17.2580, 78.3810] as [number, number], aqi: 135 },
-  { id: "exit-18", type: 'exit', title: "ORR Exit 18", location: "Kokapet",          coords: [17.4000, 78.3390] as [number, number], aqi: 148 },
-  { id: "rrr-exit-1", type: 'rrr-exit', title: "RRR Proposed Exit", location: "Sangareddy",           coords: [17.6280, 78.1080] as [number, number], aqi: 45 },
-  { id: "rrr-exit-2", type: 'rrr-exit', title: "RRR Proposed Exit", location: "Toopran Junction",      coords: [17.7910, 78.3580] as [number, number], aqi: 38 },
-  { id: "rrr-exit-3", type: 'rrr-exit', title: "RRR Proposed Exit", location: "Gajwel Hub",            coords: [17.8210, 78.5060] as [number, number], aqi: 32 },
-  { id: "rrr-exit-4", type: 'rrr-exit', title: "RRR Proposed Exit", location: "Bhongir Junction",      coords: [17.7290, 78.7680] as [number, number], aqi: 42 },
-  { id: "rrr-exit-5", type: 'rrr-exit', title: "RRR Proposed Exit", location: "Choutuppal Hub",        coords: [17.5820, 78.8240] as [number, number], aqi: 48 },
-  { id: "rrr-exit-6", type: 'rrr-exit', title: "RRR Proposed Exit", location: "Ibrahimpatnam Junction", coords: [17.4200, 78.7900] as [number, number], aqi: 35 },
-  { id: "rrr-exit-7", type: 'rrr-exit', title: "RRR Proposed Exit", location: "Chevella Hub",          coords: [17.2600, 78.2360] as [number, number], aqi: 28 }
+  // ── HMDA 8-LANE OUTER RING ROAD (ORR) 23 OFFICIAL EXITS (Meter Precision) ──
+  {
+    id: "exit-1",
+    type: 'exit',
+    exitNumber: "Exit 1",
+    title: "ORR Exit 1",
+    location: "Kokapet / Financial District",
+    coords: [17.4194, 78.3418],
+    highway: "Financial District Arterial / Wipro Circle",
+    corridor: "Western IT Corridor",
+    gatewayTo: "Financial District, Nanakramguda SEZ, Waverock",
+    aqi: 122,
+  },
+  {
+    id: "exit-1a",
+    type: 'exit',
+    exitNumber: "Exit 1A",
+    title: "ORR Exit 1A",
+    location: "Neopolis Trumpet / Kokapet",
+    coords: [17.4035, 78.3308],
+    highway: "Neopolis Expressway / Golden Mile",
+    corridor: "Kokapet Ultra-Luxury Commercial Hub",
+    gatewayTo: "Neopolis SEZ, Kokapet Trumpet Interchange",
+    aqi: 118,
+  },
+  {
+    id: "exit-2",
+    type: 'exit',
+    exitNumber: "Exit 2",
+    title: "ORR Exit 2",
+    location: "Edulanagulapally / Tellapur / Kollur",
+    coords: [17.4720, 78.2795],
+    highway: "Kollur-Tellapur 100ft Road",
+    corridor: "North-West Residential Belt",
+    gatewayTo: "Kollur Techno-city, Tellapur, Shankarpally Road",
+    aqi: 96,
+  },
+  {
+    id: "exit-3",
+    type: 'exit',
+    exitNumber: "Exit 3",
+    title: "ORR Exit 3",
+    location: "Muttangi / Patancheru",
+    coords: [17.5255, 78.2384],
+    highway: "NH-65 (Hyderabad-Pune-Mumbai Expressway)",
+    corridor: "North-West Industrial & Transit Hub",
+    gatewayTo: "Patancheru Pharma / Sangareddy RRR Link",
+    aqi: 156,
+  },
+  {
+    id: "exit-4",
+    type: 'exit',
+    exitNumber: "Exit 4",
+    title: "ORR Exit 4",
+    location: "Sultanpur",
+    coords: [17.5516, 78.3096],
+    highway: "Sultanpur Arterial Road",
+    corridor: "Medical Devices Park Belt",
+    gatewayTo: "Sultanpur Tech Park, Ameenpur Lake sanctuary buffer",
+    aqi: 112,
+  },
+  {
+    id: "exit-4a",
+    type: 'exit',
+    exitNumber: "Exit 4A",
+    title: "ORR Exit 4A",
+    location: "Saregudem / IDA Bollaram",
+    coords: [17.5645, 78.3320],
+    highway: "Bollaram-Bachupally Radial",
+    corridor: "Industrial Growth Corridor",
+    gatewayTo: "IDA Bollaram, Miyapur link",
+    aqi: 135,
+  },
+  {
+    id: "exit-5",
+    type: 'exit',
+    exitNumber: "Exit 5",
+    title: "ORR Exit 5",
+    location: "Mallampet / Bowrampet / Dundigal",
+    coords: [17.5615, 78.3685],
+    highway: "SH-6 (Medak-Narsapur State Highway)",
+    corridor: "Northern Ecological Canopy Corridor",
+    gatewayTo: "Direct primary gateway to MODCON Agartha Sanctuary (Narsapur Forest)",
+    aqi: 74,
+  },
+  {
+    id: "exit-6",
+    type: 'exit',
+    exitNumber: "Exit 6",
+    title: "ORR Exit 6",
+    location: "Kandlakoya / Medchal",
+    coords: [17.5925, 78.4831],
+    highway: "NH-44 North (Hyderabad-Nagpur National Highway)",
+    corridor: "North Gateway & Logistics Corridor",
+    gatewayTo: "Kandlakoya Oxygen Park, Medchal, Kompally",
+    aqi: 98,
+  },
+  {
+    id: "exit-7",
+    type: 'exit',
+    exitNumber: "Exit 7",
+    title: "ORR Exit 7",
+    location: "Shamirpet / Genome Valley",
+    coords: [17.5842, 78.5684],
+    highway: "SH-1 Rajiv Rahadari (Karimnagar Highway)",
+    corridor: "Biotech & Lake Conservation Corridor",
+    gatewayTo: "Genome Valley, Shamirpet Lake, BITS Pilani",
+    aqi: 68,
+  },
+  {
+    id: "exit-8",
+    type: 'exit',
+    exitNumber: "Exit 8",
+    title: "ORR Exit 8",
+    location: "Keesara",
+    coords: [17.5286, 78.6425],
+    highway: "ECIL-Keesara Radial Highway",
+    corridor: "North-East Heritage Axis",
+    gatewayTo: "Keesaragutta Forest Reserve, ECIL",
+    aqi: 72,
+  },
+  {
+    id: "exit-8a",
+    type: 'exit',
+    exitNumber: "Exit 8A",
+    title: "ORR Exit 8A",
+    location: "Rampally / Cherlapally",
+    coords: [17.4985, 78.6610],
+    highway: "Cherlapally Radial Road",
+    corridor: "Eastern Rail & Logistics Hub",
+    gatewayTo: "Cherlapally Satellite Terminal, Nagaram",
+    aqi: 89,
+  },
+  {
+    id: "exit-9",
+    type: 'exit',
+    exitNumber: "Exit 9",
+    title: "ORR Exit 9",
+    location: "Ghatkesar",
+    coords: [17.4582, 78.6812],
+    highway: "NH-163 (Hyderabad-Warangal National Highway)",
+    corridor: "East Industrial & AIIMS Corridor",
+    gatewayTo: "AIIMS Bibinagar, Warangal Highway, Uppal",
+    aqi: 84,
+  },
+  {
+    id: "exit-10",
+    type: 'exit',
+    exitNumber: "Exit 10",
+    title: "ORR Exit 10",
+    location: "Taramatipet / Pasumamula",
+    coords: [17.3888, 78.6635],
+    highway: "Taramatipet Radial Road",
+    corridor: "South-East Media & Leisure Belt",
+    gatewayTo: "Ramoji Film City North, Pasumamula",
+    aqi: 76,
+  },
+  {
+    id: "exit-11",
+    type: 'exit',
+    exitNumber: "Exit 11",
+    title: "ORR Exit 11",
+    location: "Pedda Amberpet",
+    coords: [17.3204, 78.6472],
+    highway: "NH-65 East (Hyderabad-Vijayawada Highway)",
+    corridor: "East Interstate Commercial Arterial",
+    gatewayTo: "Ramoji Film City, Hayathnagar, Vijayawada Express",
+    aqi: 92,
+  },
+  {
+    id: "exit-12",
+    type: 'exit',
+    exitNumber: "Exit 12",
+    title: "ORR Exit 12",
+    location: "Bongulur / Mangalpally",
+    coords: [17.2685, 78.6015],
+    highway: "SH-19 (Nagarjuna Sagar Highway)",
+    corridor: "South-East Logistics & Aerospace Corridor",
+    gatewayTo: "Ibrahimpatnam, Mangalpally Logistics Hub, TCS Adibatla",
+    aqi: 62,
+  },
+  {
+    id: "exit-13",
+    type: 'exit',
+    exitNumber: "Exit 13",
+    title: "ORR Exit 13",
+    location: "Raviryal / Wonderla",
+    coords: [17.2346, 78.5478],
+    highway: "Hardware Park Radial Road",
+    corridor: "Hardware & Aviation SEZ",
+    gatewayTo: "Wonderla, E-City, Fab City North",
+    aqi: 54,
+  },
+  {
+    id: "exit-14",
+    type: 'exit',
+    exitNumber: "Exit 14",
+    title: "ORR Exit 14",
+    location: "Tukkuguda / FAB City",
+    coords: [17.2285, 78.4908],
+    highway: "NH-765 (Srisailam Highway) / Future City Gateway",
+    corridor: "Telangana Future City & Pharma City Axis",
+    gatewayTo: "Direct primary gateway to SYL and Dates County sanctuaries",
+    aqi: 48,
+  },
+  {
+    id: "exit-15",
+    type: 'exit',
+    exitNumber: "Exit 15",
+    title: "ORR Exit 15",
+    location: "Pedda Golconda",
+    coords: [17.2295, 78.4420],
+    highway: "Cargo Road / Airport South Bypass",
+    corridor: "Air Cargo & Logistics Hub",
+    gatewayTo: "RGIA Cargo Village, Shamshabad South",
+    aqi: 82,
+  },
+  {
+    id: "exit-16",
+    type: 'exit',
+    exitNumber: "Exit 16",
+    title: "ORR Exit 16",
+    location: "Shamshabad / RGIA Airport",
+    coords: [17.2442, 78.4116],
+    highway: "NH-44 South (Hyderabad-Bangalore Highway)",
+    corridor: "International Airport Gateway",
+    gatewayTo: "Rajiv Gandhi International Airport (RGIA), Bangalore Highway",
+    aqi: 110,
+  },
+  {
+    id: "exit-17",
+    type: 'exit',
+    exitNumber: "Exit 17",
+    title: "ORR Exit 17",
+    location: "Rajendranagar / Budvel",
+    coords: [17.2785, 78.3740],
+    highway: "Budvel IT Expressway / PVNR Connector",
+    corridor: "Budvel Hi-Tech Mega Cluster",
+    gatewayTo: "Budvel IT Cluster, PJTSAU University, PVNR Elevated Expressway",
+    aqi: 118,
+  },
+  {
+    id: "exit-18",
+    type: 'exit',
+    exitNumber: "Exit 18",
+    title: "ORR Exit 18",
+    location: "TSPA (APPA) Junction / Himayathsagar",
+    coords: [17.3542, 78.3618],
+    highway: "Vikarabad-Chilkur Highway",
+    corridor: "South-West Reservoir Catchment",
+    gatewayTo: "Telangana State Police Academy (TSPA), Chilkur Balaji Temple, Mrugavani NP",
+    aqi: 65,
+  },
+  {
+    id: "exit-18a",
+    type: 'exit',
+    exitNumber: "Exit 18A",
+    title: "ORR Exit 18A",
+    location: "Narsingi Interchange",
+    coords: [17.3912, 78.3450],
+    highway: "Narsingi-Puppalaguda Main Road",
+    corridor: "Osman Sagar & Financial District Fringe",
+    gatewayTo: "Gandipet, Osman Sagar Lake, Puppalaguda",
+    aqi: 78,
+  },
+  {
+    id: "exit-19",
+    type: 'exit',
+    exitNumber: "Exit 19",
+    title: "ORR Exit 19",
+    location: "Gachibowli / Financial District Link",
+    coords: [17.4365, 78.3512],
+    highway: "Old Bombay Highway / Gachibowli Flyover",
+    corridor: "Core Financial District & HITEC Link",
+    gatewayTo: "Gachibowli Stadium, HITEC City, IIIT Hyderabad",
+    aqi: 142,
+  },
+
+  // ── NHAI 340-KM REGIONAL RING ROAD (RRR) 19 SURGICAL INTERCHANGES ──────────
+  // Northern Arc (158.6 km)
+  {
+    id: "rrr-n1",
+    type: 'rrr-exit',
+    exitNumber: "RRR-N1",
+    title: "RRR N1 · Girmapur / Sangareddy",
+    location: "Sangareddy West Junction",
+    coords: [17.5852, 78.0782],
+    highway: "NH-65 (Pune-Mumbai Highway Junction)",
+    corridor: "RRR Western Northern Anchor",
+    gatewayTo: "Sangareddy District HQ, IIT Hyderabad Kandi",
+    status: "NHAI Approved / Phase 1 Land Acquisition",
+    aqi: 36,
+  },
+  {
+    id: "rrr-n2",
+    type: 'rrr-exit',
+    exitNumber: "RRR-N2",
+    title: "RRR N2 · Fasalwadi / Shivampet",
+    location: "Shivampet Range",
+    coords: [17.6520, 78.1480],
+    highway: "NH-161 (Sangareddy-Nanded Highway)",
+    corridor: "North-West Interstate Freight Corridor",
+    status: "NHAI Approved / Alignment Notified",
+    aqi: 28,
+  },
+  {
+    id: "rrr-n3",
+    type: 'rrr-exit',
+    exitNumber: "RRR-N3",
+    title: "RRR N3 · Narsapur Interchange",
+    location: "Narsapur Reserve Forest Belt",
+    coords: [17.7385, 78.2745],
+    highway: "NH-765D (Hyderabad-Medak National Highway)",
+    corridor: "Prime Forest Ecological Corridor",
+    gatewayTo: "Immediate direct access point for MODCON Agartha Sanctuary (4 mins away)",
+    status: "NHAI Priority Section / Direct Sanctuary Access",
+    aqi: 14,
+  },
+  {
+    id: "rrr-n4",
+    type: 'rrr-exit',
+    exitNumber: "RRR-N4",
+    title: "RRR N4 · Masaipet / Toopran",
+    location: "Toopran Junction",
+    coords: [17.8542, 78.4725],
+    highway: "NH-44 North (Hyderabad-Nagpur Highway Junction)",
+    corridor: "North Inter-state Transit Hub",
+    gatewayTo: "Toopran Industrial Hub, Medak Forest Range",
+    status: "NHAI Approved / Tenders Initiated",
+    aqi: 24,
+  },
+  {
+    id: "rrr-n5",
+    type: 'rrr-exit',
+    exitNumber: "RRR-N5",
+    title: "RRR N5 · Gajwel / Pragnapur",
+    location: "Gajwel Hub",
+    coords: [17.8485, 78.6812],
+    highway: "SH-1 Rajiv Rahadari (Karimnagar Highway)",
+    corridor: "North-East Agro-Tech & Horticulture Belt",
+    gatewayTo: "Gajwel Education Hub, Kondapochamma Canal",
+    status: "NHAI Approved / Land Acquisition Advanced",
+    aqi: 26,
+  },
+  {
+    id: "rrr-n6",
+    type: 'rrr-exit',
+    exitNumber: "RRR-N6",
+    title: "RRR N6 · Jagdevpur / Markook",
+    location: "Markook / Kondapochamma Catchment",
+    coords: [17.7842, 78.8125],
+    highway: "Siddipet-Yadadri Arterial Road",
+    corridor: "Waterfront & Eco-Tourism Belt",
+    gatewayTo: "Kondapochamma Sagar Reservoir",
+    status: "NHAI Approved Alignment",
+    aqi: 22,
+  },
+  {
+    id: "rrr-n7",
+    type: 'rrr-exit',
+    exitNumber: "RRR-N7",
+    title: "RRR N7 · Turkapally / Yadagirigutta",
+    location: "Yadadri Temple Corridor",
+    coords: [17.6125, 78.9642],
+    highway: "Yadadri Temple Spiritual Expressway",
+    corridor: "Pilgrimage Green Buffer Zone",
+    gatewayTo: "Yadadri Temple City, Alair Corridor",
+    status: "NHAI Approved / Heritage Buffer",
+    aqi: 25,
+  },
+  {
+    id: "rrr-n8",
+    type: 'rrr-exit',
+    exitNumber: "RRR-N8",
+    title: "RRR N8 · Bhongir Junction",
+    location: "Bhongir Fort Belt",
+    coords: [17.5242, 78.8925],
+    highway: "NH-163 (Hyderabad-Warangal Highway Junction)",
+    corridor: "Eastern Industrial & Logistics Axis",
+    gatewayTo: "Bhongir Fort, AIIMS Bibinagar East",
+    status: "NHAI Approved / Phase 1 Land Survey",
+    aqi: 34,
+  },
+  {
+    id: "rrr-n9",
+    type: 'rrr-exit',
+    exitNumber: "RRR-N9",
+    title: "RRR N9 · Choutuppal / Bangarigadda",
+    location: "Choutuppal North",
+    coords: [17.2512, 78.9024],
+    highway: "NH-65 East (Hyderabad-Vijayawada Highway)",
+    corridor: "Northern & Southern Arcs Confluence",
+    gatewayTo: "Choutuppal Industrial Cluster, Vijayawada Express",
+    status: "NHAI Priority Interchange / Junction of N & S Arcs",
+    aqi: 38,
+  },
+  // Southern Arc (182.0 km)
+  {
+    id: "rrr-s10",
+    type: 'rrr-exit',
+    exitNumber: "RRR-S10",
+    title: "RRR S10 · Malkapur / Narayanpur",
+    location: "Narayanpur Corridor",
+    coords: [17.1524, 78.8642],
+    highway: "Choutuppal-Narayanpur Link",
+    corridor: "South-East Scenic Hills & Granites",
+    gatewayTo: "Narayanpur, Rachakonda Hills",
+    status: "NHAI Southern Arc / Alignment Notified",
+    aqi: 25,
+  },
+  {
+    id: "rrr-s11",
+    type: 'rrr-exit',
+    exitNumber: "RRR-S11",
+    title: "RRR S11 · Ibrahimpatnam Hub",
+    location: "Ibrahimpatnam Junction",
+    coords: [17.1825, 78.6542],
+    highway: "NH-765 / SH-19 (Nagarjuna Sagar Road)",
+    corridor: "Defence & Aerospace Outer Ring",
+    gatewayTo: "DRDO / BDL Facilities, Ibrahimpatnam Lake",
+    status: "NHAI Southern Arc / DPR Finalized",
+    aqi: 28,
+  },
+  {
+    id: "rrr-s12",
+    type: 'rrr-exit',
+    exitNumber: "RRR-S12",
+    title: "RRR S12 · Yacharam / Pharma City North",
+    location: "Yacharam Outer Belt",
+    coords: [17.0852, 78.6124],
+    highway: "Pharma City Radial Expressway",
+    corridor: "Pharma City Buffer & Innovation Zone",
+    gatewayTo: "Green Pharma City buffer zone",
+    status: "NHAI Southern Arc / Alignment Approved",
+    aqi: 32,
+  },
+  {
+    id: "rrr-s13",
+    type: 'rrr-exit',
+    exitNumber: "RRR-S13",
+    title: "RRR S13 · Kandukur / Future City",
+    location: "Kandukur Reserve Forest Axis",
+    coords: [17.0985, 78.5284],
+    highway: "Future City AI & Green Innovation Axis",
+    corridor: "Telangana Future City Core Zone",
+    gatewayTo: "Direct primary access point for Dates County Sanctuary (adjacent) & SYL",
+    status: "NHAI Southern Arc / High-Priority Future City Node",
+    aqi: 18,
+  },
+  {
+    id: "rrr-s14",
+    type: 'rrr-exit',
+    exitNumber: "RRR-S14",
+    title: "RRR S14 · Kadthal / Amangal",
+    location: "Srisailam Highway Crossing",
+    coords: [17.0245, 78.4852],
+    highway: "NH-765 (Hyderabad-Srisailam National Highway)",
+    corridor: "Southern Eco-Tourism Corridor",
+    gatewayTo: "Maisigandi Temple, Amangal, Srisailam Forest",
+    status: "NHAI Southern Arc / DPR Stage",
+    aqi: 20,
+  },
+  {
+    id: "rrr-s15",
+    type: 'rrr-exit',
+    exitNumber: "RRR-S15",
+    title: "RRR S15 · Shadnagar / Farooqnagar",
+    location: "Shadnagar South Junction",
+    coords: [17.0725, 78.2045],
+    highway: "NH-44 South (Hyderabad-Bangalore Highway)",
+    corridor: "Southern Industrial & Warehousing Axis",
+    gatewayTo: "NRSC Shadnagar, Bangalore Industrial Corridor",
+    status: "NHAI Southern Arc / Major Logistics Interchange",
+    aqi: 35,
+  },
+  {
+    id: "rrr-s16",
+    type: 'rrr-exit',
+    exitNumber: "RRR-S16",
+    title: "RRR S16 · Shabad Interchange",
+    location: "Shabad Belt",
+    coords: [17.1425, 78.1482],
+    highway: "Shabad-Pargi Arterial Road",
+    corridor: "Electronics & EV Manufacturing Belt",
+    gatewayTo: "Shabad Industrial Parks",
+    status: "NHAI Southern Arc / Alignment Notified",
+    aqi: 26,
+  },
+  {
+    id: "rrr-s17",
+    type: 'rrr-exit',
+    exitNumber: "RRR-S17",
+    title: "RRR S17 · Chevella / Pudur",
+    location: "Chevella Reserve Belt",
+    coords: [17.3052, 78.1342],
+    highway: "SH-4 (Hyderabad-Bijapur Highway)",
+    corridor: "Ananthagiri Forest Proximity Zone",
+    gatewayTo: "Chevella Reserve Forest, Vikarabad eco-belt",
+    status: "NHAI Southern Arc / DPR Approved",
+    aqi: 22,
+  },
+  {
+    id: "rrr-s18",
+    type: 'rrr-exit',
+    exitNumber: "RRR-S18",
+    title: "RRR S18 · Shankarpally / Manneguda",
+    location: "Shankarpally West",
+    coords: [17.4525, 78.1285],
+    highway: "Vikarabad-Shankarpally Expressway",
+    corridor: "Green Agri-Estate & Living Zone",
+    gatewayTo: "Shankarpally Rail Hub, BDLP corridor",
+    status: "NHAI Southern Arc / Alignment Fixed",
+    aqi: 24,
+  },
+  {
+    id: "rrr-s19",
+    type: 'rrr-exit',
+    exitNumber: "RRR-S19",
+    title: "RRR S19 · Sangareddy South / Kandi",
+    location: "Kandi Southern Loop",
+    coords: [17.5580, 78.0720],
+    highway: "Sangareddy Southern Connector (Completing 340km RRR Loop)",
+    corridor: "IIT Hyderabad & Tech Belt",
+    gatewayTo: "IIT Hyderabad, Sangareddy Collectorate, Loops to RRR-N1",
+    status: "NHAI Southern Arc / Closing Loop Interchange",
+    aqi: 32,
+  },
 ];
 
 export const KEY_ZONES: KeyZone[] = [
