@@ -45,7 +45,7 @@ const COLUMNS: { title: string; links: { label: string; href: string }[] }[] = [
 export function Footer() {
   return (
     <footer className="bg-forest-section text-white">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 pt-14 md:pt-20 pb-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 pt-10 sm:pt-14 md:pt-20 pb-28 md:pb-12">
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-12">
           <div className="max-w-xl">
             <Logo onDark />

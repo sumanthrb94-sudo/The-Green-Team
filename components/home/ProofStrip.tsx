@@ -35,22 +35,22 @@ const PRINCIPLES = [
 
 export function ProofStrip() {
   return (
-    <section className="py-20 px-6 md:px-14 bg-surface border-b border-outline/10">
+    <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 md:px-14 bg-surface border-b border-outline/10">
       <div className="max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mb-12 text-center"
+          className="mb-8 sm:mb-12 text-center"
         >
-          <span className="text-primary text-[10px] font-bold uppercase tracking-[0.6em] mb-4 block">Why trust us</span>
-          <h2 className="font-headline font-extrabold tracking-[-0.02em] text-3xl md:text-5xl text-on-surface leading-[1.02]">
+          <span className="text-primary text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.5em] sm:tracking-[0.6em] mb-2 sm:mb-4 block">Why trust us</span>
+          <h2 className="font-headline font-extrabold tracking-[-0.02em] text-2xl sm:text-4xl md:text-5xl text-on-surface leading-[1.05]">
             A curation house.{' '}
             <span className="text-primary">Not a listing portal.</span>
           </h2>
         </motion.div>
 
-        <div className="grid md:grid-cols-3 gap-5 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-5 mb-6 sm:mb-8">
           {PRINCIPLES.map(({ Icon, title, desc }, i) => (
             <motion.div
               key={title}
@@ -58,23 +58,20 @@ export function ProofStrip() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.08 }}
-              className="p-7 rounded-3xl border border-outline/15 bg-surface-container-low"
+              className="p-5 sm:p-7 rounded-2xl sm:rounded-3xl border border-outline/15 bg-surface-container-low"
             >
-              <Icon className="w-5 h-5 text-primary mb-4" />
-              <h3 className="font-headline font-bold text-on-surface mb-2">{title}</h3>
-              <p className="text-sm text-secondary leading-relaxed">{desc}</p>
+              <Icon className="w-5 h-5 text-primary mb-3 sm:mb-4" />
+              <h3 className="font-headline font-bold text-on-surface text-base sm:text-lg mb-1.5 sm:mb-2">{title}</h3>
+              <p className="text-xs sm:text-sm text-secondary leading-relaxed">{desc}</p>
             </motion.div>
           ))}
         </div>
 
-        {/* The award belongs to MODCON, for Agartha — not to us, and not jointly
-            to the three developers. Sitting unattributed under "Why trust us",
-            beside a partner list, it read as ours. Say whose it is, and link to
-            the project so a buyer can check. */}
-        <div className="rounded-3xl bg-gold/8 border border-gold/20 divide-y divide-outline/10">
+        {/* The award belongs to MODCON, for Agartha */}
+        <div className="rounded-2xl sm:rounded-3xl bg-gold/8 border border-gold/20 divide-y divide-outline/10">
           <Link
             href="/sanctuaries/agartha"
-            className="group flex items-start gap-4 p-6 hover:bg-gold/5 transition-colors rounded-t-3xl"
+            className="group flex items-start gap-3.5 sm:gap-4 p-4 sm:p-6 hover:bg-gold/5 transition-colors rounded-t-2xl sm:rounded-t-3xl"
           >
             <Award className="w-5 h-5 text-gold flex-shrink-0 mt-0.5" />
             <div>

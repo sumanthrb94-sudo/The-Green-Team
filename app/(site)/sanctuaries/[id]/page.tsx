@@ -134,39 +134,39 @@ export default async function SanctuaryPage({ params }: Props) {
       />
 
       {/* Hero */}
-      <section id="pdp-hero" className="relative min-h-[70vh] md:min-h-[78vh] flex items-end overflow-hidden">
+      <section id="pdp-hero" className="relative min-h-[52vh] sm:min-h-[62vh] md:min-h-[78vh] flex items-end overflow-hidden">
         <Image src={s.image} alt={s.title} fill priority sizes="100vw" className="object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a1208] via-[#0a1208]/35 to-[#0a1208]/20" />
         <div className="absolute inset-0 bg-gradient-to-r from-[#0a1208]/50 to-transparent" />
         <a
           href="#gallery"
-          className="absolute top-5 right-5 md:top-6 md:right-8 inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-black/45 backdrop-blur-sm border border-white/15 text-white text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-black/60 transition-all"
+          className="absolute top-4 right-4 sm:top-5 sm:right-5 md:top-6 md:right-8 inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-full bg-black/45 backdrop-blur-sm border border-white/15 text-white text-[9px] sm:text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-black/60 transition-all"
         >
           <Camera className="w-3.5 h-3.5" /> {photos.length} photos
         </a>
-        <div className="relative z-10 w-full max-w-6xl mx-auto px-6 md:px-12 pb-10 md:pb-14">
-          <p className="text-[10px] uppercase tracking-[0.5em] text-[#c8a951] font-bold mb-4">{s.tagline}</p>
-          <div className="flex flex-wrap items-end justify-between gap-6">
+        <div className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 md:px-12 pb-7 sm:pb-10 md:pb-14">
+          <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.4em] sm:tracking-[0.5em] text-[#c8a951] font-bold mb-2 sm:mb-4">{s.tagline}</p>
+          <div className="flex flex-wrap items-end justify-between gap-4 sm:gap-6">
             <div>
-              <h1 className="font-headline font-extrabold tracking-[-0.02em] text-4xl md:text-6xl xl:text-7xl text-white leading-[0.95]">
+              <h1 className="font-headline font-extrabold tracking-[-0.02em] text-3xl sm:text-5xl md:text-6xl xl:text-7xl text-white leading-[0.95]">
                 {s.title}
               </h1>
-              <p className="mt-3 text-white/60 text-sm md:text-base">{s.location}</p>
+              <p className="mt-2 sm:mt-3 text-white/60 text-xs sm:text-sm md:text-base">{s.location}</p>
             </div>
-            <div className="text-right">
+            <div className="text-left sm:text-right">
               {s.pricePerSqYd ? (
                 <p className="text-[9px] text-white/45 uppercase tracking-widest">₹{s.pricePerSqYd.toLocaleString('en-IN')}/sq yd</p>
               ) : null}
-              <p className="text-3xl md:text-4xl font-headline font-extrabold text-white">{s.memberPrice}</p>
+              <p className="text-2xl sm:text-3xl md:text-4xl font-headline font-extrabold text-white">{s.memberPrice}</p>
             </div>
           </div>
-          <div className="flex flex-wrap gap-x-6 gap-y-3 mt-7">
+          <div className="flex flex-wrap gap-x-4 sm:gap-x-6 gap-y-2 sm:gap-y-3 mt-4 sm:mt-7">
             {[
               { Icon: Wind, text: `AQI ${s.aqi}` },
               { Icon: VolumeX, text: `${s.noise} dB` },
               { Icon: Clock, text: s.commute },
             ].map(({ Icon, text }) => (
-              <span key={text} className="flex items-center gap-2 text-white/75 text-[10px] uppercase tracking-widest font-bold">
+              <span key={text} className="flex items-center gap-1.5 sm:gap-2 text-white/75 text-[9px] sm:text-[10px] uppercase tracking-widest font-bold">
                 <Icon className="w-3.5 h-3.5 text-[#a3b18a]" /> {text}
               </span>
             ))}
@@ -176,7 +176,7 @@ export default async function SanctuaryPage({ params }: Props) {
 
       <PdpTabs sections={sections} title={s.title} price={s.memberPrice} propertyId={s.id} />
 
-      <div className="max-w-6xl mx-auto px-6 md:px-12">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-12">
         {/* Overview */}
         <section id="overview" className="scroll-mt-40 py-10 md:py-12">
           <KeyFacts sanctuary={s} />
@@ -269,7 +269,7 @@ export default async function SanctuaryPage({ params }: Props) {
       {/* Reviews */}
       <div id="reviews" className="scroll-mt-40 border-t border-outline/10">
         <ReviewList reviews={reviews} />
-        <section className="py-14 px-6 md:px-24">
+        <section className="py-8 sm:py-12 md:py-14 px-4 sm:px-6 md:px-24">
           <div className="max-w-4xl mx-auto">
             <h2 className="font-headline font-extrabold tracking-[-0.01em] text-2xl md:text-3xl mb-2">
               Visited {s.title}? Tell us how it went.
@@ -282,7 +282,7 @@ export default async function SanctuaryPage({ params }: Props) {
 
       {/* Similar */}
       {others.length ? (
-        <section id="similar" className="scroll-mt-40 py-12 md:py-16 px-6 md:px-12 bg-surface-container-low border-t border-outline/10">
+        <section id="similar" className="scroll-mt-40 py-8 sm:py-12 md:py-16 px-4 sm:px-6 md:px-12 bg-surface-container-low border-t border-outline/10">
           <div className="max-w-6xl mx-auto">
             <SectionHead eyebrow="Also curated" title="Similar sanctuaries" />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">

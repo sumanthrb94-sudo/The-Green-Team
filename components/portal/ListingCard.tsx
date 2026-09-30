@@ -30,7 +30,7 @@ export function ListingCard({ sanctuary: s }: { sanctuary: Sanctuary }) {
   const units = s.plots && s.plots > 0 ? `${s.plots} ${s.category === 'villas' ? 'homes' : 'plots'}` : null;
 
   return (
-    <article className="group relative flex flex-col rounded-[1.75rem] overflow-hidden bg-surface border border-outline/10 hover:border-primary/30 hover:shadow-[0_24px_50px_-24px_rgba(45,58,29,0.35)] hover:-translate-y-0.5 transition-all duration-500">
+    <article className="group relative flex flex-col rounded-2xl sm:rounded-[1.75rem] overflow-hidden bg-surface border border-outline/10 hover:border-primary/30 hover:shadow-[0_24px_50px_-24px_rgba(45,58,29,0.35)] hover:-translate-y-0.5 transition-all duration-500">
       {/* Photo — only what belongs on it */}
       <Link href={`/sanctuaries/${s.id}`} className="relative block aspect-[4/3] overflow-hidden" aria-label={s.title}>
         <Image
@@ -41,12 +41,12 @@ export function ListingCard({ sanctuary: s }: { sanctuary: Sanctuary }) {
           className="object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-[1.04]"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/5" />
-        <div className="absolute top-3.5 left-3.5 flex gap-1.5">
-          <span className="px-2.5 py-1 rounded-full bg-black/45 backdrop-blur-sm border border-white/15 text-white text-[8px] uppercase tracking-[0.22em] font-bold">
+        <div className="absolute top-3 left-3 sm:top-3.5 sm:left-3.5 flex gap-1.5">
+          <span className="px-2 sm:px-2.5 py-1 rounded-full bg-black/45 backdrop-blur-sm border border-white/15 text-white text-[8px] uppercase tracking-[0.22em] font-bold">
             {stageLabel(s.stage)}
           </span>
           {s.investment && (
-            <span className="px-2.5 py-1 rounded-full bg-gold/90 text-[#1a1a0a] text-[8px] uppercase tracking-[0.22em] font-bold">
+            <span className="px-2 sm:px-2.5 py-1 rounded-full bg-gold/90 text-[#1a1a0a] text-[8px] uppercase tracking-[0.22em] font-bold">
               Investment
             </span>
           )}
@@ -62,25 +62,25 @@ export function ListingCard({ sanctuary: s }: { sanctuary: Sanctuary }) {
       </button>
 
       {/* Info — price and name where they can breathe */}
-      <div className="flex flex-col flex-1 p-5 md:p-6">
+      <div className="flex flex-col flex-1 p-4 sm:p-5 md:p-6">
         <div className="flex items-baseline justify-between gap-3">
-          <p className="font-headline font-extrabold tracking-[-0.01em] text-xl text-on-surface leading-none">
+          <p className="font-headline font-extrabold tracking-[-0.01em] text-lg sm:text-xl text-on-surface leading-none">
             {s.memberPrice || (from ? priceLabel(from) : 'On request')}
           </p>
-          {rate && <p className="text-[11px] text-secondary/70 whitespace-nowrap">{rate}</p>}
+          {rate && <p className="text-[10px] sm:text-[11px] text-secondary/70 whitespace-nowrap">{rate}</p>}
         </div>
-        <h3 className="font-headline font-bold text-lg text-on-surface leading-snug mt-3">
+        <h3 className="font-headline font-bold text-base sm:text-lg text-on-surface leading-snug mt-2 sm:mt-3">
           <Link href={`/sanctuaries/${s.id}`} className="hover:text-primary transition-colors">
             {s.title}
           </Link>
         </h3>
-        <p className="flex items-center gap-1.5 text-sm text-secondary/75 mt-1">
+        <p className="flex items-center gap-1.5 text-xs sm:text-sm text-secondary/75 mt-1">
           <MapPin className="w-3.5 h-3.5 flex-shrink-0 text-primary/60" />
           <span className="truncate">{s.location}</span>
         </p>
 
         {/* One quiet line of specs */}
-        <ul className="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-4 pt-4 border-t border-outline/10 text-[12px] text-on-surface/80">
+        <ul className="flex flex-wrap items-center gap-x-3.5 sm:gap-x-4 gap-y-1.5 mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-outline/10 text-[11px] sm:text-[12px] text-on-surface/80">
           <li className="flex items-center gap-1.5 font-semibold text-primary">
             <Wind className="w-3.5 h-3.5" /> AQI {s.aqi}
           </li>
@@ -101,17 +101,17 @@ export function ListingCard({ sanctuary: s }: { sanctuary: Sanctuary }) {
         </ul>
 
         {/* One primary action, one quiet second */}
-        <div className="flex items-center justify-between gap-3 mt-5 pt-1">
+        <div className="flex items-center justify-between gap-3 mt-4 sm:mt-5 pt-1">
           <Link
             href={`/sanctuaries/${s.id}`}
-            className="group/btn inline-flex items-center gap-2 px-4.5 py-2.5 rounded-full bg-primary text-on-primary text-[10px] uppercase tracking-[0.2em] font-bold hover:opacity-90 transition-all"
+            className="group/btn inline-flex items-center gap-1.5 sm:gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-full bg-primary text-on-primary text-[9px] sm:text-[10px] uppercase tracking-[0.18em] font-bold hover:opacity-90 transition-all"
           >
             View details
             <ArrowUpRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
           </Link>
           <Link
             href={`/contact?interest=${s.category ?? 'general'}&property=${s.id}`}
-            className="text-[10px] uppercase tracking-[0.2em] font-bold text-secondary/70 hover:text-primary transition-colors"
+            className="text-[9px] sm:text-[10px] uppercase tracking-[0.18em] font-bold text-secondary/70 hover:text-primary transition-colors py-1"
           >
             Enquire
           </Link>

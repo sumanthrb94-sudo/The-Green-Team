@@ -821,7 +821,7 @@ export default function SanctuaryMap() {
               <>
                 <div className="flex items-center gap-3 relative">
                   {selectedLocation.image && (
-                    <div className="relative w-18 h-18 rounded-xl overflow-hidden shrink-0 border border-white/10">
+                    <div className="relative w-16 h-16 rounded-xl overflow-hidden shrink-0 border border-white/10">
                       <Image
                         src={selectedLocation.image}
                         alt={selectedLocation.title}
@@ -1206,7 +1206,7 @@ export default function SanctuaryMap() {
           onClick={() => setShowLayersSheet(false)}
         >
           <div
-            className="w-full bg-[#0a1208] border-t border-white/15 rounded-t-3xl p-5 pb-8 shadow-2xl animate-fade-up max-h-[85vh] overflow-y-auto"
+            className="w-full bg-[#0a1208] border-t border-white/15 rounded-t-3xl p-5 pb-[max(2rem,env(safe-area-inset-bottom))] shadow-2xl animate-fade-up max-h-[85vh] overflow-y-auto"
             onClick={e => e.stopPropagation()}
           >
             {/* Drawer Handle */}

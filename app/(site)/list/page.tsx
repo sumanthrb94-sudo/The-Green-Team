@@ -33,32 +33,32 @@ export default async function ListPage() {
 
   return (
     <>
-      <section className="pt-24 md:pt-28 pb-6 px-6 md:px-14">
+      <section className="pt-10 sm:pt-16 md:pt-28 pb-4 sm:pb-6 px-4 sm:px-6 md:px-14">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-end justify-between gap-4 flex-wrap">
             <div>
-              <span className="text-primary text-[10px] font-bold uppercase tracking-[0.6em] mb-3 block">
+              <span className="text-primary text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.4em] sm:tracking-[0.6em] mb-2 sm:mb-3 block">
                 Curated, not listed · Hyderabad
               </span>
-              <h1 className="font-serif text-4xl md:text-6xl font-light text-on-surface leading-[0.98]">
+              <h1 className="font-serif text-3xl sm:text-4xl md:text-6xl font-light text-on-surface leading-[0.98]">
                 Find your <span className="italic text-primary">sanctuary.</span>
               </h1>
             </div>
             <Link
               href="/standard"
-              className="text-[10px] uppercase tracking-[0.3em] font-bold text-primary hover:underline underline-offset-4 pb-2"
+              className="text-[9px] sm:text-[10px] uppercase tracking-[0.25em] sm:tracking-[0.3em] font-bold text-primary hover:underline underline-offset-4 pb-1 sm:pb-2"
             >
               How we choose →
             </Link>
           </div>
-          <p className="text-base md:text-lg font-light text-secondary leading-relaxed mt-5 max-w-2xl">
+          <p className="text-sm sm:text-base md:text-lg font-light text-secondary leading-relaxed mt-3 sm:mt-5 max-w-2xl">
             Every listing here cleared the same six tests before it was allowed on the page. Search, filter and
             sort the set below — or start with the kind of place you want from the type filter.
           </p>
         </div>
       </section>
 
-      <section className="px-6 md:px-14 pb-24">
+      <section className="px-4 sm:px-6 md:px-14 pb-28 md:pb-24">
         <div className="max-w-7xl mx-auto">
           <Suspense fallback={<div className="h-40" />}>
             <PortalBrowser all={portfolio} />

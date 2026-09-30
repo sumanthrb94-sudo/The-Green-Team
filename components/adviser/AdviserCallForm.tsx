@@ -145,12 +145,12 @@ export function AdviserCallForm({
 export function AdviserCallSection({ variant = 'control' }: { variant?: string }) {
   const outcome = variant === 'outcome';
   return (
-    <section id="adviser-call" className="bg-[#141c0f] py-24 px-6 scroll-mt-14">
-      <div className="max-w-xl mx-auto text-center mb-10">
-        <span className="text-[#c8a951] text-[10px] font-bold uppercase tracking-[0.7em] mb-5 block">
+    <section id="adviser-call" className="bg-[#141c0f] py-12 sm:py-16 md:py-24 px-4 sm:px-6 scroll-mt-14">
+      <div className="max-w-xl mx-auto text-center mb-6 sm:mb-10">
+        <span className="text-[#c8a951] text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.5em] sm:tracking-[0.7em] mb-2 sm:mb-5 block">
           One call. Every answer.
         </span>
-        <h2 className="font-headline font-extrabold tracking-[-0.02em] text-4xl md:text-6xl text-white leading-[1.0]">
+        <h2 className="font-headline font-extrabold tracking-[-0.02em] text-2xl sm:text-4xl md:text-6xl text-white leading-[1.05]">
           {outcome ? (
             <>
               Get the <span className="text-[#c8a951]">real numbers.</span>
@@ -161,7 +161,7 @@ export function AdviserCallSection({ variant = 'control' }: { variant?: string }
             </>
           )}
         </h2>
-        <p className="mt-5 text-white/45 font-light">
+        <p className="mt-2.5 sm:mt-5 text-xs sm:text-sm text-white/55 font-light">
           Pricing, plots, site visits — a private call within 24 hours.
         </p>
       </div>

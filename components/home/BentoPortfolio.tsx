@@ -28,7 +28,7 @@ function Tile({
     >
       <Link
         href={`/sanctuaries/${s.id}`}
-        className={`group relative block rounded-[2rem] overflow-hidden h-full ${large ? 'min-h-[30rem] md:min-h-full' : 'min-h-[16rem]'}`}
+        className={`group relative block rounded-2xl sm:rounded-[2rem] overflow-hidden h-full ${large ? 'min-h-[20rem] sm:min-h-[26rem] md:min-h-full' : 'min-h-[14rem] sm:min-h-[16rem]'}`}
       >
         <Image
           src={s.image}
@@ -39,28 +39,28 @@ function Tile({
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-black/25" />
 
-        <span className="absolute top-5 left-5 px-3.5 py-1.5 rounded-full bg-black/45 backdrop-blur-md border border-white/15 text-white text-[8px] uppercase tracking-[0.3em] font-bold">
+        <span className="absolute top-3.5 left-3.5 sm:top-5 sm:left-5 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-black/45 backdrop-blur-md border border-white/15 text-white text-[7.5px] sm:text-[8px] uppercase tracking-[0.25em] sm:tracking-[0.3em] font-bold">
           {badge}
         </span>
-        <span className="absolute top-5 right-5 w-9 h-9 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center opacity-0 group-hover:opacity-100 -translate-y-1 group-hover:translate-y-0 transition-all">
+        <span className="absolute top-3.5 right-3.5 sm:top-5 sm:right-5 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center opacity-0 group-hover:opacity-100 -translate-y-1 group-hover:translate-y-0 transition-all">
           <ArrowUpRight className="w-4 h-4 text-white" />
         </span>
 
-        <div className="absolute inset-x-0 bottom-0 p-6 md:p-7">
-          <p className="text-[9px] uppercase tracking-[0.3em] text-white/45 font-bold mb-1.5">{s.location}</p>
-          <div className="flex items-end justify-between gap-4">
-            <h3 className={`font-headline font-bold text-white leading-tight ${large ? 'text-3xl md:text-4xl' : 'text-xl'}`}>
+        <div className="absolute inset-x-0 bottom-0 p-4 sm:p-6 md:p-7">
+          <p className="text-[8.5px] sm:text-[9px] uppercase tracking-[0.25em] text-white/45 font-bold mb-1">{s.location}</p>
+          <div className="flex items-end justify-between gap-3 sm:gap-4">
+            <h3 className={`font-headline font-bold text-white leading-tight ${large ? 'text-2xl sm:text-3xl md:text-4xl' : 'text-lg sm:text-xl'}`}>
               {s.title}
             </h3>
-            <p className={`font-headline font-bold text-[#c8a951] whitespace-nowrap ${large ? 'text-xl' : 'text-base'}`}>
+            <p className={`font-headline font-bold text-[#c8a951] whitespace-nowrap ${large ? 'text-lg sm:text-xl' : 'text-sm sm:text-base'}`}>
               {s.memberPrice}
             </p>
           </div>
-          <div className="flex items-center gap-4 mt-3">
-            <span className="flex items-center gap-1.5 text-[9px] uppercase tracking-widest font-bold text-white/65">
+          <div className="flex items-center gap-3 sm:gap-4 mt-2 sm:mt-3">
+            <span className="flex items-center gap-1.5 text-[8.5px] sm:text-[9px] uppercase tracking-wider font-bold text-white/70">
               <Wind className="w-3.5 h-3.5 text-[#a3b18a]" /> AQI {s.aqi}
             </span>
-            <span className="flex items-center gap-1.5 text-[9px] uppercase tracking-widest font-bold text-white/65">
+            <span className="flex items-center gap-1.5 text-[8.5px] sm:text-[9px] uppercase tracking-wider font-bold text-white/70">
               <VolumeX className="w-3.5 h-3.5 text-white/40" /> {s.noise} dB
             </span>
             {large && s.plotRange && (
@@ -90,33 +90,33 @@ export function BentoPortfolio({ sanctuaries }: { sanctuaries: Sanctuary[] }) {
   const [first, ...rest] = sanctuaries;
   if (!first) return null;
   return (
-    <section id="sanctuaries" className="py-24 px-6 md:px-14 bg-surface-container-low">
+    <section id="sanctuaries" className="py-12 sm:py-16 md:py-24 px-4 sm:px-6 md:px-14 bg-surface-container-low">
       <div className="max-w-[1400px] mx-auto">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6 mb-8 sm:mb-12">
           <div>
-            <span className="text-primary text-[10px] font-bold uppercase tracking-[0.6em] mb-4 block">
+            <span className="text-primary text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.5em] sm:tracking-[0.6em] mb-2 sm:mb-4 block">
               Curated Portfolio
             </span>
-            <h2 className="font-headline font-extrabold tracking-[-0.02em] text-4xl md:text-6xl text-on-surface leading-[0.95]">
+            <h2 className="font-headline font-extrabold tracking-[-0.02em] text-3xl sm:text-5xl md:text-6xl text-on-surface leading-[0.98]">
               Curated sanctuaries.
               <br />
               <span className="text-primary">Chosen to be lived in.</span>
             </h2>
           </div>
           <div className="max-w-xl">
-            <p className="text-on-surface/60 text-base md:text-lg leading-relaxed mb-5">
+            <p className="text-on-surface/60 text-sm sm:text-base md:text-lg leading-relaxed mb-4 sm:mb-5">
               Every listing is visited, checked, and described in plain language. Compare the setting, access, air, noise, title, and development stage before you spend a weekend on a site visit.
             </p>
             <Link
               href="/list"
-              className="inline-flex px-7 py-3.5 rounded-full border border-outline/30 text-[10px] uppercase tracking-[0.4em] font-bold text-on-surface/60 hover:border-primary hover:text-primary transition-all"
+              className="inline-flex px-5 py-2.5 sm:px-7 sm:py-3.5 rounded-full border border-outline/30 text-[9px] sm:text-[10px] uppercase tracking-[0.35em] sm:tracking-[0.4em] font-bold text-on-surface/70 hover:border-primary hover:text-primary transition-all"
             >
               View all listings
             </Link>
           </div>
         </div>
 
-        <div className="grid md:grid-cols-3 md:grid-rows-2 gap-4 md:gap-5">
+        <div className="grid md:grid-cols-3 md:grid-rows-2 gap-3.5 sm:gap-4 md:gap-5">
           <Tile s={first} large badge={BADGES[first.id] ?? 'Curated'} />
           {rest.slice(0, 2).map((s, i) => (
             <Tile key={s.id} s={s} index={i + 1} badge={BADGES[s.id] ?? 'Curated'} />
@@ -125,28 +125,28 @@ export function BentoPortfolio({ sanctuaries }: { sanctuaries: Sanctuary[] }) {
 
         {/* Upcoming In-Dossier Sanctuaries */}
         {rest.length > 2 && (
-          <div className="mt-14 pt-10 border-t border-outline/10">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+          <div className="mt-10 sm:mt-14 pt-8 sm:pt-10 border-t border-outline/10">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4 mb-6 sm:mb-8">
               <div>
-                <span className="text-primary text-[9px] font-bold uppercase tracking-[0.4em] block mb-1">
+                <span className="text-primary text-[8.5px] sm:text-[9px] font-bold uppercase tracking-[0.35em] sm:tracking-[0.4em] block mb-1">
                   Pipeline &amp; Onboarding
                 </span>
-                <h3 className="font-headline font-bold text-2xl md:text-3xl text-on-surface">
+                <h3 className="font-headline font-bold text-xl sm:text-2xl md:text-3xl text-on-surface">
                   Upcoming Sanctuaries in Dossier
                 </h3>
-                <p className="text-xs text-secondary/70 mt-1 max-w-xl">
+                <p className="text-[11px] sm:text-xs text-secondary/70 mt-1 max-w-xl">
                   Properties undergoing legal vetting, TG-RERA compliance drafting, and on-ground environmental measurements.
                 </p>
               </div>
               <Link
                 href="/list?stage=upcoming"
-                className="inline-flex items-center gap-1.5 text-xs uppercase tracking-wider font-bold text-primary hover:underline underline-offset-4"
+                className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs uppercase tracking-wider font-bold text-primary hover:underline underline-offset-4"
               >
                 <span>View all upcoming ({rest.length - 2})</span>
                 <span>→</span>
               </Link>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4 md:gap-5">
               {rest.slice(2).map((s, i) => (
                 <Tile key={s.id} s={s} index={i + 3} badge={BADGES[s.id] ?? 'In Dossier'} />
               ))}

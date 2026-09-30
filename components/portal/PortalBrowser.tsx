@@ -224,10 +224,10 @@ export function PortalBrowser({
 
       {/* ── Mobile filter sheet ──────────────────────────────────────────── */}
       {sheetOpen && (
-        <div className="md:hidden fixed inset-0 z-[950]" role="dialog" aria-modal="true" aria-label="Filters">
-          <div className="absolute inset-0 bg-black/40" onClick={() => setSheetOpen(false)} />
-          <div className="absolute inset-x-0 bottom-0 rounded-t-3xl bg-surface border-t border-outline/15 p-6 pb-8 max-h-[85vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-6">
+        <div className="md:hidden fixed inset-0 z-[10000]" role="dialog" aria-modal="true" aria-label="Filters">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setSheetOpen(false)} />
+          <div className="absolute inset-x-0 bottom-0 rounded-t-3xl bg-surface border-t border-outline/15 p-5 sm:p-6 pb-[max(2rem,env(safe-area-inset-bottom))] max-h-[85vh] overflow-y-auto shadow-2xl">
+            <div className="flex items-center justify-between mb-5">
               <h2 className="font-headline font-bold text-lg text-on-surface">Filters</h2>
               <button onClick={() => setSheetOpen(false)} aria-label="Close filters" className="text-secondary/60 hover:text-on-surface">
                 <X className="w-5 h-5" />
@@ -260,18 +260,18 @@ export function PortalBrowser({
               </ChipWrap>
             </SheetGroup>
 
-            <div className="flex gap-3 mt-8">
+            <div className="flex gap-2.5 mt-6">
               <button
                 onClick={clearAll}
-                className="flex-1 py-3.5 rounded-full border border-outline/25 text-[11px] uppercase tracking-[0.2em] font-bold text-on-surface/70"
+                className="flex-1 py-3 rounded-full border border-outline/25 text-[10px] sm:text-[11px] uppercase tracking-[0.2em] font-bold text-on-surface/70"
               >
                 Clear all
               </button>
               <button
                 onClick={() => setSheetOpen(false)}
-                className="flex-1 py-3.5 rounded-full bg-primary text-on-primary text-[11px] uppercase tracking-[0.2em] font-bold"
+                className="flex-1 py-3 rounded-full bg-primary text-on-primary text-[10px] sm:text-[11px] uppercase tracking-[0.2em] font-bold"
               >
-                Show {results.length} {results.length === 1 ? 'result' : 'results'}
+                Show {results.length} {results.length === 1 ? 'sanctuary' : 'sanctuaries'}
               </button>
             </div>
           </div>

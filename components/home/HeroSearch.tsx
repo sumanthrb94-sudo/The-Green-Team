@@ -43,9 +43,9 @@ export function HeroSearch() {
       <form
         onSubmit={submit}
         role="search"
-        className="flex items-center gap-2 p-2 rounded-2xl bg-white/[0.07] border border-white/15 backdrop-blur-xl focus-within:border-[#a3b18a]/50 transition-colors max-w-lg"
+        className="flex items-center gap-2 p-1.5 sm:p-2 rounded-2xl bg-white/[0.07] border border-white/15 backdrop-blur-xl focus-within:border-[#a3b18a]/50 transition-colors max-w-lg"
       >
-        <Search className="w-4 h-4 text-white/40 ml-3 flex-shrink-0" aria-hidden />
+        <Search className="w-4 h-4 text-white/40 ml-2.5 sm:ml-3 flex-shrink-0" aria-hidden />
         <label htmlFor="hero-search" className="sr-only">
           Search villas, plots and locations
         </label>
@@ -55,22 +55,22 @@ export function HeroSearch() {
           value={q}
           onChange={e => setQ(e.target.value)}
           placeholder="Search Narsapur, villas, farm plots…"
-          className="flex-1 min-w-0 bg-transparent py-3 text-sm text-white placeholder:text-white/35 outline-none"
+          className="flex-1 min-w-0 bg-transparent py-2 sm:py-3 text-xs sm:text-sm text-white placeholder:text-white/35 outline-none"
         />
         <button
           type="submit"
-          className="px-6 py-3 rounded-xl bg-[#c8a951] text-[#1a1a0a] text-[9px] uppercase tracking-[0.3em] font-bold hover:bg-[#d9bb62] transition-all flex-shrink-0"
+          className="px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-[#c8a951] text-[#1a1a0a] text-[9px] uppercase tracking-[0.25em] sm:tracking-[0.3em] font-bold hover:bg-[#d9bb62] transition-all flex-shrink-0"
         >
           Search
         </button>
       </form>
 
-      <div className="flex flex-wrap gap-2 mt-3.5">
+      <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar -mx-1 px-1 sm:flex-wrap mt-3 sm:mt-3.5">
         {SHORTCUTS.map(s => (
           <Link
             key={s.label}
             href={s.href}
-            className="px-4 py-2 rounded-full border border-white/15 text-white/55 text-[10px] uppercase tracking-[0.2em] font-bold hover:border-[#a3b18a]/50 hover:text-white transition-all"
+            className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-white/15 text-white/60 text-[9px] sm:text-[10px] uppercase tracking-[0.2em] font-bold hover:border-[#a3b18a]/50 hover:text-white transition-all shrink-0"
           >
             {s.label}
           </Link>

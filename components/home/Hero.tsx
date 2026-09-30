@@ -47,20 +47,20 @@ export function Hero() {
       />
 
       <div className="relative z-10 max-w-[1500px] mx-auto">
-        <div className="min-w-0 max-w-2xl flex flex-col justify-center px-6 md:px-14 pt-16 md:pt-20 pb-14 md:pb-20 min-h-[62svh] lg:min-h-[78svh]">
+        <div className="min-w-0 max-w-2xl flex flex-col justify-center px-4 sm:px-6 md:px-14 pt-10 sm:pt-16 md:pt-20 pb-8 sm:pb-14 md:pb-20 min-h-[58svh] lg:min-h-[78svh]">
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="flex items-center gap-3 mb-8"
+            className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-8"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-[#c8a951]" />
-            <span className="text-[10px] font-bold uppercase tracking-[0.5em] text-white/45">
+            <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.4em] sm:tracking-[0.5em] text-white/45">
               The Green Team · Hyderabad
             </span>
           </motion.div>
 
-          <h1 className="font-headline font-extrabold tracking-[-0.02em] leading-[0.9] text-[15vw] sm:text-6xl md:text-7xl xl:text-[5.6rem] text-white">
+          <h1 className="font-headline font-extrabold tracking-[-0.02em] leading-[0.92] text-4xl sm:text-6xl md:text-7xl xl:text-[5.6rem] text-white">
             {['The forest', 'is the'].map((line, i) => (
               <span key={line} className="block overflow-hidden">
                 <motion.span
@@ -89,7 +89,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.8 }}
-            className="text-sm md:text-base font-light text-white/55 leading-relaxed max-w-md mt-5"
+            className="text-xs sm:text-sm md:text-base font-light text-white/60 leading-relaxed max-w-md mt-3 sm:mt-5"
           >
             Forest-adjacent homes and plots near Hyderabad — each verified for air, quiet, access and title
             before you ever see it.
@@ -100,29 +100,47 @@ export function Hero() {
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.62, duration: 0.8 }}
-            className="mt-7"
+            className="mt-5 sm:mt-7"
           >
             <HeroSearch />
+          </motion.div>
+
+          {/* Compact Mobile Credential Strip */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.75, duration: 0.7 }}
+            className="flex sm:hidden items-center justify-between mt-4 px-3.5 py-2.5 rounded-2xl bg-white/[0.05] border border-white/10 backdrop-blur-md"
+          >
+            {STATS.map((s, i) => (
+              <div key={s.label} className="flex items-center gap-2">
+                {i > 0 && <span className="h-4 w-px bg-white/15" />}
+                <div>
+                  <p className={`font-headline font-black text-sm leading-none ${s.accent ? 'text-[#c8a951]' : 'text-white'}`}>
+                    {s.v}
+                  </p>
+                  <p className="text-[7.5px] uppercase tracking-wider font-bold text-white/40 mt-0.5">{s.label}</p>
+                </div>
+              </div>
+            ))}
           </motion.div>
 
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8, duration: 0.8 }}
-            className="mt-6"
+            className="mt-4 sm:mt-6"
           >
             <Link
               href="/contact"
-              className="group inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] font-bold text-white/45 hover:text-white transition-colors"
+              className="group inline-flex items-center gap-2 text-[9px] sm:text-[10px] uppercase tracking-[0.25em] sm:tracking-[0.3em] font-bold text-white/50 hover:text-white transition-colors"
             >
-              <Phone className="w-3.5 h-3.5" /> Or talk to an adviser
+              <Phone className="w-3.5 h-3.5 text-[#c8a951]" /> Or talk to an adviser
               <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
             </Link>
           </motion.div>
 
-          {/* Credential row — desktop only. On a phone it wrapped into the
-              sticky call bar, and the search is the job there anyway; the proof
-              strip further down carries the same numbers. */}
+          {/* Credential row — desktop only */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
