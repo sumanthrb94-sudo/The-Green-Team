@@ -324,8 +324,7 @@ export function Groot() {
         aria-label="Chat with Groot"
         aria-expanded={open}
         className={cn(
-          "fixed bottom-20 right-5 md:bottom-8 md:right-8 z-[999] w-12 h-12 bg-olive-800 text-cream dark:bg-primary dark:text-on-primary rounded-full shadow-lg flex items-center justify-center hover:scale-105 hover:shadow-xl transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface",
-          isMapPage && "hidden md:flex"
+          "hidden md:flex fixed md:bottom-8 md:right-8 z-[999] w-12 h-12 bg-olive-800 text-cream dark:bg-primary dark:text-on-primary rounded-full shadow-lg items-center justify-center hover:scale-105 hover:shadow-xl transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
         )}
       >
         <MessageSquare className="w-5 h-5" />
