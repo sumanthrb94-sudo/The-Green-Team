@@ -152,12 +152,12 @@ export const SALES_FAQ: Array<{ q: string; a: string; tags?: string[] }> = [
   },
   {
     q: 'How do the different sanctuaries in the portfolio compare, and which suits me?',
-    a: 'MODCON Agartha is a 25-acre farmhouse community on the Narsapur forest boundary for someone who wants land, permaculture and the cleanest air. MODCON SYL Residences at Tukkuguda is built living: villaments 10 minutes from the airport in the Fourth City corridor. Dates County at Kandukur is 300+ acres of villa plots beside a 4,000-acre reserve forest. Our upcoming in-dossier properties — including Ananthagiri Biosphere Retreat and Kollur Green Canopy — expand this choice across the Western and Northern biodiversity ridges.',
+    a: 'MODCON Agartha is a 25-acre farmhouse community on the Narsapur forest boundary for someone who wants land, permaculture and the cleanest air. MODCON SYL Residences at Tukkuguda is built living: villaments 10 minutes from the airport in the Fourth City corridor. Dates County at Kandukur is 300+ acres of villa plots beside a 4,000-acre reserve forest.',
     tags: ['comparison', 'portfolio', 'fit'],
   },
   {
     q: 'Which of them will appreciate fastest?',
-    a: 'That question has no honest answer in advance, as corridors run on different timelines. Agartha is a scarcity play on a forest boundary near the RRR, SYL is an early-phase play in the Tukkuguda growth corridor, Dates County and Mucherla are scale plays on the Srisailam Highway axis, while Ananthagiri and Kollur capture the Vikarabad nature ridge and western IT extension. Match the asset to your holding horizon first, then talk about price.',
+    a: 'That question has no honest answer in advance, as corridors run on different timelines. Agartha is a scarcity play on a forest boundary near the RRR, SYL is an early-phase play in the Tukkuguda growth corridor, and Dates County is a scale play on the Srisailam Highway axis. Match the asset to your holding horizon first, then talk about price.',
     tags: ['comparison', 'returns', 'objection'],
   },
   {

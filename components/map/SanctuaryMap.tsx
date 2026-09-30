@@ -61,10 +61,6 @@ function getSanctuaryAccent(id: string) {
   if (id === 'agartha') return '#a3b18a';
   if (id === 'syl') return '#c8a951';
   if (id === 'dates-county') return '#e2c46e';
-  if (id === 'ananthagiri-reserve') return '#34d399';
-  if (id === 'kollur-canopy') return '#2dd4bf';
-  if (id === 'shamirpet-lakeview') return '#38bdf8';
-  if (id === 'mucherla-future-city') return '#f59e0b';
   return '#10b981';
 }
 

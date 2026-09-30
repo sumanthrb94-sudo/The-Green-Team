@@ -180,8 +180,14 @@ export function PortalBrowser({
       {/* ── Results toolbar ──────────────────────────────────────────────── */}
       <div className="flex items-center justify-between gap-4 mt-7 mb-5">
         <p className="text-sm text-secondary/80">
-          <span className="font-bold text-on-surface tabular-nums">{results.length}</span>{' '}
-          {results.length === 1 ? 'curated sanctuary' : 'curated sanctuaries'}
+          {activeCount > 0 ? (
+            <>
+              <span className="font-bold text-on-surface tabular-nums">{results.length}</span>{' '}
+              {results.length === 1 ? 'matching sanctuary' : 'matching sanctuaries'}
+            </>
+          ) : (
+            <span className="font-bold text-on-surface">Curated sanctuaries</span>
+          )}
           <span className="hidden sm:inline"> · </span>
           <span className="hidden sm:inline-flex items-center gap-1 text-secondary/60">
             <MapPin className="w-3.5 h-3.5 text-primary/50" /> Hyderabad Green Corridors
@@ -271,7 +277,7 @@ export function PortalBrowser({
                 onClick={() => setSheetOpen(false)}
                 className="flex-1 py-3 rounded-full bg-primary text-on-primary text-[10px] sm:text-[11px] uppercase tracking-[0.2em] font-bold"
               >
-                Show {results.length} {results.length === 1 ? 'sanctuary' : 'sanctuaries'}
+                Apply filters
               </button>
             </div>
           </div>

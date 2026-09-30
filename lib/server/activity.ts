@@ -58,9 +58,6 @@ export async function getActivity(): Promise<{ items: ActivityItem[]; at: string
     if (reserved > 0 && units > 0) {
       items.push({ id: 'reserved', label: 'units reserved', value: `${reserved} of ${units}`, emphasis: true });
     }
-    if (props.size > 0) {
-      items.push({ id: 'sanctuaries', label: props.size === 1 ? 'curated sanctuary' : 'curated sanctuaries', value: String(props.size) });
-    }
   } catch (err) {
     console.error('[activity] properties:', err);
   }
@@ -85,22 +82,6 @@ export async function getActivity(): Promise<{ items: ActivityItem[]; at: string
     }
   } catch (err) {
     console.error('[activity] visitors:', err);
-  }
-
-  // --- Enquiries to date (real leads). Shown once there are enough to band.
-  try {
-    // Buyer enquiries only. The lead auto-created on every new sign-up and a
-    // developer's listing request are real rows but not enquiries; counting
-    // them would inflate the number the strip promises is real.
-    const leads = (
-      await db.collection('leads').where('source', 'not-in', ['signup', 'list-property']).count().get()
-    ).data().count;
-    const ENQUIRY_MIN = 10;
-    if (leads >= ENQUIRY_MIN) {
-      items.push({ id: 'enquiries', label: 'enquiries and counting', value: `${bandDown(leads, 10)}+` });
-    }
-  } catch (err) {
-    console.error('[activity] leads:', err);
   }
 
   return { items, at: new Date().toISOString() };
