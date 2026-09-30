@@ -1,12 +1,20 @@
 'use client';
 
 /**
- * The environmental-intelligence map. Carried over from v1 with its dead code
- * revived: the forest/lakes layer now has a working filter pill, the region
- * view presets have buttons, and the exit-marker HTML is rebuilt cleanly.
+ * Minimalist Leaflet Eco-Map for The Green Team.
+ *
+ * An architectural, serene environmental-intelligence surface:
+ * - Ultra-clean dark Carto / Satellite basemap
+ * - Luminous, subtle biophilic forest & lake reserves
+ * - Hairline ORR & RRR arterial infrastructure
+ * - Sleek micro-pins for curated sanctuaries
+ * - Interactive floating sanctuary preview card with flyTo navigation
+ * - Minimalist floating filter HUD optimized for desktop & APK WebViews
  */
+
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   MapContainer,
   TileLayer,
@@ -14,555 +22,524 @@ import {
   Polygon,
   Polyline,
   Marker,
-  Popup,
-  ZoomControl,
   useMap,
   useMapEvents,
 } from 'react-leaflet';
 import L from 'leaflet';
-import { Activity, Home, AlertTriangle, Layers, Trees, X } from 'lucide-react';
 import {
-  AQI_HOTSPOTS,
-  CLEAN_AIR_ZONES,
+  Trees,
+  Wind,
+  Layers,
+  MapPin,
+  ChevronRight,
+  X,
+  Volume2,
+  Clock,
+  Sparkles,
+  Maximize2,
+} from 'lucide-react';
+import {
   ORR_PATH,
   RRR_PATH,
-  HIGHWAYS,
   NATURAL_FEATURES,
   MAP_LOCATIONS,
-  KEY_ZONES,
-  getAqiIntensity,
   type LatLng,
+  type MapLocation,
 } from '@/lib/data/map';
 import { cn } from '@/lib/utils';
 
-// re-referenced so tree-shaking keeps datasets available for tuning
-void AQI_HOTSPOTS;
-void CLEAN_AIR_ZONES;
+// --- Custom Minimalist Leaflet Markers ---
 
-const SANCTUARY_ACCENTS: Record<string, { rgb: string; label: string }> = {
-  agartha: { rgb: '126,184,90', label: 'AGR' },
-  syl: { rgb: '200,169,81', label: 'SYL' },
-  'dates-county': { rgb: '192,122,61', label: 'DTC' },
-};
-
-const FILTER_PILLS = [
-  { id: 'aqi-live', label: 'AQI Live', Icon: Activity },
-  { id: 'sanctuaries', label: 'Sanctuaries', Icon: Home },
-  { id: 'forest-zone', label: 'Forests & Lakes', Icon: Trees },
-  { id: 'key-zones', label: 'Key Zones', Icon: AlertTriangle },
-] as const;
-
-function ZoomTracker({ onZoom }: { onZoom: (z: number) => void }) {
-  useMapEvents({ zoomend: e => onZoom(e.target.getZoom()) });
-  return null;
-}
-
-function FlyTo({ target }: { target: { center: LatLng; zoom: number } | null }) {
-  const map = useMap();
-  useEffect(() => {
-    if (target) map.flyTo(target.center, target.zoom, { duration: 1.2 });
-  }, [target, map]);
-  return null;
-}
-
-/** Dark veil outside the RRR ring (v1's RRRBlurOverlay, clip-path based). */
-function RRRVeil() {
-  const map = useMap();
-  const veilRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const container = map.getContainer();
-    const veil = document.createElement('div');
-    Object.assign(veil.style, {
-      position: 'absolute',
-      inset: '0',
-      background: 'rgba(8,12,16,0.38)',
-      pointerEvents: 'none',
-      zIndex: '351',
-    });
-    container.appendChild(veil);
-    veilRef.current = veil;
-
-    const redraw = () => {
-      const size = map.getSize();
-      const pts = RRR_PATH.map(ll => {
-        const p = map.latLngToContainerPoint(ll as [number, number]);
-        return `${p.x},${p.y}`;
-      }).join(' L ');
-      veil.style.clipPath = `path(evenodd, "M 0,0 L ${size.x},0 L ${size.x},${size.y} L 0,${size.y} Z M ${pts} Z")`;
-    };
-    redraw();
-    map.on('move zoom moveend zoomend viewreset resize', redraw);
-    return () => {
-      map.off('move zoom moveend zoomend viewreset resize', redraw);
-      veil.remove();
-    };
-  }, [map]);
-
-  return null;
-}
-
-function exitIcon(kind: 'orr' | 'rrr', title: string, zoom: number) {
-  const labelled = kind === 'rrr' ? zoom >= 9 : zoom >= 11;
-  const color = kind === 'orr' ? '#fcd34d' : '#d97706';
-  const html = labelled
-    ? `<div style="display:flex;align-items:center;gap:6px;background:rgba(8,13,6,0.88);border:1px solid ${color}55;border-radius:999px;padding:3px 10px 3px 6px;white-space:nowrap;">
-         <span style="width:8px;height:8px;border-radius:50%;background:${color};box-shadow:0 0 6px ${color};"></span>
-         <span style="color:#fde68a;font:700 9px/1 var(--font-inter),sans-serif;letter-spacing:0.08em;">${title}</span>
-       </div>`
-    : `<div style="width:10px;height:10px;border-radius:50%;background:${color};border:1.5px solid rgba(255,255,255,0.6);box-shadow:0 0 6px ${color}aa;"></div>`;
-  return L.divIcon({ className: 'custom-div-icon', html, iconSize: undefined, iconAnchor: labelled ? [10, 10] : [5, 5] });
-}
-
-function sanctuaryIcon(id: string, image?: string) {
-  const accent = SANCTUARY_ACCENTS[id] ?? { rgb: '163,177,138', label: 'TGT' };
+function createSanctuaryIcon(s: MapLocation, isSelected: boolean) {
+  const accentColor = s.id === 'agartha' ? '#a3b18a' : s.id === 'syl' ? '#c8a951' : '#e2c46e';
   const html = `
-    <div style="position:relative;width:62px;height:78px;">
-      <div style="position:absolute;top:0;left:0;width:62px;height:62px;border-radius:50%;background:rgba(${accent.rgb},0.35);animation:tgt-pulse 2.4s infinite;"></div>
-      <div style="position:absolute;top:3px;left:3px;width:56px;height:56px;border-radius:50%;padding:3px;background:linear-gradient(135deg, rgba(${accent.rgb},1), rgba(${accent.rgb},0.4));box-shadow:0 6px 16px rgba(0,0,0,0.45);">
-        <div style="width:100%;height:100%;border-radius:50%;overflow:hidden;position:relative;background:#1a2410;">
-          ${image ? `<img src="${image}" style="width:100%;height:100%;object-fit:cover;" alt=""/>` : ''}
-          <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(10,15,7,0.75), transparent 55%);"></div>
-          <span style="position:absolute;bottom:5px;left:0;right:0;text-align:center;color:#fff;font:800 8px/1 var(--font-inter),sans-serif;letter-spacing:0.2em;">${accent.label}</span>
-        </div>
+    <div style="position:relative;display:flex;align-items:center;transform:translate(-50%,-50%);cursor:pointer;">
+      <div style="
+        display:flex;
+        align-items:center;
+        gap:6px;
+        background:rgba(10,18,8,0.92);
+        backdrop-filter:blur(12px);
+        border:1.5px solid ${isSelected ? '#c8a951' : accentColor};
+        border-radius:999px;
+        padding:4px 10px 4px 6px;
+        box-shadow:0 6px 20px rgba(0,0,0,0.6)${isSelected ? ', 0 0 16px rgba(200,169,81,0.5)' : ''};
+        transition:all 0.3s ease;
+      ">
+        <span style="
+          width:8px;
+          height:8px;
+          border-radius:50%;
+          background:${accentColor};
+          box-shadow:0 0 8px ${accentColor};
+          animation:${isSelected ? 'none' : 'tgt-pulse 2s infinite'};
+        "></span>
+        <span style="color:#ffffff;font:700 10px/1 var(--font-manrope),sans-serif;letter-spacing:0.04em;white-space:nowrap;">
+          ${s.title}
+        </span>
+        <span style="
+          font:800 9px/1 var(--font-mono),monospace;
+          color:${accentColor};
+          background:rgba(255,255,255,0.08);
+          padding:2px 5px;
+          border-radius:6px;
+        ">
+          AQI ${s.aqi}
+        </span>
       </div>
-      <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:2px;height:12px;background:rgba(${accent.rgb},0.9);"></div>
-      <div style="position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:14px;height:4px;border-radius:50%;background:rgba(0,0,0,0.35);filter:blur(1px);"></div>
-    </div>`;
-  return L.divIcon({ className: 'custom-div-icon', html, iconSize: [62, 78], iconAnchor: [31, 78], popupAnchor: [0, -80] });
+    </div>
+  `;
+
+  return L.divIcon({
+    className: 'minimal-sanctuary-icon',
+    html,
+    iconSize: undefined,
+    iconAnchor: [0, 0],
+  });
 }
 
-const KZ_STYLE: Record<string, { ring: string; bg: string }> = {
-  critical: { ring: '#ef4444', bg: '#7f1d1d' },
-  high: { ring: '#f97316', bg: '#7c2d12' },
-  moderate: { ring: '#eab308', bg: '#713f12' },
+function createExitIcon(title: string, aqi: number, zoom: number) {
+  const isDetailed = zoom >= 11;
+  const html = isDetailed
+    ? `<div style="display:flex;align-items:center;gap:4px;background:rgba(15,22,12,0.85);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.12);border-radius:999px;padding:2px 7px;font:600 8.5px/1 var(--font-inter),sans-serif;color:rgba(255,255,255,0.65);transform:translate(-50%,-50%);white-space:nowrap;">
+         <span style="width:4px;height:4px;border-radius:50%;background:#fcd34d;"></span>
+         <span>${title}</span>
+         <span style="color:#fcd34d;font-size:7.5px;">${aqi}</span>
+       </div>`
+    : `<div style="width:6px;height:6px;border-radius:50%;background:#fcd34d;border:1px solid rgba(0,0,0,0.5);opacity:0.75;transform:translate(-50%,-50%);"></div>`;
+
+  return L.divIcon({
+    className: 'minimal-exit-icon',
+    html,
+    iconSize: undefined,
+    iconAnchor: [0, 0],
+  });
+}
+
+// Controller for programmatic map animations
+function MapController({
+  target,
+  onZoomChange,
+}: {
+  target: { center: LatLng; zoom: number } | null;
+  onZoomChange: (z: number) => void;
+}) {
+  const map = useMap();
+
+  useMapEvents({
+    zoomend: e => onZoomChange(e.target.getZoom()),
+  });
+
+  useEffect(() => {
+    if (target) {
+      map.flyTo(target.center, target.zoom, { duration: 1.2, easeLinearity: 0.25 });
+    }
+  }, [target, map]);
+
+  return null;
+}
+
+type BasemapStyle = 'dark' | 'satellite' | 'terrain';
+
+const BASEMAPS: Record<BasemapStyle, { name: string; url: string; attr: string; maxZoom: number }> = {
+  dark: {
+    name: 'Obsidian',
+    url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
+    attr: '&copy; OpenStreetMap contributors &copy; CARTO',
+    maxZoom: 20,
+  },
+  satellite: {
+    name: 'Satellite',
+    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    attr: 'Imagery &copy; Esri, Maxar',
+    maxZoom: 19,
+  },
+  terrain: {
+    name: 'Canopy',
+    url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+    attr: '&copy; OpenStreetMap contributors, SRTM',
+    maxZoom: 17,
+  },
 };
-
-function keyZoneIcon(aqi: number, hazard: string) {
-  const s = KZ_STYLE[hazard] ?? KZ_STYLE.moderate;
-  const html = `<div style="width:32px;height:32px;border-radius:50%;background:${s.bg};border:2px solid ${s.ring};display:flex;align-items:center;justify-content:center;color:#fff;font:800 10px/1 var(--font-inter),sans-serif;box-shadow:0 0 10px ${s.ring}66;">${aqi}</div>`;
-  return L.divIcon({ className: 'custom-div-icon', html, iconSize: [32, 32], iconAnchor: [16, 16] });
-}
-
-const aqiBand = (aqi: number) =>
-  aqi >= 200 ? 'Hazardous' : aqi >= 150 ? 'Very Unhealthy' : aqi >= 100 ? 'Unhealthy' : 'Moderate';
-
-const METRIC_STRIP = [
-  { label: 'Agartha · AQI', value: '12', sub: 'Pristine', color: '#4ade80', pulse: true },
-  { label: 'SYL · AQI', value: '22', sub: 'Clean', color: '#86efac', pulse: true },
-  { label: 'City · AQI', value: '148', sub: 'Unhealthy', color: '#f87171', pulse: false },
-  { label: 'Air Edge', value: '12.3×', sub: 'Cleaner', color: '#fcd34d', pulse: false },
-  { label: 'Noise · Agartha', value: '18 dB', sub: 'Near Silent', color: '#a5f3fc', pulse: false },
-] as const;
 
 export default function SanctuaryMap() {
-  const [ready, setReady] = useState(false);
-  type BaseMode = 'dark' | 'satellite' | 'terrain' | 'light';
+  const [selectedBasemap, setSelectedBasemap] = useState<BasemapStyle>('dark');
+  const [activeLayers, setActiveLayers] = useState({
+    sanctuaries: true,
+    forests: true,
+    infra: true,
+    airGlow: true,
+  });
 
-  /**
-   * Base layers, all free and correctly attributed.
-   *
-   * The satellite layer used to point at `mt1.google.com/vt/` — Google's
-   * undocumented internal tile server. That is not a public API: scraping it
-   * breaks the Maps terms of service and can be cut off without notice, and
-   * labelling it "© Google Maps" did not make it licensed. Replaced with Esri
-   * World Imagery, which is free to use with attribution and is the standard
-   * satellite basemap in the Leaflet ecosystem.
-   *
-   * Terrain is new — for a brand selling forest-adjacent land, showing canopy
-   * and elevation is more use than a plain road map.
-   */
-  const BASE_TILES: Record<
-    BaseMode,
-    { url: string; attribution: string; label: string; maxZoom: number }
-  > = {
-    dark: {
-      url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
-      attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-      label: 'Dark',
-      maxZoom: 20,
-    },
-    satellite: {
-      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-      attribution: 'Imagery &copy; Esri, Maxar, Earthstar Geographics',
-      label: 'Satellite',
-      maxZoom: 19,
-    },
-    terrain: {
-      url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
-      attribution: '&copy; OpenStreetMap contributors, SRTM | &copy; OpenTopoMap (CC-BY-SA)',
-      label: 'Terrain',
-      maxZoom: 17,
-    },
-    light: {
-      url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png',
-      attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-      label: 'Light',
-      maxZoom: 20,
-    },
-  };
-  const BASE_ORDER: BaseMode[] = ['dark', 'satellite', 'terrain', 'light'];
-
-  /**
-   * Last-resort basemap. Every provider above is a third party that can rate-
-   * limit, block a referrer or go down, and when that happens Leaflet renders
-   * nothing — the map goes silently blank with no JS error. OpenStreetMap's own
-   * tile server is the most durable no-key fallback, so a repeated tile error
-   * on the chosen provider swaps to it rather than leaving an empty canvas.
-   */
-  const FALLBACK_TILES = {
-    url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-    attribution: '&copy; OpenStreetMap contributors',
-    maxZoom: 19,
-  };
-
-  const [baseMode, setBaseMode] = useState<BaseMode>('dark');
-  const [tilesFailed, setTilesFailed] = useState(false);
-  const tileErrors = useRef(0);
-  const fellBack = useRef(false);
-
-  // A new provider deserves a fresh probe — reset when the user switches.
-  useEffect(() => {
-    tileErrors.current = 0;
-    fellBack.current = false;
-    setTilesFailed(false);
-  }, [baseMode]);
-  const [zoom, setZoom] = useState(10);
-  const [pulse, setPulse] = useState(0);
-  const [target, setTarget] = useState<{ center: LatLng; zoom: number } | null>(null);
-  const [filters, setFilters] = useState<Set<string>>(new Set(['aqi-live', 'sanctuaries']));
+  const [selectedSanctuary, setSelectedSanctuary] = useState<MapLocation | null>(null);
+  const [flyTarget, setFlyTarget] = useState<{ center: LatLng; zoom: number } | null>(null);
+  const [currentZoom, setCurrentZoom] = useState(10);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const t = setTimeout(() => setReady(true), 1600);
-    const iv = setInterval(() => setPulse(p => (p + 1) % 100), 2000);
-    return () => {
-      clearTimeout(t);
-      clearInterval(iv);
-    };
+    setMounted(true);
   }, []);
 
-  const toggleFilter = (id: string) =>
-    setFilters(prev => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+  const sanctuaries = useMemo(
+    () => MAP_LOCATIONS.filter(l => l.type === 'sanctuary'),
+    []
+  );
 
-  const showAqi = filters.has('aqi-live');
+  const orrExits = useMemo(
+    () => MAP_LOCATIONS.filter(l => l.type === 'exit'),
+    []
+  );
 
-  const gridPoints = useMemo(() => {
-    let step = 0.08;
-    if (zoom >= 13) step = 0.015;
-    else if (zoom >= 11) step = 0.025;
-    else if (zoom >= 9) step = 0.04;
-    const CX = 17.505, CY = 78.44, AX = 0.33, AY = 0.41, FADE = 0.76;
-    const pts: { lat: number; lng: number; fade: number }[] = [];
-    for (let lat = 16.9; lat <= 17.9; lat += step) {
-      for (let lng = 78.0; lng <= 79.1; lng += step) {
-        const nd = Math.sqrt(((lat - CX) / AX) ** 2 + ((lng - CY) / AY) ** 2);
-        if (nd >= 1.4) continue;
-        pts.push({ lat, lng, fade: nd < FADE ? 1 : 1 - (nd - FADE) / (1.4 - FADE) });
-      }
-    }
-    return pts;
-  }, [zoom]);
+  const selectSanctuary = (s: MapLocation) => {
+    setSelectedSanctuary(s);
+    setFlyTarget({ center: s.coords, zoom: 13 });
+  };
 
-  const circleRadius = zoom >= 13 ? 1300 : zoom >= 11 ? 2200 : zoom >= 9 ? 3500 : 7000;
+  const toggleLayer = (layer: keyof typeof activeLayers) => {
+    setActiveLayers(prev => ({ ...prev, [layer]: !prev[layer] }));
+  };
 
-  const netColor = (net: number) =>
-    net > 0.55 ? '#ef4444' : net > 0.28 ? '#f97316' : net > 0.08 ? '#eab308' : net > -0.12 ? '#4ade80' : '#3b82f6';
-
-  const sanctuaries = MAP_LOCATIONS.filter(l => l.type === 'sanctuary');
-  const orrExits = MAP_LOCATIONS.filter(l => l.type === 'exit');
-  const rrrExits = MAP_LOCATIONS.filter(l => l.type === 'rrr-exit');
+  const resetView = () => {
+    setSelectedSanctuary(null);
+    setFlyTarget({ center: [17.49, 78.48], zoom: 10 });
+  };
 
   return (
-    <div className="relative h-[calc(100svh-7.5rem)] md:h-[calc(100svh-3.5rem)] overflow-hidden bg-[#0d1409]">
-      {/* Loading overlay */}
-      <div
-        className={cn(
-          'absolute inset-0 z-[1100] flex flex-col items-center justify-center gap-6 bg-gradient-to-b from-[#0d1409] to-[#1a2310] transition-opacity duration-700',
-          ready ? 'opacity-0 pointer-events-none' : 'opacity-100'
-        )}
-      >
-        <Trees className="w-10 h-10 text-[#4ade80] animate-pulse" />
-        <p className="text-[10px] uppercase tracking-[0.5em] font-bold text-white/60">
-          Connecting to Live Environmental Data
-        </p>
-        <div className="w-48 h-px bg-white/10 overflow-hidden">
-          <div className="h-full w-1/3 bg-gradient-to-r from-transparent via-[#4ade80] to-transparent animate-[sweep_1.8s_linear_infinite]" />
-        </div>
-        <p className="text-[8px] uppercase tracking-[0.4em] text-white/25">
-          The Green Team · Environmental Intelligence
-        </p>
-        <style>{`@keyframes sweep { from { transform: translateX(-150%);} to { transform: translateX(450%);} }`}</style>
-      </div>
-
-      {/* Top controls */}
-      <div className="absolute top-3 inset-x-3 z-[1000] flex items-center gap-2 pointer-events-none">
-        <div className="pointer-events-auto flex items-center gap-3 px-4 py-2.5 rounded-full bg-[rgba(8,13,6,0.92)] backdrop-blur-xl border border-white/8">
-          <span className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#4ade80] animate-pulse" />
-            <span className="text-[9px] uppercase tracking-[0.3em] font-bold text-[#86efac]">Live</span>
+    <div className="relative w-full h-[calc(100svh-4.2rem)] md:h-[calc(100svh-3.5rem)] overflow-hidden bg-[#0a1208] select-none">
+      {/* ── Top Minimalist Control Bar (HUD) ───────────────────────────── */}
+      <header className="absolute top-4 inset-x-4 z-[999] pointer-events-none flex flex-col md:flex-row md:items-center justify-between gap-3 max-w-7xl mx-auto">
+        {/* Brand / Status Pill */}
+        <div className="pointer-events-auto flex items-center gap-2 self-start p-1.5 pl-3.5 pr-2 rounded-full bg-[#0a1208]/90 backdrop-blur-xl border border-white/10 shadow-xl">
+          <span className="w-2 h-2 rounded-full bg-[#a3b18a] animate-pulse" />
+          <span className="text-[10px] uppercase tracking-[0.25em] font-extrabold text-white">
+            Eco Intelligence
           </span>
-          <span className="w-px h-4 bg-white/10" />
-          <button
-            onClick={() =>
-              setBaseMode(m => BASE_ORDER[(BASE_ORDER.indexOf(m) + 1) % BASE_ORDER.length])
-            }
-            aria-label={`Base map: ${BASE_TILES[baseMode].label}. Tap to change.`}
-            className="flex items-center gap-1.5 text-[9px] uppercase tracking-[0.3em] font-bold text-white/60 hover:text-white transition-colors"
-          >
-            <Layers className="w-3.5 h-3.5" /> {BASE_TILES[baseMode].label}
-          </button>
-        </div>
+          <span className="text-[9px] font-mono text-white/40">· HYD</span>
 
-        <div className="pointer-events-auto flex gap-2 overflow-x-auto no-scrollbar">
-          {FILTER_PILLS.map(({ id, label, Icon }) => {
-            const active = filters.has(id);
-            return (
-              <button
-                key={id}
-                onClick={() => toggleFilter(id)}
-                className={cn(
-                  'flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-full text-[9px] uppercase tracking-[0.25em] font-bold border transition-all backdrop-blur-xl',
-                  active
-                    ? 'bg-[rgba(45,58,29,0.95)] border-[#4ade80]/30 text-[#86efac] shadow-[0_0_14px_rgba(74,222,128,0.25)]'
-                    : 'bg-[rgba(8,13,6,0.75)] border-white/10 text-white/40 hover:text-white/70'
-                )}
-              >
-                <Icon className="w-3.5 h-3.5" />
-                {label}
-                {id === 'aqi-live' && active && <span className="w-1.5 h-1.5 rounded-full bg-[#4ade80] animate-pulse" />}
-              </button>
-            );
-          })}
-        </div>
-      </div>
+          <span className="w-px h-3.5 bg-white/15 mx-1" />
 
-      <MapContainer
-        center={[17.49, 78.48]}
-        zoom={10}
-        minZoom={9}
-        maxBounds={[[16.7, 77.5], [18.3, 79.5]]}
-        maxBoundsViscosity={1.0}
-        scrollWheelZoom
-        zoomControl={false}
-        className="h-full w-full"
-      >
-        <ZoomControl position="bottomleft" />
-        <ZoomTracker onZoom={setZoom} />
-        <FlyTo target={target} />
-        <RRRVeil />
-
-        <TileLayer
-          key={tilesFailed ? `${baseMode}-fallback` : baseMode}
-          url={tilesFailed ? FALLBACK_TILES.url : BASE_TILES[baseMode].url}
-          attribution={tilesFailed ? FALLBACK_TILES.attribution : BASE_TILES[baseMode].attribution}
-          // Each provider stops at a different level; without this Leaflet
-          // requests tiles that do not exist and the map goes blank on zoom-in.
-          maxNativeZoom={tilesFailed ? FALLBACK_TILES.maxZoom : BASE_TILES[baseMode].maxZoom}
-          maxZoom={20}
-          eventHandlers={{
-            // A handful of failures means the provider is unreachable, not that
-            // one tile 404'd at the edge of coverage. Refs, not state, so the
-            // threshold survives re-renders without re-binding the handler.
-            tileerror: () => {
-              if (fellBack.current) return;
-              tileErrors.current += 1;
-              if (tileErrors.current >= 6) {
-                fellBack.current = true;
-                setTilesFailed(true);
-              }
-            },
-          }}
-        />
-
-        {/* AQI heat field */}
-        {showAqi &&
-          gridPoints.map((p, idx) => {
-            const net = getAqiIntensity(p, pulse);
-            return (
-              <Circle
-                key={`${p.lat.toFixed(3)}-${p.lng.toFixed(3)}`}
-                center={[p.lat, p.lng]}
-                radius={circleRadius}
-                className="trichome-glass-mesh"
-                pathOptions={{
-                  stroke: false,
-                  fillColor: netColor(net),
-                  fillOpacity: Math.max(
-                    0,
-                    (Math.abs(net) * 0.22 + 0.04 + Math.sin((idx + pulse) * 0.1) * 0.03) * p.fade
-                  ),
-                }}
-              />
-            );
-          })}
-
-        {/* ORR — glow, casing, centre stripe */}
-        <Polyline positions={ORR_PATH} pathOptions={{ color: '#d97706', weight: 16, opacity: 0.1 }} />
-        <Polyline positions={ORR_PATH} pathOptions={{ color: '#92400e', weight: 6, opacity: 0.95 }} />
-        <Polyline positions={ORR_PATH} pathOptions={{ color: '#fcd34d', weight: 2, opacity: 0.85 }} />
-
-        {/* RRR — dashed */}
-        <Polyline positions={RRR_PATH} pathOptions={{ color: '#d97706', weight: 12, opacity: 0.08 }} />
-        <Polyline positions={RRR_PATH} pathOptions={{ color: '#92400e', weight: 4, opacity: 0.8, dashArray: '14, 10' }} />
-        <Polyline positions={RRR_PATH} pathOptions={{ color: '#fcd34d', weight: 1.5, opacity: 0.65, dashArray: '14, 10' }} />
-
-        {/* Radial highways */}
-        {HIGHWAYS.map(h => (
-          <span key={h.id}>
-            <Polyline positions={h.path} pathOptions={{ color: '#d97706', weight: 10, opacity: 0.07 }} />
-            <Polyline positions={h.path} pathOptions={{ color: '#d97706', weight: 2.5, opacity: 0.8 }} />
-          </span>
-        ))}
-
-        {/* Forests & lakes — v1 had this data gated behind a filter that didn't exist */}
-        {filters.has('forest-zone') &&
-          NATURAL_FEATURES.map(f => (
-            <Polygon
-              key={f.id}
-              positions={f.boundary}
-              interactive
-              pathOptions={
-                f.type === 'forest'
-                  ? { fillColor: '#3d5c35', fillOpacity: 0.22, color: '#4a6741', weight: 1, opacity: 0.6 }
-                  : { fillColor: '#334e68', fillOpacity: 0.24, color: '#4a6fa5', weight: 1, opacity: 0.55 }
-              }
-            >
-              <Popup className="custom-popup">
-                <div className="bg-[#0c1208] text-white rounded-2xl p-4 w-60 border border-white/10">
-                  <p className="text-[8px] uppercase tracking-[0.35em] font-bold text-[#86efac] mb-1">
-                    {f.type === 'forest' ? 'Reserve Forest' : 'Protected Water Body'} · {f.area}
-                  </p>
-                  <p className="font-bold text-sm mb-2">{f.title}</p>
-                  <p className="text-[11px] text-white/55 leading-relaxed">{f.description}</p>
-                </div>
-              </Popup>
-            </Polygon>
-          ))}
-
-        {/* ORR / RRR exits */}
-        {orrExits.map(loc => (
-          <Marker key={loc.id} position={loc.coords} icon={exitIcon('orr', loc.title, zoom)}>
-            <Popup className="custom-popup">
-              <div className="bg-[#0c1208] text-white rounded-2xl p-4 w-52 border border-white/10">
-                <p className="font-bold text-sm">{loc.title}</p>
-                <p className="text-[11px] text-white/55">{loc.location}</p>
-                <p className="mt-2 text-[10px] uppercase tracking-widest font-bold text-amber-300">AQI {loc.aqi}</p>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
-        {rrrExits.map(loc => (
-          <Marker key={loc.id} position={loc.coords} icon={exitIcon('rrr', loc.location, zoom)}>
-            <Popup className="custom-popup">
-              <div className="bg-[#0c1208] text-white rounded-2xl p-4 w-52 border border-white/10">
-                <p className="font-bold text-sm">RRR Proposed Exit</p>
-                <p className="text-[11px] text-white/55">{loc.location}</p>
-                <p className="mt-1 text-[10px] text-white/40">Proposed alignment · Under construction</p>
-                <p className="mt-2 text-[10px] uppercase tracking-widest font-bold text-[#86efac]">AQI {loc.aqi}</p>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
-
-        {/* Sanctuary markers */}
-        {filters.has('sanctuaries') &&
-          sanctuaries.map(loc => (
-            <span key={loc.id}>
-              {loc.forestRadius && (
-                <Circle
-                  center={loc.coords}
-                  radius={loc.forestRadius}
-                  pathOptions={{ color: '#4ade80', weight: 1, opacity: 0.35, fillColor: '#4ade80', fillOpacity: 0.06 }}
-                />
-              )}
-              <Marker
-                position={loc.coords}
-                icon={sanctuaryIcon(loc.id, loc.image)}
-                eventHandlers={{ click: () => setTarget({ center: loc.coords, zoom: 14 }) }}
-              >
-                <Popup className="custom-popup">
-                  <div className="bg-[#0c1208] text-white rounded-2xl overflow-hidden w-64 border border-white/10">
-                    {loc.image && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={loc.image} alt={loc.title} className="w-full h-28 object-cover" />
-                    )}
-                    <div className="p-4">
-                      <p className="font-bold text-sm mb-0.5">{loc.title}</p>
-                      <p className="text-[11px] text-white/55 mb-3">{loc.location}</p>
-                      <div className="flex gap-4 mb-4">
-                        <span className="text-[10px] uppercase tracking-widest font-bold text-[#86efac]">
-                          AQI {loc.aqi}
-                        </span>
-                        {loc.noise !== undefined && (
-                          <span className="text-[10px] uppercase tracking-widest font-bold text-white/60">
-                            {loc.noise} dB
-                          </span>
-                        )}
-                      </div>
-                      <Link
-                        href={`/sanctuaries/${loc.id}`}
-                        className="block w-full text-center py-2.5 rounded-xl bg-[#a3b18a] text-[#0a1208] text-[9px] uppercase tracking-[0.3em] font-bold hover:bg-[#b8c8a0] transition-colors"
-                      >
-                        View Details
-                      </Link>
-                    </div>
-                  </div>
-                </Popup>
-              </Marker>
-            </span>
-          ))}
-
-        {/* Key hazard zones */}
-        {filters.has('key-zones') &&
-          KEY_ZONES.map(z => (
-            <Marker key={z.id} position={z.coords} icon={keyZoneIcon(z.aqi, z.hazard)}>
-              <Popup className="custom-popup">
-                <div className="bg-[#0c1208] text-white rounded-2xl p-4 w-56 border border-white/10">
-                  <p className="font-bold text-sm mb-1">{z.name}</p>
-                  <span className="inline-block px-2 py-0.5 rounded-md bg-white/10 text-[9px] uppercase tracking-widest font-bold text-white/60 mb-3">
-                    {z.tag}
-                  </span>
-                  <div className="flex gap-4">
-                    <span className="text-[10px] uppercase tracking-widest font-bold" style={{ color: KZ_STYLE[z.hazard]?.ring }}>
-                      AQI {z.aqi} · {aqiBand(z.aqi)}
-                    </span>
-                    <span className="text-[10px] uppercase tracking-widest font-bold text-white/50">{z.noise} dB</span>
-                  </div>
-                </div>
-              </Popup>
-            </Marker>
-          ))}
-      </MapContainer>
-
-      {/* Bottom metric strip */}
-      <div className="absolute bottom-0 inset-x-0 z-[1000] pointer-events-none">
-        <div className="flex items-stretch gap-px overflow-x-auto no-scrollbar bg-[rgba(5,8,4,0.97)] backdrop-blur-2xl border-t border-white/5">
-          {METRIC_STRIP.map(m => (
-            <div key={m.label} className="flex-shrink-0 px-6 py-3.5 flex items-center gap-3">
-              {m.pulse && <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: m.color }} />}
-              <div>
-                <p className="text-[7px] uppercase tracking-[0.35em] font-bold text-white/30">{m.label}</p>
-                <p className="text-sm font-headline font-bold" style={{ color: m.color }}>
-                  {m.value} <span className="text-[9px] font-sans font-medium text-white/35">{m.sub}</span>
-                </p>
-              </div>
-            </div>
-          ))}
-          <div className="flex-shrink-0 px-6 py-3.5 flex items-center gap-3">
-            <span className="w-6 border-t-2 border-dashed border-amber-500/80" />
-            <div>
-              <p className="text-[7px] uppercase tracking-[0.35em] font-bold text-white/30">Infra</p>
-              <p className="text-sm font-headline font-bold text-amber-300">ORR · RRR</p>
-            </div>
+          {/* Sanctuary Quick Jump Chips */}
+          <div className="flex items-center gap-1">
+            {sanctuaries.map(s => {
+              const active = selectedSanctuary?.id === s.id;
+              return (
+                <button
+                  key={s.id}
+                  onClick={() => selectSanctuary(s)}
+                  className={cn(
+                    'px-2.5 py-1 rounded-full text-[9px] font-bold tracking-wider transition-all',
+                    active
+                      ? 'bg-[#c8a951] text-[#0a1208] shadow-sm'
+                      : 'text-white/60 hover:text-white hover:bg-white/5'
+                  )}
+                >
+                  {s.title.replace('MODCON ', '')}
+                </button>
+              );
+            })}
           </div>
         </div>
-      </div>
-      <span className="hidden"><X className="w-0 h-0" /></span>
+
+        {/* Layer Toggles & Style Switcher */}
+        <div className="pointer-events-auto flex items-center gap-1.5 self-start md:self-auto overflow-x-auto no-scrollbar p-1.5 rounded-full bg-[#0a1208]/90 backdrop-blur-xl border border-white/10 shadow-xl">
+          {/* Layer Chips */}
+          <button
+            onClick={() => toggleLayer('forests')}
+            className={cn(
+              'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9px] uppercase tracking-wider font-bold transition-all',
+              activeLayers.forests
+                ? 'bg-[#2d3a1d] text-[#a3b18a] border border-[#a3b18a]/30'
+                : 'text-white/40 hover:text-white/70'
+            )}
+          >
+            <Trees className="w-3 h-3" />
+            <span>Forests & Lakes</span>
+          </button>
+
+          <button
+            onClick={() => toggleLayer('airGlow')}
+            className={cn(
+              'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9px] uppercase tracking-wider font-bold transition-all',
+              activeLayers.airGlow
+                ? 'bg-[#2d3a1d] text-[#86efac] border border-[#86efac]/30'
+                : 'text-white/40 hover:text-white/70'
+            )}
+          >
+            <Wind className="w-3 h-3" />
+            <span>Air Purity</span>
+          </button>
+
+          <span className="w-px h-3.5 bg-white/15 mx-0.5" />
+
+          {/* Basemap Switcher */}
+          <button
+            onClick={() =>
+              setSelectedBasemap(prev =>
+                prev === 'dark' ? 'satellite' : prev === 'satellite' ? 'terrain' : 'dark'
+              )
+            }
+            title="Switch map theme"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9px] uppercase tracking-wider font-bold text-white/60 hover:text-white transition-colors"
+          >
+            <Layers className="w-3 h-3" />
+            <span>{BASEMAPS[selectedBasemap].name}</span>
+          </button>
+
+          {/* Reset View */}
+          <button
+            onClick={resetView}
+            title="Reset overview"
+            className="w-7 h-7 rounded-full flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-colors"
+          >
+            <Maximize2 className="w-3 h-3" />
+          </button>
+        </div>
+      </header>
+
+      {/* ── Leaflet Canvas ─────────────────────────────────────────────── */}
+      {mounted && (
+        <MapContainer
+          center={[17.49, 78.48]}
+          zoom={10}
+          minZoom={9}
+          maxZoom={18}
+          zoomControl={false}
+          scrollWheelZoom={true}
+          maxBounds={[
+            [16.8, 77.6],
+            [18.2, 79.4],
+          ]}
+          maxBoundsViscosity={0.9}
+          className="w-full h-full"
+        >
+          <MapController target={flyTarget} onZoomChange={setCurrentZoom} />
+
+          <TileLayer
+            key={selectedBasemap}
+            url={BASEMAPS[selectedBasemap].url}
+            attribution={BASEMAPS[selectedBasemap].attr}
+            maxNativeZoom={BASEMAPS[selectedBasemap].maxZoom}
+            maxZoom={18}
+          />
+
+          {/* Minimalist Air Quality Purity Halos (Subtle & serene, not noisy dots) */}
+          {activeLayers.airGlow && (
+            <>
+              {/* Narsapur Pure Air Belt */}
+              <Circle
+                center={[17.75, 78.28]}
+                radius={8500}
+                pathOptions={{
+                  fillColor: '#86efac',
+                  fillOpacity: 0.12,
+                  color: '#4ade80',
+                  weight: 1,
+                  opacity: 0.35,
+                }}
+              />
+              {/* Kandukur Forest Canopy */}
+              <Circle
+                center={[17.118, 78.588]}
+                radius={7000}
+                pathOptions={{
+                  fillColor: '#86efac',
+                  fillOpacity: 0.1,
+                  color: '#4ade80',
+                  weight: 1,
+                  opacity: 0.3,
+                }}
+              />
+              {/* Gandipet Reservoir Catchment */}
+              <Circle
+                center={[17.37, 78.29]}
+                radius={6000}
+                pathOptions={{
+                  fillColor: '#6ee7b7',
+                  fillOpacity: 0.08,
+                  color: '#34d399',
+                  weight: 1,
+                  opacity: 0.25,
+                }}
+              />
+              {/* Urban Industrial Heat Island (Subtle muted amber) */}
+              <Circle
+                center={[17.44, 78.44]}
+                radius={10000}
+                pathOptions={{
+                  fillColor: '#f87171',
+                  fillOpacity: 0.06,
+                  color: '#ef4444',
+                  weight: 1,
+                  opacity: 0.2,
+                }}
+              />
+            </>
+          )}
+
+          {/* Protected Forests & Lakes (Serene translucent jade & slate) */}
+          {activeLayers.forests &&
+            NATURAL_FEATURES.map(f => (
+              <Polygon
+                key={f.id}
+                positions={f.boundary}
+                pathOptions={
+                  f.type === 'forest'
+                    ? {
+                        fillColor: '#34d399',
+                        fillOpacity: 0.16,
+                        color: '#10b981',
+                        weight: 1,
+                        opacity: 0.5,
+                      }
+                    : {
+                        fillColor: '#38bdf8',
+                        fillOpacity: 0.18,
+                        color: '#0ea5e9',
+                        weight: 1,
+                        opacity: 0.55,
+                      }
+                }
+              />
+            ))}
+
+          {/* Minimalist Arterial Infrastructure */}
+          {activeLayers.infra && (
+            <>
+              {/* ORR — Luminous fine gold ring */}
+              <Polyline
+                positions={ORR_PATH}
+                pathOptions={{
+                  color: '#c8a951',
+                  weight: 2,
+                  opacity: 0.85,
+                }}
+              />
+              {/* RRR — Refined dashed golden corridor */}
+              <Polyline
+                positions={RRR_PATH}
+                pathOptions={{
+                  color: '#e2c46e',
+                  weight: 1.5,
+                  opacity: 0.6,
+                  dashArray: '8, 8',
+                }}
+              />
+
+              {/* Minimalist Exit Markers */}
+              {orrExits.map(loc => (
+                <Marker
+                  key={loc.id}
+                  position={loc.coords}
+                  icon={createExitIcon(loc.title, loc.aqi, currentZoom)}
+                />
+              ))}
+            </>
+          )}
+
+          {/* Curated Sanctuary Luxury Micro-Pins */}
+          {activeLayers.sanctuaries &&
+            sanctuaries.map(s => {
+              const isSelected = selectedSanctuary?.id === s.id;
+              return (
+                <Marker
+                  key={s.id}
+                  position={s.coords}
+                  icon={createSanctuaryIcon(s, isSelected)}
+                  eventHandlers={{
+                    click: () => selectSanctuary(s),
+                  }}
+                />
+              );
+            })}
+        </MapContainer>
+      )}
+
+      {/* ── Minimalist Floating Sanctuary Card (Sheet) ─────────────────── */}
+      {selectedSanctuary && (
+        <aside
+          aria-label="Selected Sanctuary Preview"
+          className="absolute bottom-16 md:bottom-6 left-4 right-4 md:right-auto md:w-96 z-[999] p-5 rounded-3xl bg-[#0a1208]/95 backdrop-blur-2xl border border-white/15 shadow-[0_20px_50px_rgba(0,0,0,0.8)] animate-fade-up"
+        >
+          <div className="flex items-start justify-between gap-3 mb-3">
+            <div>
+              <span className="text-[9px] uppercase tracking-[0.25em] font-extrabold text-[#c8a951] block mb-0.5">
+                Curated Sanctuary
+              </span>
+              <h3 className="font-headline font-extrabold text-xl text-white">
+                {selectedSanctuary.title}
+              </h3>
+              <p className="text-xs text-white/50 mt-0.5">{selectedSanctuary.location}</p>
+            </div>
+            <button
+              onClick={() => setSelectedSanctuary(null)}
+              aria-label="Close details"
+              className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-white/60 hover:text-white transition-colors"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          {selectedSanctuary.image && (
+            <div className="relative w-full h-32 rounded-2xl overflow-hidden mb-3.5 border border-white/10">
+              <Image
+                src={selectedSanctuary.image}
+                alt={selectedSanctuary.title}
+                fill
+                sizes="(max-width: 768px) 100vw, 400px"
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+              <div className="absolute bottom-2.5 left-3 flex items-center gap-2">
+                <span className="px-2 py-0.5 rounded-full bg-[#0a1208]/90 text-[#86efac] text-[9px] font-bold uppercase tracking-wider flex items-center gap-1 border border-white/10">
+                  <Wind className="w-3 h-3 text-[#4ade80]" /> AQI {selectedSanctuary.aqi}
+                </span>
+                {selectedSanctuary.noise && (
+                  <span className="px-2 py-0.5 rounded-full bg-[#0a1208]/90 text-white/70 text-[9px] font-bold uppercase tracking-wider flex items-center gap-1 border border-white/10">
+                    <Volume2 className="w-3 h-3 text-white/40" /> {selectedSanctuary.noise} dB
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+
+          <p className="text-xs text-white/70 leading-relaxed mb-4 line-clamp-2">
+            {selectedSanctuary.description}
+          </p>
+
+          <div className="flex items-center gap-2">
+            <Link
+              href={`/sanctuaries/${selectedSanctuary.id}`}
+              className="flex-1 py-3 rounded-full bg-[#c8a951] text-[#0a1208] text-[9.5px] uppercase tracking-[0.25em] font-extrabold text-center hover:bg-[#d4a72c] transition-all flex items-center justify-center gap-1.5 shadow-md"
+            >
+              <span>Explore Sanctuary</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </Link>
+            <button
+              onClick={() => setFlyTarget({ center: selectedSanctuary.coords, zoom: 15 })}
+              title="Zoom to location"
+              className="px-4 py-3 rounded-full border border-white/20 text-white text-[9.5px] uppercase tracking-wider font-bold hover:bg-white/10 transition-colors"
+            >
+              Zoom
+            </button>
+          </div>
+        </aside>
+      )}
+
+      {/* ── Discreet Bottom Environmental Stats Strip ──────────────────── */}
+      {!selectedSanctuary && (
+        <footer className="absolute bottom-16 md:bottom-4 inset-x-4 z-[998] pointer-events-none flex justify-center">
+          <div className="pointer-events-auto flex items-center gap-3 px-4 py-2 rounded-full bg-[#0a1208]/85 backdrop-blur-xl border border-white/10 shadow-lg text-[9px] text-white/70">
+            <span className="flex items-center gap-1.5 text-[#86efac] font-bold">
+              <Sparkles className="w-3 h-3 text-[#4ade80]" />
+              <span>Sanctuary AQI: 12–22</span>
+            </span>
+            <span className="text-white/20">|</span>
+            <span className="text-white/50">City Center AQI: 148+</span>
+            <span className="text-white/20">|</span>
+            <span className="text-[#c8a951] font-bold">10× Cleaner Air</span>
+          </div>
+        </footer>
+      )}
     </div>
   );
 }
