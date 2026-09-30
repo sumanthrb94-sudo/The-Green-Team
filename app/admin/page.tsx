@@ -50,11 +50,13 @@ export default async function AdminOverview() {
     .sort((a, b) => b.count - a.count)
     .slice(0, 7);
 
+  const onboardCount = leads.filter(l => l.source === 'property-onboard' || l.source === 'list-property').length;
+
   const stats = [
-    { label: 'Total Leads', value: leads.length, sub: `+${leadsThisWeek} this week`, Icon: Inbox, href: '/admin/leads' },
-    { label: 'Newsletter', value: newsletter.length, sub: 'subscribers', Icon: Mail, href: '/admin/newsletter' },
-    { label: 'Users', value: users.length, sub: 'registered', Icon: Users, href: '/admin/users' },
-    { label: 'Properties', value: properties.length, sub: `${properties.filter(p => p.status === 'live').length} live`, Icon: Building2, href: '/admin/properties' },
+    { label: 'Buyer Leads', value: leads.length - onboardCount, sub: `+${leadsThisWeek} this week`, Icon: Inbox, href: '/admin/leads' },
+    { label: 'Onboardings', value: onboardCount, sub: 'developer dossiers', Icon: Building2, href: '/admin/leads' },
+    { label: 'Users', value: users.length, sub: 'registered members', Icon: Users, href: '/admin/users' },
+    { label: 'Properties', value: properties.length, sub: `${properties.filter(p => p.status === 'live').length} live on portal`, Icon: Building2, href: '/admin/properties' },
   ];
 
   return (
