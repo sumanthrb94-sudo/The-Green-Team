@@ -14,7 +14,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
       {/* First in the tree so the server HTML carries the splash before anything else paints. */}
       <SplashScreen />
       <Navbar />
-      <main className="pb-24 md:pb-0">{children}</main>
+      <main className="pb-24 md:pb-0 has-[[data-fullscreen-map]]:pb-0 has-[[data-fullscreen-map]]:overflow-hidden">{children}</main>
       <StickyCTA />
       <Groot />
       <WhatsAppFab />

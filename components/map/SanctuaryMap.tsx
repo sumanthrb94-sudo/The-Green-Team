@@ -3,16 +3,16 @@
 /**
  * Minimalist Leaflet Eco-Map for The Green Team.
  *
- * An architectural, serene environmental-intelligence surface:
- * - Ultra-clean dark Carto / Satellite basemap
- * - Luminous, subtle biophilic forest & lake reserves
- * - Hairline ORR & RRR arterial infrastructure
- * - Sleek micro-pins for curated sanctuaries
- * - Interactive floating sanctuary preview card with flyTo navigation
- * - Minimalist floating filter HUD optimized for desktop & APK WebViews
+ * Designed with a native APK / mobile GIS UX:
+ * - 100% full-bleed map canvas without browser scroll conflicts
+ * - Horizontal swipeable sanctuary selector on mobile (36px total height overhead)
+ * - Native-feel bottom sheet for cartographic layers & basemap styling
+ * - Ultra-compact, non-intrusive mobile sanctuary preview card above bottom tab bar
+ * - Floating 1-handed zoom & recenter controls
+ * - Contrast layers: pristine forest/air sanctuaries vs. urban industrial pollution hotspots
  */
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -30,19 +30,23 @@ import {
   Trees,
   Wind,
   Layers,
-  MapPin,
   ChevronRight,
   X,
   Volume2,
-  Clock,
   Sparkles,
   Maximize2,
+  Plus,
+  Minus,
+  Check,
+  AlertTriangle,
+  Compass,
 } from 'lucide-react';
 import {
   ORR_PATH,
   RRR_PATH,
   NATURAL_FEATURES,
   MAP_LOCATIONS,
+  KEY_ZONES,
   type LatLng,
   type MapLocation,
 } from '@/lib/data/map';
@@ -74,7 +78,7 @@ function createSanctuaryIcon(s: MapLocation, isSelected: boolean) {
           box-shadow:0 0 8px ${accentColor};
           animation:${isSelected ? 'none' : 'tgt-pulse 2s infinite'};
         "></span>
-        <span style="color:#ffffff;font:700 10px/1 var(--font-manrope),sans-serif;letter-spacing:0.04em;white-space:nowrap;">
+        <span style="color:#ffffff;font:700 10.5px/1 var(--font-manrope),sans-serif;letter-spacing:0.04em;white-space:nowrap;">
           ${s.title}
         </span>
         <span style="
@@ -116,13 +120,33 @@ function createExitIcon(title: string, aqi: number, zoom: number) {
   });
 }
 
-// Controller for programmatic map animations
+function createHazardIcon(name: string, aqi: number) {
+  const html = `
+    <div style="display:flex;align-items:center;gap:3px;background:rgba(30,10,10,0.9);backdrop-filter:blur(6px);border:1px solid rgba(239,68,68,0.4);border-radius:999px;padding:2px 6px;font:700 8px/1 var(--font-inter),sans-serif;color:#fca5a5;transform:translate(-50%,-50%);white-space:nowrap;">
+      <span style="width:5px;height:5px;border-radius:50%;background:#ef4444;"></span>
+      <span>${name}</span>
+      <span style="color:#ef4444;font-family:monospace;font-weight:900;">${aqi}</span>
+    </div>
+  `;
+  return L.divIcon({
+    className: 'minimal-hazard-icon',
+    html,
+    iconSize: undefined,
+    iconAnchor: [0, 0],
+  });
+}
+
+// Controller for programmatic map animations & touch zoom triggers
 function MapController({
   target,
   onZoomChange,
+  zoomInTick,
+  zoomOutTick,
 }: {
   target: { center: LatLng; zoom: number } | null;
   onZoomChange: (z: number) => void;
+  zoomInTick: number;
+  zoomOutTick: number;
 }) {
   const map = useMap();
 
@@ -132,9 +156,17 @@ function MapController({
 
   useEffect(() => {
     if (target) {
-      map.flyTo(target.center, target.zoom, { duration: 1.2, easeLinearity: 0.25 });
+      map.flyTo(target.center, target.zoom, { duration: 1.1, easeLinearity: 0.25 });
     }
   }, [target, map]);
+
+  useEffect(() => {
+    if (zoomInTick > 0) map.zoomIn();
+  }, [zoomInTick, map]);
+
+  useEffect(() => {
+    if (zoomOutTick > 0) map.zoomOut();
+  }, [zoomOutTick, map]);
 
   return null;
 }
@@ -145,19 +177,19 @@ const BASEMAPS: Record<BasemapStyle, { name: string; url: string; attr: string; 
   dark: {
     name: 'Obsidian',
     url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
-    attr: '&copy; OpenStreetMap contributors &copy; CARTO',
+    attr: '&copy; OpenStreetMap &copy; CARTO',
     maxZoom: 20,
   },
   satellite: {
     name: 'Satellite',
     url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    attr: 'Imagery &copy; Esri, Maxar',
+    attr: '&copy; Esri, Maxar',
     maxZoom: 19,
   },
   terrain: {
     name: 'Canopy',
     url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
-    attr: '&copy; OpenStreetMap contributors, SRTM',
+    attr: '&copy; OpenStreetMap, SRTM',
     maxZoom: 17,
   },
 };
@@ -169,15 +201,24 @@ export default function SanctuaryMap() {
     forests: true,
     infra: true,
     airGlow: true,
+    hotspots: false,
   });
 
   const [selectedSanctuary, setSelectedSanctuary] = useState<MapLocation | null>(null);
   const [flyTarget, setFlyTarget] = useState<{ center: LatLng; zoom: number } | null>(null);
   const [currentZoom, setCurrentZoom] = useState(10);
   const [mounted, setMounted] = useState(false);
+  const [showLayersSheet, setShowLayersSheet] = useState(false);
+  const [zoomInTick, setZoomInTick] = useState(0);
+  const [zoomOutTick, setZoomOutTick] = useState(0);
 
+  // Prevent background scroll bounce on mobile browsers
   useEffect(() => {
     setMounted(true);
+    document.body.classList.add('map-fullscreen-active');
+    return () => {
+      document.body.classList.remove('map-fullscreen-active');
+    };
   }, []);
 
   const sanctuaries = useMemo(
@@ -205,9 +246,71 @@ export default function SanctuaryMap() {
   };
 
   return (
-    <div className="relative w-full h-[calc(100svh-4.2rem)] md:h-[calc(100svh-3.5rem)] overflow-hidden bg-[#0a1208] select-none">
-      {/* ── Top Minimalist Control Bar (HUD) ───────────────────────────── */}
-      <header className="absolute top-4 inset-x-4 z-[999] pointer-events-none flex flex-col md:flex-row md:items-center justify-between gap-3 max-w-7xl mx-auto">
+    <div
+      data-fullscreen-map="true"
+      className="relative w-full h-[calc(100dvh-3.5rem)] md:h-[calc(100svh-3.5rem)] overflow-hidden bg-[#0a1208] select-none touch-none"
+    >
+      {/* ── MOBILE TOP HUD (Single Sleek Row, < 40px) ──────────────────── */}
+      <header className="md:hidden absolute top-2 inset-x-2.5 z-[999] pointer-events-none flex items-center justify-between gap-1.5">
+        {/* Horizontal Sanctuary Selector Bar */}
+        <div className="pointer-events-auto flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 flex-1 pr-1">
+          {/* All Sanctuaries Pill */}
+          <button
+            onClick={resetView}
+            className={cn(
+              'px-3 py-1.5 rounded-full text-[9.5px] font-extrabold uppercase tracking-wider backdrop-blur-xl border transition-all shrink-0 active:scale-95',
+              !selectedSanctuary
+                ? 'bg-[#c8a951] text-[#0a1208] border-[#c8a951] shadow-lg font-black'
+                : 'bg-[#0a1208]/90 text-white/80 border-white/10 hover:bg-white/10'
+            )}
+          >
+            All (3)
+          </button>
+
+          {/* Individual Sanctuaries */}
+          {sanctuaries.map(s => {
+            const active = selectedSanctuary?.id === s.id;
+            const dotColor = s.id === 'agartha' ? '#4ade80' : s.id === 'syl' ? '#facc15' : '#fb923c';
+            return (
+              <button
+                key={s.id}
+                onClick={() => selectSanctuary(s)}
+                className={cn(
+                  'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9.5px] font-bold tracking-wide backdrop-blur-xl border transition-all shrink-0 active:scale-95',
+                  active
+                    ? 'bg-[#c8a951] text-[#0a1208] border-[#c8a951] shadow-lg'
+                    : 'bg-[#0a1208]/90 text-white/80 border-white/10 hover:bg-white/10'
+                )}
+              >
+                <span className="w-1.5 h-1.5 rounded-full" style={{ background: dotColor }} />
+                <span>{s.title.replace('MODCON ', '')}</span>
+                <span
+                  className={cn(
+                    'px-1.5 py-0.2 rounded text-[8px] font-mono font-bold',
+                    active ? 'bg-black/20 text-[#0a1208]' : 'bg-white/10 text-[#86efac]'
+                  )}
+                >
+                  AQI {s.aqi}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Mobile Layers & Cartography Trigger */}
+        <div className="pointer-events-auto flex items-center gap-1 shrink-0">
+          <button
+            onClick={() => setShowLayersSheet(true)}
+            aria-label="Map layers and basemap theme"
+            className="w-9 h-9 rounded-full bg-[#0a1208]/92 backdrop-blur-xl border border-white/15 text-white/90 hover:text-white flex items-center justify-center shadow-lg active:scale-95 transition-all"
+          >
+            <Layers className="w-4 h-4 text-[#c8a951]" />
+          </button>
+        </div>
+      </header>
+
+      {/* ── DESKTOP TOP HUD (Widescreen Architectural) ─────────────────── */}
+      <header className="hidden md:flex absolute top-4 inset-x-6 z-[999] pointer-events-none items-center justify-between gap-3 max-w-7xl mx-auto">
         {/* Brand / Status Pill */}
         <div className="pointer-events-auto flex items-center gap-2 self-start p-1.5 pl-3.5 pr-2 rounded-full bg-[#0a1208]/90 backdrop-blur-xl border border-white/10 shadow-xl">
           <span className="w-2 h-2 rounded-full bg-[#a3b18a] animate-pulse" />
@@ -240,9 +343,8 @@ export default function SanctuaryMap() {
           </div>
         </div>
 
-        {/* Layer Toggles & Style Switcher */}
-        <div className="pointer-events-auto flex items-center gap-1.5 self-start md:self-auto overflow-x-auto no-scrollbar p-1.5 rounded-full bg-[#0a1208]/90 backdrop-blur-xl border border-white/10 shadow-xl">
-          {/* Layer Chips */}
+        {/* Desktop Layer Toggles & Style Switcher */}
+        <div className="pointer-events-auto flex items-center gap-1.5 p-1.5 rounded-full bg-[#0a1208]/90 backdrop-blur-xl border border-white/10 shadow-xl">
           <button
             onClick={() => toggleLayer('forests')}
             className={cn(
@@ -253,7 +355,7 @@ export default function SanctuaryMap() {
             )}
           >
             <Trees className="w-3 h-3" />
-            <span>Forests & Lakes</span>
+            <span>Reserves</span>
           </button>
 
           <button
@@ -267,6 +369,19 @@ export default function SanctuaryMap() {
           >
             <Wind className="w-3 h-3" />
             <span>Air Purity</span>
+          </button>
+
+          <button
+            onClick={() => toggleLayer('hotspots')}
+            className={cn(
+              'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9px] uppercase tracking-wider font-bold transition-all',
+              activeLayers.hotspots
+                ? 'bg-red-950/80 text-red-400 border border-red-500/40'
+                : 'text-white/40 hover:text-white/70'
+            )}
+          >
+            <AlertTriangle className="w-3 h-3" />
+            <span>City Hazards</span>
           </button>
 
           <span className="w-px h-3.5 bg-white/15 mx-0.5" />
@@ -296,6 +411,32 @@ export default function SanctuaryMap() {
         </div>
       </header>
 
+      {/* ── FLOATING 1-HANDED CONTROLS (Right Edge) ────────────────────── */}
+      <div className="absolute right-3 top-14 md:top-24 z-[998] flex flex-col gap-1.5 pointer-events-auto">
+        <button
+          onClick={() => setZoomInTick(t => t + 1)}
+          aria-label="Zoom in"
+          className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-[#0a1208]/90 backdrop-blur-xl border border-white/15 text-white/80 hover:text-white flex items-center justify-center shadow-lg active:scale-90 transition-transform"
+        >
+          <Plus className="w-3.5 h-3.5" />
+        </button>
+        <button
+          onClick={() => setZoomOutTick(t => t + 1)}
+          aria-label="Zoom out"
+          className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-[#0a1208]/90 backdrop-blur-xl border border-white/15 text-white/80 hover:text-white flex items-center justify-center shadow-lg active:scale-90 transition-transform"
+        >
+          <Minus className="w-3.5 h-3.5" />
+        </button>
+        <button
+          onClick={resetView}
+          aria-label="Reset overview"
+          title="Reset to Hyderabad Corridor"
+          className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-[#0a1208]/90 backdrop-blur-xl border border-white/15 text-[#c8a951] hover:text-white flex items-center justify-center shadow-lg active:scale-90 transition-transform"
+        >
+          <Compass className="w-3.5 h-3.5" />
+        </button>
+      </div>
+
       {/* ── Leaflet Canvas ─────────────────────────────────────────────── */}
       {mounted && (
         <MapContainer
@@ -312,7 +453,12 @@ export default function SanctuaryMap() {
           maxBoundsViscosity={0.9}
           className="w-full h-full"
         >
-          <MapController target={flyTarget} onZoomChange={setCurrentZoom} />
+          <MapController
+            target={flyTarget}
+            onZoomChange={setCurrentZoom}
+            zoomInTick={zoomInTick}
+            zoomOutTick={zoomOutTick}
+          />
 
           <TileLayer
             key={selectedBasemap}
@@ -322,7 +468,7 @@ export default function SanctuaryMap() {
             maxZoom={18}
           />
 
-          {/* Minimalist Air Quality Purity Halos (Subtle & serene, not noisy dots) */}
+          {/* Minimalist Air Quality Purity Halos */}
           {activeLayers.airGlow && (
             <>
               {/* Narsapur Pure Air Belt */}
@@ -376,7 +522,7 @@ export default function SanctuaryMap() {
             </>
           )}
 
-          {/* Protected Forests & Lakes (Serene translucent jade & slate) */}
+          {/* Protected Forests & Lakes */}
           {activeLayers.forests &&
             NATURAL_FEATURES.map(f => (
               <Polygon
@@ -402,7 +548,7 @@ export default function SanctuaryMap() {
               />
             ))}
 
-          {/* Minimalist Arterial Infrastructure */}
+          {/* Arterial Infrastructure */}
           {activeLayers.infra && (
             <>
               {/* ORR — Luminous fine gold ring */}
@@ -436,6 +582,16 @@ export default function SanctuaryMap() {
             </>
           )}
 
+          {/* City Hazard / Pollution Hotspots (Contrasts heavily with sanctuaries) */}
+          {activeLayers.hotspots &&
+            KEY_ZONES.map(z => (
+              <Marker
+                key={z.id}
+                position={z.coords}
+                icon={createHazardIcon(z.name, z.aqi)}
+              />
+            ))}
+
           {/* Curated Sanctuary Luxury Micro-Pins */}
           {activeLayers.sanctuaries &&
             sanctuaries.map(s => {
@@ -454,11 +610,85 @@ export default function SanctuaryMap() {
         </MapContainer>
       )}
 
-      {/* ── Minimalist Floating Sanctuary Card (Sheet) ─────────────────── */}
+      {/* ── MOBILE SANCTUARY PREVIEW CARD (Above Tab Bar) ───────────────── */}
       {selectedSanctuary && (
         <aside
           aria-label="Selected Sanctuary Preview"
-          className="absolute bottom-16 md:bottom-6 left-4 right-4 md:right-auto md:w-96 z-[999] p-5 rounded-3xl bg-[#0a1208]/95 backdrop-blur-2xl border border-white/15 shadow-[0_20px_50px_rgba(0,0,0,0.8)] animate-fade-up"
+          className="md:hidden absolute bottom-[4.75rem] inset-x-3 z-[999] p-3.5 rounded-2xl bg-[#0a1208]/96 backdrop-blur-2xl border border-white/15 shadow-[0_16px_40px_rgba(0,0,0,0.85)] animate-fade-up"
+        >
+          {/* Top Row: Thumbnail + Details + Close */}
+          <div className="flex items-center gap-3 relative">
+            {selectedSanctuary.image && (
+              <div className="relative w-18 h-18 rounded-xl overflow-hidden shrink-0 border border-white/10">
+                <Image
+                  src={selectedSanctuary.image}
+                  alt={selectedSanctuary.title}
+                  fill
+                  sizes="80px"
+                  className="object-cover"
+                />
+                <span className="absolute bottom-1 left-1 px-1.5 py-0.2 rounded bg-black/80 text-[7.5px] font-mono font-black text-[#86efac]">
+                  AQI {selectedSanctuary.aqi}
+                </span>
+              </div>
+            )}
+
+            <div className="flex-1 min-w-0 pr-6">
+              <span className="text-[7.5px] uppercase tracking-[0.25em] font-extrabold text-[#c8a951] block leading-none mb-1">
+                Curated Sanctuary
+              </span>
+              <h3 className="font-headline font-extrabold text-base text-white truncate leading-snug">
+                {selectedSanctuary.title}
+              </h3>
+              <p className="text-[11px] text-white/55 truncate">{selectedSanctuary.location}</p>
+
+              <div className="flex items-center gap-1.5 mt-1.5">
+                <span className="px-2 py-0.5 rounded-full bg-white/5 text-[#86efac] text-[8.5px] font-bold border border-white/10 flex items-center gap-1">
+                  <Wind className="w-2.5 h-2.5 text-[#4ade80]" />
+                  AQI {selectedSanctuary.aqi}
+                </span>
+                {selectedSanctuary.noise && (
+                  <span className="px-2 py-0.5 rounded-full bg-white/5 text-white/70 text-[8.5px] font-bold border border-white/10 flex items-center gap-1">
+                    <Volume2 className="w-2.5 h-2.5 text-white/40" />
+                    {selectedSanctuary.noise} dB
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <button
+              onClick={() => setSelectedSanctuary(null)}
+              aria-label="Close details"
+              className="absolute top-0 right-0 w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-white/70 hover:text-white transition-colors"
+            >
+              <X className="w-3 h-3" />
+            </button>
+          </div>
+
+          {/* Action Row */}
+          <div className="flex items-center gap-2 mt-3 pt-2.5 border-t border-white/10">
+            <Link
+              href={`/sanctuaries/${selectedSanctuary.id}`}
+              className="flex-1 py-2 rounded-xl bg-[#c8a951] text-[#0a1208] text-[9.5px] uppercase tracking-[0.2em] font-black text-center flex items-center justify-center gap-1 shadow-md active:scale-95 transition-all"
+            >
+              <span>Explore Sanctuary</span>
+              <ChevronRight className="w-3 h-3" />
+            </Link>
+            <button
+              onClick={() => setFlyTarget({ center: selectedSanctuary.coords, zoom: 15 })}
+              className="px-3.5 py-2 rounded-xl border border-white/20 text-white text-[9px] uppercase tracking-wider font-bold hover:bg-white/10 active:scale-95 transition-all"
+            >
+              Zoom
+            </button>
+          </div>
+        </aside>
+      )}
+
+      {/* ── DESKTOP SANCTUARY PREVIEW CARD ─────────────────────────────── */}
+      {selectedSanctuary && (
+        <aside
+          aria-label="Selected Sanctuary Preview"
+          className="hidden md:block absolute bottom-6 left-6 w-[23rem] z-[999] p-5 rounded-3xl bg-[#0a1208]/95 backdrop-blur-2xl border border-white/15 shadow-[0_20px_50px_rgba(0,0,0,0.8)] animate-fade-up"
         >
           <div className="flex items-start justify-between gap-3 mb-3">
             <div>
@@ -485,7 +715,7 @@ export default function SanctuaryMap() {
                 src={selectedSanctuary.image}
                 alt={selectedSanctuary.title}
                 fill
-                sizes="(max-width: 768px) 100vw, 400px"
+                sizes="400px"
                 className="object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
@@ -525,20 +755,221 @@ export default function SanctuaryMap() {
         </aside>
       )}
 
-      {/* ── Discreet Bottom Environmental Stats Strip ──────────────────── */}
+      {/* ── ENVIRONMENTAL BENCHMARK PILL (When No Sanctuary Selected) ───── */}
       {!selectedSanctuary && (
-        <footer className="absolute bottom-16 md:bottom-4 inset-x-4 z-[998] pointer-events-none flex justify-center">
-          <div className="pointer-events-auto flex items-center gap-3 px-4 py-2 rounded-full bg-[#0a1208]/85 backdrop-blur-xl border border-white/10 shadow-lg text-[9px] text-white/70">
-            <span className="flex items-center gap-1.5 text-[#86efac] font-bold">
-              <Sparkles className="w-3 h-3 text-[#4ade80]" />
-              <span>Sanctuary AQI: 12–22</span>
-            </span>
-            <span className="text-white/20">|</span>
-            <span className="text-white/50">City Center AQI: 148+</span>
-            <span className="text-white/20">|</span>
-            <span className="text-[#c8a951] font-bold">10× Cleaner Air</span>
+        <>
+          {/* Mobile Discrete Pill */}
+          <div className="md:hidden absolute bottom-[4.75rem] left-1/2 -translate-x-1/2 z-[998] pointer-events-none">
+            <div className="pointer-events-auto flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0a1208]/92 backdrop-blur-xl border border-white/10 shadow-lg text-[8.5px] text-white/80 whitespace-nowrap">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#86efac] animate-pulse" />
+              <span className="text-[#86efac] font-bold">Sanctuary: 12–22 AQI</span>
+              <span className="text-white/30">|</span>
+              <span className="text-white/50">City: 148+</span>
+              <span className="text-white/30">|</span>
+              <span className="text-[#c8a951] font-bold">10× Cleaner</span>
+            </div>
           </div>
-        </footer>
+
+          {/* Desktop Footer Strip */}
+          <footer className="hidden md:flex absolute bottom-4 inset-x-4 z-[998] pointer-events-none justify-center">
+            <div className="pointer-events-auto flex items-center gap-3 px-4 py-2 rounded-full bg-[#0a1208]/85 backdrop-blur-xl border border-white/10 shadow-lg text-[9px] text-white/70">
+              <span className="flex items-center gap-1.5 text-[#86efac] font-bold">
+                <Sparkles className="w-3 h-3 text-[#4ade80]" />
+                <span>Sanctuary AQI: 12–22</span>
+              </span>
+              <span className="text-white/20">|</span>
+              <span className="text-white/50">City Center AQI: 148+</span>
+              <span className="text-white/20">|</span>
+              <span className="text-[#c8a951] font-bold">10× Cleaner Air</span>
+            </div>
+          </footer>
+        </>
+      )}
+
+      {/* ── MOBILE CARTOGRAPHY & LAYERS BOTTOM DRAWER ──────────────────── */}
+      {showLayersSheet && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Map layers and basemap theme"
+          className="fixed inset-0 z-[10000] flex flex-col justify-end bg-black/60 backdrop-blur-sm"
+          onClick={() => setShowLayersSheet(false)}
+        >
+          <div
+            className="w-full bg-[#0a1208] border-t border-white/15 rounded-t-3xl p-5 pb-8 shadow-2xl animate-fade-up"
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Drawer Handle */}
+            <div className="w-10 h-1 rounded-full bg-white/20 mx-auto mb-4" />
+
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h4 className="font-headline font-extrabold text-base text-white">
+                  Environmental Cartography
+                </h4>
+                <p className="text-[10px] text-white/50">
+                  Configure layers, reserves, and satellite imagery
+                </p>
+              </div>
+              <button
+                onClick={() => setShowLayersSheet(false)}
+                className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/70"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Basemap Styles */}
+            <div className="mb-4">
+              <span className="text-[9px] uppercase tracking-widest font-extrabold text-[#c8a951] block mb-2">
+                Basemap Theme
+              </span>
+              <div className="grid grid-cols-3 gap-2">
+                {(['dark', 'satellite', 'terrain'] as BasemapStyle[]).map(style => {
+                  const active = selectedBasemap === style;
+                  return (
+                    <button
+                      key={style}
+                      onClick={() => setSelectedBasemap(style)}
+                      className={cn(
+                        'py-2.5 px-2 rounded-xl text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 border transition-all',
+                        active
+                          ? 'bg-[#c8a951] text-[#0a1208] border-[#c8a951] shadow-md font-black'
+                          : 'bg-white/5 text-white/70 border-white/10 hover:bg-white/10'
+                      )}
+                    >
+                      {active && <Check className="w-3 h-3 stroke-[3]" />}
+                      <span>{BASEMAPS[style].name}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Layer Toggles */}
+            <div className="mb-5 space-y-2">
+              <span className="text-[9px] uppercase tracking-widest font-extrabold text-[#c8a951] block mb-1">
+                Active Intelligence Layers
+              </span>
+
+              {/* Forests */}
+              <button
+                onClick={() => toggleLayer('forests')}
+                className={cn(
+                  'w-full py-2.5 px-3.5 rounded-xl border flex items-center justify-between text-left transition-all',
+                  activeLayers.forests
+                    ? 'bg-[#2d3a1d]/60 border-[#a3b18a]/40 text-white'
+                    : 'bg-white/5 border-white/10 text-white/50'
+                )}
+              >
+                <div className="flex items-center gap-2.5">
+                  <Trees className={cn('w-4 h-4', activeLayers.forests ? 'text-[#a3b18a]' : 'text-white/40')} />
+                  <div>
+                    <span className="text-xs font-bold block">Forests & Protected Lakes</span>
+                    <span className="text-[9px] text-white/40 block">Narsapur, Ananthagiri, Osman Sagar</span>
+                  </div>
+                </div>
+                <div
+                  className={cn(
+                    'w-5 h-5 rounded-full flex items-center justify-center',
+                    activeLayers.forests ? 'bg-[#a3b18a] text-[#0a1208]' : 'bg-white/10'
+                  )}
+                >
+                  {activeLayers.forests && <Check className="w-3 h-3 stroke-[3]" />}
+                </div>
+              </button>
+
+              {/* Air Purity */}
+              <button
+                onClick={() => toggleLayer('airGlow')}
+                className={cn(
+                  'w-full py-2.5 px-3.5 rounded-xl border flex items-center justify-between text-left transition-all',
+                  activeLayers.airGlow
+                    ? 'bg-[#2d3a1d]/60 border-[#86efac]/40 text-white'
+                    : 'bg-white/5 border-white/10 text-white/50'
+                )}
+              >
+                <div className="flex items-center gap-2.5">
+                  <Wind className={cn('w-4 h-4', activeLayers.airGlow ? 'text-[#86efac]' : 'text-white/40')} />
+                  <div>
+                    <span className="text-xs font-bold block">Air Purity Halos</span>
+                    <span className="text-[9px] text-white/40 block">Real-time green canopy oxygenation</span>
+                  </div>
+                </div>
+                <div
+                  className={cn(
+                    'w-5 h-5 rounded-full flex items-center justify-center',
+                    activeLayers.airGlow ? 'bg-[#86efac] text-[#0a1208]' : 'bg-white/10'
+                  )}
+                >
+                  {activeLayers.airGlow && <Check className="w-3 h-3 stroke-[3]" />}
+                </div>
+              </button>
+
+              {/* Highways */}
+              <button
+                onClick={() => toggleLayer('infra')}
+                className={cn(
+                  'w-full py-2.5 px-3.5 rounded-xl border flex items-center justify-between text-left transition-all',
+                  activeLayers.infra
+                    ? 'bg-white/10 border-[#c8a951]/40 text-white'
+                    : 'bg-white/5 border-white/10 text-white/50'
+                )}
+              >
+                <div className="flex items-center gap-2.5">
+                  <Compass className={cn('w-4 h-4', activeLayers.infra ? 'text-[#c8a951]' : 'text-white/40')} />
+                  <div>
+                    <span className="text-xs font-bold block">ORR & RRR Expressways</span>
+                    <span className="text-[9px] text-white/40 block">Outer & Regional Ring Road alignment</span>
+                  </div>
+                </div>
+                <div
+                  className={cn(
+                    'w-5 h-5 rounded-full flex items-center justify-center',
+                    activeLayers.infra ? 'bg-[#c8a951] text-[#0a1208]' : 'bg-white/10'
+                  )}
+                >
+                  {activeLayers.infra && <Check className="w-3 h-3 stroke-[3]" />}
+                </div>
+              </button>
+
+              {/* Urban Pollution Hotspots */}
+              <button
+                onClick={() => toggleLayer('hotspots')}
+                className={cn(
+                  'w-full py-2.5 px-3.5 rounded-xl border flex items-center justify-between text-left transition-all',
+                  activeLayers.hotspots
+                    ? 'bg-red-950/60 border-red-500/40 text-white'
+                    : 'bg-white/5 border-white/10 text-white/50'
+                )}
+              >
+                <div className="flex items-center gap-2.5">
+                  <AlertTriangle className={cn('w-4 h-4', activeLayers.hotspots ? 'text-red-400' : 'text-white/40')} />
+                  <div>
+                    <span className="text-xs font-bold block">City Pollution Hotspots</span>
+                    <span className="text-[9px] text-white/40 block">Sanath Nagar, Charminar, Patancheru</span>
+                  </div>
+                </div>
+                <div
+                  className={cn(
+                    'w-5 h-5 rounded-full flex items-center justify-center',
+                    activeLayers.hotspots ? 'bg-red-500 text-white' : 'bg-white/10'
+                  )}
+                >
+                  {activeLayers.hotspots && <Check className="w-3 h-3 stroke-[3]" />}
+                </div>
+              </button>
+            </div>
+
+            {/* Close Button */}
+            <button
+              onClick={() => setShowLayersSheet(false)}
+              className="w-full py-3 rounded-xl bg-[#c8a951] text-[#0a1208] text-xs font-extrabold uppercase tracking-widest text-center shadow-lg active:scale-95 transition-all"
+            >
+              Apply Cartography
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

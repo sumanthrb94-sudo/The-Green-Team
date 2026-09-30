@@ -109,6 +109,12 @@
     touch-action: none;
   }
 
+  body.map-fullscreen-active {
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
+    touch-action: none;
+  }
+
   h1, h2, h3 {
     @apply font-headline tracking-tight leading-[1.08];
   }
