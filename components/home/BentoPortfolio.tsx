@@ -63,9 +63,11 @@ function Tile({
                 <Wind className="w-3.5 h-3.5 text-[#a3b18a]" /> AQI {s.aqi}
               </span>
             )}
-            <span className="flex items-center gap-1.5 text-[8.5px] sm:text-[9px] uppercase tracking-wider font-bold text-white/70">
-              <VolumeX className="w-3.5 h-3.5 text-white/40" /> {s.noise} dB
-            </span>
+            {s.noise > 0 && (
+              <span className="flex items-center gap-1.5 text-[8.5px] sm:text-[9px] uppercase tracking-wider font-bold text-white/70">
+                <VolumeX className="w-3.5 h-3.5 text-white/40" /> {s.noise} dB
+              </span>
+            )}
             {large && s.plotRange && (
               <span className="hidden md:inline text-[9px] uppercase tracking-widest font-bold text-white/45">
                 {s.plotRange}

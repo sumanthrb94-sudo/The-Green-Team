@@ -120,8 +120,8 @@ export default async function SanctuaryPage({ params }: Props) {
     ...(rating ? { aggregateRating: rating } : {}),
     additionalProperty: [
       ...(showsAqi(s) ? [{ '@type': 'PropertyValue', name: 'AQI', value: s.aqi }] : []),
-      { '@type': 'PropertyValue', name: 'Ambient noise', value: `${s.noise} dB` },
-      { '@type': 'PropertyValue', name: 'Commute', value: s.commute },
+      ...(s.noise > 0 ? [{ '@type': 'PropertyValue', name: 'Ambient noise', value: `${s.noise} dB` }] : []),
+      ...(s.commute ? [{ '@type': 'PropertyValue', name: 'Commute', value: s.commute }] : []),
       ...(s.plotRange ? [{ '@type': 'PropertyValue', name: 'Sizes', value: s.plotRange }] : []),
       ...(s.rera ? [{ '@type': 'PropertyValue', name: 'RERA', value: s.rera }] : []),
       ...specsFor(s.category).flatMap(f => {
@@ -170,8 +170,8 @@ export default async function SanctuaryPage({ params }: Props) {
           <div className="flex flex-wrap gap-x-4 sm:gap-x-6 gap-y-2 sm:gap-y-3 mt-4 sm:mt-7">
             {[
               showsAqi(s) ? { Icon: Wind, text: `AQI ${s.aqi}` } : null,
-              { Icon: VolumeX, text: `${s.noise} dB` },
-              { Icon: Clock, text: s.commute },
+              s.noise > 0 ? { Icon: VolumeX, text: `${s.noise} dB` } : null,
+              s.commute ? { Icon: Clock, text: s.commute } : null,
             ].filter(x => x !== null).map(({ Icon, text }) => (
               <span key={text} className="flex items-center gap-1.5 sm:gap-2 text-white/75 text-[9px] sm:text-[10px] uppercase tracking-widest font-bold">
                 <Icon className="w-3.5 h-3.5 text-[#a3b18a]" /> {text}
@@ -202,8 +202,10 @@ export default async function SanctuaryPage({ params }: Props) {
                   showsAqi(s)
                     ? { Icon: Wind, k: 'Air quality', v: `AQI ${s.aqi}`, sub: s.aqi <= 15 ? 'Pure air · city is 100–180' : 'Clean air · city is 100–180' }
                     : null,
-                  { Icon: VolumeX, k: 'Ambient noise', v: `${s.noise} dB`, sub: s.noise <= 20 ? 'Near silent · city is 65+' : 'Quiet · city is 65+' },
-                  { Icon: Clock, k: 'Commute', v: s.commute.split('·')[0].trim(), sub: 'measured, not estimated' },
+                  s.noise > 0
+                    ? { Icon: VolumeX, k: 'Ambient noise', v: `${s.noise} dB`, sub: s.noise <= 20 ? 'Near silent · city is 65+' : 'Quiet · city is 65+' }
+                    : null,
+                  s.commute ? { Icon: Clock, k: 'Commute', v: s.commute.split('·')[0].trim(), sub: 'measured, not estimated' } : null,
                 ].filter(x => x !== null).map(({ Icon, k, v, sub }) => (
                   <div key={k} className="flex items-start gap-3">
                     <span className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">

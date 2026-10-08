@@ -17,7 +17,9 @@ function fromDoc(id: string, data: FirebaseFirestore.DocumentData): Sanctuary {
   for (const [k, v] of Object.entries(data)) {
     if (v === null || ['string', 'number', 'boolean'].includes(typeof v) || Array.isArray(v)) plain[k] = v;
   }
-  return { ...(plain as Omit<Sanctuary, 'id'>), id };
+  // Admin-added listings may not have a measured commute yet; '' renders as "not shown".
+  const doc = plain as Omit<Sanctuary, 'id'>;
+  return { ...doc, commute: doc.commute ?? '', id };
 }
 
 export async function getPortfolio(): Promise<Sanctuary[]> {

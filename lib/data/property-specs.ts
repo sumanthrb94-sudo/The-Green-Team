@@ -59,7 +59,8 @@ export const COMMON_SPECS: SpecField[] = [
     key: 'transaction',
     label: 'Transaction',
     kind: 'select',
-    options: opts(['new', 'New booking (developer)'], ['resale', 'Resale (owner)']),
+    // 'resale' covers any owner-held listing — a resale or an owner's lease we broker.
+    options: opts(['new', 'Direct from developer'], ['resale', 'From owner']),
     required: true,
   },
   { key: 'approvals', label: 'Approvals', kind: 'multi', options: APPROVALS, required: true },

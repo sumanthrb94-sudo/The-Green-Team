@@ -64,10 +64,12 @@ export function SanctuaryCard({ sanctuary, index = 0 }: { sanctuary: Sanctuary; 
                 <span className="text-[9px] uppercase tracking-widest font-bold text-white/70">AQI {sanctuary.aqi}</span>
               </span>
             )}
-            <span className="flex items-center gap-1.5">
-              <VolumeX className="w-3.5 h-3.5 text-white/40" />
-              <span className="text-[9px] uppercase tracking-widest font-bold text-white/70">{sanctuary.noise} dB</span>
-            </span>
+            {sanctuary.noise > 0 && (
+              <span className="flex items-center gap-1.5">
+                <VolumeX className="w-3.5 h-3.5 text-white/40" />
+                <span className="text-[9px] uppercase tracking-widest font-bold text-white/70">{sanctuary.noise} dB</span>
+              </span>
+            )}
           </div>
           <Link
             href={`/sanctuaries/${sanctuary.id}`}

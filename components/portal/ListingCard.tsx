@@ -87,9 +87,11 @@ export function ListingCard({ sanctuary: s }: { sanctuary: Sanctuary }) {
               <Wind className="w-3.5 h-3.5" /> AQI {s.aqi}
             </li>
           )}
-          <li className="flex items-center gap-1.5">
-            <VolumeX className="w-3.5 h-3.5 text-secondary/50" /> {s.noise} dB
-          </li>
+          {s.noise > 0 && (
+            <li className="flex items-center gap-1.5">
+              <VolumeX className="w-3.5 h-3.5 text-secondary/50" /> {s.noise} dB
+            </li>
+          )}
           {s.plotRange && (
             <li className="flex items-center gap-1.5 min-w-0">
               <Ruler className="w-3.5 h-3.5 text-secondary/50 flex-shrink-0" />

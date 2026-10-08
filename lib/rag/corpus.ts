@@ -94,7 +94,7 @@ function propertyChunks(out: KbChunk[]): (s: Sanctuary) => void {
 
     const environment =
       `${s.title} environmental and access profile, verified on site by The Green Team: ` +
-      `${showsAqi(s) ? `air quality index ${s.aqi}, ` : ''}ambient noise ${s.noise} dB, commute ${s.commute}. ` +
+      `${showsAqi(s) ? `air quality index ${s.aqi}, ` : ''}${s.noise > 0 ? `ambient noise ${s.noise} dB, ` : ''}${s.commute ? `commute ${s.commute}` : 'commute not yet measured'}. ` +
       `${s.title} sits at ${s.location}. ` +
       `The Green Team measures AQI and noise at the site itself at different times of day rather than quoting a city average, and drives the commute rather than calculating it.`;
     add(out, {

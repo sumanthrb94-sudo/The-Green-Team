@@ -38,15 +38,18 @@ export function InvestPanel({ sanctuary }: { sanctuary: Sanctuary }) {
   // the negotiation line. Three hardcoded copies is what let the page keep
   // saying ₹8,500 after the rate moved, so it is derived once from the constant.
   const agarthaRate = `₹${AGARTHA_NOW_RATE.toLocaleString('en-IN')} / sq yd`;
-  const telemetry = (
-    <div className={`grid ${showsAqi(sanctuary) ? 'grid-cols-3' : 'grid-cols-2'} gap-px bg-outline/10 border border-outline/10 rounded-2xl overflow-hidden mb-10`}>
-      {[
-        showsAqi(sanctuary)
-          ? { Icon: Wind, label: 'AQI', value: String(sanctuary.aqi), sub: sanctuary.aqi <= 15 ? 'Pure Air' : 'Clean' }
-          : null,
-        { Icon: VolumeX, label: 'Noise', value: `${sanctuary.noise} dB`, sub: sanctuary.noise <= 20 ? 'Near Silent' : 'Quiet' },
-        { Icon: Clock, label: 'Commute', value: sanctuary.commute.split('·')[0].trim(), sub: '' },
-      ].filter(x => x !== null).map(({ Icon, label, value, sub }) => (
+  const stats = [
+    showsAqi(sanctuary)
+      ? { Icon: Wind, label: 'AQI', value: String(sanctuary.aqi), sub: sanctuary.aqi <= 15 ? 'Pure Air' : 'Clean' }
+      : null,
+    sanctuary.noise > 0
+      ? { Icon: VolumeX, label: 'Noise', value: `${sanctuary.noise} dB`, sub: sanctuary.noise <= 20 ? 'Near Silent' : 'Quiet' }
+      : null,
+    sanctuary.commute ? { Icon: Clock, label: 'Commute', value: sanctuary.commute.split('·')[0].trim(), sub: '' } : null,
+  ].filter(x => x !== null);
+  const telemetry = stats.length === 0 ? null : (
+    <div className={`grid ${['', 'grid-cols-1', 'grid-cols-2', 'grid-cols-3'][stats.length]} gap-px bg-outline/10 border border-outline/10 rounded-2xl overflow-hidden mb-10`}>
+      {stats.map(({ Icon, label, value, sub }) => (
         <div key={label} className="bg-surface p-6 text-center">
           <Icon className="w-4 h-4 mx-auto text-primary/60 mb-2" />
           <p className="text-[8px] uppercase tracking-[0.4em] text-secondary/50 font-bold">{label}</p>

@@ -98,7 +98,7 @@ export async function pinnedFacts(): Promise<string> {
   const portfolio = await getPortfolio();
   const lines = portfolio.map(
     p =>
-      `- ${p.title} (id: ${p.id}) — ${p.location}. ${p.memberPrice}. ${showsAqi(p) ? `AQI ${p.aqi}, ` : ''}${p.noise} dB, ${p.commute}.`
+      `- ${p.title} (id: ${p.id}) — ${p.location}. ${p.memberPrice}. ${[showsAqi(p) ? `AQI ${p.aqi}` : '', p.noise > 0 ? `${p.noise} dB` : '', p.commute].filter(Boolean).join(', ')}.`
   );
   return [
     'THE PORTFOLIO (all currently listed sanctuaries):',
