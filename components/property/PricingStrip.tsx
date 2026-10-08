@@ -28,7 +28,9 @@ export function PricingStrip({ sanctuary: s }: { sanctuary: Sanctuary }) {
     <div className="mt-6 rounded-3xl border border-outline/12 bg-surface p-5 md:p-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-[9px] uppercase tracking-[0.3em] font-bold text-secondary/50">Bookings from</p>
+          <p className="text-[9px] uppercase tracking-[0.3em] font-bold text-secondary/50">
+            {s.dealType === 'lease' ? 'Lease rent' : 'Bookings from'}
+          </p>
           <p className="font-headline font-extrabold tracking-[-0.02em] text-3xl md:text-4xl text-on-surface mt-1">{from}</p>
           {rate && <p className="text-xs text-secondary mt-1.5">{rate}</p>}
         </div>
