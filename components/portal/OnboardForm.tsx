@@ -177,8 +177,9 @@ Notes: ${form.notes || 'N/A'}`;
           >
             <option value="plots">Forest Farm Plots / Farmland</option>
             <option value="villas">Eco-Villas & Villaments</option>
+            <option value="apartments">Apartments / High-Rise</option>
             <option value="retreats">Earthen Retreats / Agro-Estates</option>
-            <option value="commercial">Integrated Eco-Commercial Hub</option>
+            <option value="commercial">Office / Commercial Space</option>
           </select>
         </div>
         <div>

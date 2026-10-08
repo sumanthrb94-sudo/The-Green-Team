@@ -8,6 +8,7 @@
 import { ArrowRight, Flame } from 'lucide-react';
 import type { Sanctuary } from '@/lib/data/sanctuaries';
 import { estimateFromPrice, priceLabel } from '@/lib/data/listing';
+import { unitNoun } from '@/lib/data/categories';
 
 export function PricingStrip({ sanctuary: s }: { sanctuary: Sanctuary }) {
   const est = estimateFromPrice(s);
@@ -16,9 +17,11 @@ export function PricingStrip({ sanctuary: s }: { sanctuary: Sanctuary }) {
     ? `₹${s.pricePerSqYd.toLocaleString('en-IN')} / sq yd · headline rate`
     : /sft/i.test(s.memberPrice ?? '')
       ? 'Headline rate · unit sizes below'
-      : null;
+      : s.pricePerSqFt
+        ? `₹${s.pricePerSqFt.toLocaleString('en-IN')} / sq ft · headline rate`
+        : null;
   const units = s.plots && s.plots > 0 ? s.plots : null;
-  const noun = s.category === 'villas' ? 'homes' : 'plots';
+  const noun = unitNoun(s.category);
   const reserved = units && s.reserved ? Math.min(s.reserved, units) : 0;
 
   return (

@@ -10,6 +10,7 @@ import { InvestPanel } from '@/components/property/InvestPanel';
 import { PdpTabs, type PdpSection } from '@/components/property/PdpTabs';
 import { KeyFacts } from '@/components/property/KeyFacts';
 import { PricingStrip } from '@/components/property/PricingStrip';
+import { Specifications } from '@/components/property/Specifications';
 import { Highlights } from '@/components/property/Highlights';
 import { LocationAdvantages } from '@/components/property/LocationAdvantages';
 import { EmiCalculator } from '@/components/property/EmiCalculator';
@@ -22,6 +23,7 @@ import { ReviewForm } from '@/components/reviews/ReviewForm';
 import { getApprovedReviews, aggregateRating } from '@/lib/server/reviews';
 import { SITE_URL } from '@/lib/data/contact';
 import { estimateFromPrice } from '@/lib/data/listing';
+import { formatSpec, specsFor } from '@/lib/data/property-specs';
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -121,6 +123,10 @@ export default async function SanctuaryPage({ params }: Props) {
       { '@type': 'PropertyValue', name: 'Commute', value: s.commute },
       ...(s.plotRange ? [{ '@type': 'PropertyValue', name: 'Sizes', value: s.plotRange }] : []),
       ...(s.rera ? [{ '@type': 'PropertyValue', name: 'RERA', value: s.rera }] : []),
+      ...specsFor(s.category).flatMap(f => {
+        const value = formatSpec(f, (s as unknown as Record<string, unknown>)[f.key]);
+        return value ? [{ '@type': 'PropertyValue', name: f.label, value }] : [];
+      }),
     ],
   };
 
@@ -181,6 +187,7 @@ export default async function SanctuaryPage({ params }: Props) {
         <section id="overview" className="scroll-mt-40 py-10 md:py-12">
           <KeyFacts sanctuary={s} />
           <PricingStrip sanctuary={s} />
+          <Specifications sanctuary={s} />
           <div className="grid lg:grid-cols-[1.6fr_1fr] gap-10 mt-10">
             <div>
               <SectionHead eyebrow="About" title={s.title} />

@@ -40,6 +40,8 @@ function firstInt(s?: string): number | null {
 
 /** Best-effort entry price in rupees, or null when it is genuinely on request. */
 export function estimateFromPrice(s: Sanctuary): number | null {
+  // A lease-only space has a rent, not a purchase price — never fold it into budgets.
+  if (s.dealType === 'lease') return null;
   const mp = s.memberPrice ?? '';
   // Rate-based headline: rate × smallest available unit size.
   if (/\bsft\b/i.test(mp) || /sq\.?\s*ft/i.test(mp)) {
@@ -51,7 +53,13 @@ export function estimateFromPrice(s: Sanctuary): number | null {
     const minYd = firstInt(s.plotRange);
     return minYd ? s.pricePerSqYd * minYd : null;
   }
-  return parseTotalRupees(mp);
+  const total = parseTotalRupees(mp);
+  if (total != null) return total;
+  // No readable headline: fall back to the admin-entered rate × smallest size.
+  const minSize = firstInt(s.plotRange);
+  if (minSize && s.pricePerSqFt) return s.pricePerSqFt * minSize;
+  if (minSize && s.pricePerSqYd) return s.pricePerSqYd * minSize;
+  return null;
 }
 
 /** Compact ₹ label for a rupee figure (₹78.0 L / ₹2.72 Cr). */

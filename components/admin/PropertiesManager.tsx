@@ -6,7 +6,8 @@ import { useRouter } from 'next/navigation';
 import { Plus, Pencil, Trash2, Eye, EyeOff, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { AdminProperty } from '@/lib/server/admin-data';
-import { CATEGORIES, STAGES, type Category, type Stage } from '@/lib/data/categories';
+import { PROPERTY_TYPES, STAGES, typeLabel, unitNoun, type Category, type Stage } from '@/lib/data/categories';
+import { ALL_SPEC_FIELDS, SIZE_LABEL, missingRequired, specsFor, type SpecField } from '@/lib/data/property-specs';
 
 const EMPTY = {
   title: '',
@@ -23,6 +24,8 @@ const EMPTY = {
   amenityAcres: '',
   architect: '',
   pricePerSqYd: 0,
+  pricePerSqFt: 0,
+  plots: 0,
   brochureUrl: '',
   sitePlanSrc: '',
   order: 0,
@@ -38,7 +41,10 @@ const EMPTY = {
   plotImages: [] as string[],
 };
 
-type FormState = typeof EMPTY;
+const SPEC_KEYS = new Set(ALL_SPEC_FIELDS.map(f => f.key));
+
+/** The fixed fields plus whatever per-type specs (lib/data/property-specs.ts) are filled in. */
+type FormState = typeof EMPTY & { [spec: string]: unknown };
 
 export function PropertiesManager({ initial }: { initial: AdminProperty[] }) {
   const router = useRouter();
@@ -57,7 +63,7 @@ export function PropertiesManager({ initial }: { initial: AdminProperty[] }) {
     setMsg('');
   };
   const openEdit = (p: AdminProperty) => {
-    setForm({ ...EMPTY, ...Object.fromEntries(Object.entries(p).filter(([k]) => k in EMPTY)) } as FormState);
+    setForm({ ...EMPTY, ...Object.fromEntries(Object.entries(p).filter(([k]) => k in EMPTY || SPEC_KEYS.has(k))) } as FormState);
     setEditing(p.id);
     setMsg('');
   };
@@ -66,6 +72,17 @@ export function PropertiesManager({ initial }: { initial: AdminProperty[] }) {
     if (!form.title || !form.location) {
       setMsg('Title and Location are required.');
       return;
+    }
+    if (form.status === 'live') {
+      const missing = [
+        ...(form.image ? [] : ['Cover image']),
+        ...(form.memberPrice ? [] : ['Headline price']),
+        ...missingRequired(form),
+      ];
+      if (missing.length) {
+        setMsg(`Required to publish: ${missing.join(', ')}. Save as Draft to finish later.`);
+        return;
+      }
     }
     setSaving(true);
     try {
@@ -100,11 +117,19 @@ export function PropertiesManager({ initial }: { initial: AdminProperty[] }) {
   const toggleStatus = async (p: AdminProperty) => {
     const status = p.status === 'live' ? 'draft' : 'live';
     setItems(xs => xs.map(x => (x.id === p.id ? { ...x, status } : x)));
-    await fetch(`/api/admin/properties/${p.id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status }),
-    }).catch(() => router.refresh());
+    setMsg('');
+    try {
+      const res = await fetch(`/api/admin/properties/${p.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      });
+      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error ?? 'Update failed');
+    } catch (e) {
+      // Roll back — most often a listing missing its required specs.
+      setItems(xs => xs.map(x => (x.id === p.id ? { ...x, status: p.status } : x)));
+      setMsg(`${p.title}: ${e instanceof Error ? e.message : 'Update failed'} — edit it to fill these in.`);
+    }
   };
 
   const remove = async (p: AdminProperty) => {
@@ -127,6 +152,28 @@ export function PropertiesManager({ initial }: { initial: AdminProperty[] }) {
           </button>
         </div>
         <div className="space-y-4">
+          <div>
+            <label className={label}>Property type *</label>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {PROPERTY_TYPES.map(t => (
+                <button
+                  key={t.value}
+                  type="button"
+                  onClick={() => set('category', t.value)}
+                  aria-pressed={form.category === t.value}
+                  className={cn(
+                    'px-3 py-3 rounded-2xl text-[9px] uppercase tracking-widest font-bold border transition-all',
+                    form.category === t.value ? 'bg-primary text-on-primary border-primary' : 'border-outline/30 text-secondary/60'
+                  )}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+            <p className="text-[11px] text-secondary/50 mt-1.5">
+              Fields marked * are required to publish. Drafts can be saved incomplete.
+            </p>
+          </div>
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
               <label className={label}>Title *</label>
@@ -137,7 +184,7 @@ export function PropertiesManager({ initial }: { initial: AdminProperty[] }) {
               <input value={form.location} onChange={e => set('location', e.target.value)} className={input} />
             </div>
           </div>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div>
               <label className={label}>AQI</label>
               <input type="number" value={form.aqi} onChange={e => set('aqi', Number(e.target.value))} className={input} />
@@ -146,9 +193,20 @@ export function PropertiesManager({ initial }: { initial: AdminProperty[] }) {
               <label className={label}>Noise (dB)</label>
               <input type="number" value={form.noise} onChange={e => set('noise', Number(e.target.value))} className={input} />
             </div>
+            {form.category === 'plots' ? (
+              <div>
+                <label className={label}>₹ / sq yd</label>
+                <input type="number" value={form.pricePerSqYd} onChange={e => set('pricePerSqYd', Number(e.target.value))} className={input} />
+              </div>
+            ) : (
+              <div>
+                <label className={label}>₹ / sq ft</label>
+                <input type="number" value={form.pricePerSqFt} onChange={e => set('pricePerSqFt', Number(e.target.value))} className={input} />
+              </div>
+            )}
             <div>
-              <label className={label}>₹ / sq yd</label>
-              <input type="number" value={form.pricePerSqYd} onChange={e => set('pricePerSqYd', Number(e.target.value))} className={input} />
+              <label className={label}>Total {unitNoun(form.category)}</label>
+              <input type="number" min={0} value={form.plots} onChange={e => set('plots', Math.max(0, Number(e.target.value) || 0))} className={input} />
             </div>
           </div>
           <div className="grid sm:grid-cols-2 gap-4">
@@ -157,12 +215,12 @@ export function PropertiesManager({ initial }: { initial: AdminProperty[] }) {
               <input value={form.commute} onChange={e => set('commute', e.target.value)} placeholder="40 mins to Financial District" className={input} />
             </div>
             <div>
-              <label className={label}>Member Price</label>
+              <label className={label}>Headline Price *</label>
               <input value={form.memberPrice} onChange={e => set('memberPrice', e.target.value)} placeholder="From ₹78 L" className={input} />
             </div>
           </div>
           <div>
-            <label className={label}>Cover Image URL</label>
+            <label className={label}>Cover Image URL *</label>
             <input value={form.image} onChange={e => set('image', e.target.value)} placeholder="/gallery/… or https://…" className={input} />
           </div>
           <div>
@@ -199,14 +257,36 @@ export function PropertiesManager({ initial }: { initial: AdminProperty[] }) {
           </div>
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
-              <label className={label}>Sizes / Plot Range</label>
-              <input value={form.plotRange} onChange={e => set('plotRange', e.target.value)} className={input} />
+              <label className={label}>{SIZE_LABEL[form.category].label} *</label>
+              <input
+                value={form.plotRange}
+                onChange={e => set('plotRange', e.target.value)}
+                placeholder={SIZE_LABEL[form.category].placeholder}
+                className={input}
+              />
             </div>
             <div>
               <label className={label}>Developer</label>
               <input value={form.architect} onChange={e => set('architect', e.target.value)} className={input} />
             </div>
           </div>
+          <fieldset className="rounded-3xl border border-outline/15 p-4 sm:p-5">
+            <legend className="px-2 text-[10px] uppercase tracking-[0.35em] font-bold text-primary">
+              {typeLabel(form.category)} specifications
+            </legend>
+            <div className="grid sm:grid-cols-2 gap-4">
+              {specsFor(form.category).map(f => (
+                <SpecInput
+                  key={f.key}
+                  field={f}
+                  value={form[f.key]}
+                  onChange={v => setForm(prev => ({ ...prev, [f.key]: v }))}
+                  input={input}
+                  label={label}
+                />
+              ))}
+            </div>
+          </fieldset>
           <div>
             <label className={label}>Features</label>
             <div className="flex gap-2 mb-2 flex-wrap">
@@ -235,14 +315,6 @@ export function PropertiesManager({ initial }: { initial: AdminProperty[] }) {
             </div>
           </div>
           <div className="grid sm:grid-cols-3 gap-4">
-            <div>
-              <label className={label}>Category</label>
-              <select value={form.category} onChange={e => set('category', e.target.value as Category)} className={input}>
-                {CATEGORIES.filter(c => c.slug !== 'investments').map(c => (
-                  <option key={c.slug} value={c.slug}>{c.title}</option>
-                ))}
-              </select>
-            </div>
             <div>
               <label className={label}>Stage</label>
               <select value={form.stage} onChange={e => set('stage', e.target.value as Stage)} className={input}>
@@ -343,6 +415,7 @@ export function PropertiesManager({ initial }: { initial: AdminProperty[] }) {
         </button>
       </div>
 
+      {msg && <p className="text-sm text-error mb-4">{msg}</p>}
       <div className="space-y-3">
         {items.length === 0 && (
           <p className="text-center py-16 text-secondary/40 text-sm">No Firestore properties yet — add your first one.</p>
@@ -368,7 +441,7 @@ export function PropertiesManager({ initial }: { initial: AdminProperty[] }) {
                 </span>
               </div>
               <p className="text-xs text-secondary/60 truncate mt-0.5">
-                {p.location} · AQI {p.aqi} · {p.memberPrice}
+                {typeLabel(p.category as Category)} · {p.location} · AQI {p.aqi} · {p.memberPrice}
               </p>
             </div>
             <div className="flex items-center gap-1.5 flex-shrink-0">
@@ -388,6 +461,106 @@ export function PropertiesManager({ initial }: { initial: AdminProperty[] }) {
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+/** One spec field, rendered by kind. Schema: lib/data/property-specs.ts. */
+function SpecInput({
+  field: f,
+  value,
+  onChange,
+  input,
+  label,
+}: {
+  field: SpecField;
+  value: unknown;
+  onChange: (v: unknown) => void;
+  input: string;
+  label: string;
+}) {
+  const title = (
+    <label className={label}>
+      {f.label}
+      {f.unit ? ` (${f.unit})` : ''}
+      {f.required ? ' *' : ''}
+    </label>
+  );
+  const hint = f.hint && <p className="text-[11px] text-secondary/50 mt-1">{f.hint}</p>;
+
+  if (f.kind === 'multi') {
+    const selected = Array.isArray(value) ? (value as string[]) : [];
+    return (
+      <div className="sm:col-span-2">
+        {title}
+        <div className="flex flex-wrap gap-2">
+          {f.options!.map(o => {
+            const on = selected.includes(o.value);
+            return (
+              <button
+                key={o.value}
+                type="button"
+                aria-pressed={on}
+                onClick={() => onChange(on ? selected.filter(x => x !== o.value) : [...selected, o.value])}
+                className={cn(
+                  'px-3 py-1.5 rounded-full text-xs border transition-all',
+                  on ? 'bg-primary text-on-primary border-primary' : 'border-outline/30 text-secondary/70'
+                )}
+              >
+                {o.label}
+              </button>
+            );
+          })}
+        </div>
+        {hint}
+      </div>
+    );
+  }
+  if (f.kind === 'boolean') {
+    return (
+      <div>
+        {title}
+        <button
+          type="button"
+          aria-pressed={value === true}
+          onClick={() => onChange(value !== true)}
+          className={cn(
+            'w-full px-4 py-3 rounded-2xl text-[9px] uppercase tracking-widest font-bold border transition-all',
+            value === true ? 'bg-primary text-on-primary border-primary' : 'border-outline/30 text-secondary/60'
+          )}
+        >
+          {value === true ? 'Yes' : 'No / not stated'}
+        </button>
+        {hint}
+      </div>
+    );
+  }
+  if (f.kind === 'select') {
+    return (
+      <div>
+        {title}
+        <select value={String(value ?? '')} onChange={e => onChange(e.target.value)} className={input}>
+          <option value="">— Select —</option>
+          {f.options!.map(o => (
+            <option key={o.value} value={o.value}>{o.label}</option>
+          ))}
+        </select>
+        {hint}
+      </div>
+    );
+  }
+  return (
+    <div>
+      {title}
+      <input
+        type={f.kind === 'number' ? 'number' : 'text'}
+        min={f.kind === 'number' ? 0 : undefined}
+        value={value === undefined || value === null || value === 0 ? '' : String(value)}
+        onChange={e => onChange(f.kind === 'number' ? Number(e.target.value) || 0 : e.target.value)}
+        placeholder={f.placeholder}
+        className={input}
+      />
+      {hint}
     </div>
   );
 }

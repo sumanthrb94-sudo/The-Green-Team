@@ -4,9 +4,9 @@
  * from the listing; anything absent is simply not shown, never padded.
  */
 import type { LucideIcon } from 'lucide-react';
-import { Building2, Trees, Layers, Hammer, KeyRound, Sparkles, Ruler, Building, CalendarCheck, ShieldCheck } from 'lucide-react';
+import { Building2, Trees, Briefcase, Layers, Hammer, KeyRound, Sparkles, Ruler, Building, CalendarCheck, ShieldCheck } from 'lucide-react';
 import type { Sanctuary } from '@/lib/data/sanctuaries';
-import { stageLabel } from '@/lib/data/categories';
+import { stageLabel, typeLabel, unitNoun, type Category } from '@/lib/data/categories';
 import { cn } from '@/lib/utils';
 
 interface Fact {
@@ -16,15 +16,18 @@ interface Fact {
   accent?: boolean;
 }
 
+const TYPE_ICON: Record<Category, LucideIcon> = {
+  villas: Building2,
+  apartments: Building,
+  plots: Trees,
+  commercial: Briefcase,
+};
+
 export function KeyFacts({ sanctuary: s }: { sanctuary: Sanctuary }) {
   const StageIcon = s.stage === 'completed' ? KeyRound : s.stage === 'upcoming' ? Sparkles : Hammer;
   const facts = [
-    s.category
-      ? { Icon: s.category === 'villas' ? Building2 : Trees, label: 'Type', value: s.category === 'villas' ? 'Villas' : 'Plots' }
-      : null,
-    s.plots && s.plots > 0
-      ? { Icon: Layers, label: 'Inventory', value: `${s.plots} ${s.category === 'villas' ? 'homes' : 'plots'}` }
-      : null,
+    s.category ? { Icon: TYPE_ICON[s.category], label: 'Type', value: typeLabel(s.category) } : null,
+    s.plots && s.plots > 0 ? { Icon: Layers, label: 'Inventory', value: `${s.plots} ${unitNoun(s.category)}` } : null,
     { Icon: StageIcon, label: 'Stage', value: stageLabel(s.stage) },
     s.plotRange ? { Icon: Ruler, label: 'Sizes', value: s.plotRange } : null,
     s.architect ? { Icon: Building, label: 'Developer', value: s.architect } : null,

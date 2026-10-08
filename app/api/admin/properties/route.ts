@@ -4,7 +4,7 @@ import { FieldValue } from 'firebase-admin/firestore';
 import { adminDb } from '@/lib/firebase/admin';
 import { requireAdmin } from '@/lib/server/session';
 import { demoEnabled } from '@/lib/server/demo-data';
-import { sanitizePropertyInput } from '@/lib/server/property-input';
+import { publishBlockers, sanitizePropertyInput } from '@/lib/server/property-input';
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,9 +17,14 @@ export async function POST(req: NextRequest) {
   if (!body.title || !body.location) {
     return NextResponse.json({ error: 'title and location required' }, { status: 400 });
   }
+  const data = { status: 'draft', ...sanitizePropertyInput(body) };
+  const missing = publishBlockers(data);
+  if (missing.length) {
+    return NextResponse.json({ error: `Required to publish: ${missing.join(', ')}`, missing }, { status: 400 });
+  }
   const ref = await adminDb()
     .collection('properties')
-    .add({ ...sanitizePropertyInput(body), createdAt: FieldValue.serverTimestamp() });
+    .add({ ...data, createdAt: FieldValue.serverTimestamp() });
   // The admin lists are cached for 30s; an admin must never watch
   // their own edit reappear as the old value.
   revalidateTag('admin', 'max');

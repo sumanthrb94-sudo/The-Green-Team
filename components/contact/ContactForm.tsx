@@ -20,7 +20,9 @@ import { cn } from '@/lib/utils';
 
 const INTERESTS = [
   { value: 'villas', label: 'A villa / villament' },
+  { value: 'apartments', label: 'An apartment' },
   { value: 'plots', label: 'A plot / farmland' },
+  { value: 'commercial', label: 'An office / commercial space' },
   { value: 'investments', label: 'An investment' },
   { value: 'site-visit', label: 'Booking a site visit' },
   { value: 'list-property', label: 'Listing my property (owner / developer)' },

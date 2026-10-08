@@ -14,7 +14,7 @@
  * category AND under Investments; that is the point.
  */
 
-export type Category = 'villas' | 'plots';
+export type Category = 'villas' | 'apartments' | 'plots' | 'commercial';
 export type Stage = 'completed' | 'ongoing' | 'upcoming';
 
 /** A browse page: the URL slug and everything the page says about itself. */
@@ -48,6 +48,18 @@ export const CATEGORIES: CategoryDef[] = [
     match: p => p.category === 'villas',
   },
   {
+    slug: 'apartments',
+    label: 'Apartments',
+    title: 'Apartments & High-Rises',
+    tagline: 'Height, with green below it.',
+    intro:
+      'Low-density towers where the open space is real and the view lands on trees, not the next tower. Carpet areas stated plainly, RERA on the page, and a developer with something delivered you can walk through.',
+    seoTitle: 'Premium Apartments Near Hyderabad — Low-Density, Green Views',
+    seoDescription:
+      'Premium 2, 3 and 4 BHK apartments near Hyderabad with real open space, stated carpet areas and RERA registration. Curated, not listed.',
+    match: p => p.category === 'apartments',
+  },
+  {
     slug: 'plots',
     label: 'Plots',
     title: 'Plots & Farmland',
@@ -58,6 +70,18 @@ export const CATEGORIES: CategoryDef[] = [
     seoDescription:
       'HMDA/DTCP-approved farm plots and villa plots on the forest boundary near Hyderabad. Measured AQI and noise, real road access, clear title. Curated, not listed.',
     match: p => p.category === 'plots',
+  },
+  {
+    slug: 'commercial',
+    label: 'Offices',
+    title: 'Office & Commercial Spaces',
+    tagline: 'Work where the air is better.',
+    intro:
+      'Office floors, co-working and retail in projects that take the same air, access and approval checks as our homes. For sale or lease, with the fit-out, the rent and the lock-in stated before the first call.',
+    seoTitle: 'Office Space & Commercial Property Near Hyderabad — Sale & Lease',
+    seoDescription:
+      'Office space, co-working and retail near Hyderabad for sale or lease — Grade-A buildings, stated rents and fit-out, verified approvals.',
+    match: p => p.category === 'commercial',
   },
   {
     slug: 'investments',
@@ -74,6 +98,19 @@ export const CATEGORIES: CategoryDef[] = [
 ];
 
 export const getCategory = (slug: string) => CATEGORIES.find(c => c.slug === slug);
+
+/** The asset classes a listing can be — one per `Category`, with the nouns the UI needs. */
+export const PROPERTY_TYPES: { value: Category; label: string; unit: string }[] = [
+  { value: 'villas', label: 'Villas', unit: 'homes' },
+  { value: 'apartments', label: 'Apartments', unit: 'units' },
+  { value: 'plots', label: 'Plots', unit: 'plots' },
+  { value: 'commercial', label: 'Office / Commercial', unit: 'units' },
+];
+
+export const isCategory = (v: unknown): v is Category => PROPERTY_TYPES.some(t => t.value === v);
+export const typeLabel = (c?: Category) => PROPERTY_TYPES.find(t => t.value === c)?.label ?? 'Property';
+/** "homes" / "units" / "plots" — what an inventory count is counting. */
+export const unitNoun = (c?: Category) => PROPERTY_TYPES.find(t => t.value === c)?.unit ?? 'units';
 
 export const STAGES: { value: Stage; label: string; hint: string }[] = [
   { value: 'ongoing', label: 'Ongoing', hint: 'Under development — bookings open' },

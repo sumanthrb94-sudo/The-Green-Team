@@ -49,6 +49,45 @@ export interface Sanctuary {
   rera?: string;
   /** Expected possession / handover, free text (e.g. "Dec 2027"). */
   possession?: string;
+  /** Rate for built-up / carpet-area pricing (apartments, villas, offices). */
+  pricePerSqFt?: number;
+  /**
+   * Per-type specifications — see lib/data/property-specs.ts for which apply
+   * to which category, and which are required to publish.
+   */
+  transaction?: 'new' | 'resale';
+  approvals?: string[];
+  totalLandArea?: string;
+  facing?: string[];
+  gated?: boolean;
+  maintenance?: string;
+  villaType?: string;
+  configurations?: string[];
+  landPerUnit?: string;
+  floors?: string;
+  carParking?: string;
+  furnishing?: string;
+  privateGarden?: boolean;
+  superBuiltUpArea?: string;
+  towers?: number;
+  unitsPerFloor?: number;
+  liftsPerTower?: number;
+  openSpacePercent?: number;
+  plotType?: string;
+  layoutApproval?: string;
+  roadWidth?: string;
+  cornerPlots?: boolean;
+  utilities?: string[];
+  constructionAllowed?: string;
+  commercialType?: string;
+  dealType?: 'sale' | 'lease' | 'both';
+  rentPerSqFt?: number;
+  fitout?: string;
+  workstations?: string;
+  buildingGrade?: string;
+  powerBackup?: string;
+  lockInPeriod?: string;
+  occupancyCertificate?: boolean;
   /** Firestore-managed properties carry these */
   status?: 'live' | 'draft';
   order?: number;
@@ -80,6 +119,10 @@ export const SANCTUARIES: Sanctuary[] = [
       'MODCON Agartha is a 25-acre bespoke farmhouse community on the Narsapur forest boundary, 100 m from the upcoming RRR. Two of those acres are given to a resort and clubhouse — earthen retreats, a farm-to-table restaurant, a yoga and wellness centre, a Tulum-style gym, a banquet hall, and a natural bio-pool filtered biologically rather than chemically, fed by a hand-built natural stream. The 37 farm plots run from 726 sq yds to a full acre, each with an edible permaculture backyard, and homes are built to order in natural materials: the Bamora Retreat in bamboo with a mezzanine floor, or the Earthlyn Retreat in CSCB brick finished in lime plaster, as 1, 2 or 3 BHK. Designed by ARQEN Design Studio. Winner: Best Sustainable Eco-Friendly Project of the Year 2024 (Outlook Business Spotlight Entity Awards); nominated for the Times of India Ecopreneur Awards 2026.',
     plots: 37,
     plotRange: '726 sq yds – 1 acre',
+    plotType: 'farm',
+    transaction: 'new',
+    totalLandArea: '25 acres',
+    constructionAllowed: 'Bamboo / CSCB homes · 1–3 BHK, built to order',
     amenityAcres: '2-Acre Resort & Clubhouse',
     architect: 'MODCON Builders',
     sitePlanSrc: '/agartha-master-plan.webp',
@@ -120,6 +163,10 @@ export const SANCTUARIES: Sanctuary[] = [
       "MODCON SYL Residences is the residential half of a 4.5-acre integrated commercial-and-residential project at Tukkuguda, ORR Exit-14 — villament living in a low-density, biophilic enclave overlooking forest, with large balconies, abundant light and sunrise views. The 22,000 sq ft G+2 clubhouse is built entirely around health, wellness and nature: infinity pool, fully equipped gym with Pilates, yoga pavilion, steam and sauna, library, co-working spaces, banquet and guest rooms, indoor and outdoor play. Alongside it sits an integrated commercial hub — retail, cafés and banking at ground, co-working on the first floor, clinics and diagnostics on the second, and business suites with a hospitality stay concept above. Every balcony is landscaped on biophilic principles. Two to five minutes from ORR Exit-14 and Fab City, 10–15 minutes from the airport.",
     plots: 155,
     plotRange: 'Villaments 3,882 – 7,000 SFT · Integrated Commercial',
+    villaType: 'villament',
+    pricePerSqFt: 6999,
+    transaction: 'new',
+    totalLandArea: '4.5 acres',
     amenityAcres: '22,000 SFT G+2 Clubhouse · Health • Wellness • Nature',
     architect: 'MODCON Builders',
     sitePlanSrc: '/syl-site-plan.webp',
@@ -175,6 +222,10 @@ export const SANCTUARIES: Sanctuary[] = [
       "Dates County by Planet Green is a 300+ acre eco-luxury villa-plot community in Kandukur — the epicentre of Hyderabad's emerging Future City on Srisailam Highway. Adjacent to a 4,000-acre reserve forest, the township reserves 40% of its land for open and recreational spaces, woven through with date palm plantations, themed parks, sports courts and natural fishing ponds. 15 minutes to the Hyderabad International Airport and 15 minutes to ORR Exit-14 (Tukkuguda). RERA P02400002648 · P02400003813.",
     plots: 0,
     plotRange: '500 sq yds · ₹18,000/sq yd',
+    plotType: 'villa',
+    transaction: 'new',
+    totalLandArea: '300+ acres',
+    gated: true,
     amenityAcres: '300+ Acres · 40% Open Space',
     architect: 'Planet Green Infra',
     rera: 'P02400002648 · P02400003813',

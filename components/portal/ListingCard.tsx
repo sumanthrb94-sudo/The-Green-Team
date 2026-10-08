@@ -14,7 +14,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { MapPin, Wind, VolumeX, Ruler, Layers, Heart, ArrowUpRight } from 'lucide-react';
 import type { Sanctuary } from '@/lib/data/sanctuaries';
-import { stageLabel } from '@/lib/data/categories';
+import { stageLabel, unitNoun } from '@/lib/data/categories';
 import { estimateFromPrice, priceLabel } from '@/lib/data/listing';
 import { useShortlist } from '@/lib/shortlist';
 import { cn } from '@/lib/utils';
@@ -22,12 +22,13 @@ import { cn } from '@/lib/utils';
 export function ListingCard({ sanctuary: s }: { sanctuary: Sanctuary }) {
   const [saved, toggleSaved] = useShortlist(s.id);
   const from = estimateFromPrice(s);
+  // A per-SFT headline already is the rate, so it isn't repeated.
   const rate = s.pricePerSqYd
     ? `₹${s.pricePerSqYd.toLocaleString('en-IN')}/sq yd`
-    : /sft/i.test(s.memberPrice ?? '')
-      ? null // the headline already is the rate
+    : s.pricePerSqFt && !/sft/i.test(s.memberPrice ?? '')
+      ? `₹${s.pricePerSqFt.toLocaleString('en-IN')}/sq ft`
       : null;
-  const units = s.plots && s.plots > 0 ? `${s.plots} ${s.category === 'villas' ? 'homes' : 'plots'}` : null;
+  const units = s.plots && s.plots > 0 ? `${s.plots} ${unitNoun(s.category)}` : null;
 
   return (
     <article className="group relative flex flex-col rounded-2xl sm:rounded-[1.75rem] overflow-hidden bg-surface border border-outline/10 hover:border-primary/30 hover:shadow-[0_24px_50px_-24px_rgba(45,58,29,0.35)] hover:-translate-y-0.5 transition-all duration-500">
