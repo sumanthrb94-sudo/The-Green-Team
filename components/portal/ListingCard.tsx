@@ -14,7 +14,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { MapPin, Wind, VolumeX, Ruler, Layers, Heart, ArrowUpRight } from 'lucide-react';
 import type { Sanctuary } from '@/lib/data/sanctuaries';
-import { stageLabel, unitNoun } from '@/lib/data/categories';
+import { showsAqi, stageLabel, unitNoun } from '@/lib/data/categories';
 import { estimateFromPrice, priceLabel } from '@/lib/data/listing';
 import { useShortlist } from '@/lib/shortlist';
 import { cn } from '@/lib/utils';
@@ -82,9 +82,11 @@ export function ListingCard({ sanctuary: s }: { sanctuary: Sanctuary }) {
 
         {/* One quiet line of specs */}
         <ul className="flex flex-wrap items-center gap-x-3.5 sm:gap-x-4 gap-y-1.5 mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-outline/10 text-[11px] sm:text-[12px] text-on-surface/80">
-          <li className="flex items-center gap-1.5 font-semibold text-primary">
-            <Wind className="w-3.5 h-3.5" /> AQI {s.aqi}
-          </li>
+          {showsAqi(s) && (
+            <li className="flex items-center gap-1.5 font-semibold text-primary">
+              <Wind className="w-3.5 h-3.5" /> AQI {s.aqi}
+            </li>
+          )}
           <li className="flex items-center gap-1.5">
             <VolumeX className="w-3.5 h-3.5 text-secondary/50" /> {s.noise} dB
           </li>

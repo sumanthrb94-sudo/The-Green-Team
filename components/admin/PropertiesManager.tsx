@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Plus, Pencil, Trash2, Eye, EyeOff, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { AdminProperty } from '@/lib/server/admin-data';
-import { PROPERTY_TYPES, STAGES, typeLabel, unitNoun, type Category, type Stage } from '@/lib/data/categories';
+import { PROPERTY_TYPES, STAGES, showsAqi, typeLabel, unitNoun, type Category, type Stage } from '@/lib/data/categories';
 import { ALL_SPEC_FIELDS, SIZE_LABEL, missingRequired, specsFor, type SpecField } from '@/lib/data/property-specs';
 
 const EMPTY = {
@@ -185,10 +185,12 @@ export function PropertiesManager({ initial }: { initial: AdminProperty[] }) {
             </div>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div>
-              <label className={label}>AQI</label>
-              <input type="number" value={form.aqi} onChange={e => set('aqi', Number(e.target.value))} className={input} />
-            </div>
+            {showsAqi(form) && (
+              <div>
+                <label className={label}>AQI</label>
+                <input type="number" value={form.aqi} onChange={e => set('aqi', Number(e.target.value))} className={input} />
+              </div>
+            )}
             <div>
               <label className={label}>Noise (dB)</label>
               <input type="number" value={form.noise} onChange={e => set('noise', Number(e.target.value))} className={input} />
@@ -441,7 +443,8 @@ export function PropertiesManager({ initial }: { initial: AdminProperty[] }) {
                 </span>
               </div>
               <p className="text-xs text-secondary/60 truncate mt-0.5">
-                {typeLabel(p.category as Category)} · {p.location} · AQI {p.aqi} · {p.memberPrice}
+                {typeLabel(p.category as Category)} · {p.location}
+                {showsAqi({ category: p.category as Category }) ? ` · AQI ${p.aqi}` : ''} · {p.memberPrice}
               </p>
             </div>
             <div className="flex items-center gap-1.5 flex-shrink-0">

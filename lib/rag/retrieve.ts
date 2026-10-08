@@ -4,6 +4,7 @@ import { loadIndex } from './index-store';
 import { getPortfolio } from '@/lib/server/portfolio';
 import { BUSINESS, WHATSAPP } from '@/lib/data/contact';
 import type { ChatMessage, RetrievalResult, ScoredChunk } from './types';
+import { showsAqi } from '@/lib/data/categories';
 
 const TOP_K = 8;
 /**
@@ -96,7 +97,8 @@ export async function retrieve(query: string, history: ChatMessage[]): Promise<R
 export async function pinnedFacts(): Promise<string> {
   const portfolio = await getPortfolio();
   const lines = portfolio.map(
-    p => `- ${p.title} (id: ${p.id}) — ${p.location}. ${p.memberPrice}. AQI ${p.aqi}, ${p.noise} dB, ${p.commute}.`
+    p =>
+      `- ${p.title} (id: ${p.id}) — ${p.location}. ${p.memberPrice}. ${showsAqi(p) ? `AQI ${p.aqi}, ` : ''}${p.noise} dB, ${p.commute}.`
   );
   return [
     'THE PORTFOLIO (all currently listed sanctuaries):',

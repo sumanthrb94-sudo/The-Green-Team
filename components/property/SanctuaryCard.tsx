@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { motion } from 'motion/react';
 import { Wind, VolumeX, ArrowUpRight } from 'lucide-react';
 import type { Sanctuary } from '@/lib/data/sanctuaries';
+import { showsAqi } from '@/lib/data/categories';
 
 const BADGES: Record<string, { top: string; sub?: string }> = {
   agartha: { top: 'Open Reservation', sub: 'TGT Channel Partner' },
@@ -57,10 +58,12 @@ export function SanctuaryCard({ sanctuary, index = 0 }: { sanctuary: Sanctuary; 
         </div>
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1.5">
-              <Wind className="w-3.5 h-3.5 text-[#a3b18a]" />
-              <span className="text-[9px] uppercase tracking-widest font-bold text-white/70">AQI {sanctuary.aqi}</span>
-            </span>
+            {showsAqi(sanctuary) && (
+              <span className="flex items-center gap-1.5">
+                <Wind className="w-3.5 h-3.5 text-[#a3b18a]" />
+                <span className="text-[9px] uppercase tracking-widest font-bold text-white/70">AQI {sanctuary.aqi}</span>
+              </span>
+            )}
             <span className="flex items-center gap-1.5">
               <VolumeX className="w-3.5 h-3.5 text-white/40" />
               <span className="text-[9px] uppercase tracking-widest font-bold text-white/70">{sanctuary.noise} dB</span>

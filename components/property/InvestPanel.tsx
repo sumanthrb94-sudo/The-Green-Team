@@ -5,6 +5,7 @@ import { Wind, VolumeX, Clock, MapPin, Leaf } from 'lucide-react';
 import { AGARTHA_NOW_RATE, WHATSAPP } from '@/lib/data/contact';
 import { UnitPricing } from '@/components/property/UnitPricing';
 import type { Sanctuary } from '@/lib/data/sanctuaries';
+import { showsAqi } from '@/lib/data/categories';
 
 function WhatsAppButtons({ enquire, visit, visitLabel }: { enquire: string; visit: string; visitLabel: string }) {
   return (
@@ -38,12 +39,14 @@ export function InvestPanel({ sanctuary }: { sanctuary: Sanctuary }) {
   // saying ₹8,500 after the rate moved, so it is derived once from the constant.
   const agarthaRate = `₹${AGARTHA_NOW_RATE.toLocaleString('en-IN')} / sq yd`;
   const telemetry = (
-    <div className="grid grid-cols-3 gap-px bg-outline/10 border border-outline/10 rounded-2xl overflow-hidden mb-10">
+    <div className={`grid ${showsAqi(sanctuary) ? 'grid-cols-3' : 'grid-cols-2'} gap-px bg-outline/10 border border-outline/10 rounded-2xl overflow-hidden mb-10`}>
       {[
-        { Icon: Wind, label: 'AQI', value: String(sanctuary.aqi), sub: sanctuary.aqi <= 15 ? 'Pure Air' : 'Clean' },
+        showsAqi(sanctuary)
+          ? { Icon: Wind, label: 'AQI', value: String(sanctuary.aqi), sub: sanctuary.aqi <= 15 ? 'Pure Air' : 'Clean' }
+          : null,
         { Icon: VolumeX, label: 'Noise', value: `${sanctuary.noise} dB`, sub: sanctuary.noise <= 20 ? 'Near Silent' : 'Quiet' },
         { Icon: Clock, label: 'Commute', value: sanctuary.commute.split('·')[0].trim(), sub: '' },
-      ].map(({ Icon, label, value, sub }) => (
+      ].filter(x => x !== null).map(({ Icon, label, value, sub }) => (
         <div key={label} className="bg-surface p-6 text-center">
           <Icon className="w-4 h-4 mx-auto text-primary/60 mb-2" />
           <p className="text-[8px] uppercase tracking-[0.4em] text-secondary/50 font-bold">{label}</p>

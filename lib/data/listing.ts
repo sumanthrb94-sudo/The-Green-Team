@@ -8,7 +8,7 @@
  * them live as the buyer types and taps, with no round-trip.
  */
 
-import { CATEGORIES, type Category, type Stage } from '@/lib/data/categories';
+import { CATEGORIES, showsAqi, type Category, type Stage } from '@/lib/data/categories';
 import type { Sanctuary } from '@/lib/data/sanctuaries';
 
 /* ── Price ─────────────────────────────────────────────────────────────────
@@ -145,7 +145,9 @@ export function applyFilters(all: Sanctuary[], f: Filters): Sanctuary[] {
       return f.sort === 'price-asc' ? pa - pb : pb - pa;
     });
   } else if (f.sort === 'aqi') {
-    out = [...out].sort((a, b) => (a.aqi ?? 999) - (b.aqi ?? 999));
+    // Offices carry no AQI claim, so they sink below every measured listing.
+    const air = (s: Sanctuary) => (showsAqi(s) ? (s.aqi ?? 999) : 999);
+    out = [...out].sort((a, b) => air(a) - air(b));
   }
 
   return out;

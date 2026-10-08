@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { motion } from 'motion/react';
 import { ArrowUpRight, Wind, VolumeX } from 'lucide-react';
 import type { Sanctuary } from '@/lib/data/sanctuaries';
+import { showsAqi } from '@/lib/data/categories';
 
 function Tile({
   s,
@@ -57,9 +58,11 @@ function Tile({
             </p>
           </div>
           <div className="flex items-center gap-3 sm:gap-4 mt-2 sm:mt-3">
-            <span className="flex items-center gap-1.5 text-[8.5px] sm:text-[9px] uppercase tracking-wider font-bold text-white/70">
-              <Wind className="w-3.5 h-3.5 text-[#a3b18a]" /> AQI {s.aqi}
-            </span>
+            {showsAqi(s) && (
+              <span className="flex items-center gap-1.5 text-[8.5px] sm:text-[9px] uppercase tracking-wider font-bold text-white/70">
+                <Wind className="w-3.5 h-3.5 text-[#a3b18a]" /> AQI {s.aqi}
+              </span>
+            )}
             <span className="flex items-center gap-1.5 text-[8.5px] sm:text-[9px] uppercase tracking-wider font-bold text-white/70">
               <VolumeX className="w-3.5 h-3.5 text-white/40" /> {s.noise} dB
             </span>

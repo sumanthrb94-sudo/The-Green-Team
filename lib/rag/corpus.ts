@@ -19,7 +19,7 @@ import {
 } from '@/lib/data/contact';
 import { SALES_FAQ } from '@/lib/data/faq';
 import { DISQUALIFIERS, LISTING_STANDARD, SERVICE_AREA } from '@/lib/data/standard';
-import { CATEGORIES, stageLabel } from '@/lib/data/categories';
+import { CATEGORIES, showsAqi, stageLabel } from '@/lib/data/categories';
 import { JOURNAL_POSTS } from '@/lib/data/journal';
 import { KEY_ZONES, MAP_LOCATIONS, NATURAL_FEATURES } from '@/lib/data/map';
 import { getPortfolio } from '@/lib/server/portfolio';
@@ -94,7 +94,7 @@ function propertyChunks(out: KbChunk[]): (s: Sanctuary) => void {
 
     const environment =
       `${s.title} environmental and access profile, verified on site by The Green Team: ` +
-      `air quality index ${s.aqi}, ambient noise ${s.noise} dB, commute ${s.commute}. ` +
+      `${showsAqi(s) ? `air quality index ${s.aqi}, ` : ''}ambient noise ${s.noise} dB, commute ${s.commute}. ` +
       `${s.title} sits at ${s.location}. ` +
       `The Green Team measures AQI and noise at the site itself at different times of day rather than quoting a city average, and drives the commute rather than calculating it.`;
     add(out, {

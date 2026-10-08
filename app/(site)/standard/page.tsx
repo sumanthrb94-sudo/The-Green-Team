@@ -4,6 +4,7 @@ import { Check, X, MapPin } from 'lucide-react';
 import { Footer } from '@/components/Footer';
 import { SITE_URL, WHATSAPP } from '@/lib/data/contact';
 import { getPortfolio } from '@/lib/server/portfolio';
+import { showsAqi } from '@/lib/data/categories';
 import {
   CITY_AQI_BASELINE,
   DISQUALIFIERS,
@@ -39,7 +40,8 @@ export const revalidate = 300;
  */
 export default async function StandardPage() {
   const portfolio = await getPortfolio();
-  const proof = measureAgainstStandard(portfolio);
+  // The air/noise bar is a residential standard; office listings aren't scored on it.
+  const proof = measureAgainstStandard(portfolio.filter(showsAqi));
   const byId = new Map(portfolio.map(p => [p.id, p]));
 
   return (

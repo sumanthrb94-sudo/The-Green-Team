@@ -107,6 +107,9 @@ export const PROPERTY_TYPES: { value: Category; label: string; unit: string }[] 
   { value: 'commercial', label: 'Office / Commercial', unit: 'units' },
 ];
 
+/** AQI is a residential promise; office/commercial listings never show it. */
+export const showsAqi = (p: { category?: Category }) => p.category !== 'commercial';
+
 export const isCategory = (v: unknown): v is Category => PROPERTY_TYPES.some(t => t.value === v);
 export const typeLabel = (c?: Category) => PROPERTY_TYPES.find(t => t.value === c)?.label ?? 'Property';
 /** "homes" / "units" / "plots" — what an inventory count is counting. */

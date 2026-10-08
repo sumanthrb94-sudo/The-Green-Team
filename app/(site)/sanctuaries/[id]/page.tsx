@@ -24,6 +24,7 @@ import { getApprovedReviews, aggregateRating } from '@/lib/server/reviews';
 import { SITE_URL } from '@/lib/data/contact';
 import { estimateFromPrice } from '@/lib/data/listing';
 import { formatSpec, specsFor } from '@/lib/data/property-specs';
+import { showsAqi } from '@/lib/data/categories';
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -118,7 +119,7 @@ export default async function SanctuaryPage({ params }: Props) {
     },
     ...(rating ? { aggregateRating: rating } : {}),
     additionalProperty: [
-      { '@type': 'PropertyValue', name: 'AQI', value: s.aqi },
+      ...(showsAqi(s) ? [{ '@type': 'PropertyValue', name: 'AQI', value: s.aqi }] : []),
       { '@type': 'PropertyValue', name: 'Ambient noise', value: `${s.noise} dB` },
       { '@type': 'PropertyValue', name: 'Commute', value: s.commute },
       ...(s.plotRange ? [{ '@type': 'PropertyValue', name: 'Sizes', value: s.plotRange }] : []),
@@ -168,10 +169,10 @@ export default async function SanctuaryPage({ params }: Props) {
           </div>
           <div className="flex flex-wrap gap-x-4 sm:gap-x-6 gap-y-2 sm:gap-y-3 mt-4 sm:mt-7">
             {[
-              { Icon: Wind, text: `AQI ${s.aqi}` },
+              showsAqi(s) ? { Icon: Wind, text: `AQI ${s.aqi}` } : null,
               { Icon: VolumeX, text: `${s.noise} dB` },
               { Icon: Clock, text: s.commute },
-            ].map(({ Icon, text }) => (
+            ].filter(x => x !== null).map(({ Icon, text }) => (
               <span key={text} className="flex items-center gap-1.5 sm:gap-2 text-white/75 text-[9px] sm:text-[10px] uppercase tracking-widest font-bold">
                 <Icon className="w-3.5 h-3.5 text-[#a3b18a]" /> {text}
               </span>
@@ -198,10 +199,12 @@ export default async function SanctuaryPage({ params }: Props) {
               <p className="text-[9px] uppercase tracking-[0.4em] font-bold text-secondary/50 mb-4">Environment · measured on site</p>
               <dl className="space-y-4">
                 {[
-                  { Icon: Wind, k: 'Air quality', v: `AQI ${s.aqi}`, sub: s.aqi <= 15 ? 'Pure air · city is 100–180' : 'Clean air · city is 100–180' },
+                  showsAqi(s)
+                    ? { Icon: Wind, k: 'Air quality', v: `AQI ${s.aqi}`, sub: s.aqi <= 15 ? 'Pure air · city is 100–180' : 'Clean air · city is 100–180' }
+                    : null,
                   { Icon: VolumeX, k: 'Ambient noise', v: `${s.noise} dB`, sub: s.noise <= 20 ? 'Near silent · city is 65+' : 'Quiet · city is 65+' },
                   { Icon: Clock, k: 'Commute', v: s.commute.split('·')[0].trim(), sub: 'measured, not estimated' },
-                ].map(({ Icon, k, v, sub }) => (
+                ].filter(x => x !== null).map(({ Icon, k, v, sub }) => (
                   <div key={k} className="flex items-start gap-3">
                     <span className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">
                       <Icon className="w-4 h-4" />
