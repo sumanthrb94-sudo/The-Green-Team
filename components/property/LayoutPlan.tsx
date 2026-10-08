@@ -36,7 +36,8 @@ export function LayoutPlan({ sanctuary }: { sanctuary: Sanctuary }) {
   const areas = plots.map(p => p.area);
   const minArea = areas.length ? Math.min(...areas) : 0;
   const maxArea = areas.length ? Math.max(...areas) : 1;
-  const enquireUrl = sanctuary.id === 'syl' ? WHATSAPP.sylEnquire : WHATSAPP.agarthaEnquire;
+  const enquireUrl =
+    sanctuary.id === 'syl' ? WHATSAPP.sylEnquire : sanctuary.id === 'agartha' ? WHATSAPP.agarthaEnquire : WHATSAPP.generic;
   const [mode, setMode] = useState<'plots' | 'features'>('plots');
   const [selPlot, setSelPlot] = useState<PlotDot | null>(null);
   const [selSpot, setSelSpot] = useState<Hotspot | null>(null);

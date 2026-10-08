@@ -15,7 +15,7 @@ export const BUSINESS = {
   geo: { lat: 17.385, lng: 78.4867 },
 } as const;
 
-const wa = (text: string) =>
+export const wa = (text: string) =>
   `https://wa.me/${BUSINESS.whatsappNumber}?text=${encodeURIComponent(text)}`;
 
 export const WHATSAPP = {

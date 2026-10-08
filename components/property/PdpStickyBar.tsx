@@ -7,7 +7,7 @@
  * card's form so the lead is tagged with this property.
  */
 import { Phone, MessageSquareText } from 'lucide-react';
-import { BUSINESS, WHATSAPP } from '@/lib/data/contact';
+import { BUSINESS, WHATSAPP, wa as waLink } from '@/lib/data/contact';
 
 const WA: Record<string, string> = {
   agartha: WHATSAPP.agarthaEnquire,
@@ -15,8 +15,8 @@ const WA: Record<string, string> = {
   'dates-county': WHATSAPP.datesEnquire,
 };
 
-export function PdpStickyBar({ id }: { id: string }) {
-  const wa = WA[id] ?? WHATSAPP.generic;
+export function PdpStickyBar({ id, title }: { id: string; title?: string }) {
+  const wa = WA[id] ?? (title ? waLink(`Hi, I'm interested in ${title}. Could you share more details?`) : WHATSAPP.generic);
   const enquire = () => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   return (

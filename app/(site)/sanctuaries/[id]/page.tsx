@@ -306,7 +306,7 @@ export default async function SanctuaryPage({ params }: Props) {
         </section>
       ) : null}
 
-      <PdpStickyBar id={s.id} />
+      <PdpStickyBar id={s.id} title={s.title} />
       <Footer />
     </>
   );

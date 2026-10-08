@@ -2,7 +2,8 @@
 
 /** Per-property investment economics + WhatsApp CTAs — parity with v1's Invest tab. */
 import { Wind, VolumeX, Clock, MapPin, Leaf } from 'lucide-react';
-import { AGARTHA_NOW_RATE, WHATSAPP } from '@/lib/data/contact';
+import { AGARTHA_NOW_RATE, WHATSAPP, wa } from '@/lib/data/contact';
+import { typeLabel } from '@/lib/data/categories';
 import { UnitPricing } from '@/components/property/UnitPricing';
 import type { Sanctuary } from '@/lib/data/sanctuaries';
 import { showsAqi } from '@/lib/data/categories';
@@ -129,7 +130,8 @@ export function InvestPanel({ sanctuary }: { sanctuary: Sanctuary }) {
     );
   }
 
-  // dates-county
+  if (sanctuary.id !== 'dates-county') return <ListingPricing sanctuary={sanctuary} telemetry={telemetry} />;
+
   return (
     <div>
       {telemetry}
@@ -148,6 +150,52 @@ export function InvestPanel({ sanctuary }: { sanctuary: Sanctuary }) {
       <UnitPricing sanctuaryId="dates-county" rateLabel="₹18,000 / sq yd" noun="plot" />
       <p className="mt-3 text-[10px] text-secondary/50">★ The 500 sq yd signature plot is the ₹90 L entry point.</p>
       <WhatsAppButtons enquire={WHATSAPP.datesEnquire} visit={WHATSAPP.datesVisit} visitLabel="Book Site Visit · WhatsApp" />
+    </div>
+  );
+}
+
+/**
+ * Pricing for any admin-added listing. The three flagships above have
+ * hand-written panels; everything else is built only from its own fields, so a
+ * new listing can never inherit another project's prices or RERA numbers.
+ */
+function ListingPricing({ sanctuary: s, telemetry }: { sanctuary: Sanctuary; telemetry: React.ReactNode }) {
+  const sizeSft = Number((s.plotRange ?? '').match(/[\d,]{2,}/)?.[0]?.replace(/,/g, '')) || 0;
+  const lease = s.dealType === 'lease' || s.dealType === 'both';
+  const monthly = lease && s.rentPerSqFt && sizeSft && /sft|sq\.?\s*ft/i.test(s.plotRange ?? '') ? s.rentPerSqFt * sizeSft : 0;
+  const rows = [
+    { k: lease && s.dealType === 'lease' ? 'Lease rent' : 'Price', v: s.memberPrice },
+    s.plotRange ? { k: 'Area', v: s.plotRange } : null,
+    monthly ? { k: 'Monthly rent', v: `≈ ₹${monthly.toLocaleString('en-IN')} / month` } : null,
+    s.pricePerSqFt ? { k: 'Sale rate', v: `₹${s.pricePerSqFt.toLocaleString('en-IN')} / sq ft` } : null,
+    s.pricePerSqYd ? { k: 'Rate', v: `₹${s.pricePerSqYd.toLocaleString('en-IN')} / sq yd` } : null,
+    s.maintenance ? { k: 'Maintenance', v: s.maintenance } : null,
+    s.lockInPeriod ? { k: 'Lock-in', v: s.lockInPeriod } : null,
+    s.rera ? { k: 'RERA', v: s.rera } : null,
+  ].filter((r): r is { k: string; v: string } => Boolean(r?.v));
+  const name = `${s.title} (${s.location})`;
+
+  return (
+    <div>
+      {telemetry}
+      <div className="rounded-3xl border border-outline/12 bg-surface overflow-hidden">
+        {rows.map(r => (
+          <div key={r.k} className="flex justify-between gap-4 px-6 py-4 border-b border-outline/10 last:border-0">
+            <span className="text-sm text-secondary">{r.k}</span>
+            <span className="text-sm font-semibold text-on-surface text-right">{r.v}</span>
+          </div>
+        ))}
+      </div>
+      {monthly > 0 && (
+        <p className="mt-3 text-[10px] text-secondary/50">
+          Monthly figure is rate × area before negotiation; deposit, maintenance and taxes are additional.
+        </p>
+      )}
+      <WhatsAppButtons
+        enquire={wa(`Hi, I'm interested in ${name} — ${typeLabel(s.category)}. Could you share more details?`)}
+        visit={wa(`Hi, I'd like to schedule a visit to ${name}. Please share available slots.`)}
+        visitLabel="Book a Visit · WhatsApp"
+      />
     </div>
   );
 }
