@@ -12,9 +12,9 @@
  * rotation/skew as a fixed CSS matrix inside it. Pinch zoom re-pins it on
  * every step, so the drawing stays glued to the ground.
  */
-import { useEffect, useMemo, useRef } from 'react';
+import { Fragment, useEffect, useMemo, useRef } from 'react';
 import L from 'leaflet';
-import { Circle, Marker, Tooltip, useMap } from 'react-leaflet';
+import { Marker, Polygon, useMap } from 'react-leaflet';
 import type { LatLng } from '@/lib/data/map';
 import {
   geoPlots,
@@ -40,6 +40,7 @@ class AffineImageLayer extends L.Layer {
     private src: string,
     private anchors: LayoutAnchors,
     private opacity: number,
+    private plain = false,
   ) {
     super();
   }
@@ -58,7 +59,7 @@ class AffineImageLayer extends L.Layer {
       maxWidth: 'none',
       transformOrigin: '0 0',
       opacity: String(this.opacity),
-      filter: 'drop-shadow(0 0 1.5px rgba(0,0,0,0.9))',
+      filter: this.plain ? 'none' : 'drop-shadow(0 0 1.5px rgba(0,0,0,0.9))',
     });
     img.onload = () => this.reset();
     this.wrap = wrap;
@@ -112,12 +113,23 @@ class AffineImageLayer extends L.Layer {
   }
 }
 
-function AffineImage({ src, anchors, opacity }: { src: string; anchors: LayoutAnchors; opacity: number }) {
+function AffineImage({
+  src,
+  anchors,
+  opacity,
+  plain = false,
+}: {
+  src: string;
+  anchors: LayoutAnchors;
+  opacity: number;
+  /** Skip the dark edge shadow that helps thin white lines read on imagery. */
+  plain?: boolean;
+}) {
   const map = useMap();
   const layerRef = useRef<AffineImageLayer | null>(null);
 
   useEffect(() => {
-    const layer = new AffineImageLayer(src, anchors, opacity);
+    const layer = new AffineImageLayer(src, anchors, opacity, plain);
     layer.addTo(map);
     layerRef.current = layer;
     return () => {
@@ -126,7 +138,7 @@ function AffineImage({ src, anchors, opacity }: { src: string; anchors: LayoutAn
     };
     // anchors are pushed through setAnchors below so dragging doesn't recreate the <img>
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [map, src, opacity]);
+  }, [map, src, opacity, plain]);
 
   useEffect(() => {
     layerRef.current?.setAnchors(anchors);
@@ -134,9 +146,6 @@ function AffineImage({ src, anchors, opacity }: { src: string; anchors: LayoutAn
 
   return null;
 }
-
-/** Plot circle radius in metres — the radius of a disc with ~30% of the plot's area. */
-const plotRadius = (sqYds: number) => Math.sqrt((sqYds * 0.8361 * 0.3) / Math.PI);
 
 const handleIcon = (label: string) =>
   L.divIcon({
@@ -155,7 +164,6 @@ const CORNERS: { key: keyof LayoutAnchors; label: string }[] = [
 export function SiteLayoutLayer({
   layout,
   anchors,
-  zoom,
   selectedPlotId,
   onPlotClick,
   calibrating = false,
@@ -163,41 +171,41 @@ export function SiteLayoutLayer({
 }: {
   layout: SiteLayout;
   anchors: LayoutAnchors;
-  zoom: number;
   selectedPlotId: number | null;
   onPlotClick: (plot: GeoPlot) => void;
   calibrating?: boolean;
   onAnchorsChange?: (anchors: LayoutAnchors) => void;
 }) {
   const plots = useMemo(() => geoPlots({ ...layout, anchors }), [layout, anchors]);
-  const showLabels = zoom >= 17;
 
   return (
     <>
+      {/* colour fills first, so the white line art sits on top of them */}
+      {layout.colorSrc && <AffineImage src={layout.colorSrc} anchors={anchors} opacity={0.85} plain />}
       <AffineImage src={layout.overlaySrc} anchors={anchors} opacity={calibrating ? 0.95 : 0.85} />
 
       {plots.map(p => {
         const selected = p.id === selectedPlotId;
         const color = PLOT_STATUS_COLOR[p.status];
         return (
-          <Circle
-            key={`${layout.sanctuaryId}-${p.id}`}
-            center={p.position}
-            radius={plotRadius(p.area)}
-            pathOptions={{
-              color: selected ? '#c8a951' : color,
-              weight: selected ? 3 : 1.5,
-              fillColor: color,
-              fillOpacity: p.status === 'sold' ? 0.7 : 0.35,
-            }}
-            eventHandlers={{ click: () => onPlotClick(p) }}
-          >
-            {showLabels && (
-              <Tooltip permanent direction="center" className="plot-label" interactive={false}>
-                {p.id}
-              </Tooltip>
-            )}
-          </Circle>
+          <Fragment key={`${layout.sanctuaryId}-${p.id}`}>
+            {/* pale halo under the black outline so it reads on dark fields too */}
+            <Polygon
+              positions={p.corners}
+              interactive={false}
+              pathOptions={{ color: '#ffffff', weight: 4.5, opacity: 0.55, fill: false }}
+            />
+            <Polygon
+              positions={p.corners}
+              pathOptions={{
+                color: selected ? '#c8a951' : '#000000',
+                weight: selected ? 3.5 : 2,
+                fillColor: color,
+                fillOpacity: p.status === 'sold' ? 0.6 : 0.3,
+              }}
+              eventHandlers={{ click: () => onPlotClick(p) }}
+            />
+          </Fragment>
         );
       })}
 
