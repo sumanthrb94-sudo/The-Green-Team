@@ -41,6 +41,8 @@ export interface SiteLayout {
   shapes?: Record<number, PlotShape>;
   /** Transparent line-art version of the master plan (white strokes, no background). */
   overlaySrc: string;
+  /** Optional colour fills drawn under the line art (see scripts/build-agartha-clubhouse.py). */
+  colorSrc?: string;
   anchors: LayoutAnchors;
   /** false until someone has lined the anchors up against the imagery. */
   calibrated: boolean;
@@ -116,6 +118,7 @@ export const SITE_LAYOUTS: Record<string, SiteLayout> = {
   agartha: {
     sanctuaryId: 'agartha',
     overlaySrc: '/layouts/agartha-overlay.webp',
+    colorSrc: '/layouts/agartha-clubhouse.webp',
     // Centre: Google Maps listing "Agartha By Modcon", plus code Q64Q+C9F
     // (Mohammadabad @ Janakampet). ~10° clockwise matches how the plan sits on
     // the ground relative to its sheet. Fine-tune at /map?calibrate=agartha.

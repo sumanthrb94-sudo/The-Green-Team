@@ -40,6 +40,7 @@ class AffineImageLayer extends L.Layer {
     private src: string,
     private anchors: LayoutAnchors,
     private opacity: number,
+    private plain = false,
   ) {
     super();
   }
@@ -58,7 +59,7 @@ class AffineImageLayer extends L.Layer {
       maxWidth: 'none',
       transformOrigin: '0 0',
       opacity: String(this.opacity),
-      filter: 'drop-shadow(0 0 1.5px rgba(0,0,0,0.9))',
+      filter: this.plain ? 'none' : 'drop-shadow(0 0 1.5px rgba(0,0,0,0.9))',
     });
     img.onload = () => this.reset();
     this.wrap = wrap;
@@ -112,12 +113,23 @@ class AffineImageLayer extends L.Layer {
   }
 }
 
-function AffineImage({ src, anchors, opacity }: { src: string; anchors: LayoutAnchors; opacity: number }) {
+function AffineImage({
+  src,
+  anchors,
+  opacity,
+  plain = false,
+}: {
+  src: string;
+  anchors: LayoutAnchors;
+  opacity: number;
+  /** Skip the dark edge shadow that helps thin white lines read on imagery. */
+  plain?: boolean;
+}) {
   const map = useMap();
   const layerRef = useRef<AffineImageLayer | null>(null);
 
   useEffect(() => {
-    const layer = new AffineImageLayer(src, anchors, opacity);
+    const layer = new AffineImageLayer(src, anchors, opacity, plain);
     layer.addTo(map);
     layerRef.current = layer;
     return () => {
@@ -126,7 +138,7 @@ function AffineImage({ src, anchors, opacity }: { src: string; anchors: LayoutAn
     };
     // anchors are pushed through setAnchors below so dragging doesn't recreate the <img>
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [map, src, opacity]);
+  }, [map, src, opacity, plain]);
 
   useEffect(() => {
     layerRef.current?.setAnchors(anchors);
@@ -168,6 +180,8 @@ export function SiteLayoutLayer({
 
   return (
     <>
+      {/* colour fills first, so the white line art sits on top of them */}
+      {layout.colorSrc && <AffineImage src={layout.colorSrc} anchors={anchors} opacity={0.85} plain />}
       <AffineImage src={layout.overlaySrc} anchors={anchors} opacity={calibrating ? 0.95 : 0.85} />
 
       {plots.map(p => {
