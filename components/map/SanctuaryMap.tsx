@@ -34,15 +34,13 @@ import {
   ChevronRight,
   X,
   Volume2,
-  Sparkles,
-  Maximize2,
   Plus,
   Minus,
   Check,
   AlertTriangle,
   Compass,
-  ArrowUpRight,
   Navigation,
+  SlidersHorizontal,
 } from 'lucide-react';
 import {
   ORR_PATH,
@@ -53,7 +51,21 @@ import {
   type LatLng,
   type MapLocation,
 } from '@/lib/data/map';
-import { cn } from '@/lib/utils';
+import { cn, formatRs } from '@/lib/utils';
+import { SiteLayoutLayer } from '@/components/map/SiteLayoutLayer';
+import {
+  SITE_LAYOUTS,
+  PLOT_STATUS_COLOR,
+  layoutCenter,
+  type GeoPlot,
+  type LayoutAnchors,
+} from '@/lib/data/site-layouts';
+import { SITE_PLAN_CONFIG } from '@/lib/data/agartha-layout';
+import { WHATSAPP } from '@/lib/data/contact';
+import { useAuth } from '@/components/auth/AuthProvider';
+
+/** Zoom at which georeferenced site layouts replace the sanctuary pin. */
+const LAYOUT_MIN_ZOOM = 15;
 
 // --- Custom Surgical Leaflet Markers ---
 
@@ -308,13 +320,14 @@ const BASEMAPS: Record<BasemapStyle, { name: string; url: string; attr: string; 
 export default function SanctuaryMap() {
   // Default to Satellite (as explicitly requested: no Obsidian / no API key requirements)
   const [selectedBasemap, setSelectedBasemap] = useState<BasemapStyle>('satellite');
+  // Minimal by default: only the sanctuaries. Everything else lives under Filters.
   const [activeLayers, setActiveLayers] = useState({
     sanctuaries: true,
-    orrExits: true,
-    rrrExits: true,
-    forests: true,
-    infra: true,
-    airGlow: true,
+    orrExits: false,
+    rrrExits: false,
+    forests: false,
+    infra: false,
+    airGlow: false,
     hotspots: false,
   });
 
@@ -326,9 +339,25 @@ export default function SanctuaryMap() {
   const [zoomInTick, setZoomInTick] = useState(0);
   const [zoomOutTick, setZoomOutTick] = useState(0);
 
+  // Georeferenced site layouts (lib/data/site-layouts.ts)
+  const { user, openAuth } = useAuth();
+  const [layoutVisible, setLayoutVisible] = useState(true);
+  const [selectedPlot, setSelectedPlot] = useState<(GeoPlot & { sanctuaryId: string }) | null>(null);
+  const [anchorsById, setAnchorsById] = useState<Record<string, LayoutAnchors>>(() =>
+    Object.fromEntries(Object.values(SITE_LAYOUTS).map(l => [l.sanctuaryId, l.anchors]))
+  );
+  // /map?calibrate=<id> shows drag handles for lining a layout up with the imagery
+  const [calibrateId, setCalibrateId] = useState<string | null>(null);
+  const layoutsOn = layoutVisible && currentZoom >= LAYOUT_MIN_ZOOM;
+
   // Prevent background scroll bounce on mobile browsers
   useEffect(() => {
     setMounted(true);
+    const cal = new URLSearchParams(window.location.search).get('calibrate');
+    if (cal && SITE_LAYOUTS[cal]) {
+      setCalibrateId(cal);
+      setFlyTarget({ center: layoutCenter(SITE_LAYOUTS[cal].anchors), zoom: 17 });
+    }
     document.body.classList.add('map-fullscreen-active');
     return () => {
       document.body.classList.remove('map-fullscreen-active');
@@ -352,8 +381,19 @@ export default function SanctuaryMap() {
 
   const selectLocation = (loc: MapLocation, zoom = 14) => {
     setSelectedLocation(loc);
-    setFlyTarget({ center: loc.coords, zoom });
+    setSelectedPlot(null);
+    // A sanctuary with a site layout opens straight onto its plots
+    const anchors = anchorsById[loc.id];
+    if (anchors) {
+      setLayoutVisible(true);
+      setFlyTarget({ center: layoutCenter(anchors), zoom: 16 });
+    } else {
+      setFlyTarget({ center: loc.coords, zoom });
+    }
   };
+
+  // Layers switched on beyond the default (sanctuaries) — shown on the Filters badge
+  const activeFilterCount = Object.entries(activeLayers).filter(([k, v]) => k !== 'sanctuaries' && v).length;
 
   const toggleLayer = (layer: keyof typeof activeLayers) => {
     setActiveLayers(prev => ({ ...prev, [layer]: !prev[layer] }));
@@ -361,6 +401,7 @@ export default function SanctuaryMap() {
 
   const resetView = () => {
     setSelectedLocation(null);
+    setSelectedPlot(null);
     setFlyTarget({ center: [17.49, 78.48], zoom: 10 });
   };
 
@@ -379,232 +420,34 @@ export default function SanctuaryMap() {
       data-fullscreen-map="true"
       className="relative w-full h-[calc(100dvh-3.5rem)] md:h-[calc(100svh-3.5rem)] overflow-hidden bg-[#0a1208] select-none touch-none"
     >
-      {/* ── MOBILE TOP HUD (Single Sleek Row, < 40px) ──────────────────── */}
-      <header className="md:hidden absolute top-2 inset-x-2 z-[999] pointer-events-none flex items-center justify-between gap-1.5">
-        {/* Horizontal Navigation & Filter Carousel */}
-        <div className="pointer-events-auto flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 flex-1 pr-1">
-          {/* All Overview Pill */}
-          <button
-            onClick={resetView}
-            className={cn(
-              'px-3 py-1.5 rounded-full text-[9.5px] font-extrabold uppercase tracking-wider backdrop-blur-xl border transition-all shrink-0 active:scale-95',
-              !selectedLocation
-                ? 'bg-[#c8a951] text-[#0a1208] border-[#c8a951] shadow-lg font-black'
-                : 'bg-[#0a1208]/92 text-white/80 border-white/10 hover:bg-white/10'
-            )}
-          >
-            Overview
-          </button>
-
-          {/* Quick-Jump to ORR Ring */}
-          <button
-            onClick={focusOrr}
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-full text-[9.5px] font-bold tracking-wide backdrop-blur-xl border border-[#c8a951]/40 bg-[#0a1208]/92 text-[#facc15] shrink-0 active:scale-95 shadow-md"
-          >
-            <span>🛣️ ORR (23 Exits)</span>
-          </button>
-
-          {/* Quick-Jump to RRR Orbital */}
-          <button
-            onClick={focusRrr}
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-full text-[9.5px] font-bold tracking-wide backdrop-blur-xl border border-[#2dd4bf]/40 bg-[#0a1208]/92 text-[#2dd4bf] shrink-0 active:scale-95 shadow-md"
-          >
-            <span>🌐 RRR (19 Exits)</span>
-          </button>
-
-          <span className="w-px h-3.5 bg-white/15 mx-0.5 shrink-0" />
-
-          {/* Individual Sanctuaries */}
-          {sanctuaries.map(s => {
-            const active = selectedLocation?.id === s.id;
-            const dotColor = getSanctuaryAccent(s.id);
-            return (
-              <button
-                key={s.id}
-                onClick={() => selectLocation(s, 13)}
-                className={cn(
-                  'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9.5px] font-bold tracking-wide backdrop-blur-xl border transition-all shrink-0 active:scale-95',
-                  active
-                    ? 'bg-[#c8a951] text-[#0a1208] border-[#c8a951] shadow-lg'
-                    : 'bg-[#0a1208]/92 text-white/80 border-white/10 hover:bg-white/10'
-                )}
-              >
-                <span className="w-1.5 h-1.5 rounded-full" style={{ background: dotColor }} />
-                <span>{s.title.replace('MODCON ', '')}</span>
-                <span
-                  className={cn(
-                    'px-1.5 py-0.2 rounded text-[8px] font-mono font-bold',
-                    active ? 'bg-black/20 text-[#0a1208]' : 'bg-white/10 text-[#86efac]'
-                  )}
-                >
-                  AQI {s.aqi}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Mobile Layers & Cartography Trigger */}
-        <div className="pointer-events-auto flex items-center gap-1 shrink-0">
-          <button
-            onClick={() => setShowLayersSheet(true)}
-            aria-label="Map layers and basemap theme"
-            className="w-9 h-9 rounded-full bg-[#0a1208]/94 backdrop-blur-xl border border-white/15 text-white/90 hover:text-white flex items-center justify-center shadow-lg active:scale-95 transition-all"
-          >
-            <Layers className="w-4 h-4 text-[#c8a951]" />
-          </button>
-        </div>
-      </header>
-
-      {/* ── DESKTOP TOP HUD (Widescreen Architectural) ─────────────────── */}
-      <header className="hidden md:flex absolute top-4 inset-x-6 z-[999] pointer-events-none items-center justify-between gap-3 max-w-7xl mx-auto">
-        {/* Brand / Status Pill */}
-        <div className="pointer-events-auto flex items-center gap-2 self-start p-1.5 pl-3.5 pr-2 rounded-full bg-[#0a1208]/92 backdrop-blur-xl border border-white/10 shadow-xl">
-          <span className="w-2 h-2 rounded-full bg-[#a3b18a] animate-pulse" />
-          <span className="text-[10px] uppercase tracking-[0.25em] font-extrabold text-white">
-            Eco Intelligence
-          </span>
-          <span className="text-[9px] font-mono text-white/40">· HYD</span>
-
-          <span className="w-px h-3.5 bg-white/15 mx-1" />
-
-          {/* Quick Filter Buttons */}
-          <div className="flex items-center gap-1">
-            <button
-              onClick={focusOrr}
-              className="px-2.5 py-1 rounded-full text-[9px] font-bold text-[#facc15] hover:bg-white/5 transition-all"
-            >
-              ORR (23 Exits)
-            </button>
-            <button
-              onClick={focusRrr}
-              className="px-2.5 py-1 rounded-full text-[9px] font-bold text-[#2dd4bf] hover:bg-white/5 transition-all"
-            >
-              RRR (19 Exits)
-            </button>
-            <span className="w-px h-3 bg-white/10 mx-0.5" />
-            {sanctuaries.map(s => {
-              const active = selectedLocation?.id === s.id;
-              return (
-                <button
-                  key={s.id}
-                  onClick={() => selectLocation(s, 13)}
-                  className={cn(
-                    'px-2.5 py-1 rounded-full text-[9px] font-bold tracking-wider transition-all',
-                    active
-                      ? 'bg-[#c8a951] text-[#0a1208] shadow-sm'
-                      : 'text-white/70 hover:text-white hover:bg-white/5'
-                  )}
-                >
-                  {s.title.replace('MODCON ', '')}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Desktop Layer Toggles & Style Switcher */}
-        <div className="pointer-events-auto flex items-center gap-1.5 p-1.5 rounded-full bg-[#0a1208]/92 backdrop-blur-xl border border-white/10 shadow-xl">
-          <button
-            onClick={() => toggleLayer('orrExits')}
-            className={cn(
-              'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9px] uppercase tracking-wider font-bold transition-all',
-              activeLayers.orrExits
-                ? 'bg-[#c8a951]/20 text-[#fde047] border border-[#c8a951]/40'
-                : 'text-white/40 hover:text-white/70'
-            )}
-          >
-            <span>ORR Exits</span>
-          </button>
-
-          <button
-            onClick={() => toggleLayer('rrrExits')}
-            className={cn(
-              'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9px] uppercase tracking-wider font-bold transition-all',
-              activeLayers.rrrExits
-                ? 'bg-[#0d9488]/25 text-[#2dd4bf] border border-[#2dd4bf]/40'
-                : 'text-white/40 hover:text-white/70'
-            )}
-          >
-            <span>RRR Project</span>
-          </button>
-
-          <button
-            onClick={() => toggleLayer('forests')}
-            className={cn(
-              'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9px] uppercase tracking-wider font-bold transition-all',
-              activeLayers.forests
-                ? 'bg-[#2d3a1d] text-[#a3b18a] border border-[#a3b18a]/30'
-                : 'text-white/40 hover:text-white/70'
-            )}
-          >
-            <Trees className="w-3 h-3" />
-            <span>Reserves</span>
-          </button>
-
-          <button
-            onClick={() => toggleLayer('airGlow')}
-            className={cn(
-              'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9px] uppercase tracking-wider font-bold transition-all',
-              activeLayers.airGlow
-                ? 'bg-[#2d3a1d] text-[#86efac] border border-[#86efac]/30'
-                : 'text-white/40 hover:text-white/70'
-            )}
-          >
-            <Wind className="w-3 h-3" />
-            <span>Air Purity</span>
-          </button>
-
-          <span className="w-px h-3.5 bg-white/15 mx-0.5" />
-
-          {/* Basemap Switcher */}
-          <button
-            onClick={() =>
-              setSelectedBasemap(prev =>
-                prev === 'satellite' ? 'canopy' : prev === 'canopy' ? 'streets' : 'satellite'
-              )
-            }
-            title="Switch map theme (Satellite / Canopy / Vector)"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9px] uppercase tracking-wider font-bold text-white/70 hover:text-white transition-colors"
-          >
-            <Layers className="w-3 h-3 text-[#c8a951]" />
-            <span>{BASEMAPS[selectedBasemap].name}</span>
-          </button>
-
-          {/* Reset View */}
-          <button
-            onClick={resetView}
-            title="Reset overview"
-            className="w-7 h-7 rounded-full flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-colors"
-          >
-            <Maximize2 className="w-3 h-3" />
-          </button>
-        </div>
-      </header>
-
-      {/* ── FLOATING 1-HANDED CONTROLS (Right Edge) ────────────────────── */}
-      <div className="absolute right-3 top-14 md:top-24 z-[998] flex flex-col gap-1.5 pointer-events-auto">
+      {/* ── FILTERS BUTTON (the only chrome on the map) ─────────────────── */}
+      <div className="absolute right-3 top-3 md:right-5 md:top-5 z-[999] flex flex-col items-end gap-1.5">
+        <button
+          onClick={() => setShowLayersSheet(true)}
+          aria-label="Filters"
+          className="relative w-10 h-10 rounded-full bg-[#0a1208]/90 backdrop-blur-xl border border-white/15 text-white flex items-center justify-center shadow-lg active:scale-95 transition-transform"
+        >
+          <SlidersHorizontal className="w-4 h-4" />
+          {activeFilterCount > 0 && (
+            <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 rounded-full bg-[#c8a951] text-[#0a1208] text-[9px] font-black flex items-center justify-center">
+              {activeFilterCount}
+            </span>
+          )}
+        </button>
+        {/* Zoom buttons only where there's no pinch */}
         <button
           onClick={() => setZoomInTick(t => t + 1)}
           aria-label="Zoom in"
-          className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-[#0a1208]/92 backdrop-blur-xl border border-white/15 text-white/80 hover:text-white flex items-center justify-center shadow-lg active:scale-90 transition-transform"
+          className="hidden md:flex w-10 h-10 rounded-full bg-[#0a1208]/90 backdrop-blur-xl border border-white/15 text-white/80 hover:text-white items-center justify-center shadow-lg"
         >
-          <Plus className="w-3.5 h-3.5" />
+          <Plus className="w-4 h-4" />
         </button>
         <button
           onClick={() => setZoomOutTick(t => t + 1)}
           aria-label="Zoom out"
-          className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-[#0a1208]/92 backdrop-blur-xl border border-white/15 text-white/80 hover:text-white flex items-center justify-center shadow-lg active:scale-90 transition-transform"
+          className="hidden md:flex w-10 h-10 rounded-full bg-[#0a1208]/90 backdrop-blur-xl border border-white/15 text-white/80 hover:text-white items-center justify-center shadow-lg"
         >
-          <Minus className="w-3.5 h-3.5" />
-        </button>
-        <button
-          onClick={resetView}
-          aria-label="Reset overview"
-          title="Reset to Hyderabad Corridor"
-          className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-[#0a1208]/92 backdrop-blur-xl border border-white/15 text-[#c8a951] hover:text-white flex items-center justify-center shadow-lg active:scale-90 transition-transform"
-        >
-          <Compass className="w-3.5 h-3.5" />
+          <Minus className="w-4 h-4" />
         </button>
       </div>
 
@@ -790,6 +633,8 @@ export default function SanctuaryMap() {
           {activeLayers.sanctuaries &&
             sanctuaries.map(s => {
               const isSelected = selectedLocation?.id === s.id;
+              // the layout itself marks the site once it's drawn
+              if ((layoutsOn || calibrateId === s.id) && anchorsById[s.id]) return null;
               return (
                 <Marker
                   key={s.id}
@@ -801,11 +646,126 @@ export default function SanctuaryMap() {
                 />
               );
             })}
+          {/* Georeferenced site layouts — master plan + plots on the imagery */}
+          {Object.values(SITE_LAYOUTS).map(layout =>
+            layoutsOn || calibrateId === layout.sanctuaryId ? (
+              <SiteLayoutLayer
+                key={layout.sanctuaryId}
+                layout={layout}
+                anchors={anchorsById[layout.sanctuaryId]}
+                zoom={currentZoom}
+                selectedPlotId={selectedPlot?.sanctuaryId === layout.sanctuaryId ? selectedPlot.id : null}
+                onPlotClick={p => setSelectedPlot({ ...p, sanctuaryId: layout.sanctuaryId })}
+                calibrating={calibrateId === layout.sanctuaryId}
+                onAnchorsChange={a => setAnchorsById(prev => ({ ...prev, [layout.sanctuaryId]: a }))}
+              />
+            ) : null
+          )}
         </MapContainer>
       )}
 
+      {/* ── SITE LAYOUT TOGGLE + LEGEND (zoomed in on a venture) ─────────── */}
+      {currentZoom >= LAYOUT_MIN_ZOOM && !calibrateId && (
+        <div className="absolute top-3 md:top-5 left-1/2 -translate-x-1/2 z-[999] flex flex-col items-center gap-1.5 pointer-events-none">
+          <button
+            onClick={() => {
+              setLayoutVisible(v => !v);
+              setSelectedPlot(null);
+            }}
+            className="pointer-events-auto px-4 py-2 rounded-full bg-[#14532d] text-white text-[11px] font-bold shadow-xl border border-white/15 active:scale-95 transition-transform"
+          >
+            {layoutVisible ? 'Hide layout' : 'Show layout'}
+          </button>
+          {layoutVisible && (
+            <div className="flex items-center gap-2.5 px-3 py-1 rounded-full bg-[#0a1208]/85 backdrop-blur text-[9px] font-bold text-white/80">
+              {(['available', 'reserved', 'sold'] as const).map(st => (
+                <span key={st} className="flex items-center gap-1 capitalize">
+                  <span className="w-2 h-2 rounded-full border border-white/40" style={{ background: PLOT_STATUS_COLOR[st] }} />
+                  {st}
+                </span>
+              ))}
+              {Object.values(SITE_LAYOUTS).some(l => !l.calibrated) && (
+                <span className="text-[#facc15]">· position approximate</span>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── PLOT CARD (tapped a plot on a site layout) ───────────────────── */}
+      {selectedPlot &&
+        (() => {
+          const cfg = SITE_PLAN_CONFIG[selectedPlot.sanctuaryId] ?? { noun: 'Plot', areaLabel: 'sq yds', rateNow: 0 };
+          const venture = sanctuaries.find(v => v.id === selectedPlot.sanctuaryId);
+          const enquireUrl = selectedPlot.sanctuaryId === 'agartha' ? WHATSAPP.agarthaEnquire : WHATSAPP.generic;
+          return (
+            <aside
+              aria-label={`${cfg.noun} ${selectedPlot.id} details`}
+              className="absolute bottom-[4.75rem] md:bottom-6 inset-x-3 md:inset-x-auto md:left-6 md:w-[22rem] z-[999] p-4 rounded-2xl bg-[#0a1208]/96 backdrop-blur-2xl border border-white/15 shadow-[0_16px_40px_rgba(0,0,0,0.85)] animate-fade-up text-white"
+            >
+              <button
+                onClick={() => setSelectedPlot(null)}
+                aria-label="Close"
+                className="absolute top-3 right-3 w-7 h-7 rounded-full bg-white/10 flex items-center justify-center"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+              <p className="text-[9px] uppercase tracking-[0.3em] font-bold text-[#c8a951]">
+                {venture?.title ?? 'Venture'} · {cfg.noun} {selectedPlot.id}
+              </p>
+              <p className="mt-1 text-[10px] font-bold capitalize" style={{ color: PLOT_STATUS_COLOR[selectedPlot.status] === '#1f2937' ? '#9ca3af' : PLOT_STATUS_COLOR[selectedPlot.status] }}>
+                {selectedPlot.status}
+              </p>
+              <div className="grid grid-cols-2 gap-3 mt-3">
+                <div>
+                  <p className="text-[8px] uppercase tracking-widest text-white/50 font-bold">Size</p>
+                  <p className="font-bold mt-0.5">{selectedPlot.area.toLocaleString('en-IN')} {cfg.areaLabel}</p>
+                </div>
+                <div>
+                  <p className="text-[8px] uppercase tracking-widest text-white/50 font-bold">Price</p>
+                  {user ? (
+                    <p className="font-bold mt-0.5">{formatRs(selectedPlot.area * cfg.rateNow)}</p>
+                  ) : (
+                    <button onClick={openAuth} className="mt-0.5 text-[11px] font-bold text-[#86efac] underline underline-offset-2">
+                      Sign in to see
+                    </button>
+                  )}
+                </div>
+              </div>
+              <a
+                href={enquireUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 block text-center px-4 py-2.5 rounded-xl bg-[#14532d] text-[11px] font-bold"
+              >
+                Enquire about {cfg.noun.toLowerCase()} {selectedPlot.id}
+              </a>
+            </aside>
+          );
+        })()}
+
+      {/* ── CALIBRATION PANEL (/map?calibrate=<id>) ─────────────────────── */}
+      {calibrateId && anchorsById[calibrateId] && (
+        <div className="absolute bottom-[4.75rem] md:bottom-6 left-3 right-3 md:left-auto md:right-6 md:w-96 z-[1000] p-3 rounded-2xl bg-[#0a1208]/95 border border-[#c8a951]/40 text-white text-[11px]">
+          <p className="font-bold text-[#c8a951]">Calibrating {calibrateId} layout</p>
+          <p className="mt-1 text-white/70">
+            Drag ✥ to move, TL / TR / BL to fit the drawn boundary onto the fence line and roads. Then paste
+            these anchors into <code>lib/data/site-layouts.ts</code> and set <code>calibrated: true</code>.
+          </p>
+          <pre className="mt-2 p-2 rounded bg-black/50 text-[10px] font-mono whitespace-pre-wrap select-text">
+            {JSON.stringify(anchorsById[calibrateId])}
+          </pre>
+          <button
+            onClick={() => navigator.clipboard?.writeText(JSON.stringify(anchorsById[calibrateId]))}
+            className="mt-2 px-3 py-1.5 rounded-full bg-[#c8a951] text-[#0a1208] font-bold"
+          >
+            Copy anchors
+          </button>
+        </div>
+      )}
+
       {/* ── DYNAMIC INSPECTION SHEET / CARD (Sanctuaries, ORR & RRR Exits) ─── */}
-      {selectedLocation && (
+      {selectedLocation && !selectedPlot && (
         <>
           {/* Mobile Sheet Layout */}
           <aside
@@ -1159,63 +1119,26 @@ export default function SanctuaryMap() {
         </>
       )}
 
-      {/* ── ENVIRONMENTAL BENCHMARK PILL (When No Location Selected) ───── */}
-      {!selectedLocation && (
-        <>
-          {/* Mobile Discrete Pill */}
-          <div className="md:hidden absolute bottom-[4.75rem] left-1/2 -translate-x-1/2 z-[998] pointer-events-none">
-            <div className="pointer-events-auto flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0a1208]/92 backdrop-blur-xl border border-white/10 shadow-lg text-[8.5px] text-white/80 whitespace-nowrap">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#86efac] animate-pulse" />
-              <span className="text-[#86efac] font-bold">Sanctuaries: 12–22 AQI</span>
-              <span className="text-white/30">|</span>
-              <span className="text-[#facc15] font-bold">ORR: 23 Exits</span>
-              <span className="text-white/30">|</span>
-              <span className="text-[#2dd4bf] font-bold">RRR: 19 Exits</span>
-            </div>
-          </div>
-
-          {/* Desktop Footer Strip */}
-          <footer className="hidden md:flex absolute bottom-4 inset-x-4 z-[998] pointer-events-none justify-center">
-            <div className="pointer-events-auto flex items-center gap-3 px-4 py-2 rounded-full bg-[#0a1208]/90 backdrop-blur-xl border border-white/10 shadow-lg text-[9px] text-white/70">
-              <span className="flex items-center gap-1.5 text-[#86efac] font-bold">
-                <Sparkles className="w-3 h-3 text-[#4ade80]" />
-                <span>Sanctuaries: 12–22 AQI</span>
-              </span>
-              <span className="text-white/20">|</span>
-              <span className="text-[#facc15] font-bold">158 km ORR (23 Exits Mapped)</span>
-              <span className="text-white/20">|</span>
-              <span className="text-[#2dd4bf] font-bold">340 km RRR (19 Interchanges Mapped)</span>
-              <span className="text-white/20">|</span>
-              <span className="text-white/50">City Center: 148+ AQI</span>
-            </div>
-          </footer>
-        </>
-      )}
-
-      {/* ── MOBILE CARTOGRAPHY & LAYERS BOTTOM DRAWER ──────────────────── */}
+      {/* ── FILTERS PANEL (bottom sheet on mobile, side panel on desktop) ── */}
       {showLayersSheet && (
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="Map layers and basemap theme"
-          className="fixed inset-0 z-[10000] flex flex-col justify-end bg-black/60 backdrop-blur-sm"
+          aria-label="Map filters"
+          className="fixed inset-0 z-[10000] flex flex-col justify-end md:items-end md:justify-start md:p-5 md:pt-20 bg-black/50 md:bg-black/20 backdrop-blur-sm"
           onClick={() => setShowLayersSheet(false)}
         >
           <div
-            className="w-full bg-[#0a1208] border-t border-white/15 rounded-t-3xl p-5 pb-[max(2rem,env(safe-area-inset-bottom))] shadow-2xl animate-fade-up max-h-[85vh] overflow-y-auto"
+            className="w-full md:w-[22rem] bg-[#0a1208] border-t md:border border-white/15 rounded-t-3xl md:rounded-3xl p-5 pb-[max(2rem,env(safe-area-inset-bottom))] md:pb-5 shadow-2xl animate-fade-up max-h-[85vh] overflow-y-auto"
             onClick={e => e.stopPropagation()}
           >
             {/* Drawer Handle */}
-            <div className="w-10 h-1 rounded-full bg-white/20 mx-auto mb-4" />
+            <div className="md:hidden w-10 h-1 rounded-full bg-white/20 mx-auto mb-4" />
 
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h4 className="font-headline font-extrabold text-base text-white">
-                  Environmental Cartography
-                </h4>
-                <p className="text-[10px] text-white/50">
-                  Select key-free satellite basemaps & expressway layers
-                </p>
+                <h4 className="font-headline font-extrabold text-base text-white">Filters</h4>
+                <p className="text-[10px] text-white/50">Jump to a place, change the map, add layers</p>
               </div>
               <button
                 onClick={() => setShowLayersSheet(false)}
@@ -1225,10 +1148,45 @@ export default function SanctuaryMap() {
               </button>
             </div>
 
+            {/* Jump to */}
+            <div className="mb-4">
+              <span className="text-[9px] uppercase tracking-widest font-extrabold text-[#c8a951] block mb-2">
+                Go to
+              </span>
+              <div className="flex flex-wrap gap-1.5">
+                {[
+                  { label: 'Overview', onClick: resetView, active: !selectedLocation },
+                  ...sanctuaries.map(s => ({
+                    label: s.title.replace('MODCON ', ''),
+                    onClick: () => selectLocation(s, 13),
+                    active: selectedLocation?.id === s.id,
+                  })),
+                  { label: 'ORR', onClick: focusOrr, active: false },
+                  { label: 'RRR', onClick: focusRrr, active: false },
+                ].map(b => (
+                  <button
+                    key={b.label}
+                    onClick={() => {
+                      b.onClick();
+                      setShowLayersSheet(false);
+                    }}
+                    className={cn(
+                      'px-3 py-1.5 rounded-full text-[11px] font-bold border transition-all',
+                      b.active
+                        ? 'bg-[#c8a951] text-[#0a1208] border-[#c8a951]'
+                        : 'bg-white/5 text-white/80 border-white/10 hover:bg-white/10'
+                    )}
+                  >
+                    {b.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Basemap Styles */}
             <div className="mb-4">
               <span className="text-[9px] uppercase tracking-widest font-extrabold text-[#c8a951] block mb-2">
-                Basemap Theme (100% Key-Free)
+                Map style
               </span>
               <div className="grid grid-cols-3 gap-2">
                 {(['satellite', 'canopy', 'streets'] as BasemapStyle[]).map(style => {
@@ -1255,7 +1213,7 @@ export default function SanctuaryMap() {
             {/* Layer Toggles */}
             <div className="mb-5 space-y-2">
               <span className="text-[9px] uppercase tracking-widest font-extrabold text-[#c8a951] block mb-1">
-                Active GIS Layers
+                Layers
               </span>
 
               {/* ORR Exits */}
@@ -1426,7 +1384,7 @@ export default function SanctuaryMap() {
               onClick={() => setShowLayersSheet(false)}
               className="w-full py-3 rounded-xl bg-[#c8a951] text-[#0a1208] text-xs font-extrabold uppercase tracking-widest text-center shadow-lg active:scale-95 transition-all"
             >
-              Apply Cartography
+              Done
             </button>
           </div>
         </div>
