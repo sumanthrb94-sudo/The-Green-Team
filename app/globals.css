@@ -335,10 +335,13 @@
 }
 
 /* Close the hairline gaps Chrome leaves between raster tiles at fractional
-   device-pixel ratios (most Android phones) — they show as a grid on satellite. */
+   device-pixel ratios (most Android phones) — they show as a grid on satellite.
+   Tiles overlap by half a pixel; blending must be normal, because Leaflet's
+   default plus-lighter adds the overlap twice and draws a bright grid instead. */
 .leaflet-container .leaflet-tile-container img.leaflet-tile {
   width: 256.5px !important;
   height: 256.5px !important;
+  mix-blend-mode: normal !important;
 }
 
 /* The reduced-motion guardrail above zeroes every transition, which also kills

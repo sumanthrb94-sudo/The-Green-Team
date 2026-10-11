@@ -43,6 +43,32 @@ export interface SiteLayout {
 }
 
 /**
+ * Anchors from a site centre, the drawing's real-world size and how far the
+ * drawing is turned from true north (clockwise, degrees). Handy when all you
+ * have is one pin for the site — size and rotation come from the drawing.
+ */
+export function anchorsFromCenter(
+  center: LatLng,
+  widthM: number,
+  heightM: number,
+  rotationDeg: number,
+): LayoutAnchors {
+  const t = (rotationDeg * Math.PI) / 180;
+  const mPerLat = 110_950;
+  const mPerLng = 111_320 * Math.cos((center[0] * Math.PI) / 180);
+  const at = (east: number, north: number): LatLng => {
+    const e = east * Math.cos(t) + north * Math.sin(t);
+    const n = -east * Math.sin(t) + north * Math.cos(t);
+    return [+(center[0] + n / mPerLat).toFixed(6), +(center[1] + e / mPerLng).toFixed(6)];
+  };
+  return {
+    tl: at(-widthM / 2, heightM / 2),
+    tr: at(widthM / 2, heightM / 2),
+    bl: at(-widthM / 2, -heightM / 2),
+  };
+}
+
+/**
  * Agartha anchors are an estimate: centred on the map pin and scaled from the
  * drawing (plot 31 = 1 acre ⇒ ~0.4 m per px of the 800-px preview, so the
  * sheet spans ~322 m × 402 m). Needs calibrating against the real site.
@@ -51,11 +77,9 @@ export const SITE_LAYOUTS: Record<string, SiteLayout> = {
   agartha: {
     sanctuaryId: 'agartha',
     overlaySrc: '/layouts/agartha-overlay.webp',
-    anchors: {
-      tl: [17.741812, 78.278482],
-      tr: [17.741812, 78.281518],
-      bl: [17.738188, 78.278482],
-    },
+    // centre is still a placeholder; ~10° clockwise matches how the plan sits
+    // on the ground relative to its sheet
+    anchors: anchorsFromCenter([17.74, 78.28], 322, 402, 10),
     calibrated: false,
     // Sold plots as confirmed by the team, Oct 2026 — 13 sold, 24 available.
     status: Object.fromEntries(
