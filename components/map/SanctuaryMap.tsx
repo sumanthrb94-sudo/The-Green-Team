@@ -53,7 +53,21 @@ import {
   type LatLng,
   type MapLocation,
 } from '@/lib/data/map';
-import { cn } from '@/lib/utils';
+import { cn, formatRs } from '@/lib/utils';
+import { SiteLayoutLayer } from '@/components/map/SiteLayoutLayer';
+import {
+  SITE_LAYOUTS,
+  PLOT_STATUS_COLOR,
+  layoutCenter,
+  type GeoPlot,
+  type LayoutAnchors,
+} from '@/lib/data/site-layouts';
+import { SITE_PLAN_CONFIG } from '@/lib/data/agartha-layout';
+import { WHATSAPP } from '@/lib/data/contact';
+import { useAuth } from '@/components/auth/AuthProvider';
+
+/** Zoom at which georeferenced site layouts replace the sanctuary pin. */
+const LAYOUT_MIN_ZOOM = 15;
 
 // --- Custom Surgical Leaflet Markers ---
 
@@ -326,9 +340,25 @@ export default function SanctuaryMap() {
   const [zoomInTick, setZoomInTick] = useState(0);
   const [zoomOutTick, setZoomOutTick] = useState(0);
 
+  // Georeferenced site layouts (lib/data/site-layouts.ts)
+  const { user, openAuth } = useAuth();
+  const [layoutVisible, setLayoutVisible] = useState(true);
+  const [selectedPlot, setSelectedPlot] = useState<(GeoPlot & { sanctuaryId: string }) | null>(null);
+  const [anchorsById, setAnchorsById] = useState<Record<string, LayoutAnchors>>(() =>
+    Object.fromEntries(Object.values(SITE_LAYOUTS).map(l => [l.sanctuaryId, l.anchors]))
+  );
+  // /map?calibrate=<id> shows drag handles for lining a layout up with the imagery
+  const [calibrateId, setCalibrateId] = useState<string | null>(null);
+  const layoutsOn = layoutVisible && currentZoom >= LAYOUT_MIN_ZOOM;
+
   // Prevent background scroll bounce on mobile browsers
   useEffect(() => {
     setMounted(true);
+    const cal = new URLSearchParams(window.location.search).get('calibrate');
+    if (cal && SITE_LAYOUTS[cal]) {
+      setCalibrateId(cal);
+      setFlyTarget({ center: layoutCenter(SITE_LAYOUTS[cal].anchors), zoom: 17 });
+    }
     document.body.classList.add('map-fullscreen-active');
     return () => {
       document.body.classList.remove('map-fullscreen-active');
@@ -352,7 +382,15 @@ export default function SanctuaryMap() {
 
   const selectLocation = (loc: MapLocation, zoom = 14) => {
     setSelectedLocation(loc);
-    setFlyTarget({ center: loc.coords, zoom });
+    setSelectedPlot(null);
+    // A sanctuary with a site layout opens straight onto its plots
+    const anchors = anchorsById[loc.id];
+    if (anchors) {
+      setLayoutVisible(true);
+      setFlyTarget({ center: layoutCenter(anchors), zoom: 16 });
+    } else {
+      setFlyTarget({ center: loc.coords, zoom });
+    }
   };
 
   const toggleLayer = (layer: keyof typeof activeLayers) => {
@@ -361,6 +399,7 @@ export default function SanctuaryMap() {
 
   const resetView = () => {
     setSelectedLocation(null);
+    setSelectedPlot(null);
     setFlyTarget({ center: [17.49, 78.48], zoom: 10 });
   };
 
@@ -790,6 +829,8 @@ export default function SanctuaryMap() {
           {activeLayers.sanctuaries &&
             sanctuaries.map(s => {
               const isSelected = selectedLocation?.id === s.id;
+              // the layout itself marks the site once it's drawn
+              if ((layoutsOn || calibrateId === s.id) && anchorsById[s.id]) return null;
               return (
                 <Marker
                   key={s.id}
@@ -801,11 +842,126 @@ export default function SanctuaryMap() {
                 />
               );
             })}
+          {/* Georeferenced site layouts — master plan + plots on the imagery */}
+          {Object.values(SITE_LAYOUTS).map(layout =>
+            layoutsOn || calibrateId === layout.sanctuaryId ? (
+              <SiteLayoutLayer
+                key={layout.sanctuaryId}
+                layout={layout}
+                anchors={anchorsById[layout.sanctuaryId]}
+                zoom={currentZoom}
+                selectedPlotId={selectedPlot?.sanctuaryId === layout.sanctuaryId ? selectedPlot.id : null}
+                onPlotClick={p => setSelectedPlot({ ...p, sanctuaryId: layout.sanctuaryId })}
+                calibrating={calibrateId === layout.sanctuaryId}
+                onAnchorsChange={a => setAnchorsById(prev => ({ ...prev, [layout.sanctuaryId]: a }))}
+              />
+            ) : null
+          )}
         </MapContainer>
       )}
 
+      {/* ── SITE LAYOUT TOGGLE + LEGEND (zoomed in on a venture) ─────────── */}
+      {currentZoom >= LAYOUT_MIN_ZOOM && !calibrateId && (
+        <div className="absolute top-12 md:top-20 left-1/2 -translate-x-1/2 z-[999] flex flex-col items-center gap-1.5 pointer-events-none">
+          <button
+            onClick={() => {
+              setLayoutVisible(v => !v);
+              setSelectedPlot(null);
+            }}
+            className="pointer-events-auto px-4 py-2 rounded-full bg-[#14532d] text-white text-[11px] font-bold shadow-xl border border-white/15 active:scale-95 transition-transform"
+          >
+            {layoutVisible ? 'Hide layout' : 'Show layout'}
+          </button>
+          {layoutVisible && (
+            <div className="flex items-center gap-2.5 px-3 py-1 rounded-full bg-[#0a1208]/85 backdrop-blur text-[9px] font-bold text-white/80">
+              {(['available', 'reserved', 'sold'] as const).map(st => (
+                <span key={st} className="flex items-center gap-1 capitalize">
+                  <span className="w-2 h-2 rounded-full border border-white/40" style={{ background: PLOT_STATUS_COLOR[st] }} />
+                  {st}
+                </span>
+              ))}
+              {Object.values(SITE_LAYOUTS).some(l => !l.calibrated) && (
+                <span className="text-[#facc15]">· position approximate</span>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── PLOT CARD (tapped a plot on a site layout) ───────────────────── */}
+      {selectedPlot &&
+        (() => {
+          const cfg = SITE_PLAN_CONFIG[selectedPlot.sanctuaryId] ?? { noun: 'Plot', areaLabel: 'sq yds', rateNow: 0 };
+          const venture = sanctuaries.find(v => v.id === selectedPlot.sanctuaryId);
+          const enquireUrl = selectedPlot.sanctuaryId === 'agartha' ? WHATSAPP.agarthaEnquire : WHATSAPP.generic;
+          return (
+            <aside
+              aria-label={`${cfg.noun} ${selectedPlot.id} details`}
+              className="absolute bottom-[4.75rem] md:bottom-6 inset-x-3 md:inset-x-auto md:left-6 md:w-[22rem] z-[999] p-4 rounded-2xl bg-[#0a1208]/96 backdrop-blur-2xl border border-white/15 shadow-[0_16px_40px_rgba(0,0,0,0.85)] animate-fade-up text-white"
+            >
+              <button
+                onClick={() => setSelectedPlot(null)}
+                aria-label="Close"
+                className="absolute top-3 right-3 w-7 h-7 rounded-full bg-white/10 flex items-center justify-center"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+              <p className="text-[9px] uppercase tracking-[0.3em] font-bold text-[#c8a951]">
+                {venture?.title ?? 'Venture'} · {cfg.noun} {selectedPlot.id}
+              </p>
+              <p className="mt-1 text-[10px] font-bold capitalize" style={{ color: PLOT_STATUS_COLOR[selectedPlot.status] === '#1f2937' ? '#9ca3af' : PLOT_STATUS_COLOR[selectedPlot.status] }}>
+                {selectedPlot.status}
+              </p>
+              <div className="grid grid-cols-2 gap-3 mt-3">
+                <div>
+                  <p className="text-[8px] uppercase tracking-widest text-white/50 font-bold">Size</p>
+                  <p className="font-bold mt-0.5">{selectedPlot.area.toLocaleString('en-IN')} {cfg.areaLabel}</p>
+                </div>
+                <div>
+                  <p className="text-[8px] uppercase tracking-widest text-white/50 font-bold">Price</p>
+                  {user ? (
+                    <p className="font-bold mt-0.5">{formatRs(selectedPlot.area * cfg.rateNow)}</p>
+                  ) : (
+                    <button onClick={openAuth} className="mt-0.5 text-[11px] font-bold text-[#86efac] underline underline-offset-2">
+                      Sign in to see
+                    </button>
+                  )}
+                </div>
+              </div>
+              <a
+                href={enquireUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 block text-center px-4 py-2.5 rounded-xl bg-[#14532d] text-[11px] font-bold"
+              >
+                Enquire about {cfg.noun.toLowerCase()} {selectedPlot.id}
+              </a>
+            </aside>
+          );
+        })()}
+
+      {/* ── CALIBRATION PANEL (/map?calibrate=<id>) ─────────────────────── */}
+      {calibrateId && anchorsById[calibrateId] && (
+        <div className="absolute bottom-[4.75rem] md:bottom-6 left-3 right-3 md:left-auto md:right-6 md:w-96 z-[1000] p-3 rounded-2xl bg-[#0a1208]/95 border border-[#c8a951]/40 text-white text-[11px]">
+          <p className="font-bold text-[#c8a951]">Calibrating {calibrateId} layout</p>
+          <p className="mt-1 text-white/70">
+            Drag ✥ to move, TL / TR / BL to fit the drawn boundary onto the fence line and roads. Then paste
+            these anchors into <code>lib/data/site-layouts.ts</code> and set <code>calibrated: true</code>.
+          </p>
+          <pre className="mt-2 p-2 rounded bg-black/50 text-[10px] font-mono whitespace-pre-wrap select-text">
+            {JSON.stringify(anchorsById[calibrateId])}
+          </pre>
+          <button
+            onClick={() => navigator.clipboard?.writeText(JSON.stringify(anchorsById[calibrateId]))}
+            className="mt-2 px-3 py-1.5 rounded-full bg-[#c8a951] text-[#0a1208] font-bold"
+          >
+            Copy anchors
+          </button>
+        </div>
+      )}
+
       {/* ── DYNAMIC INSPECTION SHEET / CARD (Sanctuaries, ORR & RRR Exits) ─── */}
-      {selectedLocation && (
+      {selectedLocation && !selectedPlot && (
         <>
           {/* Mobile Sheet Layout */}
           <aside
