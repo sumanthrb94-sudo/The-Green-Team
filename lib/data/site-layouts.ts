@@ -68,8 +68,11 @@ export function anchorsFromCenter(
   };
 }
 
+/** Agartha's Google Maps pin (plus code 7J9WQ64Q+C9F). */
+export const AGARTHA_SITE: LatLng = [17.756063, 78.238422];
+
 /**
- * Agartha anchors are an estimate: centred on the map pin and scaled from the
+ * Agartha anchors: centred on the Google Maps pin and scaled from the
  * drawing (plot 31 = 1 acre ⇒ ~0.4 m per px of the 800-px preview, so the
  * sheet spans ~322 m × 402 m). Needs calibrating against the real site.
  */
@@ -77,9 +80,10 @@ export const SITE_LAYOUTS: Record<string, SiteLayout> = {
   agartha: {
     sanctuaryId: 'agartha',
     overlaySrc: '/layouts/agartha-overlay.webp',
-    // centre is still a placeholder; ~10° clockwise matches how the plan sits
-    // on the ground relative to its sheet
-    anchors: anchorsFromCenter([17.74, 78.28], 322, 402, 10),
+    // Centre: Google Maps listing "Agartha By Modcon", plus code Q64Q+C9F
+    // (Mohammadabad @ Janakampet). ~10° clockwise matches how the plan sits on
+    // the ground relative to its sheet. Fine-tune at /map?calibrate=agartha.
+    anchors: anchorsFromCenter(AGARTHA_SITE, 322, 402, 10),
     calibrated: false,
     // Sold plots as confirmed by the team, Oct 2026 — 13 sold, 24 available.
     status: Object.fromEntries(
