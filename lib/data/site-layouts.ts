@@ -57,7 +57,10 @@ export const SITE_LAYOUTS: Record<string, SiteLayout> = {
       bl: [17.738188, 78.278482],
     },
     calibrated: false,
-    status: {},
+    // Sold plots as confirmed by the team, Oct 2026 — 13 sold, 24 available.
+    status: Object.fromEntries(
+      [3, 7, 8, 10, 11, 14, 22, 28, 29, 34, 35, 36, 37].map(id => [id, 'sold' as const])
+    ),
   },
 };
 
