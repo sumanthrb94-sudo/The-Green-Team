@@ -334,6 +334,26 @@
   background: #0d1409;
 }
 
+/* Close the hairline gaps Chrome leaves between raster tiles at fractional
+   device-pixel ratios (most Android phones) — they show as a grid on satellite. */
+.leaflet-container .leaflet-tile-container img.leaflet-tile {
+  width: 256.5px !important;
+  height: 256.5px !important;
+}
+
+/* The reduced-motion guardrail above zeroes every transition, which also kills
+   Leaflet's zoom (phones switch "reduce motion" on in battery saver). Map zoom
+   is navigation, not decoration — keep it, just short. */
+@media (prefers-reduced-motion: reduce) {
+  .leaflet-zoom-anim .leaflet-zoom-animated {
+    transition: transform 0.25s cubic-bezier(0, 0, 0.25, 1) !important;
+  }
+  .leaflet-fade-anim .leaflet-tile,
+  .leaflet-fade-anim .leaflet-popup {
+    transition: opacity 0.2s linear !important;
+  }
+}
+
 
 /* ── Legal documents (components/legal/LegalPage.tsx) ──────────────────────
    Long-form prose that people actually have to read, so: a comfortable measure,

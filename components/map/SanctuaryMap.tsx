@@ -41,6 +41,8 @@ import {
   Compass,
   Navigation,
   SlidersHorizontal,
+  Search,
+  Map as MapIcon,
 } from 'lucide-react';
 import {
   ORR_PATH,
@@ -77,50 +79,23 @@ function getSanctuaryAccent(id: string) {
 }
 
 function createSanctuaryIcon(s: MapLocation, isSelected: boolean) {
-  const accentColor = getSanctuaryAccent(s.id);
+  const accent = getSanctuaryAccent(s.id);
+  const w = isSelected ? 38 : 30;
+  const h = Math.round(w * 1.3);
   const html = `
-    <div style="position:relative;display:flex;align-items:center;transform:translate(-50%,-50%);cursor:pointer;z-index:${isSelected ? 1000 : 500};">
-      <div style="
-        display:flex;
-        align-items:center;
-        gap:6px;
-        background:rgba(10,18,8,0.94);
-        backdrop-filter:blur(14px);
-        border:1.5px solid ${isSelected ? '#c8a951' : accentColor};
-        border-radius:999px;
-        padding:4px 10px 4px 6px;
-        box-shadow:0 6px 22px rgba(0,0,0,0.7)${isSelected ? ', 0 0 18px rgba(200,169,81,0.6)' : ''};
-        transition:all 0.3s cubic-bezier(0.16,1,0.3,1);
-      ">
-        <span style="
-          width:8px;
-          height:8px;
-          border-radius:50%;
-          background:${accentColor};
-          box-shadow:0 0 8px ${accentColor};
-          animation:${isSelected ? 'none' : 'tgt-pulse 2s infinite'};
-        "></span>
-        <span style="color:#ffffff;font:700 11px/1 var(--font-manrope),sans-serif;letter-spacing:0.04em;white-space:nowrap;">
-          ${s.title}
-        </span>
-        <span style="
-          font:800 9px/1 var(--font-mono),monospace;
-          color:${accentColor};
-          background:rgba(255,255,255,0.1);
-          padding:2px 5px;
-          border-radius:6px;
-        ">
-          AQI ${s.aqi}
-        </span>
-      </div>
-    </div>
-  `;
-
+    <div title="${s.title}" style="width:${w}px;height:${h}px;cursor:pointer;filter:drop-shadow(0 4px 8px rgba(0,0,0,.6));transition:transform .2s ease;">
+      <svg viewBox="0 0 30 39" width="${w}" height="${h}" aria-hidden="true">
+        <path d="M15 38c-1-3.5-13-15-13-23.5a13 13 0 0 1 26 0C28 23 16 34.5 15 38z"
+          fill="${isSelected ? '#c8a951' : '#0a1208'}" stroke="${isSelected ? '#fff' : accent}" stroke-width="2"/>
+        <circle cx="15" cy="14.5" r="5" fill="${isSelected ? '#0a1208' : accent}"/>
+      </svg>
+    </div>`;
   return L.divIcon({
     className: 'minimal-sanctuary-icon',
     html,
-    iconSize: undefined,
-    iconAnchor: [0, 0],
+    iconSize: [w, h],
+    // tip of the pin sits on the coordinate
+    iconAnchor: [w / 2, h],
   });
 }
 
@@ -320,13 +295,14 @@ const BASEMAPS: Record<BasemapStyle, { name: string; url: string; attr: string; 
 export default function SanctuaryMap() {
   // Default to Satellite (as explicitly requested: no Obsidian / no API key requirements)
   const [selectedBasemap, setSelectedBasemap] = useState<BasemapStyle>('satellite');
-  // Minimal by default: only the sanctuaries. Everything else lives under Filters.
+  // Minimal by default: sanctuaries, ORR/RRR rings and state borders. The rest lives under Filters.
   const [activeLayers, setActiveLayers] = useState({
     sanctuaries: true,
+    borders: true,
     orrExits: false,
     rrrExits: false,
     forests: false,
-    infra: false,
+    infra: true,
     airGlow: false,
     hotspots: false,
   });
@@ -336,6 +312,8 @@ export default function SanctuaryMap() {
   const [currentZoom, setCurrentZoom] = useState(10);
   const [mounted, setMounted] = useState(false);
   const [showLayersSheet, setShowLayersSheet] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [query, setQuery] = useState('');
   const [zoomInTick, setZoomInTick] = useState(0);
   const [zoomOutTick, setZoomOutTick] = useState(0);
 
@@ -392,8 +370,14 @@ export default function SanctuaryMap() {
     }
   };
 
+  const searchResults = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return sanctuaries;
+    return sanctuaries.filter(s => `${s.title} ${s.location} ${s.description ?? ''}`.toLowerCase().includes(q));
+  }, [query, sanctuaries]);
+
   // Layers switched on beyond the default (sanctuaries) — shown on the Filters badge
-  const activeFilterCount = Object.entries(activeLayers).filter(([k, v]) => k !== 'sanctuaries' && v).length;
+  const activeFilterCount = Object.entries(activeLayers).filter(([k, v]) => !['sanctuaries', 'borders', 'infra'].includes(k) && v).length;
 
   const toggleLayer = (layer: keyof typeof activeLayers) => {
     setActiveLayers(prev => ({ ...prev, [layer]: !prev[layer] }));
@@ -420,6 +404,62 @@ export default function SanctuaryMap() {
       data-fullscreen-map="true"
       className="relative w-full h-[calc(100dvh-3.5rem)] md:h-[calc(100svh-3.5rem)] overflow-hidden bg-[#0a1208] select-none touch-none"
     >
+      {/* ── PROPERTY SEARCH (top left) ─────────────────────────────────── */}
+      <div className="absolute left-3 top-3 md:left-5 md:top-5 z-[1001] w-[calc(100%-5rem)] max-w-xs">
+        {searchOpen ? (
+          <div className="rounded-2xl bg-[#0a1208]/95 backdrop-blur-xl border border-white/15 shadow-lg overflow-hidden">
+            <div className="flex items-center gap-2 px-3 h-10">
+              <Search className="w-4 h-4 text-white/60 shrink-0" />
+              <input
+                autoFocus
+                value={query}
+                onChange={e => setQuery(e.target.value)}
+                placeholder="Search properties or areas"
+                className="flex-1 bg-transparent text-[13px] text-white placeholder:text-white/40 outline-none"
+              />
+              <button
+                onClick={() => {
+                  setSearchOpen(false);
+                  setQuery('');
+                }}
+                aria-label="Close search"
+                className="text-white/60"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <ul className="border-t border-white/10 max-h-64 overflow-y-auto">
+              {searchResults.map(s => (
+                <li key={s.id}>
+                  <button
+                    onClick={() => {
+                      selectLocation(s, 14);
+                      setSearchOpen(false);
+                      setQuery('');
+                    }}
+                    className="w-full text-left px-3 py-2.5 hover:bg-white/5 flex flex-col"
+                  >
+                    <span className="text-[13px] font-bold text-white">{s.title}</span>
+                    <span className="text-[11px] text-white/50">{s.location}</span>
+                  </button>
+                </li>
+              ))}
+              {searchResults.length === 0 && (
+                <li className="px-3 py-2.5 text-[12px] text-white/50">No properties match “{query}”</li>
+              )}
+            </ul>
+          </div>
+        ) : (
+          <button
+            onClick={() => setSearchOpen(true)}
+            aria-label="Search properties"
+            className="w-10 h-10 rounded-full bg-[#0a1208]/90 backdrop-blur-xl border border-white/15 text-white flex items-center justify-center shadow-lg active:scale-95 transition-transform"
+          >
+            <Search className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+
       {/* ── FILTERS BUTTON (the only chrome on the map) ─────────────────── */}
       <div className="absolute right-3 top-3 md:right-5 md:top-5 z-[999] flex flex-col items-end gap-1.5">
         <button
@@ -481,6 +521,15 @@ export default function SanctuaryMap() {
             maxNativeZoom={BASEMAPS[selectedBasemap].maxZoom}
             maxZoom={18}
           />
+          {/* Borders & place names — the other two basemaps already carry their own */}
+          {activeLayers.borders && selectedBasemap === 'satellite' && (
+            <TileLayer
+              url="https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}"
+              attribution="Boundaries &copy; Esri"
+              maxNativeZoom={19}
+              maxZoom={18}
+            />
+          )}
 
           {/* Minimalist Air Quality Purity Halos */}
           {activeLayers.airGlow && (
@@ -641,7 +690,7 @@ export default function SanctuaryMap() {
                   position={s.coords}
                   icon={createSanctuaryIcon(s, isSelected)}
                   eventHandlers={{
-                    click: () => selectLocation(s, 13),
+                    click: () => selectLocation(s, 14),
                   }}
                 />
               );
@@ -1138,7 +1187,7 @@ export default function SanctuaryMap() {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h4 className="font-headline font-extrabold text-base text-white">Filters</h4>
-                <p className="text-[10px] text-white/50">Jump to a place, change the map, add layers</p>
+                <p className="text-[10px] text-white/50">Map style and layers</p>
               </div>
               <button
                 onClick={() => setShowLayersSheet(false)}
@@ -1146,41 +1195,6 @@ export default function SanctuaryMap() {
               >
                 <X className="w-4 h-4" />
               </button>
-            </div>
-
-            {/* Jump to */}
-            <div className="mb-4">
-              <span className="text-[9px] uppercase tracking-widest font-extrabold text-[#c8a951] block mb-2">
-                Go to
-              </span>
-              <div className="flex flex-wrap gap-1.5">
-                {[
-                  { label: 'Overview', onClick: resetView, active: !selectedLocation },
-                  ...sanctuaries.map(s => ({
-                    label: s.title.replace('MODCON ', ''),
-                    onClick: () => selectLocation(s, 13),
-                    active: selectedLocation?.id === s.id,
-                  })),
-                  { label: 'ORR', onClick: focusOrr, active: false },
-                  { label: 'RRR', onClick: focusRrr, active: false },
-                ].map(b => (
-                  <button
-                    key={b.label}
-                    onClick={() => {
-                      b.onClick();
-                      setShowLayersSheet(false);
-                    }}
-                    className={cn(
-                      'px-3 py-1.5 rounded-full text-[11px] font-bold border transition-all',
-                      b.active
-                        ? 'bg-[#c8a951] text-[#0a1208] border-[#c8a951]'
-                        : 'bg-white/5 text-white/80 border-white/10 hover:bg-white/10'
-                    )}
-                  >
-                    {b.label}
-                  </button>
-                ))}
-              </div>
             </div>
 
             {/* Basemap Styles */}
@@ -1215,6 +1229,33 @@ export default function SanctuaryMap() {
               <span className="text-[9px] uppercase tracking-widest font-extrabold text-[#c8a951] block mb-1">
                 Layers
               </span>
+
+              {/* Borders & place names */}
+              <button
+                onClick={() => toggleLayer('borders')}
+                className={cn(
+                  'w-full py-2.5 px-3.5 rounded-xl border flex items-center justify-between text-left transition-all',
+                  activeLayers.borders
+                    ? 'bg-white/10 border-white/30 text-white'
+                    : 'bg-white/5 border-white/10 text-white/50'
+                )}
+              >
+                <div className="flex items-center gap-2.5">
+                  <MapIcon className={cn('w-4 h-4', activeLayers.borders ? 'text-white' : 'text-white/40')} />
+                  <div>
+                    <span className="text-xs font-bold block">State Borders & Place Names</span>
+                    <span className="text-[9px] text-white/40 block">State and district lines, towns (satellite view)</span>
+                  </div>
+                </div>
+                <div
+                  className={cn(
+                    'w-5 h-5 rounded-full flex items-center justify-center',
+                    activeLayers.borders ? 'bg-white text-[#0a1208]' : 'bg-white/10'
+                  )}
+                >
+                  {activeLayers.borders && <Check className="w-3 h-3 stroke-[3]" />}
+                </div>
+              </button>
 
               {/* ORR Exits */}
               <button
