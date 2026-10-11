@@ -579,13 +579,13 @@ export const MAP_LOCATIONS: MapLocation[] = [
     type: 'sanctuary',
     title: "MODCON Agartha",
     location: "Narsapur Forest Peripheral",
-    coords: [17.74, 78.28] as [number, number],
+    // Google Maps "Agartha By Modcon", plus code Q64Q+C9F (Janakampet)
+    coords: [17.756063, 78.238422] as [number, number],
     aqi: 12,
     noise: 18,
     forestRadius: 5000,
     boundary: [
-      [17.76, 78.25], [17.78, 78.27], [17.77, 78.31], 
-      [17.73, 78.32], [17.71, 78.29], [17.72, 78.26]
+      [17.7761, 78.2084], [17.7961, 78.2284], [17.7861, 78.2684], [17.7461, 78.2784], [17.7261, 78.2484], [17.7361, 78.2184]
     ] as [number, number][],
     image: "/gallery/agartha/11.webp",
     description: "A forest-peripheral sanctuary nestled within the dense Narsapur reserve forest canopy."
