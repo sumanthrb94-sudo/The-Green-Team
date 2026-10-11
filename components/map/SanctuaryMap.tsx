@@ -702,7 +702,6 @@ export default function SanctuaryMap() {
                 key={layout.sanctuaryId}
                 layout={layout}
                 anchors={anchorsById[layout.sanctuaryId]}
-                zoom={currentZoom}
                 selectedPlotId={selectedPlot?.sanctuaryId === layout.sanctuaryId ? selectedPlot.id : null}
                 onPlotClick={p => setSelectedPlot({ ...p, sanctuaryId: layout.sanctuaryId })}
                 calibrating={calibrateId === layout.sanctuaryId}

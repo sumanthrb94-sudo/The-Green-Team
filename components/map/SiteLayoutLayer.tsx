@@ -12,9 +12,9 @@
  * rotation/skew as a fixed CSS matrix inside it. Pinch zoom re-pins it on
  * every step, so the drawing stays glued to the ground.
  */
-import { useEffect, useMemo, useRef } from 'react';
+import { Fragment, useEffect, useMemo, useRef } from 'react';
 import L from 'leaflet';
-import { Circle, Marker, Tooltip, useMap } from 'react-leaflet';
+import { Marker, Polygon, useMap } from 'react-leaflet';
 import type { LatLng } from '@/lib/data/map';
 import {
   geoPlots,
@@ -135,9 +135,6 @@ function AffineImage({ src, anchors, opacity }: { src: string; anchors: LayoutAn
   return null;
 }
 
-/** Plot circle radius in metres — the radius of a disc with ~30% of the plot's area. */
-const plotRadius = (sqYds: number) => Math.sqrt((sqYds * 0.8361 * 0.3) / Math.PI);
-
 const handleIcon = (label: string) =>
   L.divIcon({
     className: '',
@@ -155,7 +152,6 @@ const CORNERS: { key: keyof LayoutAnchors; label: string }[] = [
 export function SiteLayoutLayer({
   layout,
   anchors,
-  zoom,
   selectedPlotId,
   onPlotClick,
   calibrating = false,
@@ -163,14 +159,12 @@ export function SiteLayoutLayer({
 }: {
   layout: SiteLayout;
   anchors: LayoutAnchors;
-  zoom: number;
   selectedPlotId: number | null;
   onPlotClick: (plot: GeoPlot) => void;
   calibrating?: boolean;
   onAnchorsChange?: (anchors: LayoutAnchors) => void;
 }) {
   const plots = useMemo(() => geoPlots({ ...layout, anchors }), [layout, anchors]);
-  const showLabels = zoom >= 17;
 
   return (
     <>
@@ -180,24 +174,24 @@ export function SiteLayoutLayer({
         const selected = p.id === selectedPlotId;
         const color = PLOT_STATUS_COLOR[p.status];
         return (
-          <Circle
-            key={`${layout.sanctuaryId}-${p.id}`}
-            center={p.position}
-            radius={plotRadius(p.area)}
-            pathOptions={{
-              color: selected ? '#c8a951' : color,
-              weight: selected ? 3 : 1.5,
-              fillColor: color,
-              fillOpacity: p.status === 'sold' ? 0.7 : 0.35,
-            }}
-            eventHandlers={{ click: () => onPlotClick(p) }}
-          >
-            {showLabels && (
-              <Tooltip permanent direction="center" className="plot-label" interactive={false}>
-                {p.id}
-              </Tooltip>
-            )}
-          </Circle>
+          <Fragment key={`${layout.sanctuaryId}-${p.id}`}>
+            {/* pale halo under the black outline so it reads on dark fields too */}
+            <Polygon
+              positions={p.corners}
+              interactive={false}
+              pathOptions={{ color: '#ffffff', weight: 4.5, opacity: 0.55, fill: false }}
+            />
+            <Polygon
+              positions={p.corners}
+              pathOptions={{
+                color: selected ? '#c8a951' : '#000000',
+                weight: selected ? 3.5 : 2,
+                fillColor: color,
+                fillOpacity: p.status === 'sold' ? 0.6 : 0.3,
+              }}
+              eventHandlers={{ click: () => onPlotClick(p) }}
+            />
+          </Fragment>
         );
       })}
 

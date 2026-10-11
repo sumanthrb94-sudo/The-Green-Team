@@ -367,16 +367,3 @@
 .legal-body table { font-variant-numeric: tabular-nums; }
 .legal-body code { font-size: 0.85em; background: color-mix(in srgb, currentColor 8%, transparent); padding: 0.1em 0.35em; border-radius: 3px; }
 
-/* Plot numbers on georeferenced site layouts (components/map/SiteLayoutLayer) */
-.leaflet-tooltip.plot-label {
-  background: transparent;
-  border: 0;
-  box-shadow: none;
-  padding: 0;
-  color: #fff;
-  font: 700 11px/1 system-ui, sans-serif;
-  text-shadow: 0 0 3px rgba(0, 0, 0, 0.95);
-}
-.leaflet-tooltip.plot-label::before {
-  display: none;
-}
