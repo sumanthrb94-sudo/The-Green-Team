@@ -74,7 +74,15 @@ async function render(scene: AerialScene, format: Format): Promise<{ canvas: HTM
   const body = `${css.getPropertyValue('--font-inter').trim() || 'Inter'}, system-ui, sans-serif`;
 
   // Frame: the site plus every place, with room for labels, header and footer.
-  const pts = [scene.site, ...scene.places.map(p => p.at)];
+  // keep the inner ring whole: add its north/south/east/west points to the frame
+  const r0 = Math.min(...scene.ringsKm) * 1.08;
+  const dLat = r0 / 110.95;
+  const dLng = r0 / (111.32 * Math.cos((scene.site[0] * Math.PI) / 180));
+  const ringPts: LatLng[] = [
+    [scene.site[0] + dLat, scene.site[1]], [scene.site[0] - dLat, scene.site[1]],
+    [scene.site[0], scene.site[1] + dLng], [scene.site[0], scene.site[1] - dLng],
+  ];
+  const pts = [scene.site, ...scene.places.map(p => p.at), ...ringPts];
   const ref = pts.map(p => project(p, 0));
   const minX = Math.min(...ref.map(p => p.x)), maxX = Math.max(...ref.map(p => p.x));
   const minY = Math.min(...ref.map(p => p.y)), maxY = Math.max(...ref.map(p => p.y));
@@ -210,7 +218,20 @@ async function render(scene: AerialScene, format: Format): Promise<{ canvas: HTM
       );
     }
     const inside = (b: Rect) => b.x > 8 && b.y > H * 0.16 && b.x + b.w < W - 8 && b.y + b.h < H - 70 * u;
-    const box = candidates.find(b => inside(b) && !taken.some(t => overlaps(t, b))) ?? candidates[0];
+    // a leader line must not run through someone else's label
+    const leaderClear = (b: Rect) => {
+      const ex = Math.max(b.x, Math.min(p.pt.x, b.x + b.w));
+      const ey = Math.max(b.y, Math.min(p.pt.y, b.y + b.h));
+      for (let t = 0.05; t < 1; t += 0.05) {
+        const q = { x: p.pt.x + (ex - p.pt.x) * t, y: p.pt.y + (ey - p.pt.y) * t, w: 1, h: 1 };
+        if (taken.some(r => overlaps(r, q))) return false;
+      }
+      return true;
+    };
+    const box =
+      candidates.find(b => inside(b) && !taken.some(t => overlaps(t, b)) && leaderClear(b)) ??
+      candidates.find(b => inside(b) && !taken.some(t => overlaps(t, b))) ??
+      candidates[0];
     taken.push(box);
 
     // leader line when the label sits away from its dot

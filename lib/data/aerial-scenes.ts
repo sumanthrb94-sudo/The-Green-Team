@@ -10,6 +10,9 @@
 import type { LatLng } from '@/lib/data/map';
 import { AGARTHA_SITE } from '@/lib/data/site-layouts';
 
+/** SYL site pin, as confirmed by the team (Oct 2026). */
+export const SYL_SITE: LatLng = [17.1326227, 78.4783771];
+
 export interface AerialPlace {
   name: string;
   /** Short kind label shown under the name: "Farm stay", "Town", "Temple"… */
@@ -46,6 +49,20 @@ export const AERIAL_SCENES: Record<string, AerialScene> = {
       { name: 'Narsapur Lake & Urban Forest Park', kind: 'Lake · forest park', at: [17.7264, 78.28605] },
       { name: 'Geetha Farmz', kind: 'Farm stay', at: [17.782155, 78.294998] },
       { name: 'Forest Creek', kind: 'Resort · SH 17', at: [17.75093, 78.33356] },
+    ],
+  },
+  syl: {
+    id: 'syl',
+    title: 'MODCON SYL',
+    subtitle: 'Near Maheshwaram · South Hyderabad',
+    site: SYL_SITE,
+    ringsKm: [5, 10],
+    places: [
+      { name: 'Shivaganga Temple', kind: 'Temple · Maheshwaram town', at: [17.136528, 78.437839] },
+      { name: 'Tukkuguda · ORR Exit 14', kind: 'ORR interchange', at: [17.20917, 78.47639] },
+      { name: 'Fab City & E-City', kind: 'Electronics cluster · Raviryal', at: [17.21611, 78.51306] },
+      { name: 'Wonderla', kind: 'Amusement park · ORR Exit 13', at: [17.217289, 78.528505] },
+      { name: 'RGI Airport', kind: 'International airport', at: [17.240283, 78.429358] },
     ],
   },
 };
