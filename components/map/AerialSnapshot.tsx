@@ -16,8 +16,22 @@ import { distanceKm, type AerialScene } from '@/lib/data/aerial-scenes';
 import { SITE_LAYOUTS, geoPlots, PLOT_STATUS_COLOR } from '@/lib/data/site-layouts';
 
 const TILE = 256;
-const TILE_URL = (z: number, x: number, y: number) =>
-  `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${z}/${y}/${x}`;
+// Both Esri basemaps are keyless and CORS-enabled, so the canvas stays exportable.
+const BASEMAPS = {
+  satellite: {
+    label: 'Satellite',
+    service: 'World_Imagery',
+    credit: 'Imagery © Esri, Maxar, Earthstar Geographics',
+  },
+  map: {
+    label: 'Map',
+    service: 'World_Street_Map',
+    credit: 'Map © Esri, HERE, Garmin, OpenStreetMap contributors',
+  },
+} as const;
+type Basemap = keyof typeof BASEMAPS;
+const tileUrl = (b: Basemap, z: number, x: number, y: number) =>
+  `https://server.arcgisonline.com/ArcGIS/rest/services/${BASEMAPS[b].service}/MapServer/tile/${z}/${y}/${x}`;
 
 const FORMATS = {
   landscape: { label: 'Landscape 16:10', w: 1600, h: 1000 },
@@ -28,6 +42,7 @@ type Format = keyof typeof FORMATS;
 
 const GOLD = '#c8a951';
 const INK = '#0a1208';
+const TEAL = '#2dd4bf';
 
 /** Web Mercator world pixel at zoom z. */
 function project([lat, lng]: LatLng, z: number) {
@@ -63,7 +78,7 @@ type Rect = { x: number; y: number; w: number; h: number };
 const overlaps = (a: Rect, b: Rect) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
 
 /** Draws the whole snapshot into a fresh off-screen canvas. */
-async function render(scene: AerialScene, format: Format): Promise<{ canvas: HTMLCanvasElement; missing: number }> {
+async function render(scene: AerialScene, format: Format, basemap: Basemap): Promise<{ canvas: HTMLCanvasElement; missing: number }> {
   const { w: W, h: H } = FORMATS[format];
   const canvas = document.createElement('canvas');
   canvas.width = W;
@@ -104,7 +119,11 @@ async function render(scene: AerialScene, format: Format): Promise<{ canvas: HTM
   };
 
   // Imagery
-  ctx.fillStyle = '#1b2414';
+  const light = basemap === 'map';
+  // text and strokes that sit straight on the basemap
+  const onMap = light ? INK : '#fff';
+  const onMapSoft = light ? 'rgba(10,18,8,0.7)' : 'rgba(255,255,255,0.8)';
+  ctx.fillStyle = light ? '#f2efe9' : '#1b2414';
   ctx.fillRect(0, 0, W, H);
   const x0 = Math.floor((mid.x - (W / 2) / k) / TILE), x1 = Math.floor((mid.x + (W / 2) / k) / TILE);
   const y0 = Math.floor((mid.y - cy / k) / TILE), y1 = Math.floor((mid.y + (H - cy) / k) / TILE);
@@ -113,7 +132,7 @@ async function render(scene: AerialScene, format: Format): Promise<{ canvas: HTM
   for (let tx = x0; tx <= x1; tx++) {
     for (let ty = y0; ty <= y1; ty++) {
       jobs.push(
-        loadImage(TILE_URL(tz, tx, ty)).then(img => {
+        loadImage(tileUrl(basemap, tz, tx, ty)).then(img => {
           if (!img) { missing++; return; }
           const dx = W / 2 + (tx * TILE - mid.x) * k;
           const dy = cy + (ty * TILE - mid.y) * k;
@@ -125,12 +144,13 @@ async function render(scene: AerialScene, format: Format): Promise<{ canvas: HTM
   }
   await Promise.all(jobs);
 
-  // Soft grade so pins and labels read
+  // Soft grade so pins and labels read; the header and footer sit on its ends
+  const shade = light ? '255,255,255' : '6,12,4';
   const g = ctx.createLinearGradient(0, 0, 0, H);
-  g.addColorStop(0, 'rgba(6,12,4,0.55)');
-  g.addColorStop(0.25, 'rgba(6,12,4,0.08)');
-  g.addColorStop(0.8, 'rgba(6,12,4,0.08)');
-  g.addColorStop(1, 'rgba(6,12,4,0.6)');
+  g.addColorStop(0, `rgba(${shade},${light ? 0.92 : 0.55})`);
+  g.addColorStop(0.25, `rgba(${shade},0.08)`);
+  g.addColorStop(0.8, `rgba(${shade},0.08)`);
+  g.addColorStop(1, `rgba(${shade},${light ? 0.92 : 0.6})`);
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, W, H);
 
@@ -146,13 +166,13 @@ async function render(scene: AerialScene, format: Format): Promise<{ canvas: HTM
   ctx.setLineDash([10 * u, 8 * u]);
   for (const km of scene.ringsKm) {
     const r = km * pxPerKm;
-    ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+    ctx.strokeStyle = light ? 'rgba(10,18,8,0.5)' : 'rgba(255,255,255,0.55)';
     ctx.lineWidth = 2 * u;
     ctx.beginPath();
     ctx.arc(site.x, site.y, r, 0, Math.PI * 2);
     ctx.stroke();
     ctx.font = `700 ${15 * u}px ${body}`;
-    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.fillStyle = onMapSoft;
     ctx.textAlign = 'center';
     // below the ring: above it is where the site's name card sits
     ctx.fillText(`${km} km`, site.x, site.y + r + 20 * u);
@@ -190,9 +210,11 @@ async function render(scene: AerialScene, format: Format): Promise<{ canvas: HTM
 
   for (const p of places) {
     const r = 7 * u;
+    const residential = p.group === 'residential';
     ctx.beginPath();
-    ctx.arc(p.pt.x, p.pt.y, r, 0, Math.PI * 2);
-    ctx.fillStyle = '#fff';
+    if (residential) ctx.arc(p.pt.x, p.pt.y, r * 1.15, 0, Math.PI * 2);
+    else ctx.rect(p.pt.x - r, p.pt.y - r, 2 * r, 2 * r);
+    ctx.fillStyle = residential ? TEAL : '#fff';
     ctx.fill();
     ctx.lineWidth = 3 * u;
     ctx.strokeStyle = INK;
@@ -241,7 +263,7 @@ async function render(scene: AerialScene, format: Format): Promise<{ canvas: HTM
       ctx.beginPath();
       ctx.moveTo(p.pt.x, p.pt.y);
       ctx.lineTo(nx, ny);
-      ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+      ctx.strokeStyle = light ? 'rgba(10,18,8,0.75)' : 'rgba(255,255,255,0.85)';
       ctx.lineWidth = 2 * u;
       ctx.stroke();
     }
@@ -249,6 +271,11 @@ async function render(scene: AerialScene, format: Format): Promise<{ canvas: HTM
     roundRect(ctx, box.x, box.y, box.w, box.h, 10 * u);
     ctx.fillStyle = 'rgba(10,18,8,0.86)';
     ctx.fill();
+    if (residential) {
+      ctx.strokeStyle = TEAL;
+      ctx.lineWidth = 1.5 * u;
+      ctx.stroke();
+    }
     ctx.textAlign = 'left';
     ctx.fillStyle = '#fff';
     ctx.font = `700 ${17 * u}px ${display}`;
@@ -294,29 +321,50 @@ async function render(scene: AerialScene, format: Format): Promise<{ canvas: HTM
   ctx.font = `800 ${24 * u}px ${display}`;
   ctx.fillText(scene.title, site.x, siteCard.y + 30 * u);
   ctx.font = `600 ${13 * u}px ${body}`;
-  ctx.fillText('YOUR SANCTUARY', site.x, siteCard.y + 50 * u);
+  ctx.fillText(scene.siteTag ?? 'YOUR SANCTUARY', site.x, siteCard.y + 50 * u);
 
   // Header
   ctx.textAlign = 'left';
-  ctx.fillStyle = '#fff';
+  ctx.fillStyle = onMap;
   ctx.font = `800 ${40 * u}px ${display}`;
   ctx.fillText(`What's around ${scene.title.replace('MODCON ', '')}`, 40 * u, 66 * u);
-  ctx.fillStyle = 'rgba(255,255,255,0.8)';
+  ctx.fillStyle = onMapSoft;
   ctx.font = `500 ${18 * u}px ${body}`;
   ctx.fillText(scene.subtitle, 40 * u, 98 * u);
 
+  // Legend, only when the scene mixes residential projects with landmarks
+  const nRes = scene.places.filter(p => p.group === 'residential').length;
+  if (nRes) {
+    let lx = 40 * u;
+    const ly = 126 * u;
+    ctx.font = `600 ${14 * u}px ${body}`;
+    for (const [res, text] of [[true, `Residential projects (${nRes})`], [false, 'Landmarks']] as const) {
+      ctx.beginPath();
+      if (res) ctx.arc(lx + 7 * u, ly - 5 * u, 7 * u, 0, Math.PI * 2);
+      else ctx.rect(lx + 1 * u, ly - 11 * u, 12 * u, 12 * u);
+      ctx.fillStyle = res ? TEAL : '#fff';
+      ctx.fill();
+      ctx.lineWidth = 2 * u;
+      ctx.strokeStyle = INK;
+      ctx.stroke();
+      ctx.fillStyle = onMap;
+      ctx.fillText(text, lx + 22 * u, ly);
+      lx += 22 * u + ctx.measureText(text).width + 28 * u;
+    }
+  }
+
   // Footer: brand, scale bar, north, attribution
-  ctx.fillStyle = '#fff';
+  ctx.fillStyle = onMap;
   ctx.font = `800 ${18 * u}px ${display}`;
   ctx.fillText('THE GREEN TEAM', 40 * u, H - 38 * u);
-  ctx.fillStyle = 'rgba(255,255,255,0.6)';
+  ctx.fillStyle = onMapSoft;
   ctx.font = `500 ${11 * u}px ${body}`;
-  ctx.fillText('Imagery © Esri, Maxar, Earthstar Geographics · straight-line distances', 40 * u, H - 18 * u);
+  ctx.fillText(`${BASEMAPS[basemap].credit} · straight-line distances`, 40 * u, H - 18 * u);
 
   const barKm = pxPerKm > 120 * u ? 1 : 2;
   const barPx = barKm * pxPerKm;
   const bx = W - 40 * u - barPx, by = H - 34 * u;
-  ctx.fillStyle = '#fff';
+  ctx.fillStyle = onMap;
   ctx.fillRect(bx, by, barPx, 4 * u);
   ctx.fillRect(bx, by - 6 * u, 2 * u, 10 * u);
   ctx.fillRect(bx + barPx - 2 * u, by - 6 * u, 2 * u, 10 * u);
@@ -331,7 +379,7 @@ async function render(scene: AerialScene, format: Format): Promise<{ canvas: HTM
   ctx.lineTo(nx, ny + 2 * u);
   ctx.lineTo(nx - 10 * u, ny + 8 * u);
   ctx.closePath();
-  ctx.fillStyle = '#fff';
+  ctx.fillStyle = onMap;
   ctx.fill();
   ctx.textAlign = 'center';
   ctx.font = `800 ${14 * u}px ${display}`;
@@ -343,6 +391,7 @@ async function render(scene: AerialScene, format: Format): Promise<{ canvas: HTM
 export function AerialSnapshot({ scene }: { scene: AerialScene }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [format, setFormat] = useState<Format>('landscape');
+  const [basemap, setBasemap] = useState<Basemap>('satellite');
   const [state, setState] = useState<'drawing' | 'ready' | 'no-imagery'>('drawing');
   const [saveError, setSaveError] = useState('');
 
@@ -351,7 +400,7 @@ export function AerialSnapshot({ scene }: { scene: AerialScene }) {
     setState('drawing');
     setSaveError('');
     document.fonts.ready
-      .then(() => render(scene, format))
+      .then(() => render(scene, format, basemap))
       .then(({ canvas, missing }) => {
         // only the latest render reaches the screen
         const shown = canvasRef.current;
@@ -364,7 +413,7 @@ export function AerialSnapshot({ scene }: { scene: AerialScene }) {
     return () => {
       cancelled = true;
     };
-  }, [scene, format]);
+  }, [scene, format, basemap]);
 
   const download = useCallback(() => {
     setSaveError('');
@@ -373,18 +422,30 @@ export function AerialSnapshot({ scene }: { scene: AerialScene }) {
         if (!blob) return setSaveError('Could not create the image. Reload the page and try again.');
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = `${scene.id}-aerial-${format}.png`;
+        a.download = `${scene.id}-${basemap}-${format}.png`;
         a.click();
         setTimeout(() => URL.revokeObjectURL(a.href), 5000);
       }, 'image/png');
     } catch {
       setSaveError('The satellite imagery blocked saving. Take a screenshot of the image instead.');
     }
-  }, [scene.id, format]);
+  }, [scene.id, format, basemap]);
 
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
+        {(Object.keys(BASEMAPS) as Basemap[]).map(b => (
+          <button
+            key={b}
+            onClick={() => setBasemap(b)}
+            className={`px-4 py-2 rounded-full text-xs font-bold border transition-colors ${
+              basemap === b ? 'bg-[#c8a951] text-[#0a1208] border-[#c8a951]' : 'border-outline/30 text-on-surface/70'
+            }`}
+          >
+            {BASEMAPS[b].label}
+          </button>
+        ))}
+        <span className="w-px h-6 bg-outline/20 mx-1" />
         {(Object.keys(FORMATS) as Format[]).map(f => (
           <button
             key={f}
@@ -402,11 +463,11 @@ export function AerialSnapshot({ scene }: { scene: AerialScene }) {
           className="ml-auto inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#c8a951] text-[#0a1208] text-xs font-extrabold disabled:opacity-50"
         >
           <Download className="w-4 h-4" />
-          {state === 'drawing' ? 'Loading imagery…' : 'Download PNG'}
+          {state === 'drawing' ? 'Loading map…' : 'Download PNG'}
         </button>
       </div>
       {state === 'no-imagery' && (
-        <p className="text-sm text-tertiary">Some satellite tiles did not load. Check your connection and reload.</p>
+        <p className="text-sm text-tertiary">Some map tiles did not load. Check your connection and reload.</p>
       )}
       {saveError && <p className="text-sm text-tertiary">{saveError}</p>}
       <canvas
