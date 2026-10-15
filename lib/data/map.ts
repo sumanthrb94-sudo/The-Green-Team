@@ -595,13 +595,13 @@ export const MAP_LOCATIONS: MapLocation[] = [
     type: 'sanctuary',
     title: "SYL",
     location: "Tukkuguda (Future City)",
-    coords: [17.24, 78.48] as [number, number],
+    // site pin confirmed by the team, Oct 2026
+    coords: [17.1326227, 78.4783771] as [number, number],
     aqi: 22,
     noise: 24,
     forestRadius: 3000,
     boundary: [
-      [17.26, 78.46], [17.27, 78.49], [17.25, 78.51], 
-      [17.22, 78.50], [17.21, 78.47], [17.23, 78.45]
+      [17.1526, 78.4584], [17.1626, 78.4884], [17.1426, 78.5084], [17.1126, 78.4984], [17.1026, 78.4684], [17.1226, 78.4484]
     ] as [number, number][],
     image: "/gallery/syl/1776279315359.webp",
     description: "Vertical villaments strategically positioned near the protected green belts of the Future City."
