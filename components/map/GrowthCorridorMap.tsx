@@ -31,18 +31,18 @@ const TILE = 256;
 const BASEMAPS = {
   satellite: {
     label: 'Satellite',
-    services: ['World_Imagery', 'Reference/World_Transportation'],
+    services: ['imagery', 'roads'],
     credit: 'Imagery © Esri, Maxar, Earthstar Geographics · Roads © Esri, HERE, Garmin',
   },
   map: {
     label: 'Road map',
-    services: ['World_Street_Map'],
+    services: ['street'],
     credit: 'Map © Esri, HERE, Garmin, OpenStreetMap contributors',
   },
 } as const;
 type Basemap = keyof typeof BASEMAPS;
-const tileUrl = (service: string, z: number, x: number, y: number) =>
-  `https://server.arcgisonline.com/ArcGIS/rest/services/${service}/MapServer/tile/${z}/${y}/${x}`;
+// Tiles come through our own /api/tiles proxy (same origin, CDN-cached), not from Esri directly.
+const tileUrl = (layer: string, z: number, x: number, y: number) => `/api/tiles/${layer}/${z}/${x}/${y}`;
 
 const GOLD = '#c8a951';
 const INK = '#0a1208';
@@ -63,14 +63,25 @@ function project([lat, lng]: LatLng, z: number): Pt {
   return { x: ((lng + 180) / 360) * s, y: (0.5 - Math.log((1 + sin) / (1 - sin)) / (4 * Math.PI)) * s };
 }
 
+/** Loads one tile; gives up after 20 s so a stuck request can't stall the slide. */
 function loadImage(src: string): Promise<HTMLImageElement | null> {
   return new Promise(resolve => {
     const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = () => resolve(img);
-    img.onerror = () => resolve(null);
+    const timer = setTimeout(() => { img.src = ''; resolve(null); }, 20000);
+    img.onload = () => { clearTimeout(timer); resolve(img); };
+    img.onerror = () => { clearTimeout(timer); resolve(null); };
     img.src = src;
   });
+}
+
+/** Runs tasks a few at a time instead of firing hundreds of requests at once. */
+async function pool<T>(items: T[], size: number, run: (item: T) => Promise<void>) {
+  let next = 0;
+  await Promise.all(
+    Array.from({ length: Math.min(size, items.length) }, async () => {
+      while (next < items.length) await run(items[next++]);
+    }),
+  );
 }
 
 function roundRect(ctx: CanvasRenderingContext2D, r: Rect, radius: number) {
@@ -97,7 +108,10 @@ const fmtKm = (km: number) => (km < 10 ? km.toFixed(1) : Math.round(km).toString
 /** The distance shown for a place: the team's quoted figure where given, else straight-line km. */
 const distText = (p: GrowthPlace & { km: number }) => p.distLabel ?? `${fmtKm(p.km)} km`;
 
-async function render(basemap: Basemap): Promise<{ canvas: HTMLCanvasElement; missing: number }> {
+async function render(
+  basemap: Basemap,
+  onProgress: (done: number, total: number) => void = () => {},
+): Promise<{ canvas: HTMLCanvasElement; missing: number }> {
   const canvas = document.createElement('canvas');
   canvas.width = W * SCALE;
   canvas.height = H * SCALE;
@@ -135,21 +149,24 @@ async function render(basemap: Basemap): Promise<{ canvas: HTMLCanvasElement; mi
   const x0 = Math.floor((mid.x - cx / k) / TILE), x1 = Math.floor((mid.x + (W - cx) / k) / TILE);
   const y0 = Math.floor((mid.y - cy / k) / TILE), y1 = Math.floor((mid.y + (H - cy) / k) / TILE);
   let missing = 0;
-  for (const service of BASEMAPS[basemap].services) {
-    const jobs: Promise<void>[] = [];
-    for (let tx = x0; tx <= x1; tx++) {
-      for (let ty = y0; ty <= y1; ty++) {
-        jobs.push(
-          loadImage(tileUrl(service, tz, tx, ty)).then(img => {
-            if (!img) { missing++; return; }
-            // +0.6 px overlap hides seams between tiles
-            ctx.drawImage(img, cx + (tx * TILE - mid.x) * k, cy + (ty * TILE - mid.y) * k, TILE * k + 0.6, TILE * k + 0.6);
-          }),
-        );
-      }
-    }
-    // layers stack in order: imagery first, road overlay on top
-    await Promise.all(jobs);
+  const layers = BASEMAPS[basemap].services;
+  const cells: [number, number][] = [];
+  for (let tx = x0; tx <= x1; tx++) for (let ty = y0; ty <= y1; ty++) cells.push([tx, ty]);
+  const total = cells.length * layers.length;
+  let done = 0;
+  onProgress(0, total);
+  // layers stack in order: imagery first, road overlay on top
+  for (const layer of layers) {
+    await pool(cells, 12, async ([tx, ty]) => {
+      const url = tileUrl(layer, tz, tx, ty);
+      // one retry for a dropped request
+      const img = (await loadImage(url)) ?? (await loadImage(url));
+      if (img) {
+        // +0.6 px overlap hides seams between tiles
+        ctx.drawImage(img, cx + (tx * TILE - mid.x) * k, cy + (ty * TILE - mid.y) * k, TILE * k + 0.6, TILE * k + 0.6);
+      } else missing++;
+      onProgress(++done, total);
+    });
   }
 
   // Grade the imagery so labels read
@@ -615,15 +632,17 @@ async function render(basemap: Basemap): Promise<{ canvas: HTMLCanvasElement; mi
 export function GrowthCorridorMap() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [basemap, setBasemap] = useState<Basemap>('satellite');
-  const [state, setState] = useState<'drawing' | 'ready' | 'no-imagery'>('drawing');
+  const [state, setState] = useState<'drawing' | 'ready' | 'no-imagery' | 'failed'>('drawing');
+  const [progress, setProgress] = useState(0);
   const [saveError, setSaveError] = useState('');
 
   useEffect(() => {
     let cancelled = false;
     setState('drawing');
+    setProgress(0);
     setSaveError('');
     document.fonts.ready
-      .then(() => render(basemap))
+      .then(() => render(basemap, (done, total) => !cancelled && setProgress(Math.round((done / total) * 100))))
       .then(({ canvas, missing }) => {
         const shown = canvasRef.current;
         if (cancelled || !shown) return;
@@ -631,7 +650,8 @@ export function GrowthCorridorMap() {
         shown.height = canvas.height;
         shown.getContext('2d')!.drawImage(canvas, 0, 0);
         setState(missing > 0 ? 'no-imagery' : 'ready');
-      });
+      })
+      .catch(() => !cancelled && setState('failed'));
     return () => {
       cancelled = true;
     };
@@ -669,15 +689,18 @@ export function GrowthCorridorMap() {
         ))}
         <button
           onClick={download}
-          disabled={state === 'drawing'}
+          disabled={state === 'drawing' || state === 'failed'}
           className="ml-auto inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#c8a951] text-[#0a1208] text-xs font-extrabold disabled:opacity-50"
         >
           <Download className="w-4 h-4" />
-          {state === 'drawing' ? 'Loading map…' : 'Download PNG (4K · 3840×2160)'}
+          {state === 'drawing' ? `Loading map… ${progress}%` : 'Download PNG (4K · 3840×2160)'}
         </button>
       </div>
       {state === 'no-imagery' && (
         <p className="text-sm text-tertiary">Some map tiles did not load. Check your connection and reload.</p>
+      )}
+      {state === 'failed' && (
+        <p className="text-sm text-tertiary">The slide could not be drawn in this browser. Try Chrome on a laptop and reload.</p>
       )}
       {saveError && <p className="text-sm text-tertiary">{saveError}</p>}
       <canvas
