@@ -44,6 +44,9 @@ const tileUrl = (service: string, z: number, x: number, y: number) =>
 const GOLD = '#c8a951';
 const INK = '#0a1208';
 const TEAL = '#2dd4bf';
+// summary panel: deep teal ground with terracotta accents
+const PANEL_TEAL = '15,59,60';
+const TERRACOTTA = '#e07a52';
 const METRO = '#c4b5fd';
 
 type Pt = { x: number; y: number };
@@ -88,6 +91,8 @@ function wrap(ctx: CanvasRenderingContext2D, text: string, maxW: number): string
 }
 
 const fmtKm = (km: number) => (km < 10 ? km.toFixed(1) : Math.round(km).toString());
+/** The distance shown for a place: the team's quoted figure where given, else straight-line km. */
+const distText = (p: GrowthPlace & { km: number }) => p.distLabel ?? `${fmtKm(p.km)} km`;
 
 async function render(basemap: Basemap): Promise<{ canvas: HTMLCanvasElement; missing: number }> {
   const canvas = document.createElement('canvas');
@@ -159,7 +164,7 @@ async function render(basemap: Basemap): Promise<{ canvas: HTMLCanvasElement; mi
   ctx.font = `700 15px ${body}`;
   ctx.fillStyle = onMapSoft;
   ctx.textAlign = 'center';
-  for (const km of [5, 10, 15]) {
+  for (const km of [4, 8]) {
     const r = km * pxPerKm;
     ctx.beginPath();
     ctx.arc(site.x, site.y, r, 0, Math.PI * 2);
@@ -217,7 +222,7 @@ async function render(basemap: Basemap): Promise<{ canvas: HTMLCanvasElement; mi
   const inside = (r: Rect) => r.x > mapRect.x && r.y > mapRect.y && r.x + r.w < mapRect.x + mapRect.w && r.y + r.h < mapRect.y + mapRect.h - 40;
 
   // SYL's own card and pin take their space first
-  const siteCard: Rect = { x: site.x - 150, y: site.y - 132, w: 300, h: 64 };
+  const siteCard: Rect = { x: site.x - 210, y: site.y - 132, w: 420, h: 64 };
   taken.push(siteCard, { x: site.x - 26, y: site.y - 70, w: 52, h: 76 });
 
   const marker = (p: GrowthPlace & { pt: Pt }) => {
@@ -343,7 +348,7 @@ async function render(basemap: Basemap): Promise<{ canvas: HTMLCanvasElement; mi
 
   // Hubs and landmarks get their own cards, nearest first
   for (const p of inFrame.filter(p => p.kind !== 'residential').sort((a, b) => a.km - b.km)) {
-    const km = `${fmtKm(p.km)} km`;
+    const km = distText(p);
     const w = measure(p.name, `${p.note} · ${km}`);
     const box = placeLabel(p.pt, w, 56);
     card(box, p.name, p.note, km, p.kind === 'hub' ? GOLD : undefined);
@@ -391,9 +396,8 @@ async function render(basemap: Basemap): Promise<{ canvas: HTMLCanvasElement; mi
 
   // Residential projects: every one named, nearest first, in a compact two-line label
   const res = inFrame.filter(p => p.kind === 'residential').sort((a, b) => a.km - b.km);
-  const near = res.filter(p => p.km <= 10).length;
   for (const p of res) {
-    const km = `${fmtKm(p.km)} km`;
+    const km = distText(p);
     ctx.font = `700 16px ${display}`;
     const a = ctx.measureText(p.name).width;
     ctx.font = `700 12.5px ${body}`;
@@ -435,7 +439,7 @@ async function render(basemap: Basemap): Promise<{ canvas: HTMLCanvasElement; mi
         }
       }
     }
-    const label = `${p.name} · ${fmtKm(p.km)} km`;
+    const label = `${p.name} · ${distText(p)}`;
     ctx.font = `700 15px ${body}`;
     const w = ctx.measureText(label).width + 48;
     // chips sit to the left of the road so the dashed line stays visible
@@ -483,10 +487,10 @@ async function render(basemap: Basemap): Promise<{ canvas: HTMLCanvasElement; mi
   ctx.fill();
   ctx.fillStyle = INK;
   ctx.textAlign = 'center';
-  ctx.font = `800 27px ${display}`;
-  ctx.fillText('MODCON SYL', site.x, siteCard.y + 32);
+  ctx.font = `800 25px ${display}`;
+  ctx.fillText('MODCON SYL  ·  MODCON ONE', site.x, siteCard.y + 32);
   ctx.font = `700 13px ${body}`;
-  ctx.fillText('OUR PROJECT', site.x, siteCard.y + 53);
+  ctx.fillText('SYL RESIDENTIAL  ·  ONE COMMERCIAL', site.x, siteCard.y + 53);
 
   // ── North arrow and scale bar ──
   const nx = W - 64, ny = 70;
@@ -513,16 +517,16 @@ async function render(basemap: Basemap): Promise<{ canvas: HTMLCanvasElement; mi
 
   // ── Summary panel ──
   const g = ctx.createLinearGradient(0, 0, PANEL + 140, 0);
-  g.addColorStop(0, 'rgba(18,26,16,0.97)');
-  g.addColorStop(PANEL / (PANEL + 140), 'rgba(18,26,16,0.92)');
-  g.addColorStop(1, 'rgba(18,26,16,0)');
+  g.addColorStop(0, `rgba(${PANEL_TEAL},0.97)`);
+  g.addColorStop(PANEL / (PANEL + 140), `rgba(${PANEL_TEAL},0.93)`);
+  g.addColorStop(1, `rgba(${PANEL_TEAL},0)`);
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, PANEL + 140, H);
 
   const px = 70;
   let y = 96;
   ctx.textAlign = 'left';
-  ctx.fillStyle = GOLD;
+  ctx.fillStyle = TERRACOTTA;
   ctx.font = `800 17px ${display}`;
   ctx.fillText('SOUTH HYDERABAD  ·  GROWTH CORRIDOR', px, y);
   y += 70;
@@ -534,18 +538,18 @@ async function render(basemap: Basemap): Promise<{ canvas: HTMLCanvasElement; mi
   }
   ctx.font = `500 20px ${body}`;
   ctx.fillStyle = 'rgba(255,255,255,0.8)';
-  ctx.fillText('MODCON SYL · Near Maheshwaram, South Hyderabad', px, y + 4);
+  ctx.fillText('MODCON SYL & MODCON ONE · Near Maheshwaram', px, y + 4);
   y += 70;
 
-  const dist = (name: string) => distanceKm(SYL_SITE, GROWTH_PLACES.find(p => p.name === name)!.at);
+  // The team's own figures for the deck: drive times and the project count around SYL.
   const stats: [string, string][] = [
-    [`${fmtKm(dist('ORR Exit 14'))} km`, 'to ORR Exit 14, straight up Srisailam Highway'],
-    [`${fmtKm(dist('RGI Airport'))} km`, 'to RGI Airport'],
-    [`${fmtKm(dist('Bharat Future City'))} km`, 'to Bharat Future City and the Skills University'],
-    [`${near}`, 'established residential projects within 10 km'],
+    ['6 km', 'to ORR Exit 14 on Srisailam Highway · 10 min'],
+    ['15 min', 'to RGI Airport'],
+    ['15 min', 'to Bharat Future City and the Skills University'],
+    ['70+', 'projects within 8 km, including upcoming launches'],
   ];
   for (const [big, small] of stats) {
-    ctx.fillStyle = GOLD;
+    ctx.fillStyle = TERRACOTTA;
     ctx.font = `800 44px ${display}`;
     ctx.fillText(big, px, y);
     ctx.fillStyle = 'rgba(255,255,255,0.85)';
@@ -592,7 +596,7 @@ async function render(basemap: Basemap): Promise<{ canvas: HTMLCanvasElement; mi
   let fy = H - 112;
   for (const line of wrap(
     ctx,
-    'Distances are straight-line from SYL. Planned road and metro are drawn between published waypoints and are indicative, not surveyed. Hub positions marked by village centre where no site pin is published.',
+    'Map distances are straight-line from SYL; drive times and the ORR figure are the developer\'s. Planned road and metro are drawn between published waypoints and are indicative, not surveyed.',
     PANEL - px - 20,
   )) {
     ctx.fillText(line, px, fy);

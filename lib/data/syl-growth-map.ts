@@ -22,6 +22,8 @@ export interface GrowthPlace {
   kind: GrowthPlaceKind;
   /** 'pin' = a map listing for the place itself; 'village' = the village or town centre. */
   precision: 'pin' | 'village';
+  /** Shown instead of the straight-line km, e.g. a drive time the team quotes. */
+  distLabel?: string;
   /** false = too far to fit; drawn as an arrow at the edge of the slide instead. */
   inFrame?: boolean;
 }
@@ -44,18 +46,23 @@ export const GROWTH_PLACES: GrowthPlace[] = [
   { name: 'Sark South Fields', note: 'Villas', at: [17.188901, 78.458944], kind: 'residential', precision: 'pin' },
   { name: 'HPR Gateway', note: 'Residential', at: [17.218343, 78.491456], kind: 'residential', precision: 'pin' },
   { name: 'Northstar Airport Boulevard', note: 'Villas', at: [17.223922, 78.477183], kind: 'residential', precision: 'pin' },
+  // Wikimapia 18523296: 17°8'17"N 78°28'27"E, 26th milestone, Thummaloor, across Srisailam Highway from SYL.
+  { name: 'MAK BTR · Banyan Tree Retreat', note: 'Golf villa township', at: [17.138056, 78.474167], kind: 'residential', precision: 'pin', distLabel: 'opposite SYL' },
+  // Exa place index; Bridge Epsilon matches the PlugShare EV charger inside the community (17.1849, 78.4776).
+  { name: 'Bridge Epsilon', note: '128 villas', at: [17.1853, 78.47729], kind: 'residential', precision: 'pin' },
+  { name: 'Vertex Florenza', note: '105 villas', at: [17.22262, 78.465689], kind: 'residential', precision: 'pin' },
   { name: 'MAN Airport Residency', note: 'Residential', at: [17.225413, 78.474828], kind: 'residential', precision: 'pin' },
 
   // Economic growth hubs.
-  { name: 'RGI Airport', note: 'International airport', at: [17.240283, 78.429358], kind: 'hub', precision: 'pin' },
+  { name: 'RGI Airport', note: 'International airport', at: [17.240283, 78.429358], kind: 'hub', precision: 'pin', distLabel: '15 min' },
   { name: 'Fab City & E-City', note: 'Electronics manufacturing', at: [17.21611, 78.51306], kind: 'hub', precision: 'pin' },
   // Wikipedia, Adibatla: 17°14′N 78°33′E. The aerospace SEZ (Tata TASL, Lockheed Martin JV) is in the village.
   { name: 'Adibatla Aerospace SEZ', note: 'Tata Advanced Systems', at: [17.233, 78.55], kind: 'hub', precision: 'village' },
   // Wikipedia, Meerkhanpet: 17°03′N 78°35′E (GNS). Net Zero Valley, the university and the metro terminus.
-  { name: 'Bharat Future City', note: 'Young India Skills University · Meerkhanpet', at: [17.05, 78.583], kind: 'hub', precision: 'village', inFrame: false },
+  { name: 'Bharat Future City', note: 'Young India Skills University · Meerkhanpet', at: [17.05, 78.583], kind: 'hub', precision: 'village', inFrame: false, distLabel: '15 min' },
 
   // Landmarks.
-  { name: 'ORR Exit 14', note: 'Tukkuguda', at: [17.20917, 78.47639], kind: 'landmark', precision: 'pin' },
+  { name: 'ORR Exit 14', note: 'Tukkuguda', at: [17.20917, 78.47639], kind: 'landmark', precision: 'pin', distLabel: '6 km · 10 min' },
   { name: 'ORR Exit 13', note: 'Raviryal · Wonderla', at: [17.217289, 78.528505], kind: 'landmark', precision: 'pin' },
   { name: 'Maheshwaram', note: 'Shivaganga Temple', at: [17.136528, 78.437839], kind: 'landmark', precision: 'pin' },
   // Wikipedia, Amangal: 16°51′N 78°32′E. The radial road meets the RRR here.
