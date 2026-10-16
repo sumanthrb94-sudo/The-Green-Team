@@ -18,7 +18,7 @@ export default function SylGrowthPage() {
         <p className="text-sm text-on-surface/70 max-w-2xl">
           Satellite view of SYL with the established residential projects around it, the growth hubs, ORR and Srisailam
           Highway, and the planned radial road and metro to Bharat Future City. Switch to the road map if you prefer,
-          then download the 1920×1080 PNG for the deck.
+          then download the 4K (3840×2160) PNG for the deck.
         </p>
       </header>
       <GrowthCorridorMap />

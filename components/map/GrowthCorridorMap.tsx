@@ -22,6 +22,9 @@ import {
 
 const W = 1920;
 const H = 1080;
+// Output is 4K (3840×2160): the slide is laid out at 1920×1080 and drawn at 2×,
+// with imagery fetched one zoom level deeper so the map is sharp, not upscaled.
+const SCALE = 2;
 const PANEL = 620; // width of the summary panel on the left
 const TILE = 256;
 
@@ -96,9 +99,11 @@ const distText = (p: GrowthPlace & { km: number }) => p.distLabel ?? `${fmtKm(p.
 
 async function render(basemap: Basemap): Promise<{ canvas: HTMLCanvasElement; missing: number }> {
   const canvas = document.createElement('canvas');
-  canvas.width = W;
-  canvas.height = H;
+  canvas.width = W * SCALE;
+  canvas.height = H * SCALE;
   const ctx = canvas.getContext('2d')!;
+  ctx.scale(SCALE, SCALE);
+  ctx.imageSmoothingQuality = 'high';
   const css = getComputedStyle(document.documentElement);
   const display = `${css.getPropertyValue('--font-manrope').trim() || 'Manrope'}, system-ui, sans-serif`;
   const body = `${css.getPropertyValue('--font-inter').trim() || 'Inter'}, system-ui, sans-serif`;
@@ -114,7 +119,7 @@ async function render(basemap: Basemap): Promise<{ canvas: HTMLCanvasElement; mi
     Math.log2((area.y1 - area.y0) / (maxY - minY)),
     15,
   );
-  const tz = Math.min(17, Math.ceil(fitZ));
+  const tz = Math.min(18, Math.ceil(fitZ + Math.log2(SCALE)));
   const k = 2 ** (fitZ - tz); // tile pixel → canvas pixel
   const mid = { x: ((minX + maxX) / 2) * 2 ** tz, y: ((minY + maxY) / 2) * 2 ** tz };
   const cx = (area.x0 + area.x1) / 2, cy = (area.y0 + area.y1) / 2;
@@ -639,7 +644,7 @@ export function GrowthCorridorMap() {
         if (!blob) return setSaveError('Could not create the image. Reload the page and try again.');
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = `syl-growth-corridors-${basemap}.png`;
+        a.download = `syl-growth-corridors-${basemap}-4k.png`;
         a.click();
         setTimeout(() => URL.revokeObjectURL(a.href), 5000);
       }, 'image/png');
@@ -668,7 +673,7 @@ export function GrowthCorridorMap() {
           className="ml-auto inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#c8a951] text-[#0a1208] text-xs font-extrabold disabled:opacity-50"
         >
           <Download className="w-4 h-4" />
-          {state === 'drawing' ? 'Loading map…' : 'Download PNG (1920×1080)'}
+          {state === 'drawing' ? 'Loading map…' : 'Download PNG (4K · 3840×2160)'}
         </button>
       </div>
       {state === 'no-imagery' && (
@@ -677,8 +682,8 @@ export function GrowthCorridorMap() {
       {saveError && <p className="text-sm text-tertiary">{saveError}</p>}
       <canvas
         ref={canvasRef}
-        width={W}
-        height={H}
+        width={W * SCALE}
+        height={H * SCALE}
         className="w-full h-auto rounded-2xl border border-outline/20 bg-[#1b2414]"
         aria-label="Satellite map of MODCON SYL with nearby residential projects, growth hubs and planned corridors"
       />
