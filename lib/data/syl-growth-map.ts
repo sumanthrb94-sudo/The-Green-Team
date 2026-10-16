@@ -37,6 +37,14 @@ export const GROWTH_PLACES: GrowthPlace[] = [
   { name: 'Rukkha Residency', note: 'Residential', at: [17.210866, 78.478529], kind: 'residential', precision: 'pin' },
   { name: 'Akshita Golden Breeze I', note: 'Plotted layout', at: [17.146458, 78.436103], kind: 'residential', precision: 'pin' },
   { name: 'Akshita Golden Breeze II', note: 'Plotted layout', at: [17.105654, 78.42714], kind: 'residential', precision: 'pin' },
+  // Map listings via Exa's place index (Google Maps pins), Oct 2026.
+  { name: 'Vishal Sanjivini', note: '338 villas', at: [17.195862, 78.48996], kind: 'residential', precision: 'pin' },
+  { name: "Kavuri's Forest Nest", note: 'Villas', at: [17.18013, 78.486673], kind: 'residential', precision: 'pin' },
+  { name: 'Greenstone Kadamba Forest', note: 'Apartments', at: [17.177513, 78.493545], kind: 'residential', precision: 'pin' },
+  { name: 'Sark South Fields', note: 'Villas', at: [17.188901, 78.458944], kind: 'residential', precision: 'pin' },
+  { name: 'HPR Gateway', note: 'Residential', at: [17.218343, 78.491456], kind: 'residential', precision: 'pin' },
+  { name: 'Northstar Airport Boulevard', note: 'Villas', at: [17.223922, 78.477183], kind: 'residential', precision: 'pin' },
+  { name: 'MAN Airport Residency', note: 'Residential', at: [17.225413, 78.474828], kind: 'residential', precision: 'pin' },
 
   // Economic growth hubs.
   { name: 'RGI Airport', note: 'International airport', at: [17.240283, 78.429358], kind: 'hub', precision: 'pin' },
@@ -44,7 +52,7 @@ export const GROWTH_PLACES: GrowthPlace[] = [
   // Wikipedia, Adibatla: 17°14′N 78°33′E. The aerospace SEZ (Tata TASL, Lockheed Martin JV) is in the village.
   { name: 'Adibatla Aerospace SEZ', note: 'Tata Advanced Systems', at: [17.233, 78.55], kind: 'hub', precision: 'village' },
   // Wikipedia, Meerkhanpet: 17°03′N 78°35′E (GNS). Net Zero Valley, the university and the metro terminus.
-  { name: 'Bharat Future City', note: 'Young India Skills University · Meerkhanpet', at: [17.05, 78.583], kind: 'hub', precision: 'village' },
+  { name: 'Bharat Future City', note: 'Young India Skills University · Meerkhanpet', at: [17.05, 78.583], kind: 'hub', precision: 'village', inFrame: false },
 
   // Landmarks.
   { name: 'ORR Exit 14', note: 'Tukkuguda', at: [17.20917, 78.47639], kind: 'landmark', precision: 'pin' },

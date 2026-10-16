@@ -213,7 +213,7 @@ async function render(basemap: Basemap): Promise<{ canvas: HTMLCanvasElement; mi
 
   // ── Places ──
   const all = GROWTH_PLACES.map(p => ({ ...p, km: distanceKm(SYL_SITE, p.at), pt: toCanvas(p.at) }));
-  const mapRect: Rect = { x: PANEL + 20, y: 20, w: W - PANEL - 40, h: H - 40 };
+  const mapRect: Rect = { x: PANEL + 110, y: 20, w: W - PANEL - 130, h: H - 40 };
   const inside = (r: Rect) => r.x > mapRect.x && r.y > mapRect.y && r.x + r.w < mapRect.x + mapRect.w && r.y + r.h < mapRect.y + mapRect.h - 40;
 
   // SYL's own card and pin take their space first
@@ -242,6 +242,19 @@ async function render(basemap: Basemap): Promise<{ canvas: HTMLCanvasElement; mi
   const inFrame = all.filter(p => p.inFrame !== false);
   inFrame.forEach(marker);
 
+  const leaders: [Pt, Pt][] = [];
+  const crosses = (a: Pt, b: Pt, c: Pt, d: Pt) => {
+    const o = (p: Pt, q: Pt, r: Pt) => Math.sign((q.x - p.x) * (r.y - p.y) - (q.y - p.y) * (r.x - p.x));
+    return o(a, b, c) * o(a, b, d) < 0 && o(c, d, a) * o(c, d, b) < 0;
+  };
+  const segHitsRect = (a: Pt, b: Pt, r: Rect) => {
+    for (let t = 0; t <= 1; t += 0.05) {
+      const x = a.x + (b.x - a.x) * t, y = a.y + (b.y - a.y) * t;
+      if (x > r.x && x < r.x + r.w && y > r.y && y < r.y + r.h) return true;
+    }
+    return false;
+  };
+
   /** Places a two-line label near a point, avoiding everything already placed. */
   const placeLabel = (pt: Pt, w: number, h: number, spread = [16, 70, 140]): Rect => {
     const candidates: Rect[] = [];
@@ -257,8 +270,26 @@ async function render(basemap: Basemap): Promise<{ canvas: HTMLCanvasElement; mi
         { x: pt.x - d * 0.7 - w, y: pt.y - d * 0.7 - h, w, h },
       );
     }
+    const end = (b: Rect): Pt => ({
+      x: Math.max(b.x, Math.min(pt.x, b.x + b.w)),
+      y: Math.max(b.y, Math.min(pt.y, b.y + b.h)),
+    });
+    // a leader line must not run through another label, a marker or another leader
+    const leaderClear = (b: Rect) => {
+      const e = end(b);
+      for (let t = 0.08; t < 0.95; t += 0.04) {
+        const q = { x: pt.x + (e.x - pt.x) * t - 1, y: pt.y + (e.y - pt.y) * t - 1, w: 2, h: 2 };
+        if (taken.some(r => overlaps(r, q))) return false;
+      }
+      return !leaders.some(([a, c]) => crosses(a, c, pt, e));
+    };
+    // ...and a label must not sit on an existing leader
+    const offLeaders = (b: Rect) => !leaders.some(([a, c]) => segHitsRect(a, c, b));
+    const free = (b: Rect) => inside(b) && !taken.some(t => overlaps(t, b));
     const box =
-      candidates.find(b => inside(b) && !taken.some(t => overlaps(t, b))) ??
+      candidates.find(b => free(b) && offLeaders(b) && leaderClear(b)) ??
+      candidates.find(b => free(b) && leaderClear(b)) ??
+      candidates.find(b => free(b)) ??
       candidates.find(b => !taken.some(t => overlaps(t, b))) ??
       candidates[0];
     taken.push(box);
@@ -266,6 +297,7 @@ async function render(basemap: Basemap): Promise<{ canvas: HTMLCanvasElement; mi
     const nx = Math.max(box.x, Math.min(pt.x, box.x + box.w));
     const ny = Math.max(box.y, Math.min(pt.y, box.y + box.h));
     if (Math.hypot(nx - pt.x, ny - pt.y) > 22) {
+      leaders.push([pt, { x: nx, y: ny }]);
       ctx.beginPath();
       ctx.moveTo(pt.x, pt.y);
       ctx.lineTo(nx, ny);
@@ -317,17 +349,6 @@ async function render(basemap: Basemap): Promise<{ canvas: HTMLCanvasElement; mi
     card(box, p.name, p.note, km, p.kind === 'hub' ? GOLD : undefined);
   }
 
-  // Residential projects: one callout for the cluster, not nine labels
-  const res = inFrame.filter(p => p.kind === 'residential');
-  const near = res.filter(p => p.km <= 10).length;
-  const centroid = res.reduce((s, p) => ({ x: s.x + p.pt.x / res.length, y: s.y + p.pt.y / res.length }), { x: 0, y: 0 });
-  {
-    const title = `${res.length} established projects`;
-    const sub = `Villas, townships, plotted layouts · ${near} within 10 km`;
-    const box = placeLabel(centroid, measure(title, sub), 56, [150, 220, 300]);
-    card(box, title, sub, null, TEAL);
-  }
-
   // Road and corridor tags
   for (const t of ROAD_TAGS) {
     const pt = toCanvas(t.at);
@@ -368,25 +389,64 @@ async function render(basemap: Basemap): Promise<{ canvas: HTMLCanvasElement; mi
     ctx.fillText(c.detail, box.x + 55, box.y + 45);
   }
 
-  // Places beyond the frame: arrow at the bottom edge of the map
-  for (const p of all.filter(p => p.inFrame === false)) {
-    // where the corridor that ends here leaves the slide, else the bearing from SYL
-    const via = GROWTH_CORRIDORS.find(c => c.path.at(-1) === p.at);
-    const from = via ? toCanvas(via.path.at(-2)!) : site;
-    const t =(mapRect.y + mapRect.h - 70 - from.y) / (p.pt.y - from.y);
-    const ex = from.x + (p.pt.x - from.x) * t;
-    const ey = mapRect.y + mapRect.h - 70;
+  // Residential projects: every one named, nearest first, in a compact two-line label
+  const res = inFrame.filter(p => p.kind === 'residential').sort((a, b) => a.km - b.km);
+  const near = res.filter(p => p.km <= 10).length;
+  for (const p of res) {
+    const km = `${fmtKm(p.km)} km`;
+    ctx.font = `700 16px ${display}`;
+    const a = ctx.measureText(p.name).width;
+    ctx.font = `700 12.5px ${body}`;
+    const b = ctx.measureText(`${p.note} · ${km}`).width;
+    const box = placeLabel(p.pt, Math.max(a, b) + 22, 42, [12, 45, 90, 140, 200, 270]);
+    roundRect(ctx, box, 8);
+    ctx.fillStyle = 'rgba(10,18,8,0.88)';
+    ctx.fill();
+    ctx.strokeStyle = TEAL;
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#fff';
+    ctx.font = `700 16px ${display}`;
+    ctx.fillText(p.name, box.x + 11, box.y + 19);
+    ctx.font = `500 12.5px ${body}`;
+    ctx.fillStyle = 'rgba(255,255,255,0.72)';
+    const sub = `${p.note} · `;
+    ctx.fillText(sub, box.x + 11, box.y + 35);
+    const sw = ctx.measureText(sub).width;
+    ctx.font = `700 12.5px ${body}`;
+    ctx.fillStyle = GOLD;
+    ctx.fillText(km, box.x + 11 + sw, box.y + 35);
+  }
+
+  // Places beyond the frame: chips at the bottom edge, where the corridor leading there leaves the slide
+  const edgeY = mapRect.y + mapRect.h - 52;
+  let stack = 0;
+  for (const p of all.filter(p => p.inFrame === false).sort((a, b) => a.km - b.km)) {
+    let ex = toCanvas(p.at).x;
+    const via = GROWTH_CORRIDORS.find(c => c.style === 'expressway' && c.path.includes(p.at));
+    if (via) {
+      const pts = via.path.map(toCanvas);
+      for (let i = 1; i < pts.length; i++) {
+        const a = pts[i - 1], b = pts[i];
+        if ((a.y - edgeY) * (b.y - edgeY) <= 0 && a.y !== b.y) {
+          ex = a.x + ((edgeY - a.y) / (b.y - a.y)) * (b.x - a.x);
+          break;
+        }
+      }
+    }
     const label = `${p.name} · ${fmtKm(p.km)} km`;
     ctx.font = `700 15px ${body}`;
     const w = ctx.measureText(label).width + 48;
-    const box: Rect = { x: ex - w / 2, y: ey, w, h: 32 };
+    // chips sit to the left of the road so the dashed line stays visible
+    const box: Rect = { x: Math.min(ex - w - 16, W - 40 - w), y: edgeY - stack * 40, w, h: 32 };
+    stack++;
     roundRect(ctx, box, 16);
     ctx.fillStyle = 'rgba(255,255,255,0.94)';
     ctx.fill();
     ctx.fillStyle = INK;
     ctx.textAlign = 'left';
     ctx.fillText(label, box.x + 36, box.y + 21);
-    // down arrow
     ctx.beginPath();
     ctx.moveTo(box.x + 22, box.y + 24);
     ctx.lineTo(box.x + 15, box.y + 14);
@@ -464,7 +524,7 @@ async function render(basemap: Basemap): Promise<{ canvas: HTMLCanvasElement; mi
   ctx.textAlign = 'left';
   ctx.fillStyle = GOLD;
   ctx.font = `800 17px ${display}`;
-  ctx.fillText('THE GREEN TEAM  ·  INVESTOR BRIEF', px, y);
+  ctx.fillText('SOUTH HYDERABAD  ·  GROWTH CORRIDOR', px, y);
   y += 70;
   ctx.fillStyle = '#fff';
   ctx.font = `800 56px ${display}`;
