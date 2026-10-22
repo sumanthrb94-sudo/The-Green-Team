@@ -8,12 +8,16 @@ import './globals.css';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
 const manrope = Manrope({ subsets: ['latin'], variable: '--font-manrope', display: 'swap' });
+// The serif is an accent on a handful of headings, not the page font, so it is
+// not preloaded: preloading put two extra font files (about 75 KB) in front of
+// the hero image on every route, including the map, which never uses it.
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
   weight: ['300', '400', '600'],
   style: ['normal', 'italic'],
   variable: '--font-cormorant',
   display: 'swap',
+  preload: false,
 });
 
 export const metadata: Metadata = {

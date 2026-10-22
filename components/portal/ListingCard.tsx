@@ -19,7 +19,20 @@ import { estimateFromPrice, priceLabel } from '@/lib/data/listing';
 import { useShortlist } from '@/lib/shortlist';
 import { cn } from '@/lib/utils';
 
-export function ListingCard({ sanctuary: s }: { sanctuary: Sanctuary }) {
+/**
+ * `aboveFold` marks a card that is on screen when the page opens. Its photo then
+ * loads straight away instead of lazily, and the first card's photo is fetched
+ * first, since on a phone it is the largest thing the visitor sees.
+ */
+export function ListingCard({
+  sanctuary: s,
+  aboveFold,
+  first,
+}: {
+  sanctuary: Sanctuary;
+  aboveFold?: boolean;
+  first?: boolean;
+}) {
   const [saved, toggleSaved] = useShortlist(s.id);
   const from = estimateFromPrice(s);
   // A per-SFT headline already is the rate, so it isn't repeated.
@@ -39,6 +52,8 @@ export function ListingCard({ sanctuary: s }: { sanctuary: Sanctuary }) {
           alt={s.title}
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          loading={aboveFold ? 'eager' : 'lazy'}
+          fetchPriority={first ? 'high' : undefined}
           className="object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-[1.04]"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/5" />

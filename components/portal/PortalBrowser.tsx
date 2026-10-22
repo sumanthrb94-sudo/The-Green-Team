@@ -206,8 +206,9 @@ export function PortalBrowser({
       {/* ── Results grid ─────────────────────────────────────────────────── */}
       {results.length ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
-          {results.map(s => (
-            <ListingCard key={s.id} sanctuary={s} />
+          {results.map((s, i) => (
+            // The first row (up to three cards on desktop) is on screen at load.
+            <ListingCard key={s.id} sanctuary={s} aboveFold={i < 3} first={i === 0} />
           ))}
         </div>
       ) : (

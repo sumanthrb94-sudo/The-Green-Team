@@ -1,12 +1,8 @@
 import { Navbar } from '@/components/nav/Navbar';
 import { StickyCTA } from '@/components/nav/StickyCTA';
-import { AuthModal } from '@/components/auth/AuthModal';
-import { ProfileModal } from '@/components/auth/ProfileModal';
-import { Groot } from '@/components/chat/Groot';
 import { WhatsAppFab } from '@/components/contact/WhatsAppFab';
-import { WelcomeGate } from '@/components/home/WelcomeGate';
-import { ConsentBanner } from '@/components/legal/ConsentBanner';
 import { SplashScreen } from '@/components/brand/SplashScreen';
+import { DeferredOverlays } from '@/components/nav/DeferredOverlays';
 
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -16,12 +12,9 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
       <Navbar />
       <main className="pb-24 md:pb-0 has-[[data-fullscreen-map]]:pb-0 has-[[data-fullscreen-map]]:overflow-hidden">{children}</main>
       <StickyCTA />
-      <Groot />
       <WhatsAppFab />
-      <WelcomeGate />
-      <ConsentBanner />
-      <AuthModal />
-      <ProfileModal />
+      {/* Chat, welcome prompt, cookie banner and the auth modals load after first paint. */}
+      <DeferredOverlays />
     </>
   );
 }

@@ -2,10 +2,14 @@
  * Firebase client SDK — browser side. The config values are public client
  * identifiers (they ship in every browser bundle); env vars override them so
  * a different project can be pointed at without a code change.
+ *
+ * Auth only. The browser never reads Firestore directly (every read and write
+ * goes through an API route with the Admin SDK), so `firebase/firestore` is
+ * deliberately not imported here: initialising it at module scope put the whole
+ * Firestore SDK into the bundle every page loads.
  */
 import { initializeApp, getApps } from 'firebase/app';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY ?? 'AIzaSyAZxHDQFoThcPM-RHN5ZNAttn2vewHsciE',
@@ -20,7 +24,6 @@ const firebaseConfig = {
 const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
-export const db = getFirestore(app);
 
 export const googleProvider = (() => {
   const p = new GoogleAuthProvider();

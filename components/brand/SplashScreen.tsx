@@ -4,10 +4,12 @@
  * Launch splash — the brand mark assembling on the forest screen while the app
  * gets ready, then lifting into the landing page.
  *
- * Gating: it stays until the document has fully loaded AND the auth/backend
- * skeleton is ready (`authReady`), with a floor so the sequence completes and
- * a ceiling so it can never block if something hangs. Once per session: a hard
- * reload or a later visit in the same tab goes straight to the page.
+ * Gating: it stays until the document has fully loaded, with a floor so the
+ * sequence completes and a ceiling so it can never hold a slow connection
+ * hostage. It no longer waits for Firebase auth: nothing the visitor sees first
+ * depends on it, and on a cold mobile load that wait alone could push the splash
+ * to its old 5-second ceiling. Once per session: a hard reload or a later visit
+ * in the same tab goes straight to the page.
  *
  * The animation is CSS keyframes (see globals.css, `gt-*`) rather than JS, so
  * it starts from the server-rendered HTML before React hydrates — which is
@@ -15,16 +17,15 @@
  */
 import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { useAuth } from '@/components/auth/AuthProvider';
 
 const LEAF = 'M46 94 C39 72 27 58 34 40 C41 22 66 17 82 31 C95 43 90 64 72 74 C60 80 51 86 46 94 Z';
 const KEY = 'gt_splash_seen';
-const MIN_MS = 2400; // long enough for the sequence to land
-const MAX_MS = 5000; // never hold the door longer than this
+const MIN_MS = 1450; // long enough for the sequence (globals.css, gt-*) to land
+const MAX_MS = 2500; // never hold the door longer than this
+const FADE_MS = 450; // the lift into the page; matches duration-[450ms] below
 
 export function SplashScreen() {
   const pathname = usePathname();
-  const { authReady } = useAuth();
   // Rendered visible by default so the SSR HTML carries it; the mount effect
   // decides whether this session has already seen it.
   const [state, setState] = useState<'showing' | 'leaving' | 'gone'>(pathname.startsWith('/admin') ? 'gone' : 'showing');
@@ -39,7 +40,11 @@ export function SplashScreen() {
         return;
       }
     } catch {}
-    startedAt.current = performance.now();
+    // The CSS sequence started when the splash first painted, not when React
+    // hydrated, so count the floor from first paint. Otherwise slow hydration
+    // is added on top of an animation that has already finished.
+    const firstPaint = performance.getEntriesByName('first-contentful-paint')[0]?.startTime;
+    startedAt.current = firstPaint || performance.now();
     document.body.classList.add('modal-open');
     return () => document.body.classList.remove('modal-open');
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -57,12 +62,12 @@ export function SplashScreen() {
       setTimeout(() => {
         document.body.classList.remove('modal-open');
         setState('gone');
-      }, 700);
+      }, FADE_MS);
     };
     const check = () => {
       const elapsed = performance.now() - startedAt.current;
       const loaded = document.readyState === 'complete';
-      if ((loaded && authReady && elapsed >= MIN_MS) || elapsed >= MAX_MS) finish();
+      if ((loaded && elapsed >= MIN_MS) || elapsed >= MAX_MS) finish();
     };
     check();
     const iv = setInterval(check, 100);
@@ -71,7 +76,7 @@ export function SplashScreen() {
       clearInterval(iv);
       window.removeEventListener('load', check);
     };
-  }, [state, authReady]);
+  }, [state]);
 
   if (state === 'gone') return null;
 
@@ -80,7 +85,7 @@ export function SplashScreen() {
       role="status"
       aria-live="polite"
       aria-label="Loading The Green Team"
-      className={`gt-splash fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-[#0a1208] text-white transition-all duration-700 ease-out ${
+      className={`gt-splash fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-[#0a1208] text-white transition-all duration-[450ms] ease-out ${
         state === 'leaving' ? 'opacity-0 scale-[1.03] pointer-events-none' : 'opacity-100'
       }`}
     >
@@ -123,13 +128,13 @@ export function SplashScreen() {
 
       {/* wordmark + the two lines */}
       <div className="mt-8 text-center px-6">
-        <p className="gt-up font-headline font-extrabold tracking-[0.28em] text-[15px] md:text-base text-white" style={{ animationDelay: '1.3s' }}>
+        <p className="gt-up font-headline font-extrabold tracking-[0.28em] text-[15px] md:text-base text-white" style={{ animationDelay: '0.7s' }}>
           THE GREEN TEAM
         </p>
-        <p className="gt-up mt-5 text-sm md:text-base font-light text-white/70 leading-relaxed" style={{ animationDelay: '1.65s' }}>
+        <p className="gt-up mt-5 text-sm md:text-base font-light text-white/70 leading-relaxed" style={{ animationDelay: '0.85s' }}>
           Curated forest-adjacent homes near Hyderabad.
         </p>
-        <p className="gt-up mt-1 text-sm md:text-base font-light text-white/55 leading-relaxed" style={{ animationDelay: '1.9s' }}>
+        <p className="gt-up mt-1 text-sm md:text-base font-light text-white/55 leading-relaxed" style={{ animationDelay: '1s' }}>
           Verified for air, quiet and title.
         </p>
       </div>

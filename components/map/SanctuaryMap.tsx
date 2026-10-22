@@ -520,6 +520,9 @@ export default function SanctuaryMap() {
             attribution={BASEMAPS[selectedBasemap].attr}
             maxNativeZoom={BASEMAPS[selectedBasemap].maxZoom}
             maxZoom={18}
+            // Don't fetch tiles for every intermediate level of a pinch or
+            // scroll zoom, only for the level the zoom settles on.
+            updateWhenZooming={false}
           />
           {/* Borders & place names — the other two basemaps already carry their own */}
           {activeLayers.borders && selectedBasemap === 'satellite' && (
@@ -528,6 +531,7 @@ export default function SanctuaryMap() {
               attribution="Boundaries &copy; Esri"
               maxNativeZoom={19}
               maxZoom={18}
+              updateWhenZooming={false}
             />
           )}
 

@@ -1,6 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import { preconnect } from 'react-dom';
 
 const SanctuaryMap = dynamic(() => import('@/components/map/SanctuaryMap'), {
   ssr: false,
@@ -12,5 +13,9 @@ const SanctuaryMap = dynamic(() => import('@/components/map/SanctuaryMap'), {
 });
 
 export function MapClient() {
+  // The default basemap and its labels come straight from Esri. Opening that
+  // connection while the map code is still downloading takes the DNS, TCP and
+  // TLS round trips off the first tile.
+  preconnect('https://server.arcgisonline.com');
   return <SanctuaryMap />;
 }

@@ -5,8 +5,9 @@
  * stitched onto a 1920×1080 canvas, with the residential projects around SYL,
  * the growth hubs, the planned radial road and metro, and a summary panel.
  *
- * Drawn on a <canvas> so the PNG download is exactly what is on screen. Esri
- * serves its tiles with CORS headers, so the canvas stays exportable.
+ * Drawn on a <canvas> so the PNG download is the slide on screen, redrawn at
+ * 4K. Tiles come through our own /api/tiles proxy, so the canvas is never
+ * tainted and stays exportable.
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Download } from 'lucide-react';
@@ -22,9 +23,12 @@ import {
 
 const W = 1920;
 const H = 1080;
-// Output is 4K (3840×2160): the slide is laid out at 1920×1080 and drawn at 2×,
-// with imagery fetched one zoom level deeper so the map is sharp, not upscaled.
-const SCALE = 2;
+// The slide is laid out at 1920×1080. The download is 4K (3840×2160): drawn at
+// 2× with imagery fetched one zoom level deeper, so the map is sharp, not
+// upscaled. That costs four times the tiles, so the page shows a 1× preview and
+// only draws the 4K version when someone asks to download it.
+const PREVIEW_SCALE = 1;
+const EXPORT_SCALE = 2;
 const PANEL = 620; // width of the summary panel on the left
 const TILE = 256;
 
@@ -108,15 +112,23 @@ const fmtKm = (km: number) => (km < 10 ? km.toFixed(1) : Math.round(km).toString
 /** The distance shown for a place: the team's quoted figure where given, else straight-line km. */
 const distText = (p: GrowthPlace & { km: number }) => p.distLabel ?? `${fmtKm(p.km)} km`;
 
+/**
+ * `scale` sets the canvas resolution (1 = 1920×1080). `detail` sets how sharp
+ * the imagery must be in screen pixels per slide pixel: the preview passes what
+ * the visitor's screen can actually show, so a phone or a standard laptop
+ * fetches a quarter of the tiles a retina screen or the 4K export needs.
+ */
 async function render(
   basemap: Basemap,
+  scale: number,
+  detail: number,
   onProgress: (done: number, total: number) => void = () => {},
 ): Promise<{ canvas: HTMLCanvasElement; missing: number }> {
   const canvas = document.createElement('canvas');
-  canvas.width = W * SCALE;
-  canvas.height = H * SCALE;
+  canvas.width = W * scale;
+  canvas.height = H * scale;
   const ctx = canvas.getContext('2d')!;
-  ctx.scale(SCALE, SCALE);
+  ctx.scale(scale, scale);
   ctx.imageSmoothingQuality = 'high';
   const css = getComputedStyle(document.documentElement);
   const display = `${css.getPropertyValue('--font-manrope').trim() || 'Manrope'}, system-ui, sans-serif`;
@@ -133,7 +145,7 @@ async function render(
     Math.log2((area.y1 - area.y0) / (maxY - minY)),
     15,
   );
-  const tz = Math.min(18, Math.ceil(fitZ + Math.log2(SCALE)));
+  const tz = Math.min(18, Math.ceil(fitZ + Math.log2(detail)));
   const k = 2 ** (fitZ - tz); // tile pixel → canvas pixel
   const mid = { x: ((minX + maxX) / 2) * 2 ** tz, y: ((minY + maxY) / 2) * 2 ** tz };
   const cx = (area.x0 + area.x1) / 2, cy = (area.y0 + area.y1) / 2;
@@ -634,15 +646,25 @@ export function GrowthCorridorMap() {
   const [basemap, setBasemap] = useState<Basemap>('satellite');
   const [state, setState] = useState<'drawing' | 'ready' | 'no-imagery' | 'failed'>('drawing');
   const [progress, setProgress] = useState(0);
+  const [exporting, setExporting] = useState<number | null>(null); // 4K draw progress, null when idle
   const [saveError, setSaveError] = useState('');
+  // 4K canvases already drawn this visit, so a second download is instant.
+  const exports = useRef(new Map<Basemap, HTMLCanvasElement>());
 
   useEffect(() => {
     let cancelled = false;
     setState('drawing');
     setProgress(0);
     setSaveError('');
+    // Screen pixels the slide actually occupies, per slide pixel.
+    const shownWidth = canvasRef.current?.getBoundingClientRect().width || W;
+    const detail = Math.min(EXPORT_SCALE, Math.max(0.5, (shownWidth * window.devicePixelRatio) / W));
     document.fonts.ready
-      .then(() => render(basemap, (done, total) => !cancelled && setProgress(Math.round((done / total) * 100))))
+      .then(() =>
+        render(basemap, PREVIEW_SCALE, detail, (done, total) =>
+          !cancelled && setProgress(Math.round((done / total) * 100)),
+        ),
+      )
       .then(({ canvas, missing }) => {
         const shown = canvasRef.current;
         if (cancelled || !shown) return;
@@ -657,10 +679,26 @@ export function GrowthCorridorMap() {
     };
   }, [basemap]);
 
-  const download = useCallback(() => {
+  const download = useCallback(async () => {
     setSaveError('');
+    let canvas = exports.current.get(basemap);
+    if (!canvas) {
+      setExporting(0);
+      try {
+        const out = await render(basemap, EXPORT_SCALE, EXPORT_SCALE, (done, total) =>
+          setExporting(Math.round((done / total) * 100)),
+        );
+        canvas = out.canvas;
+        if (out.missing > 0) setSaveError('Some map tiles did not load, so parts of the 4K image are blank. Try again.');
+        else exports.current.set(basemap, canvas);
+      } catch {
+        setExporting(null);
+        return setSaveError('The 4K image could not be drawn in this browser. Try Chrome on a laptop.');
+      }
+      setExporting(null);
+    }
     try {
-      canvasRef.current!.toBlob(blob => {
+      canvas.toBlob(blob => {
         if (!blob) return setSaveError('Could not create the image. Reload the page and try again.');
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
@@ -680,6 +718,7 @@ export function GrowthCorridorMap() {
           <button
             key={b}
             onClick={() => setBasemap(b)}
+            disabled={exporting !== null}
             className={`px-4 py-2 rounded-full text-xs font-bold border transition-colors ${
               basemap === b ? 'bg-[#c8a951] text-[#0a1208] border-[#c8a951]' : 'border-outline/30 text-on-surface/70'
             }`}
@@ -689,11 +728,15 @@ export function GrowthCorridorMap() {
         ))}
         <button
           onClick={download}
-          disabled={state === 'drawing' || state === 'failed'}
+          disabled={state === 'drawing' || state === 'failed' || exporting !== null}
           className="ml-auto inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#c8a951] text-[#0a1208] text-xs font-extrabold disabled:opacity-50"
         >
           <Download className="w-4 h-4" />
-          {state === 'drawing' ? `Loading map… ${progress}%` : 'Download PNG (4K · 3840×2160)'}
+          {state === 'drawing'
+            ? `Loading map… ${progress}%`
+            : exporting !== null
+              ? `Preparing 4K… ${exporting}%`
+              : 'Download PNG (4K · 3840×2160)'}
         </button>
       </div>
       {state === 'no-imagery' && (
@@ -705,8 +748,8 @@ export function GrowthCorridorMap() {
       {saveError && <p className="text-sm text-tertiary">{saveError}</p>}
       <canvas
         ref={canvasRef}
-        width={W * SCALE}
-        height={H * SCALE}
+        width={W * PREVIEW_SCALE}
+        height={H * PREVIEW_SCALE}
         className="w-full h-auto rounded-2xl border border-outline/20 bg-[#1b2414]"
         aria-label="Satellite map of MODCON SYL with nearby residential projects, growth hubs and planned corridors"
       />
